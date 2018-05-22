@@ -1,2 +1,3 @@
 Django
 json_environ
+psycopg2
