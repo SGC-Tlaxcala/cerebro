@@ -49,8 +49,10 @@ DATABASES = {
 
 ### Configuración de la base de datos
 
+Parámetros de uso del usuario dueño de la base.
+
 ```
-ALTER ROLE cerebro_dev SET client_encoding TO 'utf8';
-ALTER ROLE cerebro_dev SET default_transaction_isolation TO 'read committed';
-ALTER ROLE cerebro_dev SET timezone TO 'Mexico/General';
+ALTER ROLE admin SET client_encoding TO 'utf8';
+ALTER ROLE admin SET default_transaction_isolation TO 'read committed';
+ALTER ROLE admin SET timezone TO 'Mexico/General';
 ```
