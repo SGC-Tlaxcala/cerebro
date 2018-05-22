@@ -11,22 +11,24 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 
 import os
+from json_environ import Environ
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
+env_path = os.path.join(BASE_DIR, '..', '.env.json')
+env = Environ(path=env_path)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '5kho_evo8b7font)yy(^p!1w$skj%)#5yw-097cr@=%w=8#i7z'
+SECRET_KEY = env('SECRET_KEY', default='5kho_evo8b7font)yy(^p!1w$skj%)#5yw-097cr@=%w=8#i7z')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
-
+DEBUG = env("DEBUG", default=True)
+ALLOWED_HOSTS = env('ALLOWED_HOSTS')
+if env('SSL', default=False) is True:
+    SECURE_SSL_REDIRECT = False
 
 # Application definition
 
@@ -75,8 +77,10 @@ WSGI_APPLICATION = 'core.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': f'django.db.backends.{env("DATABASE:ENGINE", default="sqlite")}',
+        'NAME': env("DATABASE:NAME"),
+        'USER': env("DATABASE:USER"),
+        'PASSWORD': env("DATABASE:PASSWORD")
     }
 }
 
