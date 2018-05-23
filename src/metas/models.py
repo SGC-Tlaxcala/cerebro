@@ -6,9 +6,10 @@
 #       fecha: mar, 22 de mayo de 2018 07:29 PM
 
 import uuid
+from unipath import Path
 from django.contrib.auth.models import User
 from django.db import models
-from django.template.defaultfilters import slugify
+# from django.template.defaultfilters import slugify
 
 from profiles.models import PUESTOS
 
@@ -21,7 +22,7 @@ def archivo_soporte(instancia, archivo):
     modelo = instancia.modelo()
     archivo = f'{modelo}_soporte.{ext}'
     meta = f"{instancia.puesto.lower()}-{instancia.clave}"
-    ruta = os.path.join(orig, instancia.puesto.lower(), meta, archivo)
+    ruta = Path(orig, instancia.puesto.lower(), meta, archivo)
     return ruta
 
 
