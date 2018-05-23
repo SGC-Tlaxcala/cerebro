@@ -111,4 +111,6 @@ class JMM01(Evidencia):
     oficio = models.FileField('Oficio/correo JMM a VR', upload_to=subir_archivo, )
 
     class Meta:
+        verbose_name = 'Evidencia JMM01'
+        verbose_name_plural = 'Evidencias para la meta JMM01'
         app_label = 'metas'
