@@ -40,7 +40,6 @@ class MetasSPE(models.Model):
 
     # Descripción de la Meta
     description = models.TextField('Descripción de la Meta')
-    description = models.TextField('Descripción de la Meta')
     soporte = models.FileField(
         'Soporte', upload_to = archivo_soporte, blank=True, null=True
     )
