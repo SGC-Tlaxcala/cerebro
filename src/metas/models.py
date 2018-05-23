@@ -57,3 +57,38 @@ class MetasSPE(models.Model):
 
     def __str__(self):
         return f'{self.puesto}-{self.clave}'
+
+
+class Evidencia(models.Model):
+    """Identificación de la meta"""
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    meta = models.ForeignKey(MetasSPE, related_name="evidenciaFK_meta", on_delete=models.CASCADE)
+    miembro = models.ForeignKey(
+        User, verbose_name='Miembro del SPE', related_name='evidenciaFK_pipol', on_delete=models.CASCADE
+    )
+    fecha = models.DateField()
+
+    # Calificaciones
+    eval_calidad = models.PositiveSmallIntegerField(
+        'Evaluación del Criterio de Calidad', blank=True, null=True
+    )
+    eval_oportunidad = models.PositiveSmallIntegerField(
+        'Evaluación del Criterio de Oportunidad', blank=True, null=True
+    )
+
+    # Datos de trazabilidad
+    usuario = models.ForeignKey(
+        User, related_name='evidenciaFK_usuario', editable=False
+    )
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now = True)
+
+    def pre_archivo(self):
+        return f"{self.miembro.profile.get_site_display()}_{self.meta}_{self.fecha.strftime('%Y%m%d')}"
+
+    def __str__(self):
+        return "%s - %s - %s" % (self.meta, self.miembro.profile.get_site_display(), self.fecha)
+
+    class Meta:
+        app_label = 'metas'
+        abstract = True
