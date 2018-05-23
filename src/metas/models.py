@@ -9,22 +9,33 @@ import uuid
 from unipath import Path
 from django.contrib.auth.models import User
 from django.db import models
-# from django.template.defaultfilters import slugify
+from django.template.defaultfilters import slugify
 
 from profiles.models import PUESTOS
 
 
 def archivo_soporte(instancia, archivo):
     """Función para subir archivo"""
-    import os.path
     ext = archivo.split('.')[-1]
     orig = 'metas'
-    modelo = instancia.modelo()
+    modelo = f"{instancia.puesto}-{instancia.clave}"
     archivo = f'{modelo}_soporte.{ext}'
     meta = f"{instancia.puesto.lower()}-{instancia.clave}"
     ruta = Path(orig, instancia.puesto.lower(), meta, archivo)
     return ruta
 
+
+def subir_archivo(instancia, archivo):
+    ext = archivo.split('.')[-1]
+    orig = 'metas'
+    miembro = instancia.miembro.profile.position
+    clave = "%02d" % int(instancia.meta.clave)
+    sitio = slugify(instancia.miembro.profile.site)
+    fecha = instancia.fecha.strftime('%y%m%d')
+    meta = "%s-%s" % (miembro, clave)
+    archivo = '%s_%s_%s.%s' % (meta, sitio, fecha, ext)
+    ruta = Path(orig,miembro,meta, archivo)
+    return ruta
 
 # Meta información sobre las Metas
 class MetasSPE(models.Model):
@@ -78,7 +89,7 @@ class Evidencia(models.Model):
 
     # Datos de trazabilidad
     usuario = models.ForeignKey(
-        User, related_name='evidenciaFK_usuario', editable=False
+        User, related_name='evidenciaFK_usuario', editable=False, on_delete=models.CASCADE
     )
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now = True)
@@ -92,3 +103,12 @@ class Evidencia(models.Model):
     class Meta:
         app_label = 'metas'
         abstract = True
+
+
+class JMM01(Evidencia):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    reporte = models.FileField('Reporte', upload_to=subir_archivo, )
+    oficio = models.FileField('Oficio/correo JMM a VR', upload_to=subir_archivo, )
+
+    class Meta:
+        app_label = 'metas'
