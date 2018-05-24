@@ -6,9 +6,9 @@
 # pylint: disable=W0613,R0201,R0903
 
 from django.shortcuts import render
-from metas.forms import EvidenciaForm
+from metas.forms import MetasSPEForm
 
 
 def index(request):
-    form = EvidenciaForm()
+    form = MetasSPEForm()
     return render(request, 'metas/index.html', {'form': form})
