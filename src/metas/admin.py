@@ -8,7 +8,7 @@
 
 from django.contrib import admin
 from metas.models import MetasSPE
-from metas.models import JMM01
+from metas.models import Evidencia
 
 
 class MetasAdmin(admin.ModelAdmin):
@@ -20,7 +20,7 @@ class MetasAdmin(admin.ModelAdmin):
         obj.save()
 
 
-class JMM01Admin(admin.ModelAdmin):
+class EvidenciaAdmin(admin.ModelAdmin):
     pass
 
     def save_model(self, request, obj, form, change):
@@ -29,4 +29,4 @@ class JMM01Admin(admin.ModelAdmin):
 
 
 admin.site.register(MetasSPE, MetasAdmin)
-admin.site.register(JMM01, JMM01Admin)
+admin.site.register(Evidencia, EvidenciaAdmin)

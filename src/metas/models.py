@@ -9,6 +9,7 @@ import uuid
 from unipath import Path
 from django.contrib.auth.models import User
 from django.db import models
+from django.contrib.postgres.fields import JSONField
 from django.template.defaultfilters import slugify
 
 from profiles.models import PUESTOS
@@ -34,8 +35,9 @@ def subir_archivo(instancia, archivo):
     fecha = instancia.fecha.strftime('%y%m%d')
     meta = "%s-%s" % (miembro, clave)
     archivo = '%s_%s_%s.%s' % (meta, sitio, fecha, ext)
-    ruta = Path(orig,miembro,meta, archivo)
+    ruta = Path(orig, miembro, meta, archivo)
     return ruta
+
 
 # Meta información sobre las Metas
 class MetasSPE(models.Model):
@@ -53,13 +55,16 @@ class MetasSPE(models.Model):
     # Descripción de la Meta
     description = models.TextField('Descripción de la Meta')
     soporte = models.FileField(
-        'Soporte', upload_to = archivo_soporte, blank=True, null=True
+        'Soporte', upload_to=archivo_soporte, blank=True, null=True
     )
+
+    # Evidencias
+    campos = JSONField(blank=True, null=True)
 
     # Datos de identificación y seguimiento
     usuario = models.ForeignKey(User, related_name='meta_user', editable=False, on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
-    updated = models.DateTimeField (auto_now = True)
+    updated = models.DateTimeField(auto_now=True)
 
     class Meta:
         verbose_name = "Meta"
@@ -87,12 +92,15 @@ class Evidencia(models.Model):
         'Evaluación del Criterio de Oportunidad', blank=True, null=True
     )
 
+    # Campos
+    campos = JSONField(blank=True, null=True)
+
     # Datos de trazabilidad
     usuario = models.ForeignKey(
         User, related_name='evidenciaFK_usuario', editable=False, on_delete=models.CASCADE
     )
     created = models.DateTimeField(auto_now_add=True)
-    updated = models.DateTimeField(auto_now = True)
+    updated = models.DateTimeField(auto_now=True)
 
     def pre_archivo(self):
         return f"{self.miembro.profile.get_site_display()}_{self.meta}_{self.fecha.strftime('%Y%m%d')}"
@@ -102,15 +110,5 @@ class Evidencia(models.Model):
 
     class Meta:
         app_label = 'metas'
-        abstract = True
-
-
-class JMM01(Evidencia):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    reporte = models.FileField('Reporte', upload_to=subir_archivo, )
-    oficio = models.FileField('Oficio/correo JMM a VR', upload_to=subir_archivo, )
-
-    class Meta:
-        verbose_name = 'Evidencia JMM01'
-        verbose_name_plural = 'Evidencias para la meta JMM01'
-        app_label = 'metas'
+        verbose_name_plural = "Evidencias"
+        verbose_name = "Evidencia"

@@ -7,11 +7,11 @@
 
 from crispy_forms.helper import FormHelper
 from django import forms
-from metas.models import JMM01
+from metas.models import Evidencia
 
 
-class JMM01Form(forms.ModelForm):
+class EvidenciaForm(forms.ModelForm):
 
     class Meta:
-        model = JMM01
-        fields = '__all__'
+        model = Evidencia
+        exclude = ['campos', ]
