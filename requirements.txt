@@ -2,3 +2,4 @@ Django
 json_environ
 psycopg2
 Unipath
+django-crispy-forms

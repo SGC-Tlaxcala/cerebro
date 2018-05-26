@@ -28,9 +28,12 @@ DJANGO_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 ]
-THIRD_PARTY_APPS = []
+THIRD_PARTY_APPS = [
+    'crispy_forms'
+]
 LOCAL_APPS = [
-    'profiles'
+    'profiles',
+    'metas'
 ]
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
@@ -125,3 +128,5 @@ STATICFILES_DIRS = (
 MEDIA_ROOT = BASE_DIR.child('media')
 MEDIA_URL = '/media/'
 
+# CRISPY FORMS SETTINGS
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
