@@ -22,6 +22,7 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView
 )
 from core.views import index
+from core.views import EchoView
 import metas
 
 
@@ -31,6 +32,8 @@ urlpatterns = [
     path('api/auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('api/auth/token/obtain/', TokenObtainPairView.as_view()),
     path('api/auth/token/refresh/', TokenRefreshView.as_view()),
+
+    path('api/echo', EchoView.as_view()),
 
     path('admin/', admin.site.urls),
     path('metas/', include('metas.urls')),
