@@ -3,3 +3,6 @@ json_environ
 psycopg2
 Unipath
 django-crispy-forms
+coreapi
+djangorestframework
+djangorestframework-simplejwt
