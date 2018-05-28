@@ -11,8 +11,22 @@ from dpi.models import ExpedienteDPI
 
 
 class ExpedienteDPIAdmin(admin.ModelAdmin):
-    list_display = ('tipo', 'folio', 'fecha_tramite', 'fecha_envio_expediente')
-    list_filter = ('tipo')
+    list_display = ('folio', 'fecha_tramite', 'fecha_envio_expediente', 'delta_distrito')
+    list_filter = ('tipo', 'distrito', )
+    fieldsets = (
+        (None, {
+            'fields': ('tipo', 'folio', 'nombre', 'tramite')
+        }),
+        ('Etapa de Aclaración', {
+            'fields': ('fecha_notificacion_aclaracion', 'fecha_entrevista', 'fecha_envio_expediente')
+        }),
+        ('Etapa de Validación', {
+            'fields': ('fecha_solicitud_cedula', 'fecha_ejecucion_cedula', 'fecha_validacion_expediente')
+        }),
+        ('Etapa de notificación de rechazo', {
+            'fields': ('estado', 'fecha_notificacion_rechazo', 'fecha_notificacion_exclusion')
+        })
+    )
 
     def save_model(self, request, obj, form, change):
         obj.usuario = request.user

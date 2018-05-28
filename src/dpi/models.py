@@ -19,13 +19,15 @@ TIPOS = (
     (DPI, 'Datos Personales Irregulares'),
     (USI, 'Usurpación de Identidad')
 )
-ACLARADO = 0
+NO_INDICA = 0
 RECHAZADO = 1
 ERROR_MAC = 2
+ACLARADO = 3
 ESTADO = (
-    (ACLARADO, 'Aclarado'),
+    (NO_INDICA, 'No indica'),
     (RECHAZADO, 'Rechazado'),
-    (ERROR_MAC, 'Error en MAC')
+    (ERROR_MAC, 'Error en MAC'),
+    (ACLARADO, 'Aclarado')
 )
 
 
@@ -38,6 +40,7 @@ class ExpedienteDPI(TimeStampedModel):
     # Etapa de VRD
     fecha_tramite = models.DateField(null=True, blank=True)
     fecha_notificacion_aclaracion = models.DateField(
+        'Notificación',
         help_text='Fecha de notificación de aclaración al ciudadano AC',
         null=True, blank=True
     )
@@ -80,22 +83,36 @@ class ExpedienteDPI(TimeStampedModel):
     )
 
     # Cálculo de intervalos de tiempo
-    entidad = models.PositiveSmallIntegerField(help_text='Entidad')
-    distrito = models.PositiveSmallIntegerField(help_text='Distrito')
-    delta_notificar = models.SmallIntegerField(help_text="Delta entre tramite y notificación", editable=False)
-    delta_aclarar = models.SmallIntegerField(help_text="Delta entre notificación y entrevista", editable=False)
-    delta_entrevista = models.SmallIntegerField(help_text="Delta entre notificación y entrevista", editable=False)
-    delta_enviar = models.SmallIntegerField(help_text="Delta entre entrevista y envío a JL", editable=False)
-    delta_distrito = models.SmallIntegerField(help_text="Delta entre tramite y envío a JL", editable=False)
+    entidad = models.PositiveSmallIntegerField(help_text='Entidad', editable=False)
+    distrito = models.PositiveSmallIntegerField(help_text='Distrito', editable=False)
+    delta_notificar = models.SmallIntegerField(
+        help_text="Delta entre tramite y notificación",
+        editable=False, null=True
+    )
+    delta_aclarar = models.SmallIntegerField(
+        help_text="Delta entre notificación y entrevista",
+        editable=False, null=True
+    )
+    delta_entrevista = models.SmallIntegerField(
+        help_text="Delta entre notificación y entrevista",
+        editable=False, null=True
+    )
+    delta_enviar = models.SmallIntegerField(
+        help_text="Delta entre entrevista y envío a JL",
+        editable=False, null=True
+    )
+    delta_distrito = models.SmallIntegerField(
+        help_text="Delta entre tramite y envío a JL",
+        editable=False, null=True
+    )
     delta_verificar = models.SmallIntegerField(
         help_text="Delta entre solicitud de verificación y ejecución de la cédula",
-        editable=False
+        editable=False, null=True,
     )
 
-    usuario = models.ForeignKey(User, related_name='meta_user', editable=False, on_delete=models.CASCADE)
+    usuario = models.ForeignKey(User, related_name='dpi_user', editable=False, on_delete=models.CASCADE)
 
     class Meta:
-        app_label = 'DPI'
         ordering = ['-fecha_tramite']
         indexes = [
             models.Index(fields=['folio', ], name='folio_idx')
@@ -108,6 +125,7 @@ class ExpedienteDPI(TimeStampedModel):
         return f'{self.tipo}_{self.folio}'
 
     def save(self, force_insert=False, force_update=False):
+        self.nombre = self.nombre.upper()
         self.entidad = self.folio[2:4]
         self.distrito = self.folio[4:6]
         self.delta_notificar = delta(self.fecha_tramite, self.fecha_notificacion_aclaracion)
