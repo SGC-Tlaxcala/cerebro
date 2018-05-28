@@ -44,6 +44,6 @@ def delta(inicio, final):
         return None
     else:
         if INICIO_PROCESO < inicio < FINAL_PROCESO:
-            return (final - inicio).delta
+            return (final - inicio).days
         else:
             return networkdays(inicio, final, HOLIDAYS)

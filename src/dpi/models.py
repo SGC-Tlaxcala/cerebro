@@ -71,7 +71,8 @@ class ExpedienteDPI(TimeStampedModel):
     # Notificación de estatus de trámite
     estado = models.PositiveSmallIntegerField(
         help_text='Estado del trámite',
-        choices=ESTADO
+        choices=ESTADO,
+        default=NO_INDICA
     )
     fecha_notificacion_rechazo = models.DateField(
         help_text='Fecha de notificación de trámite rechazado RE',

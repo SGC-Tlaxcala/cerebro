@@ -11,22 +11,22 @@ from dpi.models import ExpedienteDPI
 
 
 class ExpedienteDPIAdmin(admin.ModelAdmin):
-    list_display = ('folio', 'fecha_tramite', 'fecha_envio_expediente', 'delta_distrito')
+    list_display = ('folio', 'tipo', 'fecha_tramite', 'fecha_envio_expediente', 'delta_distrito')
     list_filter = ('tipo', 'distrito', )
     fieldsets = (
         (None, {
-            'fields': ('tipo', 'folio', 'nombre', 'fecha_tramite')
+            'fields': (('tipo', 'folio'), ('nombre', 'fecha_tramite'))
         }),
         ('Etapa de Aclaración', {
-            'fields': ('fecha_notificacion_aclaracion', 'fecha_entrevista', 'fecha_envio_expediente')
+            'fields': (('fecha_notificacion_aclaracion', 'fecha_entrevista', 'estado'), 'fecha_envio_expediente' )
         }),
         ('Etapa de Validación', {
             'classes': ('collapse',),
-            'fields': ('fecha_solicitud_cedula', 'fecha_ejecucion_cedula', 'fecha_validacion_expediente')
+            'fields': (('fecha_solicitud_cedula', 'fecha_ejecucion_cedula', 'fecha_validacion_expediente'), )
         }),
         ('Etapa de notificación de rechazo', {
             'classes': ('collapse',),
-            'fields': ('estado', 'fecha_notificacion_rechazo', 'fecha_notificacion_exclusion')
+            'fields': (('fecha_notificacion_rechazo', 'fecha_notificacion_exclusion'), )
         })
     )
 
