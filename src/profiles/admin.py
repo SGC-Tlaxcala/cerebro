@@ -6,10 +6,10 @@
 #       autor: Javier Sanchez Toledano
 #       fecha: miércoles, 9 de agosto de 2017
 
-from profiles.models import Profile
 from django.contrib import admin
 from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin
+from profiles.models import Profile
 
 admin.site.unregister(User)
 
