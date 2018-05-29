@@ -33,7 +33,7 @@ class ProfileAdmin(UserAdmin):
             return list()
         return super(UserAdmin, self).get_inline_instances(request, obj)
 
-    def get_site(self, user):
+    def get_site(self, user):           # pylint: disable=R0201
         return user.profile.get_site_display()
 
     def get_position(self, user):
