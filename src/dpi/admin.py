@@ -8,11 +8,33 @@
 
 from django.contrib import admin
 from dpi.models import ExpedienteDPI
+from django import forms
+
+
+class ExpedienteDPIForm(forms.ModelForm):
+
+    class Meta:
+        model = ExpedienteDPI
+        fields = '__all__'
+
+    def clean(self):
+        fecha_tramite = self.cleaned_data.get('fecha_tramite')
+        fecha_notificacion_aclaracion = self.cleaned_data.get('fecha_notificacion_aclaracion')
+        fecha_entrevista = self.cleaned_data.get('fecha_entrevista')
+        fecha_envio_expediente = self.cleaned_data.get('fecha_envio_expediente')
+        if (fecha_tramite and fecha_notificacion_aclaracion) and fecha_tramite > fecha_notificacion_aclaracion:
+            raise forms.ValidationError('La fecha de notificación debe ser posterior al trámite')
+        if (fecha_tramite and fecha_entrevista) and fecha_tramite > fecha_entrevista:
+            raise forms.ValidationError('La fecha de entrevista debe ser posterior al trámite')
+        if (fecha_tramite and fecha_envio_expediente) and fecha_tramite > fecha_envio_expediente:
+            raise forms.ValidationError('La fecha del oficio debe ser posterior al trámite')
+        return self.cleaned_data
 
 
 class ExpedienteDPIAdmin(admin.ModelAdmin):
-    list_display = ('folio', 'tipo', 'fecha_tramite', 'fecha_envio_expediente', 'delta_distrito')
-    list_filter = ('tipo', 'distrito', )
+    form = ExpedienteDPIForm
+    list_display = ('folio', 'tipo', 'delta_distrito', 'expediente_completo')
+    list_filter = ('tipo', 'entidad', 'distrito')
     fieldsets = (
         (None, {
             'fields': (('tipo', 'folio'), ('nombre', 'fecha_tramite'))
@@ -33,6 +55,16 @@ class ExpedienteDPIAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         obj.usuario = request.user
         obj.save()
+
+    def expediente_completo(self, obj):
+        if obj.entidad==29 \
+                and obj.fecha_tramite \
+                and obj.fecha_notificacion_aclaracion \
+                and obj.fecha_entrevista \
+                and obj.fecha_envio_expediente:
+            return True
+        else:
+            return False
 
 
 admin.site.register(ExpedienteDPI, ExpedienteDPIAdmin)
