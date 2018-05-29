@@ -24,6 +24,7 @@ from rest_framework_simplejwt.views import (
 from core.views import index
 from core.views import EchoView
 import metas
+import dpi
 
 
 urlpatterns = [
@@ -37,5 +38,6 @@ urlpatterns = [
 
     path('admin/', admin.site.urls),
     path('metas/', include('metas.urls')),
+    path('dpi/', include('dpi.urls')),
     path('', index, name='index')
 ]

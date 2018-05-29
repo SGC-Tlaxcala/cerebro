@@ -1,6 +1,6 @@
 Django
 json_environ
-psycopg2
+psycopg2-binary
 Unipath
 django-crispy-forms
 coreapi

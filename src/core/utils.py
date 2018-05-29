@@ -1,4 +1,6 @@
 # coding: utf-8
+u"""Funciones útiles comunes a cerebro."""
+
 #         app: cmi
 #      module: core.utils
 #        date: lunes, 28 de mayo de 2018 - 14:07
@@ -7,6 +9,7 @@
 
 from datetime import date
 from workdays import networkdays
+from django import forms
 
 
 INICIO_PROCESO = date(2017, 9, 1)
@@ -40,6 +43,7 @@ HOLIDAYS = [
 
 
 def delta(inicio, final):
+    u"""Calula la diferencia entre dos días y detecta si es hábil o natural."""
     if (inicio is None) or (final is None):
         return None
     else:
@@ -47,3 +51,9 @@ def delta(inicio, final):
             return (final - inicio).days
         else:
             return networkdays(inicio, final, HOLIDAYS)
+
+
+class HorizontalRadioSelect(forms.RadioSelect):
+    """Clase auxiliar para botones horizontales."""
+
+    template_name = 'forms/radio_horizontal.html'
