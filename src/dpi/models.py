@@ -111,7 +111,10 @@ class ExpedienteDPI(TimeStampedModel):
         editable=False, null=True,
     )
 
-    usuario = models.ForeignKey(User, related_name='dpi_user', editable=False, on_delete=models.CASCADE)
+    usuario = models.ForeignKey(
+        User, related_name='dpi_user', 
+        editable=False, on_delete=models.CASCADE
+    )
 
     class Meta:
         ordering = ['-fecha_tramite']
