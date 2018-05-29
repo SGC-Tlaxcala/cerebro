@@ -1,10 +1,21 @@
 {% extends 'base.html' %}
 {% load crispy_forms_tags %}
+{% load staticfiles %}
+
+{% block scripts %}
+  <link rel="stylesheet" href="{% static 'css/datepicker.css' %}" />
+  <script src="{% static 'js/bootstrap-datepicker.js' %}"></script>
+  <script>
+    $('.dateinput').datepicker()
+  </script>
+{% endblock %}
 
 {% block content %}
   <div class="container">
     <div class="row">
       <div class="col">
+        <h1 class="display-3">Captura de Registro DPI/USI</h1>
+        <hr>
         <form method="post" class="form">
           {% crispy form %}
         </form>

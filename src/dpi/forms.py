@@ -9,7 +9,7 @@
 
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Submit, Div, HTML, Field
-from crispy_forms.bootstrap import InlineRadios
+from crispy_forms.bootstrap import InlineRadios, Accordion, AccordionGroup, Tab, TabHolder
 from django import forms
 from dpi.models import ExpedienteDPI
 
@@ -22,21 +22,27 @@ class ExpedienteForm(forms.ModelForm):
         super(ExpedienteForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.layout = Layout(
-            HTML('<h3>Datos de Identificación</h3>'),
             Div(
-                Field('tipo', wrapper_class='col-sm-3'),
-                Field('folio', wrapper_class='col-sm-2'),
-                'fecha_tramite'
+                HTML('<h3>Datos de Identificación</h3>'),
+                'Datos de Identificación',
+                Div(
+                    Field('tipo', wrapper_class='col-sm-4'),
+                    Field('folio', wrapper_class='col-sm-3'),
+                    css_class='row'
+                ),
+                Div(
+                    Field('nombre', wrapper_class='col-md-6'),
+                    Field('fecha_tramite', wrapper_class='col-sm-2', template='forms/cmi_datepicker.html', type='date'),
+                    css_class='row'
+                ),
+                Div(
+                    InlineRadios('estado')
+                ),
+                HTML('<hr>')
             ),
-            InlineRadios('estado')
         )
         self.helper.add_input(Submit('submit', 'Enviar'))
 
-    fecha_tramite = forms.DateField(
-        widget=forms.SelectDateWidget(
-            empty_label=("Choose Year", "Choose Month", "Choose Day"),
-        ),
-    )
 
     class Meta:
         """Metadata para expedientes."""
