@@ -139,3 +139,13 @@ class ExpedienteDPI(TimeStampedModel):
         self.delta_distrito = delta(self.fecha_tramite, self.fecha_envio_expediente)
         self.delta_verificar = delta(self.fecha_solicitud_cedula, self.fecha_ejecucion_cedula)
         super(ExpedienteDPI, self).save(force_insert, force_update)
+
+    @property
+    def expediente_completo(self):
+        if self.entidad == 29 \
+                and self.fecha_tramite \
+                and self.fecha_notificacion_aclaracion \
+                and self.fecha_entrevista and self.fecha_envio_expediente:
+            return True
+        else:
+            return False

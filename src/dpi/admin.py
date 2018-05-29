@@ -57,14 +57,10 @@ class ExpedienteDPIAdmin(admin.ModelAdmin):
         obj.save()
 
     def expediente_completo(self, obj):
-        if obj.entidad==29 \
-                and obj.fecha_tramite \
-                and obj.fecha_notificacion_aclaracion \
-                and obj.fecha_entrevista \
-                and obj.fecha_envio_expediente:
-            return True
+        if obj.expediente_completo:
+            return 'Completo'
         else:
-            return False
+            return 'Incompleto'
 
 
 admin.site.register(ExpedienteDPI, ExpedienteDPIAdmin)
