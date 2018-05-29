@@ -35,7 +35,7 @@ THIRD_PARTY_APPS = [
 LOCAL_APPS = [
     'profiles',
     'metas',
-    'dpi'
+    'dpi.apps.DpiConfig'
 ]
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
