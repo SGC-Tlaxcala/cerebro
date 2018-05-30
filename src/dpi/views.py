@@ -8,10 +8,10 @@ u"""Vistas de Depuración."""
 #       fecha: lunes, 28 de mayo de 2018
 
 from django.shortcuts import render
+from django.views.generic import TemplateView
+
 from dpi.forms import ExpedienteForm
 
 
-def index(request):
-    """Vista del index de DPI."""
-    form = ExpedienteForm()
-    return render(request, 'dpi/index.html', {'form': form})
+class DPIIndex(TemplateView):
+  template_name = 'dpi/index.html'

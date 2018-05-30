@@ -145,7 +145,8 @@ class ExpedienteDPI(TimeStampedModel):
         if self.entidad == 29 \
                 and self.fecha_tramite \
                 and self.fecha_notificacion_aclaracion \
-                and self.fecha_entrevista and self.fecha_envio_expediente:
+                and self.fecha_entrevista \
+                and self.fecha_envio_expediente:
             return True
         else:
             return False

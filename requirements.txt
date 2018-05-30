@@ -7,3 +7,5 @@ coreapi
 djangorestframework
 djangorestframework-simplejwt
 workdays
+django-extensions
+Werkzeug
