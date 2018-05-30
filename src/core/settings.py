@@ -124,9 +124,7 @@ SITE_ID = 1
 
 STATIC_ROOT = BASE_DIR.child('assets')
 STATIC_URL = '/assets/'
-STATICFILES_DIRS = (
-    str(BASE_DIR.child('static')),
-)
+STATICFILES_DIRS = ('static', )
 
 MEDIA_ROOT = BASE_DIR.child('media')
 MEDIA_URL = '/media/'

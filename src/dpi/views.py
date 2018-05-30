@@ -22,7 +22,7 @@ class DPIIndex(TemplateView):
 
 
 class ExpedienteSimpleViewSet(viewsets.ViewSet):
-    """Un viewset de expedientes simples."""
+    """Permite determinar si existe un expediente o no."""
 
     def list(self, request):
         queryset = ExpedienteDPI.objects.all()
