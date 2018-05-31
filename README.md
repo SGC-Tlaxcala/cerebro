@@ -13,6 +13,7 @@ Para poder usar esta aplicación hay que crear un archivo `.env.json` con las op
     "*"
   ],
   "DATABASE": {
+    "ENGINE": "postgresql",
     "NAME": "dbname",
     "USER": "dbuser",
     "PASSWORD": "dbsecret"

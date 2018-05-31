@@ -27,15 +27,14 @@ class ExpedienteForm(forms.ModelForm):
         self.helper.layout = Layout(
             Div(
                 HTML('<h3>Datos de Identificación</h3>'),
-                'Datos de Identificación',
                 Div(
                     Field('tipo', wrapper_class='col-sm-4'),
-                    Field('folio', wrapper_class='col-sm-3'),
+                    Field('folio', wrapper_class='col-sm-3', autocomplete='off'),
                     css_class='row'
                 ),
                 Div(
-                    Field('nombre', wrapper_class='col-md-6'),
-                    Field('fecha_tramite', wrapper_class='col-sm-3', template='forms/cmi_datepicker.html', type='date'),
+                    Field('nombre', wrapper_class='col-md-6', autocomplete='off'),
+                    Field('fecha_tramite', wrapper_class='col-sm-3', autocomplete='off'),
                     css_class='row'
                 ),
                 Div(
@@ -45,32 +44,31 @@ class ExpedienteForm(forms.ModelForm):
                 TabHolder(
                     Tab('Etapa de Aclaración',
                         Div(
-                            Field('fecha_notificacion_aclaracion', wrapper_class='col-xs-2 col-md-3'),
-                            Field('fecha_entrevista', wrapper_class='col-xs-2 col-md-3'),
-                            Field('fecha_envio_expediente', wrapper_class='col-xs-2 col-md-3'),
-                            Field('estado', wrapper_class='col-xs-2 col-md-3'),
+                            Field('fecha_notificacion_aclaracion', autocomplete='off', wrapper_class='col-xs-2 col-md-3'),
+                            Field('fecha_entrevista', autocomplete='off', wrapper_class='col-xs-2 col-md-3'),
+                            Field('fecha_envio_expediente', autocomplete='off', wrapper_class='col-xs-2 col-md-3'),
                             css_class='row'
                         )
                     ),
                     Tab('Etapa de Validación',
                         Div(
-                            Field('fecha_solicitud_cedula', wrapper_class='col-xs-2 col-md-3'),
-                            Field('fecha_ejecucion_cedula', wrapper_class='col-xs-2 col-md-3'),
-                            Field('fecha_validacion_expediente', wrapper_class='col-xs-2 col-md-3'),
+                            Field('fecha_solicitud_cedula', autocomplete='off', wrapper_class='col-xs-2 col-md-3'),
+                            Field('fecha_ejecucion_cedula', autocomplete='off', wrapper_class='col-xs-2 col-md-3'),
+                            Field('fecha_validacion_expediente', autocomplete='off', wrapper_class='col-xs-2 col-md-3'),
                             css_class='row'
                         )
                     ),
                     Tab('Etapa de notificación de rechazo',
                         Div(
-                            Field('fecha_notificacion_rechazo', wrapper_class='col-xs-2 col-md-3'),
-                            Field('fecha_notificacion_exclusion', wrapper_class='col-xs-2 col-md-3'),
+                            Field('fecha_notificacion_rechazo', autocomplete='off', wrapper_class='col-xs-2 col-md-3'),
+                            Field('fecha_notificacion_exclusion', autocomplete='off', wrapper_class='col-xs-2 col-md-3'),
                             css_class='row'
                             )
                         )
                 ),
                 Div(
                     FormActions(
-                        Submit('save', 'Gardar cambios'),
+                        Submit('save', 'Guardar cambios'),
                         Button('cancel', 'Cancelar')
                     )
                 )

@@ -9,6 +9,7 @@ u"""Vistas de Depuración."""
 
 from django.shortcuts import get_object_or_404
 from django.views.generic import TemplateView
+from django.views.generic.edit import FormView
 
 from rest_framework import viewsets
 from rest_framework.response import Response
@@ -22,13 +23,10 @@ class DPIIndex(TemplateView):
     template_name = 'dpi/index.html'
 
 
-class DPIAdd(TemplateView):
+class DPIAdd(FormView):
     template_name = 'dpi/add.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['form'] = ExpedienteForm
-        return context
+    form_class = ExpedienteForm
+    success_url = '/dpi/add'
 
 
 class ExpedienteSimpleViewSet(viewsets.ViewSet):
