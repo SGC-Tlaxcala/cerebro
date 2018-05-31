@@ -2,13 +2,13 @@
 {% load crispy_forms_tags %}
 {% load staticfiles %}
 
-{% block scripts %}
+{% block footer %}
   <link rel="stylesheet" href="{% static 'css/datepicker.css' %}" />
   <script src="{% static 'js/bootstrap-datepicker.js' %}"></script>
   <script>
     $('.dateinput').datepicker()
   </script>
-{% endblock %}
+{% endblock footer %}
 
 {% block content %}
   <div class="container">
