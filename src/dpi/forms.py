@@ -9,10 +9,7 @@
 
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Submit, Div, HTML, Field, Button
-from crispy_forms.bootstrap import (
-    InlineRadios, Accordion, AccordionGroup, Tab, TabHolder,
-    FormActions, 
-)
+from crispy_forms.bootstrap import InlineRadios, Tab, TabHolder, FormActions
 from django import forms
 from dpi.models import ExpedienteDPI
 
@@ -44,13 +41,18 @@ class ExpedienteForm(forms.ModelForm):
                 TabHolder(
                     Tab('Etapa de Aclaración',
                         Div(
-                            Field('fecha_notificacion_aclaracion', autocomplete='off', wrapper_class='col-xs-2 col-md-3'),
+                            Field(
+                                'fecha_notificacion_aclaracion',
+                                autocomplete='off',
+                                wrapper_class='col-xs-2 col-md-3'
+                            ),
                             Field('fecha_entrevista', autocomplete='off', wrapper_class='col-xs-2 col-md-3'),
                             Field('fecha_envio_expediente', autocomplete='off', wrapper_class='col-xs-2 col-md-3'),
                             css_class='row'
                         )
-                    ),
-                    Tab('Etapa de Validación',
+                        ),
+                    Tab(
+                        'Etapa de Validación',
                         Div(
                             Field('fecha_solicitud_cedula', autocomplete='off', wrapper_class='col-xs-2 col-md-3'),
                             Field('fecha_ejecucion_cedula', autocomplete='off', wrapper_class='col-xs-2 col-md-3'),
@@ -61,7 +63,11 @@ class ExpedienteForm(forms.ModelForm):
                     Tab('Etapa de notificación de rechazo',
                         Div(
                             Field('fecha_notificacion_rechazo', autocomplete='off', wrapper_class='col-xs-2 col-md-3'),
-                            Field('fecha_notificacion_exclusion', autocomplete='off', wrapper_class='col-xs-2 col-md-3'),
+                            Field(
+                                'fecha_notificacion_exclusion',
+                                autocomplete='off',
+                                wrapper_class='col-xs-2 col-md-3'
+                            ),
                             css_class='row'
                             )
                         )
@@ -74,7 +80,6 @@ class ExpedienteForm(forms.ModelForm):
                 )
             ),
         )
-
 
     class Meta:
         """Metadata para expedientes."""
