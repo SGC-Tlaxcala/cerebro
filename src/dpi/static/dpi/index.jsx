@@ -9,7 +9,9 @@ class AvisoExpediente extends React.Component {
   render() {
     return (
       <div className="alert alert-danger" role="alert">
-        Ya existe un expediente con el folio <strong>{this.expediente.tipo}_{this.expediente.folio}</strong> a nombre de <strong>{this.expediente.nombre}</strong>.
+        Ya existe un expediente con el folio
+        <strong>{this.expediente.tipo}_{this.expediente.folio}</strong>
+        a nombre de <strong>{this.expediente.nombre}</strong>.
       </div>
     )
   }
@@ -34,14 +36,14 @@ class Buscador extends React.Component {
     this.setState({
       query: this.search.value
     }, () => {
-      if (this.state.query && this.state.query.length == 13) {
+      if (this.state.query && this.state.query.length === 13) {
         this.getInfo()
       }
     })
   }
 
   getInfo = () => {
-    axios.get(`/api/dpi/${this.state.query}`)
+    axios.get(`/api/dpi/${this.state.query}/`)
       .then(({data}) => {
         this.setState({
           expediente: data
@@ -50,7 +52,7 @@ class Buscador extends React.Component {
   }
 
   renderAviso(){
-    if(this.state.expediente.folio.length == 13){
+    if(this.state.expediente.folio.length === 13){
       return (
         <AvisoExpediente expediente={this.state.expediente} />
       )

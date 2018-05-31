@@ -7,18 +7,28 @@ u"""Vistas de Depuración."""
 #       autor: Javier Sanchez Toledano
 #       fecha: lunes, 28 de mayo de 2018
 
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import get_object_or_404
 from django.views.generic import TemplateView
 
 from rest_framework import viewsets
 from rest_framework.response import Response
 
 from dpi.models import ExpedienteDPI
+from dpi.forms import ExpedienteForm
 from dpi.serializers import ExpedienteSerializer
 
 
 class DPIIndex(TemplateView):
     template_name = 'dpi/index.html'
+
+
+class DPIAdd(TemplateView):
+    template_name = 'dpi/add.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'] = ExpedienteForm
+        return context
 
 
 class ExpedienteSimpleViewSet(viewsets.ViewSet):

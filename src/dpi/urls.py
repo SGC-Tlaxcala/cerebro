@@ -8,9 +8,10 @@
 
 
 from django.urls import path
-from dpi.views import DPIIndex
+from dpi.views import DPIIndex, DPIAdd
 
 app_name = 'dpi'
 urlpatterns = [
-    path('', DPIIndex.as_view(), name='index_dpi')
+    path('', DPIIndex.as_view(), name='dpi_index'),
+    path('add/', DPIAdd.as_view(), name='dpi_add')
 ]
