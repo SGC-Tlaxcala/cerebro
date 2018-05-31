@@ -28,6 +28,12 @@ class DPIAdd(FormView):
     form_class = ExpedienteForm
     success_url = '/dpi/add'
 
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
+        self.object.usuario = self.request.user
+        self.object.save()
+        return super().form_valid(form)
+
 
 class ExpedienteSimpleViewSet(viewsets.ViewSet):
     """Permite determinar si existe un expediente o no."""
