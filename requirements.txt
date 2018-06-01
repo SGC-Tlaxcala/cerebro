@@ -1,5 +1,11 @@
 Django
 json_environ
-psycopg2
+psycopg2-binary
 Unipath
 django-crispy-forms
+coreapi
+djangorestframework
+djangorestframework-simplejwt
+workdays
+django-extensions
+Werkzeug

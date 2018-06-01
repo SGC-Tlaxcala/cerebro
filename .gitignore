@@ -2,6 +2,7 @@
 .env.json
 .idea/
 media/
+.vscode/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

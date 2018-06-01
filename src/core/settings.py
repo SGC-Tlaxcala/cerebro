@@ -1,5 +1,6 @@
 from unipath import Path
 from json_environ import Environ
+from django.contrib.messages import constants as messages
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = Path(__file__).ancestor(2)
@@ -29,11 +30,14 @@ DJANGO_APPS = [
     'django.contrib.staticfiles',
 ]
 THIRD_PARTY_APPS = [
-    'crispy_forms'
+    'rest_framework',
+    'crispy_forms',
+    'django_extensions'
 ]
 LOCAL_APPS = [
     'profiles',
-    'metas'
+    'metas',
+    'dpi.apps.DpiConfig'
 ]
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
@@ -121,12 +125,29 @@ SITE_ID = 1
 
 STATIC_ROOT = BASE_DIR.child('assets')
 STATIC_URL = '/assets/'
-STATICFILES_DIRS = (
-    str(BASE_DIR.child('static')),
-)
+STATICFILES_DIRS = ('static', )
 
 MEDIA_ROOT = BASE_DIR.child('media')
 MEDIA_URL = '/media/'
 
 # CRISPY FORMS SETTINGS
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+# Rest Framework
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ),
+}
+
+MESSAGE_TAGS = {
+    messages.DEBUG: 'alert-info',
+    messages.INFO: 'alert-info',
+    messages.SUCCESS: 'alert-success',
+    messages.WARNING: 'alert-warning',
+    messages.ERROR: 'alert-danger',
+}

@@ -6,10 +6,10 @@
 #       autor: Javier Sanchez Toledano
 #       fecha: miércoles, 9 de agosto de 2017
 
-from profiles.models import Profile
 from django.contrib import admin
 from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin
+from profiles.models import Profile
 
 admin.site.unregister(User)
 
@@ -33,7 +33,7 @@ class ProfileAdmin(UserAdmin):
             return list()
         return super(UserAdmin, self).get_inline_instances(request, obj)
 
-    def get_site(self, user):
+    def get_site(self, user):           # pylint: disable=R0201
         return user.profile.get_site_display()
 
     def get_position(self, user):
