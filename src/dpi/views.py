@@ -9,31 +9,56 @@ u"""Vistas de Depuración."""
 
 from django.contrib import messages
 from django.shortcuts import get_object_or_404
+from django.urls import reverse_lazy
 from django.views.generic import TemplateView
-from django.views.generic.edit import FormView
+from django.views.generic.edit import CreateView, UpdateView
 
 from rest_framework import viewsets
 from rest_framework.response import Response
 
-from .models import ExpedienteDPI
-from .forms import ExpedienteForm
-from .serializers import ExpedienteSerializer
+from dpi.models import ExpedienteDPI
+from dpi.forms import ExpedienteForm
+from dpi.serializers import ExpedienteSerializer
 
 
 class DPIIndex(TemplateView):
     template_name = 'dpi/index.html'
 
 
-class DPIAdd(FormView):
+class DPIAdd(CreateView):
+    model = ExpedienteDPI
     template_name = 'dpi/add.html'
     form_class = ExpedienteForm
-    success_url = '/dpi/add'
+    success_url = reverse_lazy('dpi:dpi_add')
 
     def form_valid(self, form):
         self.object = form.save(commit=False)
         self.object.usuario = self.request.user
         self.object.save()
-        messages.success(self.request, f'El registro {self.object.tipo}_{self.object.folio} se guardó correctamente')
+        messages.success(
+            self.request,
+            f'El registro {self.object.tipo}_{self.object.folio} <strong>se guardó</strong> correctamente'
+        )
+        return super().form_valid(form)
+
+
+class DPIEdit(UpdateView):
+    model = ExpedienteDPI
+    template_name = 'dpi/add.html'
+    form_class = ExpedienteForm
+    success_url = reverse_lazy('dpi:dpi_add')
+
+    def get_object(self):
+        return get_object_or_404(ExpedienteDPI, folio=self.kwargs['folio'])
+
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
+        self.object.usuario = self.request.user
+        self.object.save()
+        messages.success(
+            self.request,
+            f'El registro {self.object.tipo}_{self.object.folio} se <strong>editó</strong> correctamente'
+        )
         return super().form_valid(form)
 
 
