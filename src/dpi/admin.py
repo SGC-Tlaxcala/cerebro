@@ -39,8 +39,12 @@ class ExpedienteDPIAdmin(admin.ModelAdmin):
         (None, {
             'fields': (('tipo', 'folio'), ('nombre', 'fecha_tramite'))
         }),
-        ('Etapa de Aclaración', {
+        ('TRÁMITE: Etapa de Aclaración', {
             'fields': (('fecha_notificacion_aclaracion', 'fecha_entrevista', 'estado'), 'fecha_envio_expediente' )
+        }),
+        ('REGISTRO: Etapa de Aclaración', {
+            'classes': ('collapse',),
+            'fields': (('fecha_notificacion_registro', 'fecha_entrevista_registro'), 'fecha_envio_expediente_registro')
         }),
         ('Etapa de Validación', {
             'classes': ('collapse',),
