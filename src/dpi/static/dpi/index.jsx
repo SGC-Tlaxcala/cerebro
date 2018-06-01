@@ -90,7 +90,7 @@ class PageDisplay extends React.Component {
 
   render() {
     return(
-      <h1 className="display-3">{title}</h1>
+      <h1 className="display-3">{title} - <small>{{ year }}</small></h1>
     )
   }
 }

@@ -1,21 +1,76 @@
 {% extends 'base.html' %}
 {% load staticfiles %}
 
-{% block footer %}
-  <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
-  <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
-  <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
-  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+{% block before_content %}
 
-  <script type="text/babel" src="{% static 'dpi/index.jsx' %}"></script>
-{% endblock footer %}
+{% endblock before_content %}
 
 {% block content %}
   <div class="row">
     <div class="col">
-      <div id="root"></div>
+      <h1 class="display-3">Estadísticas DPI/USI <small class="text-muted">{{ 2017 }}</small></h1>
     </div>
   </div>
+  <div class="row">
+    <div class="col">
+      <h3>Estadísticas totales</h3>
+      <ul>
+        <li><strong>Total de registros:</strong> {{ total_count }}</li>
+        <li><strong>Total de registros DPI:</strong> {{ total_dpi }}</li>
+        <li><strong>Total de registros USI:</strong> {{ total_usi }}</li>
+      </ul>
+    </div>
+    <div class="col">
+      <h3>Estadísticas para Tlaxcala</h3>
+      <ul>
+        <li><strong>Total de registros:</strong> {{ tlaxcala_count }}</li>
+        <li><strong>Total de registros DPI:</strong> {{ tlaxcala_total_dpi }}</li>
+        <li><strong>Total de registros USI:</strong> {{ tlaxcala_total_usi }}</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col">
+      <h1 class="display-5">Estadísticas DPI <small class="text-muted">{{ 2017 }}</small></h1>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col">
+<ul class="nav nav-tabs" id="myTab" role="tablist" style="margin-bottom: 15px">
+  <li class="nav-item">
+    <a class="nav-link active" id="local-tab" data-toggle="tab" href="#local" role="tab" aria-controls="local" aria-selected="true">Estatal</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="apizaco-tab" data-toggle="tab" href="#apizaco" role="tab" aria-controls="apizaco" aria-selected="false">Distrito 1</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="tlaxcala-tab" data-toggle="tab" href="#tlaxcala" role="tab" aria-controls="tlaxcala" aria-selected="false">Distrito 02</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="zacatelco-tab" data-toggle="tab" href="#zacatelco" role="tab" aria-controls="zacatelco" aria-selected="false">Distrito 03</a>
+  </li>
+</ul>
+<div class="tab-content" id="myTabContent">
+  <div class="tab-pane fade show active" id="local" role="tabpanel" aria-labelledby="local-tab">
+
+    <div class="card" style="width: 18rem;">
+      <img class="card-img-top" src=".../100px180/" alt="Card image cap">
+      <div class="card-body">
+        <h5 class="card-title">Card title</h5>
+        <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+        <a href="#" class="btn btn-primary">Go somewhere</a>
+      </div>
+    </div>
+
+  </div>
+  <div class="tab-pane fade" id="apizaco" role="tabpanel" aria-labelledby="apizaco-tab">En el 01</div>
+  <div class="tab-pane fade" id="tlaxcala" role="tabpanel" aria-labelledby="tlaxcala-tab">Estoy en el 02</div>
+  <div class="tab-pane fade" id="zacatelco" role="tabpanel" aria-labelledby="zacatelco-tab">En Zacatelco</div>
+</div>
+    </div>
+  </div>
+
 {% endblock content %}
 
 
