@@ -7,6 +7,7 @@ u"""Vistas de Depuración."""
 #       autor: Javier Sanchez Toledano
 #       fecha: lunes, 28 de mayo de 2018
 
+from django.contrib import messages
 from django.shortcuts import get_object_or_404
 from django.views.generic import TemplateView
 from django.views.generic.edit import FormView
@@ -14,9 +15,9 @@ from django.views.generic.edit import FormView
 from rest_framework import viewsets
 from rest_framework.response import Response
 
-from dpi.models import ExpedienteDPI
-from dpi.forms import ExpedienteForm
-from dpi.serializers import ExpedienteSerializer
+from .models import ExpedienteDPI
+from .forms import ExpedienteForm
+from .serializers import ExpedienteSerializer
 
 
 class DPIIndex(TemplateView):
@@ -32,6 +33,7 @@ class DPIAdd(FormView):
         self.object = form.save(commit=False)
         self.object.usuario = self.request.user
         self.object.save()
+        messages.success(self.request, f'El registro {self.object.tipo}_{self.object.folio} se guardó correctamente')
         return super().form_valid(form)
 
 
