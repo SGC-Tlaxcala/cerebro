@@ -6,10 +6,12 @@
   <link rel="stylesheet" href="{% static 'css/datepicker.css' %}" />
   <script src="{% static 'js/bootstrap-datepicker.js' %}"></script>
   <script>
+    $('#aclaracion-registro').hide()
+
     $('.dateinput').datepicker({
       format: 'dd/mm/yyyy',
       locale: 'es'
-    });
+    })
 
     $('.dateinput').datepicker.dates = {
       days: ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"],
@@ -22,7 +24,18 @@
       clear: "Borrar",
       weekStart: 1,
       format: "dd/mm/yyyy"
-      };
+    }
+
+    $('#id_tipo').on('change', function() {
+      var tipo = $(this).val()
+      switch (tipo) {
+        case "USI":
+          $("#aclaracion-registro").show()
+          break
+        default:
+          $("#aclaracion-registro").hide()
+      }
+    })
   </script>
 {% endblock footer %}
 

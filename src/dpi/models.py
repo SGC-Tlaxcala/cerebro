@@ -39,17 +39,36 @@ class ExpedienteDPI(TimeStampedModel):
 
     # Etapa de VRD
     fecha_tramite = models.DateField(null=True, blank=True)
+
+    # Notificación/Aclaración de TRAMITE
     fecha_notificacion_aclaracion = models.DateField(
-        'Notificación',
+        'TRÁMITE: Notificación',
         help_text='Fecha de notificación de aclaración al ciudadano AC',
         null=True, blank=True
     )
     fecha_entrevista = models.DateField(
-        help_text='Fecha de la entrevista o Acta Administrativa',
+        help_text='TRÁMITE: Fecha de la entrevista o Acta Administrativa',
         null=True, blank=True
     )
     fecha_envio_expediente = models.DateField(
-        help_text='Fecha de envío de expediente a la JL',
+        help_text='TRÁMITE: Fecha de envío de expediente a la JL',
+        null=True, blank=True
+    )
+
+    # Notificación/Aclaración de REGISTRO
+    fecha_notificacion_registro = models.DateField(
+        'REGISTRO: Notificación',
+        help_text='Fecha de notificación de aclaración al ciudadano AC',
+        null=True, blank=True
+    )
+    fecha_entrevista_registro = models.DateField(
+        'REGISTRO: Entrevista/Acta',
+        help_text='Fecha de la entrevista o Acta Administrativa',
+        null=True, blank=True
+    )
+    fecha_envio_expediente_registro = models.DateField(
+        'REGISTRO: Envio a JL',
+        help_text='REGISTRO: Fecha de envío de expediente a la JL',
         null=True, blank=True
     )
 

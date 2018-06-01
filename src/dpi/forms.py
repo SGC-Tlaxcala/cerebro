@@ -10,6 +10,7 @@
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Submit, Div, HTML, Field, Button
 from crispy_forms.bootstrap import InlineRadios, Tab, TabHolder, FormActions
+from django.core.exceptions import NON_FIELD_ERRORS
 from django import forms
 from dpi.models import ExpedienteDPI
 
@@ -41,6 +42,7 @@ class ExpedienteForm(forms.ModelForm):
                 TabHolder(
                     Tab('Etapa de Aclaración',
                         Div(
+                            HTML('<h4 class="col-xs-2 col-md-1">Trámite</h4>'),
                             Field(
                                 'fecha_notificacion_aclaracion',
                                 autocomplete='off',
@@ -48,9 +50,23 @@ class ExpedienteForm(forms.ModelForm):
                             ),
                             Field('fecha_entrevista', autocomplete='off', wrapper_class='col-xs-2 col-md-3'),
                             Field('fecha_envio_expediente', autocomplete='off', wrapper_class='col-xs-2 col-md-3'),
-                            css_class='row'
-                        )
+                            css_class='row',
+                            id='aclaracion-tramite'
                         ),
+                        Div(
+                            HTML('<h4 class="col-xs-2 col-md-1">Registro</h4>'),
+                            Field(
+                                'fecha_notificacion_registro',
+                                autocomplete='off',
+                                wrapper_class='col-xs-2 col-md-3'
+                            ),
+                            Field('fecha_entrevista_registro', autocomplete='off', wrapper_class='col-xs-2 col-md-3'),
+                            Field('fecha_envio_expediente_registro', autocomplete='off',
+                                  wrapper_class='col-xs-2 col-md-3'),
+                            css_class='row',
+                            id='aclaracion-registro'
+                        )
+                    ),
                     Tab(
                         'Etapa de Validación',
                         Div(
@@ -73,6 +89,7 @@ class ExpedienteForm(forms.ModelForm):
                         )
                 ),
                 Div(
+                    HTML('<hr>'),
                     FormActions(
                         Submit('save', 'Guardar cambios'),
                         Button('cancel', 'Cancelar')
@@ -86,3 +103,8 @@ class ExpedienteForm(forms.ModelForm):
 
         model = ExpedienteDPI
         fields = '__all__'
+        error_messages = {
+            NON_FIELD_ERRORS: {
+                'unique_together': "Ya existe un %(model_name)s para esos %(field_labels)s"
+            }
+        }
