@@ -57,6 +57,7 @@ class DocIndex(TemplateView):
 
 class DocDetail(DetailView):
     model = Documento
+    context_object_name = 'doc'
 
 # @render_to('2014/docs/detalles.html')
 # def detalles (request, doc):
