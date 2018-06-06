@@ -30,7 +30,7 @@ expediente_dpi = dpi.ExpedienteSimpleViewSet.as_view({
 })
 
 urlpatterns = [
-    path('', generic.RedirectView.as_view(url='/api/', permanent=False)),
+    # path('', generic.RedirectView.as_view(url='/api/', permanent=False)),
     path('api/', get_schema_view()),
     path('api/auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('api/auth/token/obtain/', TokenObtainPairView.as_view()),

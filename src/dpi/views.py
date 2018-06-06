@@ -25,6 +25,7 @@ DPI = Q(tipo='DPI')
 USI = Q(tipo='USI')
 TLAXCALA = Q(entidad=29)
 
+
 class DPIIndex(TemplateView):
     template_name = 'dpi/index.html'
     YEAR = 2017
