@@ -1,0 +1,30 @@
+{# Template Formulario agregar documento #}
+{% extends "comunes/metro.html" %}
+{% load bootstrap_toolkit %}
+
+{% block upper_header %}
+  {{ form.media }}
+{% endblock %}
+
+{% block contenido %}
+
+  <div class="page-header">
+    <h1>{{title}}</h1>
+  </div>
+  <div class="span9">
+    <form class="form-horizontal" action="/docs/add/" method="post">
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+
+      {{ form|as_bootstrap:"horizontal" }}
+
+      <div class="control-group">
+        <div class="controls">
+          <button type="submit" class="btn btn-primary">Enviar</button>
+        </div>
+      </div>  
+    </form>
+    <hr>  
+  </div>
+
+{% endblock contenido %}

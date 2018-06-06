@@ -1,0 +1,91 @@
+{% extends "2014/base.html" %}
+{% load static %}
+{% load bootstrap_toolkit %}
+
+{% block upper_header %}
+  <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}pagedown/pagedown.css" />
+  {{ form.media }}
+{% endblock %}
+
+{% block hook_footer %}
+<script type="text/javascript" src="{{STATIC_URL}}pagedown/Markdown.Converter.js"></script>
+<script type="text/javascript" src="{{STATIC_URL}}pagedown/Markdown.Sanitizer.js"></script>
+<script type="text/javascript" src="{{STATIC_URL}}pagedown/Markdown.Editor.js"></script>
+<script type="text/javascript">
+
+  (function () {
+    options = {
+      input:"id_cambios",
+    }
+    var converter1 = Markdown.getSanitizingConverter();
+    var editor1 = new Markdown.Editor(converter1, '', options);
+    editor1.run();
+  })();
+</script> 
+{% endblock %}
+
+{% block contenido %}
+  <div class="page-header">
+    <h1>Editar revisión</h1>
+  </div>
+  
+  <form class="form" action="{% url 'editar_control' rev=form.instance.id %}" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+      <p class="alert alert-error">{{ form.non_field_errors }}</p>
+    {% endif %}
+
+    <div class="control-group required">
+      <label class="control-label" for="id_documento">Documento</label>
+      <div class="controls">
+        {{form.documento}}
+      </div>
+      {% if form.documento.errors %}<span class="help-inline">{{form.documento.errors}}</span>{% endif %}
+    </div>    
+
+    <div class="control-group required {% if form.revision.errors %}error{% endif %}">
+      <label class="control-label" for="id_revision">Revision</label>
+      <div class="controls">     
+        {{form.revision}}
+      </div>
+      {% if form.revision.errors %}<div class="alert alert-error">{{form.revision.errors}}</div>{% endif %}
+    </div>
+
+    <div class="control-group required {% if form.f_actualizacion.errors %}error{% endif %}">
+      <label class="control-label" for="id_f_actualizacion">F actualizacion</label>
+      <div class="controls">    
+        <div class="input-append">
+          {{form.f_actualizacion}}
+          <span class="add-on"><i class="icon-calendar"></i></span>
+        </div>
+        {% if form.f_actualizacion.errors %}<div class="alert alert-error">{{form.f_actualizacion.errors}}</div>{% endif %}
+      </div>
+    </div>
+
+    <div class="control-group {% if form.archivo.errors %}error{% endif %}">
+      <label class="control-label" for="id_archivo">Archivo</label>
+      <div class="controls">
+        {{form.archivo}}
+      </div>
+      {% if form.archivo.errors %}<div class="alert alert-error">{{form.archivo.errors}}</div>{% endif %}
+    </div>
+    
+    <div class="control-group {% if form.cambios.errors %}error{% endif %}">
+      <label class="control-label" for="id_body">Contenido</label>
+      <div class="wmd-panel">
+        <div id="wmd-button-bar"></div>
+        {{form.cambios}}
+      </div>
+      {% if form.cambios.errors %}<div class="alert alert-error">{{form.cambios.errors}}</div>{% endif %}
+    </div>    
+
+    <div class="control-group">
+      <div class="controls">
+        <button type="submit" class="btn btn-primary">Enviar</button>
+      </div>
+    </div>  
+  </form>
+  <hr>  
+  <div id="wmd-preview" class="wmd-panel wmd-preview"></div>
+
+{% endblock contenido %}
