@@ -95,6 +95,9 @@ class Documento (models.Model):
     def historial(self):
         return self.revision_set.order_by('-revision')[1:]
 
+    def swf(self):
+        return "%s.swf" % self.revision_set.latest('revision').archivo.url.split('.')[0]
+
 
 # Función para subir archivos
 def subir_documento(instancia, archivo):

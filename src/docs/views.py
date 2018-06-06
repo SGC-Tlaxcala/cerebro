@@ -17,11 +17,12 @@
 # from cmi.settings import MEDIA_ROOT
 from django.db.models import Q
 from django.views.generic import TemplateView
+from django.views.generic import DetailView
 
 from docs.models import Documento, Tipo
 
 
-class DocsIndex(TemplateView):
+class DocIndex(TemplateView):
     template_name = 'docs/portada.html'
     # Consultas
     tipos = Tipo.objects.exclude(Q(slug='pro') | Q(slug='doc'))
@@ -53,7 +54,10 @@ class DocsIndex(TemplateView):
         context = self.context
         return context
 
-#
+
+class DocDetail(DetailView):
+    model = Documento
+
 # @render_to('2014/docs/detalles.html')
 # def detalles (request, doc):
 #     doc = Documento.objects.get(pk=doc)

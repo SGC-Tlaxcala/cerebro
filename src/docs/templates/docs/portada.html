@@ -62,9 +62,7 @@
                 {% endifchanged %}
                 <tr>
                   <td>
-                    {% if doc.activo %}
-                      <a href="/docs/{{ doc.id }}/detalles">{{ doc.nombre }}</a>
-                    {% endif %}
+                    <a href="{% url 'docs:detalle' doc.id %}">{{ doc.nombre }}</a>
                   </td>
                   <td>
                     {{ doc.clave|upper }}

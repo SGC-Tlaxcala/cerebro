@@ -7,11 +7,12 @@
 
 
 from django.urls import path
-from docs.views import DocsIndex
+from docs.views import DocIndex, DocDetail
 
 app_name = 'docs'
 urlpatterns = [
-    path('', DocsIndex.as_view(), name='index')
+    path('', DocIndex.as_view(), name='index'),
+    path('<int:pk>/detalle', DocDetail.as_view(), name='detalle')
 ]
 
 # from django.conf.urls import patterns, url
