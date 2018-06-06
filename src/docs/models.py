@@ -9,7 +9,6 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.template.defaultfilters import slugify
-import watson
 
 
 class Tipo (models.Model):
@@ -25,8 +24,12 @@ class Proceso (models.Model):
     slug = models.CharField(max_length=80)
 
     def __str__(self):
-        if self.slug == 'sistema':
+        if self.slug == 'sgc':
             return 'Documentos del Sistema'
+        elif self.slug == 'stn':
+            return 'Opiniones Técnicas de la STN'
+        elif self.slug == 'coc':
+            return 'Oficios de la COC'
         else:
             return f'Proceso {self.proceso}'
 
@@ -56,8 +59,8 @@ class Documento (models.Model):
 
     # Trazabilidad
     autor = models.ForeignKey(User, related_name='docs', editable=False, on_delete=models.CASCADE)
-    created = models.DateTimeField(auto_now_add=True)
-    updated = models.DateTimeField(auto_now=True)
+    creacion = models.DateTimeField(auto_now_add=True)
+    actualiza = models.DateTimeField(auto_now=True)
 
     def ext(self):
         return self.revision_actual().archivo.name.split('.')[-1]
@@ -77,8 +80,7 @@ class Documento (models.Model):
     def revision_actual(self):
         """Devuelve la revisión del documento como un entero"""
         try:
-            x = self.revision_set.latest('revision')
-            return x
+            return self.revision_set.latest('revision')
         except IndexError:
             return ""
 
@@ -90,7 +92,7 @@ class Documento (models.Model):
         except IndexError:
             return ""
   
-    def historial (self):
+    def historial(self):
         return self.revision_set.order_by('-revision')[1:]
 
 
@@ -123,8 +125,8 @@ class Revision (models.Model):
 
     # Trazabilidad
     autor = models.ForeignKey(User, related_name='revisions_user', editable=False, on_delete=models.CASCADE)
-    created = models.DateTimeField(auto_now_add=True)
-    updated = models.DateTimeField (auto_now = True)
+    creacion = models.DateTimeField(auto_now_add=True)
+    actualiza = models.DateTimeField (auto_now = True)
 
     def __str__ (self):
         return u"%s rev %02d (%s)" % (self.documento, self.revision, self.f_actualizacion)
