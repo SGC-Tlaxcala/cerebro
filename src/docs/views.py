@@ -9,40 +9,50 @@
 # from django.shortcuts import render_to_response, get_list_or_404, get_object_or_404, redirect
 # from django.template import RequestContext
 # from django.contrib.auth.decorators import login_required
-# from docs.models import Documento, Revision, Proceso
+#
 # from docs.forms import DocumentoForm, RevisionForm
 # from django.http import HttpResponseRedirect
 # from django import forms
-# from django.db.models import Q
-# from annoying.decorators import render_to
+
 # from cmi.settings import MEDIA_ROOT
+from django.db.models import Q
 from django.views.generic import TemplateView
+
+from docs.models import Documento, Tipo
 
 
 class DocsIndex(TemplateView):
-    template_name = 'docs/index.html'
+    template_name = 'docs/portada.html'
+    # Consultas
+    tipos = Tipo.objects.exclude(Q(slug='pro') | Q(slug='doc'))
+    docs = (Q(tipo__slug='doc') | Q(tipo__slug='pro'))
 
+    doc = Documento.objects.filter(activo=True).order_by('proceso', 'nombre')
+    los_docs = doc.filter(docs)
+    los_regs = doc.filter(tipo__slug='registros')
+    las_ints = doc.filter(tipo__slug='int')
+    los_fmts = doc.filter(tipo__slug='fmt')
+    los_exts = doc.filter(tipo__slug='externos')
+    las_stn = doc.filter(tipo__slug='stn')
+    los_coc = doc.filter(tipo__slug='coc')
 
-# @render_to('2014/docs/index.html')
-# def index (request):
-#     doc      = Documento.objects.all().order_by('proceso', 'nombre')
-#     los_docs = doc.filter(Q(tipo__id=1)|Q(tipo__id=3) )
-#     los_regs = doc.filter(tipo__id=5)
-#     las_ints = doc.filter(tipo__id=6)
-#     los_fmts = doc.filter(tipo__id=2)
-#     los_exts = doc.filter(tipo__id=4)
-#     las_stn = doc.filter(tipo__id=7)
-#     los_coc = doc.filter(tipo__id=8)
-#     return {
-#           'los_docs': los_docs
-#         , 'los_regs': los_regs
-#         , 'las_ints': las_ints
-#         , 'los_fmts': los_fmts
-#         , 'los_exts': los_exts
-#         , 'title':'Control de Documentos',
-#         'las_stn': las_stn,
-#         'los_coc': los_coc
-#     }
+    context = {
+        'tipos': tipos,
+        'los_docs': los_docs,
+        'los_regs': los_regs,
+        'las_ints': las_ints,
+        'los_fmts': los_fmts,
+        'los_exts': los_exts,
+        'title':'Control de Documentos',
+        'las_stn': las_stn,
+        'los_coc': los_coc
+    }
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context = self.context
+        return context
+
 #
 # @render_to('2014/docs/detalles.html')
 # def detalles (request, doc):

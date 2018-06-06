@@ -41,5 +41,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('metas/', include('metas.urls')),
     path('dpi/', include('dpi.urls')),
+    path('docs/', include('docs.urls')),
     path('', index, name='index')
 ]
