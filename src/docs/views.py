@@ -5,16 +5,6 @@
 # description: Vistas de la app de documentación
 # pylint: disable=W0613,R0201,R0903
 
-
-# from django.shortcuts import render_to_response, get_list_or_404, get_object_or_404, redirect
-# from django.template import RequestContext
-# from django.contrib.auth.decorators import login_required
-#
-# from docs.forms import DocumentoForm, RevisionForm
-# from django.http import HttpResponseRedirect
-# from django import forms
-
-# from cmi.settings import MEDIA_ROOT
 from django.db.models import Q
 from django.views.generic import TemplateView
 from django.views.generic import DetailView
@@ -37,21 +27,21 @@ class DocIndex(TemplateView):
     las_stn = doc.filter(tipo__slug='stn')
     los_coc = doc.filter(tipo__slug='coc')
 
-    context = {
+    docs = {
         'tipos': tipos,
         'los_docs': los_docs,
         'los_regs': los_regs,
         'las_ints': las_ints,
         'los_fmts': los_fmts,
         'los_exts': los_exts,
-        'title':'Control de Documentos',
+        'title': 'Control de Documentos',
         'las_stn': las_stn,
         'los_coc': los_coc
     }
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context = self.context
+        context.update(self.docs)
         return context
 
 
@@ -59,16 +49,6 @@ class DocDetail(DetailView):
     model = Documento
     context_object_name = 'doc'
 
-# @render_to('2014/docs/detalles.html')
-# def detalles (request, doc):
-#     doc = Documento.objects.get(pk=doc)
-#     swf = "%s.swf" % doc.revision_actual().archivo.url.split('.')[0]
-#     return {
-#           'doc': doc
-#         , 'title': 'Detalles del Documento'
-#         , 'swf':swf
-#     }
-#
 # @login_required
 # def agregar_documento (request):
 #     if request.method == 'POST':

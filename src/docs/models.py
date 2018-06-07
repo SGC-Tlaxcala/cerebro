@@ -129,9 +129,9 @@ class Revision (models.Model):
     # Trazabilidad
     autor = models.ForeignKey(User, related_name='revisions_user', editable=False, on_delete=models.CASCADE)
     creacion = models.DateTimeField(auto_now_add=True)
-    actualiza = models.DateTimeField (auto_now = True)
+    actualiza = models.DateTimeField(auto_now=True)
 
-    def __str__ (self):
+    def __str__(self):
         return u"%s rev %02d (%s)" % (self.documento, self.revision, self.f_actualizacion)
     
     class Meta:
