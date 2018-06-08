@@ -7,24 +7,19 @@
 
 
 from django.urls import path
-from docs.views import DocIndex, DocDetail
+from docs.views import DocIndex, DocDetail, ProcesoList
 
 app_name = 'docs'
 urlpatterns = [
     path('', DocIndex.as_view(), name='index'),
-    path('<int:pk>/detalle', DocDetail.as_view(), name='detalle')
+    path('<int:pk>/detalle', DocDetail.as_view(), name='detalle'),
+    path('proceso/<slug:slug>', ProcesoList.as_view(), name='procesos')
 ]
 
-# from django.conf.urls import patterns, url
-#
 # urlpatterns = patterns('docs.views'
-#     , url (r'^$', 'index')                                     # muestra los documentos disponibles
-#     , url (r'^(?P<doc>\d+)/detalles$', 'detalles')
 #     , url (r'^add/$', 'agregar_documento')
 #     , url (r'^(?P<doc>\d+)/control$', 'agregar_control')
 #     , url (r'^revision/(?P<rev>\d+)', 'editar_control', name='editar_control')
 #     , url (r'^buscador/$', 'docs_buscador', name='docs_buscador')
 #     , url(r'^tag/(?P<tag>[-\w]+)$', 'docs_tags', name='tag')
-#
-#     , url (r'^proceso/(?P<proceso>[-\w]+)/$', 'docs_proceso', name='docs_proceso')
 # )

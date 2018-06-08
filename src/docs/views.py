@@ -6,10 +6,13 @@
 # pylint: disable=W0613,R0201,R0903
 
 from django.db.models import Q
-from django.views.generic import TemplateView
-from django.views.generic import DetailView
+from django.views.generic import (
+    TemplateView,
+    DetailView,
+    ListView
+)
 
-from docs.models import Documento, Tipo
+from docs.models import Documento, Tipo, Proceso
 
 
 class DocIndex(TemplateView):
@@ -23,7 +26,7 @@ class DocIndex(TemplateView):
     los_regs = doc.filter(tipo__slug='registros')
     las_ints = doc.filter(tipo__slug='int')
     los_fmts = doc.filter(tipo__slug='fmt')
-    los_exts = doc.filter(tipo__slug='externos')
+    los_exts = doc.filter(tipo__slug='externo')
     las_stn = doc.filter(tipo__slug='stn')
     los_coc = doc.filter(tipo__slug='coc')
 
@@ -48,6 +51,11 @@ class DocIndex(TemplateView):
 class DocDetail(DetailView):
     model = Documento
     context_object_name = 'doc'
+
+
+class ProcesoList(ListView):
+    model = Proceso
+    context_object_name = 'procesos'
 
 # @login_required
 # def agregar_documento (request):

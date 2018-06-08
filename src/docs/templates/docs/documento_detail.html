@@ -1,5 +1,9 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load staticfiles %}
+
+{% block header %}
+  <link rel="stylesheet" href="{% static 'docs/estilos.css' %}">
+{% endblock header %}
 
 {% block  head_title %}{{ doc.nombre }}{% endblock %}
 
@@ -7,12 +11,12 @@
   <div class="row">
     <div class="col"><!-- contenido -->
       <div class="page-header">
-        <h1>{{ doc.nombre }} <small>{% if doc.proceso.slug != "stn" %}ver. {{ doc.r_actual }}{% endif %} ({{ doc.revision_actual.f_actualizacion }})</small></h1>
+        <h1 class="display-4">{{ doc.nombre }} <small>{% if doc.proceso.slug != "stn" %}ver. {{ doc.r_actual }}{% endif %} ({{ doc.revision_actual.f_actualizacion }})</small></h1>
       </div><!-- ./page-header -->
     </div>
   </div>
   <div class="row">
-    <div class="col-md-9 col-sm-12">
+    <div class="col">
       {% if doc.proceso.slug == "stn" %}
       <div class="well">
         <h4>Resumen de la opinión técnica</h4>
@@ -20,6 +24,89 @@
       </div>
       <hr>
       {% endif %}
+    </div>
+  </div>
+  <div class="row" id="documento">
+    <div class="col-md-9" id=""mostrarPDF>
+      <div class="row">
+        <div class="col">
+          {% if doc.ext == 'pdf' %}
+            <div class="col">
+              <embed src="http://10.29.0.79/media/{{doc.revision_actual.archivo}}" type="application/pdf" width="100%" height="600px" />
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+    </div>
+
+    <div class="col-md-3" id="sidebar">
+      <div class="row">
+        <div class="col">
+          <div class="card">
+            <div class="card-header text-white bg-primary">
+              <i class="fa fa-key"></i> Código
+            </div>
+            <div class="card-body">
+              <span>{{ doc.clave|upper }}</span>
+            </div>
+          </div>
+        </div>
+      </div><!-- ./row código -->
+      <div class="row">
+        <div class="col">
+          <div class="card">
+            <div class="card-header text-white bg-info">
+              <i class="fa fa-cogs"></i> Proceso
+            </div>
+            <div class="card-body">
+              <span><a href="#proceso">{{ doc.proceso }}</a></span>
+            </div>
+          </div>
+        </div>
+      </div><!-- ./row proceso -->
+
+      {% if doc.proceso.slug == "stn" %}
+      <div class="row">
+        <div class="col">
+          <div class="card">
+            <div class="card-header text-white bg-success">
+              <i class="fa fa-calendar"></i> Fecha de la opinión
+            </div>
+            <div class="card-body">
+              <span>{{ doc.revision_actual.f_actualizacion }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% else %}
+      <div class="row">
+        <div class="col">
+          <div class="card">
+            <div class="card-header text-white bg-warning">
+              <i class="fa fa-calendar"></i> Revisión
+            </div>
+            <div class="card-body">
+              <span>{{ doc.r_actual }} ({{ doc.revision_actual.f_actualizacion }})</span>
+            </div>
+          </div>
+        </div>
+      </div><!-- ./row revisión -->
+      {% endif %}
+
+      <div class="row">
+        <div class="col">
+          <div class="card">
+            <div class="card-header text-white bg-danger">
+              <i class="fa fa-cloud-download"></i> Descargar archivo
+            </div>
+            <div class="card-body">
+              <span><a href="{{MEDIA_URL}}{{doc.revision_actual.archivo}}">Descargar</a></span>
+            </div>
+          </div>
+        </div>
+      </div><!-- ./cad descargar -->
+
     </div>
   </div>
 {% endblock content %}
