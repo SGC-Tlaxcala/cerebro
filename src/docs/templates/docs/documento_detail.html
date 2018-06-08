@@ -38,6 +38,45 @@
         </div>
       </div>
 
+      {% if doc.proceso.slug != "stn" %}
+        <!-- Cambios actuales -->
+        <div class="row">
+          <div class="col">
+            <div class="card bg-light">
+              <div class="card-header">Cambios en esta versión</div>
+              <div class="card-body">
+                {{doc.revision_actual.cambios | safe }}
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- ./Cambios actuales -->
+      {% endif %}
+
+      <div class="row">
+        <div class="col">
+          <h4>Historial de actualizaciones</h4>
+          <div class="accoridion" id="accordionChanges">
+            {% for r in doc.historial %}
+            <div class="card">
+              <div class="card-header" id="heading{{ forloop.counter }}">
+                <h5 class="mb-0">
+                  <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse{{ forloop.counter }}" aria-expanded="true" aria-controls="collapse{{ forloop.counter }}">
+                    Revisión <strong>{{ r.revision }}</strong>
+                  </button>
+                </h5>
+              </div>
+              <div id="collapse{{ forloop.counter }}" class="collapse" aria-labelledby="heading{{ forloop.counter }}" data-parent="#accordionChanges">
+                <div class="card-body">
+                  {{ r.cambios | safe }}
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div><!-- ./#accordionChanges -->
+        </div>
+      </div>
+
     </div>
 
     <div class="col-md-3" id="sidebar">
