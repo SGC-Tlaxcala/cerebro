@@ -8,8 +8,7 @@
 from django.db.models import Q
 from django.views.generic import (
     TemplateView,
-    DetailView,
-    ListView
+    DetailView
 )
 
 from docs.models import Documento, Tipo, Proceso
@@ -53,9 +52,9 @@ class DocDetail(DetailView):
     context_object_name = 'doc'
 
 
-class ProcesoList(ListView):
+class ProcesoList(DetailView):
     model = Proceso
-    context_object_name = 'procesos'
+    context_object_name = 'proceso'
 
 # @login_required
 # def agregar_documento (request):

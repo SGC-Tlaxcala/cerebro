@@ -99,7 +99,7 @@
               <i class="fa fa-cogs"></i> Proceso
             </div>
             <div class="card-body">
-              <span><a href="#proceso">{{ doc.proceso }}</a></span>
+              <span><a href="{% url 'docs:proceso' slug=doc.proceso.slug %}">{{ doc.proceso }}</a></span>
             </div>
           </div>
         </div>

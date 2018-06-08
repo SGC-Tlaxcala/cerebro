@@ -62,6 +62,9 @@ class Documento (models.Model):
     creacion = models.DateTimeField(auto_now_add=True)
     actualiza = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        ordering = ['tipo', 'id']
+
     def ext(self):
         return self.revision_actual().archivo.name.split('.')[-1]
 

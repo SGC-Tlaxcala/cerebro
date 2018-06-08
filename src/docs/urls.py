@@ -13,7 +13,7 @@ app_name = 'docs'
 urlpatterns = [
     path('', DocIndex.as_view(), name='index'),
     path('<int:pk>/detalle', DocDetail.as_view(), name='detalle'),
-    path('proceso/<slug:slug>', ProcesoList.as_view(), name='procesos')
+    path('proceso/<slug:slug>', ProcesoList.as_view(), name='proceso')
 ]
 
 # urlpatterns = patterns('docs.views'
