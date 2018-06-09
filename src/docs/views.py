@@ -76,59 +76,6 @@ class ProcesoList(DetailView):
 #         context_instance=RequestContext(request)
 #     )
 #
-# def handle_uploaded_file(f, instancia):
-#     import os.path
-#     import subprocess
-#     from cmi import settings
-#     tmp = os.path.join(u'/tmp/', f.name)
-#     destination = open(tmp, 'wb+')
-#     for chunk in f.chunks():
-#         destination.write(chunk)
-#     destination.close()
-#     tipo = instancia.documento.tipo.slug
-#     doc  = instancia.documento.slug
-#     rev  = instancia.revision
-#     ext  = instancia.archivo.name.split('.')[-1]
-#     if ext=='pdf':
-#         archivo  = "%s_%s-%02d_rev%02d.swf" % (doc, tipo, instancia.documento.id, rev)
-#         salida = os.path.join(settings.MEDIA_ROOT, 'docs', tipo,  archivo)
-#         swftools = u'/usr/local/bin/pdf2swf'
-#         args = "-f -T 9 -t -s storeallcharacters"
-#         try:
-#             subprocess.call([swftools, tmp, "-o", salida, '-f', '-T 9', '-t', '-s storeallcharacters'])
-#             return archivo
-#         except:
-#             raise Exception
-#     else:
-#         archivo  = "%s_%s-%02d_rev%02d.%s" % (doc, tipo, instancia.documento.id, rev, ext)
-#         salida = os.path.join(settings.MEDIA_ROOT, 'docs', tipo,  archivo)
-#         return archivo
-#
-# def editar_revision(f, instancia):
-#     import os
-#     import subprocess
-#     from cmi import settings
-#     destino = os.path.join(settings.MEDIA_ROOT, instancia.archivo.name)
-#     tipo = instancia.documento.tipo.slug
-#     doc  = instancia.documento.slug
-#     rev  = instancia.revision
-#     ext  = instancia.archivo.name.split('.')[-1]
-#     if ext=='pdf':
-#         archivo  = "%s_%s-%02d_rev%02d.swf" % (doc, tipo, instancia.documento.id, rev)
-#         salida = os.path.join(settings.MEDIA_ROOT, 'docs', tipo,  archivo)
-#         swftools = u'/usr/local/bin/pdf2swf'
-#         args = "-f -T 9 -t -s storeallcharacters"
-#         try:
-#             subprocess.call([swftools, destino, "-o", salida, '-f', '-T 9', '-t', '-s storeallcharacters'])
-#             return archivo
-#         except:
-#             raise Exception
-#     else:
-#         archivo  = "%s_%s-%02d_rev%02d.%s" % (doc, tipo, instancia.documento.id, rev, ext)
-#         salida = os.path.join(settings.MEDIA_ROOT, 'docs', tipo,  archivo)
-#         return archivo
-#
-#
 # @login_required
 # def agregar_control(request, doc):
 #     if request.method == 'POST':
@@ -168,12 +115,6 @@ class ProcesoList(DetailView):
 #         ruta = '/docs/%s/detalles' % edicion.documento.id
 #         return redirect (ruta)
 #     return { 'form': form, 'title':'Editando revisión' }
-#
-# @render_to('2014/docs/proceso.html')
-# def docs_proceso(request, proceso):
-#     proceso = Proceso.objects.get(slug=proceso)
-#     docs = proceso.documento_set.all().order_by('tipo')
-#     return {'docs': docs, 'proceso':proceso, 'title':proceso }
 #
 # @render_to('2014/docs/busqueda.html')
 # def docs_buscador(request):

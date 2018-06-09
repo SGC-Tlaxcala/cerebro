@@ -64,4 +64,3 @@ class RevisionAdmin (admin.ModelAdmin):
 admin.site.register(Tipo, TipoAdmin)
 admin.site.register(Proceso, ProcesoAdmin)
 admin.site.register(Documento, DocumentoAdmin)
-# admin.site.register(Revision, RevisionAdmin)
