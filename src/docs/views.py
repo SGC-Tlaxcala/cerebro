@@ -5,6 +5,7 @@
 # description: Vistas de la app de documentación
 # pylint: disable=W0613,R0201,R0903
 
+from watson import search as watson
 from django.db.models import Q
 from django.views.generic import (
     TemplateView,
@@ -55,6 +56,23 @@ class DocDetail(DetailView):
 class ProcesoList(DetailView):
     model = Proceso
     context_object_name = 'proceso'
+
+
+class Buscador(TemplateView):
+    template_name = 'docs/busqueda.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        query = self.request.GET.get('q')
+        resultados = {}
+        if query:
+            resultados = watson.search(query)
+        context.update({
+            'resultados': resultados,
+            'query': query
+        })
+        return context
+
 
 # @login_required
 # def agregar_documento (request):
@@ -124,9 +142,4 @@ class ProcesoList(DetailView):
 #     if query:
 #         resultados = watson.search(query)
 #     return {'resultados':resultados, 'query':query}
-#
-# @render_to('2014/docs/tag_list.html')
-# def docs_tags(request, tag):
-#     docs = get_list_or_404(Documento, tags__slug=tag)
-#     return {'docs':docs, 'tag':tag}
 #
