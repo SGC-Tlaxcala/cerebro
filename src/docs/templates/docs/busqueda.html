@@ -1,5 +1,50 @@
 {% extends "base.html" %}
-
+{% load watson %}
 {% block content %}
-  {{ resultados }}
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="jumbotron">
+        <h1>Resultados de la búsqueda <strong>{{ query }}</strong></h1>
+        <p class="big grey">Se encontraron {{ resultados.count }} documentos</p>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="table-responsive">
+        <table class="table table-striped table-bordered table-sm table-hover">
+          <thead>
+            <tr>
+              <th>Documento</th>
+              <th>Código</th>
+              <th>Revisión</th>
+              <th>Aprobación</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for res in resultados %}
+            <tr>
+              <td>
+                <a href="{% url 'docs:detalle' res.object.id %}">{{ res.object.nombre }}</a>
+              </td>
+              <td>
+                {{ res.object.clave|upper }}
+              </td>
+              {% if res.object.r_actual %}
+                <td style="text-align: center;">{{ res.object.r_actual }}</td>
+                <td>{{ res.object.revision_actual.f_actualizacion|date:"M d, Y" }}</td>
+              {% else %}
+                <td colspan="3">
+                </td>
+              {% endif %}
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 {% endblock %}
