@@ -36,6 +36,7 @@ THIRD_PARTY_APPS = [
     'watson'
 ]
 LOCAL_APPS = [
+    'core',
     'profiles',
     'metas',
     'dpi.apps.DpiConfig',
