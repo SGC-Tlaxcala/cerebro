@@ -129,7 +129,6 @@ STATIC_ROOT = BASE_DIR.child('assets')
 STATIC_URL = '/assets/'
 STATICFILES_DIRS = [
     'static',
-
 ]
 
 MEDIA_ROOT = BASE_DIR.child('media')

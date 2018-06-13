@@ -1,4 +1,6 @@
 {% load staticfiles %}
+{% load docs_tags %}
+
 <nav class="navbar navbar-expand-md navbar-light bg-light fixed-top">
       <a class="navbar-brand" href="#">
         <img src="{% static 'img/credencial.jpg' %}" height="30" class="d-inline-block align-top" alt="">
@@ -11,10 +13,10 @@
       <div class="collapse navbar-collapse" id="navbarsExampleDefault">
         <ul class="navbar-nav mr-auto">
           <li class="nav-item">
-            <a class="nav-link" href="{% url 'index' %}"><i class="fa fa-home"></i> Portada</a>
+            <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="{% url 'index' %}"><i class="fa fa-home"></i> Portada</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="{% url 'docs:index' %}"><i class="fa fa-book"></i> Documentación</a>
+            <a class="nav-link {% current request 'docs' %}" href="{% url 'docs:index' %}"><i class="fa fa-book"></i> Documentación</a>
           </li>
         </ul>
         <form class="form-inline my-2 my-lg-0"  method="get" action="{% url 'docs:buscador' %}">
