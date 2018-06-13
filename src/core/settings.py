@@ -32,12 +32,14 @@ DJANGO_APPS = [
 THIRD_PARTY_APPS = [
     'rest_framework',
     'crispy_forms',
-    'django_extensions'
+    'django_extensions',
+    'watson'
 ]
 LOCAL_APPS = [
     'profiles',
     'metas',
-    'dpi.apps.DpiConfig'
+    'dpi.apps.DpiConfig',
+    'docs.apps.DocsConfig'
 ]
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
@@ -125,7 +127,9 @@ SITE_ID = 1
 
 STATIC_ROOT = BASE_DIR.child('assets')
 STATIC_URL = '/assets/'
-STATICFILES_DIRS = ('static', )
+STATICFILES_DIRS = [
+    'static',
+]
 
 MEDIA_ROOT = BASE_DIR.child('media')
 MEDIA_URL = '/media/'

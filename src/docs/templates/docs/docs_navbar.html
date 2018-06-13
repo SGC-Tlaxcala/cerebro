@@ -1,0 +1,35 @@
+<div class="col-sm-12" style="padding-top:70px;">
+  <nav class="navbar navbar-inverse" role="navigation">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#menu-documentacion">
+            <span class="sr-only">Menú</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">Documentación</a>
+        </div><!-- ./navbar-header -->
+        <div class="collapse navbar-collapse" id="menu-documentacion">
+          <ul class="nav navbar-nav">
+            <li><a href="/docs/"><span class="icon-archive"></span> Listas Maestras</a></li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="icon-share-2"></span> Procesos <b class="caret"></b></a>
+              <ul class="dropdown-menu">
+                <li><a href="{% url 'docs_proceso' 'sgc' %}">Documentos del SGC</a></li>
+                <li><a href="{% url 'docs_proceso' 'planeacion' %}">Planeación</a></li>
+                <li><a href="{% url 'docs_proceso' 'clave' %}">Clave</a> </li>
+                <li><a href="{% url 'docs_proceso' 'apoyo-soporte' %}">Apoyo Soporte</a> </li>
+                <li><a href="{% url 'docs_proceso' 'msa' %}">Medición, An&aacute;lisis y Mejora</a></li>
+                <li><a href="{% url 'docs_proceso' 'stn' %}">Opiniones T&eacute;cnicas</a></li>
+                <li><a href="{% url 'docs_proceso' 'coc' %}">Oficios COC</a></li>
+              </ul>
+            </li>
+          </ul>
+          <form class="navbar-form navbar-right" method="get" action="/docs/buscador/">
+            <input type="text" class="search-query" name="q" id="id_q" placeholder="Buscador...">
+          </form>
+        </div>
+      </div>
+  </nav>
+</div>

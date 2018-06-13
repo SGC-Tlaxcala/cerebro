@@ -9,3 +9,4 @@ djangorestframework-simplejwt
 workdays
 django-extensions
 Werkzeug
+django-watson

@@ -13,6 +13,8 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 from django.views import generic
@@ -30,7 +32,7 @@ expediente_dpi = dpi.ExpedienteSimpleViewSet.as_view({
 })
 
 urlpatterns = [
-    path('', generic.RedirectView.as_view(url='/api/', permanent=False)),
+    # path('', generic.RedirectView.as_view(url='/api/', permanent=False)),
     path('api/', get_schema_view()),
     path('api/auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('api/auth/token/obtain/', TokenObtainPairView.as_view()),
@@ -41,5 +43,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('metas/', include('metas.urls')),
     path('dpi/', include('dpi.urls')),
+    path('docs/', include('docs.urls')),
     path('', index, name='index')
-]
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

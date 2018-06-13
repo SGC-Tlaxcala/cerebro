@@ -1,0 +1,97 @@
+{% extends "comunes/metro.html" %}
+
+{% block contenido %}
+<div class="row-fluid">
+    <div class="navbar">
+      <div class="navbar-inner" style="background: #E0D6CC;">
+        <a class="brand"><strong>Documentación del Sistema</strong></a>
+        <ul class="nav">
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="icon-archive"></span> Listas Maestras <b class="caret"></b></a>
+            <ul class="dropdown-menu">    
+              <li><a href="/docs/#procedimientos">Procedimientos</a></li>
+              <li><a href="/docs/#formatos">Formatos</a></li>
+              <li><a href="/docs/#instrucciones">Instrucciones de Trabajo</a></li>
+              <li><a href="/docs/#externos">Documentos Externos</a></li>
+              <li><a href="/docs/#registros">Registros</a></li>
+            </ul>
+          </li>
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="icon-share-2"></span> Procesos <b class="caret"></b></a>
+            <ul class="dropdown-menu">
+              <li><a href="{% url 'docs_proceso' 'sgc' %}">Documentos del SGC</a></li>
+              <li><a href='{% url 'docs_proceso' 'planeacion' %}'>Planeación</a></li>
+              <li><a href="{% url 'docs_proceso' 'clave' %}">Clave</a> </li>
+              <li><a href="{% url 'docs_proceso' 'apoyo-soporte' %}">Apoyo Soporte</a> </li>
+              <li><a href="{% url 'docs_proceso' 'msa' %}">Medición, An&aacute;lisis y Mejora</a></li>
+            </ul>
+          </li>
+        </ul>
+        <form class="navbar-search pull-right" method="get" action="/docs/buscador/">
+          <input type="text" class="search-query" name="q" id="id_q" placeholder="Buscador...">
+        </form>
+      </div>
+    </div>    
+</div>
+
+<div class="page-header">
+  <h1><span class="icon-search"></span> Resultados de la Búsqueda</h1>
+</div>
+
+{% if docs %}
+<h3>Estos son los documentos etiquetados como: <em>«#{{tag}}»</em></h3>
+
+<table class="table table-striped table-bordered table-condensed table-hover">
+  <thead>
+    <tr>
+      <th>Documento</th>
+      <th>Clave</th>
+      <th>Revisión</th>
+      <th>Aprobación</th>
+      <th>Activo</th>
+    </tr>
+  </thead>
+  <tbody>
+        {% for res in docs %}
+        {% ifchanged res.tipo %}
+        <tr>
+          <td colspan="5" style="text-align: center;"><strong>{{res.tipo}}</strong></td>
+        </tr>
+        {% endifchanged %}
+        <tr>
+          <td>
+            {{ res.nombre }}
+            {% if request.user.is_superuser and not res.activo %}
+                <a title="Revisar documento OBSOLETO" class="pull-right" href="/docs/{{ res.id }}/detalles"><i class="icon-eye"></i></a>
+            {% endif %}
+          </td>
+          <td{% if res.obsoleto or not res.r_actual %} class="disabled"{% endif %}>
+            {% if res.r_actual and res.activo %}
+              <a href="/docs/{{ res.id }}/detalles">{{ res.clave|upper }}</a>
+            {% else %}
+              {{ res.clave|upper }}
+            {% endif %}
+          </td>
+          {% if res.r_actual %}
+            <td style="text-align: center;">{{ res.r_actual }}</td>
+            <td>{{ res.revision_actual.f_actualizacion|date:"M d, Y" }}</td>
+            <td style="text-align: center;">{% if res.activo %}<i class="icon-checkmark"></i>{% else %}<i class="icon-cancel-3"></i>{% endif %}</td>
+          {% else %}
+            <td colspan="3">
+              <a href="{% url "res.object..views.agregar_control" res.res.id %}">
+              <i class="icon-plus-2"></i> Agregar una nueva revisión
+            </td>
+          {% endif %}
+        </tr>
+        {% endfor %}    
+  </tbody>
+</table>
+{% else %}
+    {% if tag %}
+    <p>No hay documentos coincidentes</p>
+    {% else %}
+    <p>Escriba un término en <strong>el buscador</strong> y presione la tecla «Enter»</p>
+    {% endif %}
+{% endif %}
+
+{% endblock contenido %}
