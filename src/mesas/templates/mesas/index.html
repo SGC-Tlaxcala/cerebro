@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% load docs_tags %}
+
+{% block footer %}
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <script>
+    google.charts.load('current', {'packages':['corechart']})
+    google.charts.setOnLoadCallback(drawChart)
+
+    function drawChart() {
+      var data = google.visualization.arrayToDataTable([
+        ['Sexo', 'Cantidad'],
+        ['Mujeres', {{ sexo.1.total }}],
+        ['Hombres', {{ sexo.0.total }}]
+      ])
+
+      var options = {
+        legend: {
+          position: 'bottom'
+        }
+      }
+      var chart = new google.visualization.PieChart(document.getElementById('por_sexo'))
+      chart.draw(data, options)
+    }
+  </script>
+  <script>
+    google.charts.load('current', {'packages':['corechart']})
+    google.charts.setOnLoadCallback(drawChart)
+    function drawChart() {
+      var data = google.visualization.arrayToDataTable([
+        ['Causa', 'Cantidad'],
+        {% for causa in causas %}
+          ['{{ causa.causa|causas }}', {{ causa.total }}],
+        {% endfor %}
+      ])
+      var options = {
+        legend: {
+          position: 'none'
+        }
+      }
+      var chart = new google.visualization.PieChart(document.getElementById('por_causa'))
+      chart.draw(data, options)
+    }
+  </script>
+{% endblock footer %}
+
+{% block content %}
+  <div class="jumbotron p-3 p-md-5 rounded">
+    <div class="px-0">
+      <h1 class="display-4">Bitácora de Ciudadanos Rechazados MAC</h1>
+    </div>
+  </div>
+  <hr>
+  <div class="row">
+    <div class="col">
+      <h3>Estadísticas Básicas Generales</h3>
+    </div>
+  </div>
+  <div class="row">
+    <dvi class="col-md-4">
+      <h4>Por sexo</h4>
+      <div id="por_sexo" style="width: 100%; height: 300px;"></div>
+      <ul>
+        <li>Mujeres: {{ sexo.1.total }} - Hombres: {{ sexo.0.total }} - <strong>Total: {{ sexo.0.total|add:sexo.1.total }}</strong></li>
+      </ul>
+    </dvi>
+  <div class="col-md-8">
+    <h4>Por causa</h4>
+    <div id="por_causa" style="width: 100%; height: 500px;"></div>
+    <table class="table table-hover table-sm">
+      <thead class="thead-light">
+        <tr>
+          <th>Causa</th>
+          <th>Cantidad</th>
+        </tr>
+      </thead>
+      <tbody>{% for causa in causas %}
+        <tr>
+          <td>{{ causa.causa|causas }}</td>
+          <td>{{ causa.total }}</td>
+        </tr>
+      {% endfor %}</tbody>
+    </table>
+  </div>
+  </div>
+{% endblock content %}

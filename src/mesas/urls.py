@@ -6,9 +6,10 @@
 # pylint: disable=W0613,R0201,R0903
 
 from django.urls import path
-from mesas.views import MesasAdd
+from mesas.views import MesasIndex, MesasAdd
 
 app_name = 'mesas'
 urlpatterns = [
-    path('', MesasAdd.as_view(), name='add')
+    path('', MesasIndex.as_view(), name='index'),
+    path('add/', MesasAdd.as_view(), name='add')
 ]

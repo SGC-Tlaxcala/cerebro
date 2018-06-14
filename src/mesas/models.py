@@ -51,6 +51,28 @@ def remesa(fecha):
 
 
 class Registro(TimeStampedModel):
+    SEXO = (
+        (HOMBRE, 'Hombre'),
+        (MUJER, 'Mujer')
+    )
+
+    CAUSAS = (
+        (ACTA, '1. Falta el acta de nacimiento'),
+        (IDENTIFICACION, '2. Falta identificación'),
+        (COMPROBANTE, '3. Falta comprobante de domicilio'),
+        (INFORMACION, '4. Solo necesita información'),
+        (ENTREGA, '5. Va a recoger su CPV'),
+        (FICHA, '6. No hay mas fichas'),
+        (EDAD, '7. Menor de 18 años'),
+        (HUELLA, '8. No pasó la huella'),
+        (OTRO, '9. Otra causa')
+    )
+
+    LUGAR = (
+        (BARRA, 'Barra: Área de Trámite/Entrega'),
+        (MESA, 'Mesa: Mesa de atención')
+    )
+
     fecha = models.DateField('Fecha')
     remesa = models.CharField('Remesa', max_length=7, editable=False, null=True)
     distrito = models.PositiveSmallIntegerField('Distrito', editable=False)

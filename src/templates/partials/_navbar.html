@@ -19,11 +19,11 @@
             <a class="nav-link {% current request 'docs' %}" href="{% url 'docs:index' %}"><i class="fa fa-book"></i> Documentación</a>
           </li>
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="dropDownIndicadores" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <a class="nav-link dropdown-toggle {% if kpi_path %}active{% endif %}" href="#" id="dropDownIndicadores" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               <i class="fa fa-line-chart"></i> Indicadores
             </a>
             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-              <a class="dropdown-item {% current request 'mesas' %}" href="{% url 'mesas:add' %}"><i class="fa fa-user-times"></i> Mesa de Atención</a>
+              <a class="dropdown-item {% current request 'mesas' %}" href="{% url 'mesas:index' %}"><i class="fa fa-user-times"></i> Mesa de Atención</a>
             </div>
           </li>
         </ul>

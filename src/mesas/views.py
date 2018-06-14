@@ -6,10 +6,32 @@
 # pylint: disable=W0613,R0201,R0903
 
 from django.contrib import messages
+from django.views.generic import TemplateView
 from django.views.generic.edit import CreateView
 from django.urls import reverse_lazy
-from mesas.models import Registro
+from django.db.models import Avg, Case, Count, F, Max, Min, Prefetch, Q, Sum, When, Exists, OuterRef, Subquery
+from mesas.models import Registro, CAUSAS
 from mesas.forms import MesaForm
+
+
+class MesasIndex(TemplateView):
+    template_name = 'mesas/index.html'
+
+    base = Registro.objects.all()
+    sexo = base.values('sexo').annotate(total=Count('sexo'))
+    causas = base.values('causa').annotate(total=Count('causa')).order_by('causa')
+
+    data = {
+        'sexo': sexo,
+        'causas': causas,
+        'txt_causas': CAUSAS
+    }
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({'kpi_path': True})
+        context.update(self.data)
+        return context
 
 
 class MesasAdd(CreateView):
@@ -34,3 +56,8 @@ class MesasAdd(CreateView):
              <strong>se guardó</strong> correctamente'
         )
         return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({'kpi_path': True})
+        return context
