@@ -5,16 +5,14 @@
 # description: Modelos para la bitácora de rechazados en MAC
 # pylint: disable=W0613,R0201,R0903
 
-
-import uuid
 from django.db import models
 from core.models import TimeStampedModel, Remesa
 
 HOMBRE = 'H'
 MUJER = 'M'
 SEXO = (
-    HOMBRE, 'Hombre',
-    MUJER, 'Mujer'
+           (HOMBRE, 'Hombre'),
+           (MUJER, 'Mujer')
 )
 
 ACTA = 1
@@ -27,22 +25,22 @@ EDAD = 7
 HUELLA = 8
 OTRO = 9
 CAUSAS = (
-    (ACTA, 'Falta el acta de nacimiento'),
-    (IDENTIFICACION, 'Falta identificación'),
-    (COMPROBANTE, 'Falta comprobante de domicilio'),
-    (INFORMACION, 'Solo necesita información'),
-    (ENTREGA, 'Va a recoger su CPV'),
-    (FICHA, 'No hay mas fichas'),
-    (EDAD, 'Menor de 18 años'),
-    (HUELLA, 'No pasó la huella'),
-    (OTRO, 'Otra causa')
+    (ACTA, '1. Falta el acta de nacimiento'),
+    (IDENTIFICACION, '2. Falta identificación'),
+    (COMPROBANTE, '3. Falta comprobante de domicilio'),
+    (INFORMACION, '4. Solo necesita información'),
+    (ENTREGA, '5. Va a recoger su CPV'),
+    (FICHA, '6. No hay mas fichas'),
+    (EDAD, '7. Menor de 18 años'),
+    (HUELLA, '8. No pasó la huella'),
+    (OTRO, '9. Otra causa')
 )
 
 BARRA = 1
 MESA = 2
 LUGAR = (
-    (BARRA, 'Área de Trámite/Entrega'),
-    (MESA, 'Mesa de atención')
+    (BARRA, 'Barra: Área de Trámite/Entrega'),
+    (MESA, 'Mesa: Mesa de atención')
 )
 
 
@@ -53,20 +51,23 @@ def remesa(fecha):
 
 
 class Registro(TimeStampedModel):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     fecha = models.DateField('Fecha')
     remesa = models.CharField('Remesa', max_length=7, editable=False, null=True)
-    distrito = models.PositiveSmallIntegerField('Distrito')
+    distrito = models.PositiveSmallIntegerField('Distrito', editable=False)
     modulo = models.CharField('Módulo', max_length=3)
-    lugar = models.PositiveSmallIntegerField('Lugar de atención')
-    sexo = models.PositiveSmallIntegerField('Sexo', choices=SEXO)
+    lugar = models.PositiveSmallIntegerField('Lugar de atención', choices=LUGAR)
+    sexo = models.CharField('Sexo', choices=SEXO, max_length=1)
     causa = models.PositiveSmallIntegerField('Causa', choices=CAUSAS)
-    observaciones = models.TextField('Observaciones')
+    observaciones = models.TextField('Observaciones', blank=True, null=True)
 
     class Meta:
         verbose_name = 'Registro de Atención'
         verbose_name_plural = 'Registros de Atención'
 
+    def __str__(self):
+        return f'{self.modulo} - Remesa: {self.remesa}'
+
     def save(self, *args, **kwargs):
         self.remesa = remesa(self.fecha)
+        self.distrito = self.modulo[0]
         super(Registro, self).save(*args, **kwargs)
