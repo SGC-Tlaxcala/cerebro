@@ -18,6 +18,14 @@
           <li class="nav-item">
             <a class="nav-link {% current request 'docs' %}" href="{% url 'docs:index' %}"><i class="fa fa-book"></i> Documentación</a>
           </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle {% if kpi_path %}active{% endif %}" href="#" id="dropDownIndicadores" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <i class="fa fa-line-chart"></i> Indicadores
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <a class="dropdown-item {% current request 'mesas' %}" href="{% url 'mesas:index' %}"><i class="fa fa-user-times"></i> Mesa de Atención</a>
+            </div>
+          </li>
         </ul>
         <form class="form-inline my-2 my-lg-0"  method="get" action="{% url 'docs:buscador' %}">
           <input class="form-control mr-sm-2" type="text" name="q" id="id_q" placeholder="Buscador" aria-label="Search">

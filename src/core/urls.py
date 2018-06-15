@@ -44,5 +44,6 @@ urlpatterns = [
     path('metas/', include('metas.urls')),
     path('dpi/', include('dpi.urls')),
     path('docs/', include('docs.urls')),
+    path('mesas/', include('mesas.urls')),
     path('', index, name='index')
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

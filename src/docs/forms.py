@@ -1,15 +1,10 @@
-#-*- encoding: utf-8 -*-
+# coding: utf-8
 # Formularios para la app de documentos
 
 from django import forms
-from django.forms.models import inlineformset_factory
-from django.forms.models import modelform_factory
-from django.contrib import admin
 from docs.models import Documento
 from docs.models import Revision
-from django.contrib.auth.decorators import login_required
-from django.utils.decorators import method_decorator
-from bootstrap_toolkit.widgets import BootstrapDateInput, BootstrapTextInput
+
 
 class DocumentoForm (forms.ModelForm):
     class Meta:

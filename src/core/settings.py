@@ -36,10 +36,12 @@ THIRD_PARTY_APPS = [
     'watson'
 ]
 LOCAL_APPS = [
+    'core',
     'profiles',
     'metas',
     'dpi.apps.DpiConfig',
-    'docs.apps.DocsConfig'
+    'docs.apps.DocsConfig',
+    'mesas'
 ]
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
@@ -58,7 +60,7 @@ ROOT_URLCONF = 'core.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR.child('templates')],
+        'DIRS': ['templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

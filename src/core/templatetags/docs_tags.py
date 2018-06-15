@@ -9,7 +9,17 @@
 import re
 from django import template
 
+from mesas.models import CAUSAS
+
 register = template.Library()
+
+
+dict_causas = {key: value for key, value in CAUSAS}
+
+
+@register.filter
+def causas(causa):
+    return dict_causas[causa]
 
 
 @register.simple_tag

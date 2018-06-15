@@ -19,3 +19,15 @@ class TimeStampedModel(models.Model):
 
     class Meta:
         abstract = True
+
+
+class Remesa (models.Model):
+    remesa = models.CharField(max_length=7)
+    inicio = models.DateField()
+    fin = models.DateField()
+
+    def days(self):
+        return self.fin - self.inicio
+
+    def __str__(self):
+        return f"Remesa {self.remesa}"
