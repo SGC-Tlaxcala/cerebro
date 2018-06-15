@@ -12,7 +12,7 @@ from dpi.views import DPIIndex, DPIAdd, DPIEdit
 
 app_name = 'dpi'
 urlpatterns = [
-    path('', DPIIndex.as_view(), name='dpi_index'),
+    path('', DPIIndex.as_view(), name='index'),
     path('add/', DPIAdd.as_view(), name='dpi_add'),
     path('<str:folio>/edit/', DPIEdit.as_view(), name='dpi_edit')
 ]

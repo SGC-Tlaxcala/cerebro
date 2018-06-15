@@ -24,6 +24,7 @@
             </a>
             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
               <a class="dropdown-item {% current request 'mesas' %}" href="{% url 'mesas:index' %}"><i class="fa fa-user-times"></i> Mesa de Atención</a>
+              <a href="{% url 'dpi:index' %}" class="dropdown-item {% current request 'dpi' %}"><i class="fa fa-exclamation-triangle"></i> DPI y USI</a>
             </div>
           </li>
         </ul>

@@ -49,7 +49,7 @@ class DPIIndex(TemplateView):
         hay_fecha_envio_expediente
     )
 
-    context = {
+    contexto = {
         'year': YEAR
         , 'total_count': total.count()
         , 'total_dpi': total_dpi.count()
@@ -64,7 +64,8 @@ class DPIIndex(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context = self.context
+        context.update({'kpi_path': True})
+        context.update(self.contexto)
         return context
 
 
