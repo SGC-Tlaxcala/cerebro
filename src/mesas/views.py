@@ -13,11 +13,14 @@ from django.db.models import Avg, Case, Count, F, Max, Min, Prefetch, Q, Sum, Wh
 from mesas.models import Registro, CAUSAS
 from mesas.forms import MesaForm
 
+no_info = Q(causa=4)
+no_otro = Q(causa=9)
+
 
 class MesasIndex(TemplateView):
     template_name = 'mesas/index.html'
 
-    base = Registro.objects.all()
+    base = Registro.objects.all().exclude(no_info|no_otro)
     sexo = base.values('sexo').annotate(total=Count('sexo'))
     causas = base.values('causa').annotate(total=Count('causa')).order_by('causa')
 
