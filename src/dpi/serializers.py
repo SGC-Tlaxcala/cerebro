@@ -9,7 +9,9 @@ from rest_framework import serializers
 from dpi.models import ExpedienteDPI
 
 
-class ExpedienteSerializer(serializers.Serializer):
-    tipo = serializers.CharField(max_length=3)
-    folio = serializers.CharField(max_length=13)
-    nombre = serializers.CharField(max_length=100)
+class ExpedienteSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ExpedienteDPI
+        fields = ['tipo', 'folio', 'nombre']
+        editable = False

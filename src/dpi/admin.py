@@ -33,14 +33,14 @@ class ExpedienteDPIForm(forms.ModelForm):
 
 class ExpedienteDPIAdmin(admin.ModelAdmin):
     form = ExpedienteDPIForm
-    list_display = ('folio', 'tipo', 'delta_distrito', 'expediente_completo')
-    list_filter = ('tipo', 'entidad', 'distrito')
+    list_display = ('folio', 'tipo', 'delta_distrito', 'completo')
+    list_filter = ('completo', 'tipo', 'entidad', 'distrito')
     fieldsets = (
         (None, {
             'fields': (('tipo', 'folio'), ('nombre', 'fecha_tramite'))
         }),
         ('TRÁMITE: Etapa de Aclaración', {
-            'fields': (('fecha_notificacion_aclaracion', 'fecha_entrevista', 'estado'), 'fecha_envio_expediente' )
+            'fields': (('fecha_notificacion_aclaracion', 'fecha_entrevista', 'estado'), 'fecha_envio_expediente')
         }),
         ('REGISTRO: Etapa de Aclaración', {
             'classes': ('collapse',),
@@ -59,12 +59,6 @@ class ExpedienteDPIAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         obj.usuario = request.user
         obj.save()
-
-    def expediente_completo(self, obj):
-        if obj.expediente_completo:
-            return 'Completo'
-        else:
-            return 'Incompleto'
 
 
 admin.site.register(ExpedienteDPI, ExpedienteDPIAdmin)

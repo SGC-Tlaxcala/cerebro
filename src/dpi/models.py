@@ -130,6 +130,7 @@ class ExpedienteDPI(TimeStampedModel):
         editable=False, null=True,
     )
 
+    completo = models.PositiveSmallIntegerField(editable=False, null=False, default=0)
     usuario = models.ForeignKey(
         User, related_name='dpi_user', 
         editable=False, on_delete=models.CASCADE
@@ -147,7 +148,7 @@ class ExpedienteDPI(TimeStampedModel):
     def __str__(self):
         return f'{self.tipo}_{self.folio}'
 
-    def save(self, force_insert=False, force_update=False):
+    def save(self, *args, **kwargs):
         self.nombre = self.nombre.upper()
         self.entidad = self.folio[2:4]
         self.distrito = self.folio[4:6]
@@ -157,15 +158,13 @@ class ExpedienteDPI(TimeStampedModel):
         self.delta_enviar = delta(self.fecha_entrevista, self.fecha_envio_expediente)
         self.delta_distrito = delta(self.fecha_tramite, self.fecha_envio_expediente)
         self.delta_verificar = delta(self.fecha_solicitud_cedula, self.fecha_ejecucion_cedula)
-        super(ExpedienteDPI, self).save(force_insert, force_update)
 
-    @property
-    def expediente_completo(self):
-        if self.entidad == 29 \
-                and self.fecha_tramite \
-                and self.fecha_notificacion_aclaracion \
-                and self.fecha_entrevista \
-                and self.fecha_envio_expediente:
-            return True
+        if self.entidad == 29 and \
+                self.fecha_tramite and \
+                self.fecha_entrevista and \
+                self.fecha_envio_expediente and \
+                self.fecha_notificacion_aclaracion:
+            self.completo = 1
         else:
-            return False
+            self.completo = 0
+        super(ExpedienteDPI, self).save(*args, **kwargs)

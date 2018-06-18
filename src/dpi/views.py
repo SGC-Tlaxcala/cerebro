@@ -136,3 +136,7 @@ class ExpedienteSimpleViewSet(viewsets.ViewSet):
         expediente = get_object_or_404(queryset, folio=folio)
         serializer = ExpedienteSerializer(expediente)
         return Response(serializer.data)
+
+
+class ExpedienteIncompletoViewSet(viewsets.ModelViewSet):
+    queryset = ExpedienteDPI.objects.filter()
