@@ -11,7 +11,7 @@ from django.contrib import messages
 from django.db.models import Q, F
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, ListView
 from django.views.generic.edit import CreateView, UpdateView
 
 from rest_framework import viewsets
@@ -24,6 +24,18 @@ from dpi.serializers import ExpedienteSerializer
 DPI = Q(tipo='DPI')
 USI = Q(tipo='USI')
 TLAXCALA = Q(entidad=29)
+
+
+class ExpedientesIncompletos(ListView):
+    model = ExpedienteDPI
+    context_object_name = 'expedientes'
+    paginate_by = 6
+    make_object_list = True
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({'kpi_path': True})
+        return context
 
 
 class DPIIndex(TemplateView):
@@ -74,6 +86,11 @@ class DPIAdd(CreateView):
     template_name = 'dpi/add.html'
     form_class = ExpedienteForm
     success_url = reverse_lazy('dpi:dpi_add')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({'kpi_path': True})
+        return context
 
     def form_valid(self, form):
         self.object = form.save(commit=False)

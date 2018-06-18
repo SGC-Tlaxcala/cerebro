@@ -8,11 +8,11 @@
 
 
 from django.urls import path
-from dpi.views import DPIIndex, DPIAdd, DPIEdit
+from dpi.views import DPIAdd, DPIEdit, ExpedientesIncompletos
 
 app_name = 'dpi'
 urlpatterns = [
-    path('', DPIIndex.as_view(), name='index'),
+    path('', ExpedientesIncompletos.as_view(), name='index'),
     path('add/', DPIAdd.as_view(), name='dpi_add'),
-    path('<str:folio>/edit/', DPIEdit.as_view(), name='dpi_edit')
+    path('<str:folio>/edit/', DPIEdit.as_view(), name='edit')
 ]
