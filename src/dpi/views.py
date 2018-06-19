@@ -8,7 +8,7 @@ u"""Vistas de Depuración."""
 #       fecha: lunes, 28 de mayo de 2018
 
 from django.contrib import messages
-from django.db.models import Q, F
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView, ListView
@@ -62,16 +62,14 @@ class DPIIndex(TemplateView):
     )
 
     contexto = {
-        'year': YEAR
-        , 'total_count': total.count()
-        , 'total_dpi': total_dpi.count()
-        , 'total_usi': total_usi.count()
-
-        , 'tlaxcala_count': tlaxcala_total.count()
-        , 'tlaxcala_total_dpi': tlaxcala_total_dpi.count()
-        , 'tlaxcala_total_usi': tlaxcala_total_usi.count()
-
-        , 'tlx_dpi_exp_completo': tlx_dpi_exp_completo.count()
+        'year': YEAR,
+        'total_count': total.count(),
+        'total_dpi': total_dpi.count(),
+        'total_usi': total_usi.count(),
+        'tlaxcala_count': tlaxcala_total.count(),
+        'tlaxcala_total_dpi': tlaxcala_total_dpi.count(),
+        'tlaxcala_total_usi': tlaxcala_total_usi.count(),
+        'tlx_dpi_exp_completo': tlx_dpi_exp_completo.count()
     }
 
     def get_context_data(self, **kwargs):
@@ -138,5 +136,6 @@ class ExpedienteSimpleViewSet(viewsets.ViewSet):
         return Response(serializer.data)
 
 
-class ExpedienteIncompletoViewSet(viewsets.ModelViewSet):
+class ExpedienteIncompletoViewSet(viewsets.ReadOnlyModelViewSet ):
     queryset = ExpedienteDPI.objects.filter(Q(completo=1), Q(entidad=29))
+    serializer_class = ExpedienteSerializer

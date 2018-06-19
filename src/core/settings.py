@@ -186,9 +186,9 @@ LOGGING = {
             'propagate': False, # this tells logger to send logging message
                                 # to its parent (will send if set to True)
         },
-        'django.db': {
-            # django also has database level logging
-            'level': 'DEBUG'
-        },
+        # 'django.db': {
+        #     # django also has database level logging
+        #     'level': 'DEBUG'
+        # },
     },
 }
