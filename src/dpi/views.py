@@ -139,4 +139,4 @@ class ExpedienteSimpleViewSet(viewsets.ViewSet):
 
 
 class ExpedienteIncompletoViewSet(viewsets.ModelViewSet):
-    queryset = ExpedienteDPI.objects.filter()
+    queryset = ExpedienteDPI.objects.filter(Q(completo=1), Q(entidad=29))

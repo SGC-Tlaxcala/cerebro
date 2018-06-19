@@ -158,12 +158,10 @@ class ExpedienteDPI(TimeStampedModel):
         self.delta_enviar = delta(self.fecha_entrevista, self.fecha_envio_expediente)
         self.delta_distrito = delta(self.fecha_tramite, self.fecha_envio_expediente)
         self.delta_verificar = delta(self.fecha_solicitud_cedula, self.fecha_ejecucion_cedula)
-
-        if self.entidad == 29 and \
-                self.fecha_tramite and \
-                self.fecha_entrevista and \
-                self.fecha_envio_expediente and \
-                self.fecha_notificacion_aclaracion:
+        if (self.fecha_tramite is not None and
+                self.fecha_entrevista is not None and
+                self.fecha_envio_expediente is not None and
+                self.fecha_notificacion_aclaracion is not None):
             self.completo = 1
         else:
             self.completo = 0
