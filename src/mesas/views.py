@@ -9,7 +9,7 @@ from django.contrib import messages
 from django.views.generic import TemplateView
 from django.views.generic.edit import CreateView
 from django.urls import reverse_lazy
-from django.db.models import Avg, Case, Count, F, Max, Min, Prefetch, Q, Sum, When, Exists, OuterRef, Subquery
+from django.db.models import Count, Q
 from mesas.models import Registro, CAUSAS
 from mesas.forms import MesaForm
 
@@ -20,7 +20,7 @@ no_otro = Q(causa=9)
 class MesasIndex(TemplateView):
     template_name = 'mesas/index.html'
 
-    base = Registro.objects.all().exclude(no_info|no_otro)
+    base = Registro.objects.all().exclude(no_info).exclude(no_otro)
     sexo = base.values('sexo').annotate(total=Count('sexo'))
     causas = base.values('causa').annotate(total=Count('causa')).order_by('causa')
 
