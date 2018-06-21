@@ -31,6 +31,7 @@ DJANGO_APPS = [
 ]
 THIRD_PARTY_APPS = [
     'rest_framework',
+    'djoser',
     'crispy_forms',
     'django_extensions',
     'watson'
@@ -145,7 +146,7 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
     ),
 }
@@ -183,8 +184,8 @@ LOGGING = {
             # root level logger.
             'handlers': ['console'],
             'level': 'DEBUG',
-            'propagate': False, # this tells logger to send logging message
-                                # to its parent (will send if set to True)
+            'propagate': False,    # this tells logger to send logging message
+                                   # to its parent (will send if set to True)
         },
         # 'django.db': {
         #     # django also has database level logging
@@ -192,3 +193,4 @@ LOGGING = {
         # },
     },
 }
+

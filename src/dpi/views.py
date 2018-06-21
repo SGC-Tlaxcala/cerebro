@@ -16,6 +16,7 @@ from django.views.generic.edit import CreateView, UpdateView
 
 from rest_framework import viewsets
 from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
 
 from dpi.models import ExpedienteDPI
 from dpi.forms import ExpedienteForm
@@ -139,3 +140,4 @@ class ExpedienteSimpleViewSet(viewsets.ViewSet):
 class ExpedienteIncompletoViewSet(viewsets.ReadOnlyModelViewSet ):
     queryset = ExpedienteDPI.objects.filter(Q(completo=1), Q(entidad=29))
     serializer_class = ExpedienteSerializer
+    permission_classes = [AllowAny, ]
