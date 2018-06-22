@@ -15,12 +15,13 @@ from mesas.forms import MesaForm
 
 no_info = Q(causa=4)
 no_otro = Q(causa=9)
+no_entrega = Q(causa=5)
 
 
 class MesasIndex(TemplateView):
     template_name = 'mesas/index.html'
 
-    base = Registro.objects.all().exclude(no_info).exclude(no_otro)
+    base = Registro.objects.all().exclude(no_info).exclude(no_otro).exclude(no_entrega)
     sexo = base.values('sexo').annotate(total=Count('sexo'))
     causas = base.values('causa').annotate(total=Count('causa')).order_by('causa')
 
