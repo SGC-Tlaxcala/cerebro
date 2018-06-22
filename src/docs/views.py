@@ -6,16 +6,30 @@
 # pylint: disable=W0613,R0201,R0903
 
 from watson import search as watson
+from django.conf import settings
+from django.core.cache.backends.base import DEFAULT_TIMEOUT
+from django.views.decorators.cache import cache_page
 from django.db.models import Q
 from django.views.generic import (
     TemplateView,
     DetailView
 )
-
 from docs.models import Documento, Tipo, Proceso
 
+CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
 
-class DocIndex(TemplateView):
+
+class CacheMixin(object):
+    cache_timeout = CACHE_TTL
+
+    def get_cache_timeout(self):
+        return self.cache_timeout
+
+    def dispatch(self, *args, **kwargs):
+        return cache_page(self.get_cache_timeout())(super(CacheMixin, self).dispatch)(*args, **kwargs)
+
+
+class DocIndex(TemplateView, CacheMixin):
     template_name = 'docs/portada.html'
     # Consultas
     tipos = Tipo.objects.exclude(Q(slug='pro') | Q(slug='doc'))

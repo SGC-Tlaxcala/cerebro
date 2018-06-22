@@ -8,14 +8,15 @@ u"""Vistas de Depuración."""
 #       fecha: lunes, 28 de mayo de 2018
 
 from django.contrib import messages
-from django.db.models import Q, F
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, ListView
 from django.views.generic.edit import CreateView, UpdateView
 
 from rest_framework import viewsets
 from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
 
 from dpi.models import ExpedienteDPI
 from dpi.forms import ExpedienteForm
@@ -24,6 +25,18 @@ from dpi.serializers import ExpedienteSerializer
 DPI = Q(tipo='DPI')
 USI = Q(tipo='USI')
 TLAXCALA = Q(entidad=29)
+
+
+class ExpedientesIncompletos(ListView):
+    model = ExpedienteDPI
+    context_object_name = 'expedientes'
+    paginate_by = 6
+    make_object_list = True
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({'kpi_path': True})
+        return context
 
 
 class DPIIndex(TemplateView):
@@ -49,22 +62,21 @@ class DPIIndex(TemplateView):
         hay_fecha_envio_expediente
     )
 
-    context = {
-        'year': YEAR
-        , 'total_count': total.count()
-        , 'total_dpi': total_dpi.count()
-        , 'total_usi': total_usi.count()
-
-        , 'tlaxcala_count': tlaxcala_total.count()
-        , 'tlaxcala_total_dpi': tlaxcala_total_dpi.count()
-        , 'tlaxcala_total_usi': tlaxcala_total_usi.count()
-
-        , 'tlx_dpi_exp_completo': tlx_dpi_exp_completo.count()
+    contexto = {
+        'year': YEAR,
+        'total_count': total.count(),
+        'total_dpi': total_dpi.count(),
+        'total_usi': total_usi.count(),
+        'tlaxcala_count': tlaxcala_total.count(),
+        'tlaxcala_total_dpi': tlaxcala_total_dpi.count(),
+        'tlaxcala_total_usi': tlaxcala_total_usi.count(),
+        'tlx_dpi_exp_completo': tlx_dpi_exp_completo.count()
     }
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context = self.context
+        context.update({'kpi_path': True})
+        context.update(self.contexto)
         return context
 
 
@@ -73,6 +85,11 @@ class DPIAdd(CreateView):
     template_name = 'dpi/add.html'
     form_class = ExpedienteForm
     success_url = reverse_lazy('dpi:dpi_add')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({'kpi_path': True})
+        return context
 
     def form_valid(self, form):
         self.object = form.save(commit=False)
@@ -118,3 +135,9 @@ class ExpedienteSimpleViewSet(viewsets.ViewSet):
         expediente = get_object_or_404(queryset, folio=folio)
         serializer = ExpedienteSerializer(expediente)
         return Response(serializer.data)
+
+
+class ExpedienteIncompletoViewSet(viewsets.ReadOnlyModelViewSet ):
+    queryset = ExpedienteDPI.objects.filter(Q(completo=1), Q(entidad=29))
+    serializer_class = ExpedienteSerializer
+    permission_classes = [AllowAny, ]
