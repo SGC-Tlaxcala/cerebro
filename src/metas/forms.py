@@ -39,6 +39,7 @@ class MetasSPEForm(forms.ModelForm):
             ),
             Div(
                 Field('description', wrapper_class='col', rows='2'),
+                Field('soporte', wrapper_class='col'),
                 css_class='row'
             )
         )
