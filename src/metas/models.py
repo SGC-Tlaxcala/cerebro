@@ -47,7 +47,6 @@ class MetasSPE(models.Model):
     clave = models.CharField("Clave de la Meta", max_length=2)
     nom_corto = models.CharField('Identificación', max_length=25)
     year = models.PositiveIntegerField("Año")
-    eval = models.BooleanField('Evaluación', default=True)
 
     # Seguimiento y Medición
     ciclos = models.PositiveSmallIntegerField('Repeticiones')

@@ -18,7 +18,7 @@ class MesaForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(MesaForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper()
-        self.helper.layout = Layout(
+        self.helper .layout = Layout(
             Div(
                 Field('modulo', wrapper_class='col-md-2', autocomplete='off'),
                 Field('fecha', wrapper_class='col-md-2', autocomplete='off'),
