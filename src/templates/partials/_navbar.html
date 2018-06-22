@@ -18,6 +18,10 @@
           <li class="nav-item">
             <a class="nav-link {% current request 'docs' %}" href="{% url 'docs:index' %}"><i class="fa fa-book"></i> Documentación</a>
           </li>
+          <li class="nav-item">
+            <a href="{% url 'metas:index' %}" class="nav-link {% current request 'metas' %}">
+              <i class="fa fa-flag-checkered"></i> Metas</a>
+          </li>
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle {% if kpi_path %}active{% endif %}" href="#" id="dropDownIndicadores" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               <i class="fa fa-line-chart"></i> Indicadores
