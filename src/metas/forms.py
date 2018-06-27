@@ -41,6 +41,9 @@ class MetasSPEForm(forms.ModelForm):
                 Field('description', wrapper_class='col', rows='2'),
                 Field('soporte', wrapper_class='col'),
                 css_class='row'
+            ),
+            Div(
+                css_class='row'
             )
         )
         self.helper.add_input(Submit('submit', 'Enviar'))
