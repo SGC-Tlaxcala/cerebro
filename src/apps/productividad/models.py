@@ -71,7 +71,7 @@ class Cifras(TimeStampedModel):
     """Modelo para cifras."""
 
     # Datos del indicador
-    reporte_semanal = models.ForeignKey(ReporteSemanal, on_delete=models.CASCADE,)
+    reporte_semanal = models.ForeignKey(ReporteSemanal, related_name='cifras_reporte_semanal', on_delete= models.CASCADE)
 
     # Datos del Módulo
     modulo = models.ForeignKey(Modulo, related_name='cifras_semanales', on_delete=models.CASCADE,)
@@ -98,17 +98,17 @@ class Cifras(TimeStampedModel):
         editable=False)
 
     def __str__(self):
-        return "%s - %s" % (self.mac, self.reporte_semanal)
+        return "%s - %s" % (self.modulo, self.reporte_semanal)
 
     def save(self, *args, **kwargs):
         self.atenciones = self.tramites + self.cred_entregadas
         self.prod_dia = (self.tramites + self.cred_entregadas) / self.jornada
         self.prod_dia_est = (
                 (self.tramites + self.cred_entregadas) / self.jornada
-            ) / self.mac.historialmodulo.last().estaciones
+            ) / self.modulo.historialmodulo.last().estaciones
         super(Cifras, self).save(*args, **kwargs)
 
     class Meta:
         verbose_name = "Cifras Semanales"
         verbose_name_plural = "Reportes de Cifras"
-        ordering = ["mac__distrito", "mac__mac"]
+        ordering = ["modulo__distrito", "modulo__modulo"]

@@ -17,6 +17,7 @@ urlpatterns = [
     path('auth/', include('djoser.urls.jwt')),
     path('auth/', include('djoser.urls.authtoken')),
     path('admin/', admin.site.urls),
+    path('cifras/', include('apps.productividad.urls')),
     path('metas/', include('apps.metas.urls')),
     path('dpi/', include('apps.dpi.urls')),
     path('docs/', include('apps.docs.urls')),

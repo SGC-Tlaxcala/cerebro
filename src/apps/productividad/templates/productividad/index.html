@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+  <div class="container">
+    <div class="row">
+      <div class="col">
+        <h2>Reporte de Cifra</h2>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <form method="post" class="form">
+          {% for form in formset %}
+            {% crispy form %}
+          {% endfor %}
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock content %}
