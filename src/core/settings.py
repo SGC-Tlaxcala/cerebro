@@ -4,6 +4,7 @@ from django.contrib.messages import constants as messages
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = Path(__file__).ancestor(2)
+APPS_DIR = BASE_DIR.child('apps')
 env_path = BASE_DIR.child('.env.json')
 env = Environ(path=env_path)
 
@@ -38,11 +39,12 @@ THIRD_PARTY_APPS = [
 ]
 LOCAL_APPS = [
     'core',
-    'profiles',
-    'metas',
-    'dpi.apps.DpiConfig',
-    'docs.apps.DocsConfig',
-    'mesas'
+    'apps.profiles.config.ProfilesConfig',
+    'apps.metas.config.MetasConfig',
+    'apps.dpi.config.DpiConfig',
+    'apps.docs.config.DocsConfig',
+    'apps.mesas.config.MesasConfig',
+    'apps.productividad.config.ProductividadConfig'
 ]
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
@@ -61,7 +63,10 @@ ROOT_URLCONF = 'core.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['templates'],
+        'DIRS': [
+            APPS_DIR.child('templates'),
+            'templates'
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -128,13 +133,13 @@ USE_L10N = True
 USE_TZ = True
 SITE_ID = 1
 
-STATIC_ROOT = BASE_DIR.child('assets')
+STATIC_ROOT = APPS_DIR.child('assets')
 STATIC_URL = '/assets/'
 STATICFILES_DIRS = [
     'static',
 ]
 
-MEDIA_ROOT = BASE_DIR.child('media')
+MEDIA_ROOT = APPS_DIR.child('media')
 MEDIA_URL = '/media/'
 
 # CRISPY FORMS SETTINGS

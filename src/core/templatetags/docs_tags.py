@@ -9,7 +9,7 @@
 import re
 from django import template
 
-from mesas.models import CAUSAS
+from apps.mesas.models import CAUSAS
 
 register = template.Library()
 

@@ -6,7 +6,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
 from core.views import index
-from dpi import views as dpi
+from apps.dpi import views as dpi
 
 router = DefaultRouter()
 router.register(r'dpi', dpi.ExpedienteIncompletoViewSet)
@@ -17,9 +17,9 @@ urlpatterns = [
     path('auth/', include('djoser.urls.jwt')),
     path('auth/', include('djoser.urls.authtoken')),
     path('admin/', admin.site.urls),
-    path('metas/', include('metas.urls')),
-    path('dpi/', include('dpi.urls')),
-    path('docs/', include('docs.urls')),
-    path('mesas/', include('mesas.urls')),
+    path('metas/', include('apps.metas.urls')),
+    path('dpi/', include('apps.dpi.urls')),
+    path('docs/', include('apps.docs.urls')),
+    path('mesas/', include('apps.mesas.urls')),
     path('', index, name='index')
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
