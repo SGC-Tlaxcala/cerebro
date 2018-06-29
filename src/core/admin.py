@@ -15,7 +15,7 @@ class HistorialModuloInline(admin.TabularInline):
 
 class ModulosAdmin(admin.ModelAdmin):
     """Gestión de módulos."""
-    list_display = ('distrito', 'modulo','periodo', 'tipo', 'revisiones')
+    list_display = ('distrito', 'modulo', 'periodo', 'tipo', 'revisiones')
     list_display_links = ('modulo', )
     list_filter = ('distrito', 'modulo')
     exclude = ('author', )
@@ -39,7 +39,8 @@ class ModulosAdmin(admin.ModelAdmin):
 
     def periodo(self, mac):
         if mac.actual:
-            return f'De {mac.actual.fecha_inicio.strftime("%d/%m/%y")} a {mac.actual.fecha_termino.strftime("%d/%m/%y")}'
+            return \
+                f'De {mac.actual.fecha_inicio.strftime("%d/%m/%y")} a {mac.actual.fecha_termino.strftime("%d/%m/%y")}'
         else:
             return '-'
 
