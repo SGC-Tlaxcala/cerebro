@@ -43,6 +43,7 @@ class MetasSPEForm(forms.ModelForm):
                 css_class='row'
             ),
             Div(
+                Field('campos', wrapper_class='col', rows='3'),
                 css_class='row'
             )
         )
