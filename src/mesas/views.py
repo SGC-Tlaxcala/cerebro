@@ -10,12 +10,12 @@ from django.views.generic import TemplateView
 from django.views.generic.edit import CreateView
 from django.urls import reverse_lazy
 from django.db.models import Count, Q
-from mesas.models import Registro, CAUSAS
+from mesas.models import Registro, CAUSAS, INFORMACION, ENTREGA, OTRO
 from mesas.forms import MesaForm
 
-no_info = Q(causa=4)
-no_otro = Q(causa=9)
-no_entrega = Q(causa=5)
+no_info = Q(causa=INFORMACION)
+no_otro = Q(causa=OTRO)
+no_entrega = Q(causa=ENTREGA)
 
 
 class MesasIndex(TemplateView):

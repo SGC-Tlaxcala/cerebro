@@ -11,5 +11,5 @@ from metas.views import index
 
 app_name = 'metas'
 urlpatterns = [
-    path('', index, name='index_metas')
+    path('', index, name='index')
 ]
