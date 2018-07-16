@@ -1,6 +1,7 @@
 from unipath import Path
 from json_environ import Environ
 from django.contrib.messages import constants as messages
+import datetime
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = Path(__file__).ancestor(2)
@@ -32,6 +33,7 @@ DJANGO_APPS = [
 ]
 THIRD_PARTY_APPS = [
     'rest_framework',
+    'rest_framework.authtoken',
     'djoser',
     'crispy_forms',
     'django_extensions',
@@ -152,9 +154,17 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
     ),
+}
+
+JWT_AUTH = {
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=30),  # 3 days
+    'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=60),  # 3 days
+    'JWT_AUTH_COOKIE': 'JWT',
+    'JWT_ALLOW_REFRESH': True
 }
 
 MESSAGE_TAGS = {
