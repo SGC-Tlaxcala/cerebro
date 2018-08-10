@@ -1,5 +1,5 @@
 Django
-json_environ
+django_environ
 psycopg2-binary
 Unipath
 django-crispy-forms
