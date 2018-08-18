@@ -1,5 +1,6 @@
 # Cerebro
 .env
+.env.json
 .idea/
 media/
 .vscode/
