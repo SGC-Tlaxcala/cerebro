@@ -8,4 +8,4 @@ class DocsConfig(AppConfig):
 
     def ready(self):
         documento = self.get_model("Documento")
-        watson.register(documento.objects.filter(activo=True), field=('texto_ayuda', 'nombre', 'slug'))
+        watson.register(documento, field=('texto_ayuda', 'nombre', 'slug'))

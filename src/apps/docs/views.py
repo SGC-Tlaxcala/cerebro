@@ -80,7 +80,7 @@ class Buscador(TemplateView):
         query = self.request.GET.get('q')
         resultados = {}
         if query:
-            resultados = watson.filter(Documento.objects.filter(activo=True), query)
+            resultados = watson.search(query)
         context.update({
             'resultados': resultados,
             'query': query
