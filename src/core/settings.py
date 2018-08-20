@@ -42,11 +42,8 @@ THIRD_PARTY_APPS = [
 LOCAL_APPS = [
     'core',
     'apps.profiles.config.ProfilesConfig',
-    'apps.metas.config.MetasConfig',
-    'apps.dpi.config.DpiConfig',
     'apps.docs.config.DocsConfig',
-    'apps.mesas.config.MesasConfig',
-    'apps.productividad.config.ProductividadConfig'
+
 ]
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
