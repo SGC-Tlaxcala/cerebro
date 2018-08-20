@@ -37,7 +37,8 @@ THIRD_PARTY_APPS = [
     'djoser',
     'crispy_forms',
     'django_extensions',
-    'watson'
+    'watson',
+    'debug_toolbar',
 ]
 LOCAL_APPS = [
     'core',
@@ -55,6 +56,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware'
 ]
 
 ROOT_URLCONF = 'core.urls'
@@ -131,7 +133,6 @@ STATIC_ROOT = APPS_DIR.child('assets')
 STATIC_URL = '/assets/'
 STATICFILES_DIRS = [
     APPS_DIR.child('static'),
-    'static'
 ]
 
 MEDIA_ROOT = APPS_DIR.child('media')
@@ -167,14 +168,6 @@ MESSAGE_TAGS = {
     messages.ERROR: 'alert-danger',
 }
 
-if DEBUG:
-    CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
-        }
-    }
-    CACHE_TTL = 60 * 60 * 24 * 30
-
 LOGGING = {
     'disable_existing_loggers': False,
     'version': 1,
@@ -201,3 +194,5 @@ LOGGING = {
         # },
     },
 }
+
+INTERNAL_IPS = '127.0.0.1'
