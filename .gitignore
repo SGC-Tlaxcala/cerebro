@@ -1,8 +1,10 @@
 # Cerebro
+.env
 .env.json
 .idea/
 media/
 .vscode/
+fixtures/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

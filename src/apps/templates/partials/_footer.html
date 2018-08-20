@@ -1,6 +1,33 @@
 {% load staticfiles %}
-<footer class="py-5 navbar navbar-expand-md navbar-dark bg-dark">
-  <div class="row">
-    <div class="col">Footer</div>
+<footer class="py-5 bg-secondary text-light">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <h3>Sistema de Gestión de la Calidad</h3>
+      <p>
+        El Cuadro de Mando Integral es un desarrollo de la Junta Local de Tlaxcala
+        que contribuye a demostrar el cumplimiento de requisitos.
+      </p>
+    </div>
+    <div class="col-md-3">
+      <h4>Indicadores</h4>
+      <ul>
+        <li><a class="text-light bg-secondary" href="http://10.29.0.79:2014/"><i class="fa fa-flag-checkered"></i> Metas</a></li>
+        <li>Productividad</li>
+        <li>Encuestas</li>
+        <li>Control de DPI</li>
+      </ul>
+    </div>
+    <div class="col-md-3">
+      <h4>Enlaces</h4>
+      <ul>
+        <li><a class="text-light bg-secondary" href="https://ine.mx">Instituto Nacional Electoral</a></li>
+        <li><a class="text-light bg-secondary" href="http://www.efinf.com/client/INE/resumen.pdf">Resumen Informativo</a></li>
+        <li><a class="text-light bg-secondary" href="http://www.efinf.com/client/INE/Portadas.pdf">Portadas de los diarios</a></li>
+        <li><a class="text-light bg-secondary" href="http://www.efinf.com/client/INE/ine.pdf">INE Informativo</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="row justify-content-center">
+      <img class="img-responsive" height="50px" src="{% static 'img/logoINE-01.png' %}" alt="INE logo">
   </div>
 </footer>

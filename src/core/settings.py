@@ -1,13 +1,13 @@
 from unipath import Path
-from json_environ import Environ
+import environ
 from django.contrib.messages import constants as messages
 import datetime
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = Path(__file__).ancestor(2)
 APPS_DIR = BASE_DIR.child('apps')
-env_path = BASE_DIR.child('.env.json')
-env = Environ(path=env_path)
+env = environ.Env(DEBUG=(bool, False),)
+environ.Env.read_env(BASE_DIR.child('.env'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
@@ -17,7 +17,7 @@ SECRET_KEY = env('SECRET_KEY', default='5kho_evo8b7font)yy(^p!1w$skj%)#5yw-097cr
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env("DEBUG", default=True)
-ALLOWED_HOSTS = env('ALLOWED_HOSTS')
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default='*')
 if env('SSL', default=False) is True:
     SECURE_SSL_REDIRECT = False
 
@@ -42,11 +42,8 @@ THIRD_PARTY_APPS = [
 LOCAL_APPS = [
     'core',
     'apps.profiles.config.ProfilesConfig',
-    'apps.metas.config.MetasConfig',
-    'apps.dpi.config.DpiConfig',
     'apps.docs.config.DocsConfig',
-    'apps.mesas.config.MesasConfig',
-    'apps.productividad.config.ProductividadConfig'
+
 ]
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
@@ -88,12 +85,7 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': f'django.db.backends.{env("DATABASE:ENGINE", default="sqlite")}',
-        'NAME': env("DATABASE:NAME"),
-        'USER': env("DATABASE:USER"),
-        'PASSWORD': env("DATABASE:PASSWORD")
-    }
+    'default': env.db()
 }
 
 
