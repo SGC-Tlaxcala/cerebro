@@ -26,21 +26,23 @@
           </thead>
           <tbody>
             {% for res in resultados %}
-            <tr>
-              <td>
-                <a href="{% url 'docs:detalle' res.object.id %}">{{ res.object.nombre }}</a>
-              </td>
-              <td>
-                {{ res.object.clave|upper }}
-              </td>
-              {% if res.object.r_actual %}
-                <td style="text-align: center;">{{ res.object.r_actual }}</td>
-                <td>{{ res.object.revision_actual.f_actualizacion|date:"M d, Y" }}</td>
-              {% else %}
-                <td colspan="3">
-                </td>
+              {% if res.object.activo %}
+                <tr>
+                  <td>
+                    <a href="{% url 'docs:detalle' res.object.id %}">{{ res.object.nombre }}</a>
+                  </td>
+                  <td>
+                    {{ res.object.clave|upper }}
+                  </td>
+                  {% if res.object.r_actual %}
+                    <td style="text-align: center;">{{ res.object.r_actual }}</td>
+                    <td>{{ res.object.revision_actual.f_actualizacion|date:"M d, Y" }}</td>
+                  {% else %}
+                    <td colspan="3">
+                    </td>
+                  {% endif %}
+                </tr>
               {% endif %}
-            </tr>
             {% endfor %}
           </tbody>
         </table>
