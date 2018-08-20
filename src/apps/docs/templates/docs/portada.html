@@ -49,17 +49,10 @@
                 <tr>
                   <th>Documento</th>
                   <th>Código</th>
-                  <th>Revisión</th>
-                  <th>Aprobación</th>
                 </tr>
               </thead>
               <tbody>
                 {% for doc in los_docs %}
-                {% ifchanged doc.proceso %}
-                <tr>
-                  <td colspan="5" style="text-align: center;"><strong>{{doc.proceso}}</strong></td>
-                </tr>
-                {% endifchanged %}
                 <tr>
                   <td>
                     <a href="{% url 'docs:detalle' doc.id %}">{{ doc.nombre }}</a>
@@ -67,16 +60,6 @@
                   <td>
                     {{ doc.clave|upper }}
                   </td>
-                  {% if doc.r_actual %}
-                    <td style="text-align: center;">{{ doc.r_actual }}</td>
-                    <td>{{ doc.revision_actual.f_actualizacion|date:"M d, Y" }}</td>
-                  {% else %}
-                    <td colspan="3">
-                      <a href="{% url "docs.views.agregar_control" doc=doc.id %}">
-                        <i class="icon-plus-2"></i> Agregar una nueva revisión
-                      </a>
-                    </td>
-                  {% endif %}
                 </tr>
                 {% endfor %}
               </tbody>
@@ -91,17 +74,10 @@
                 <tr>
                   <th>Documento</th>
                   <th>Código</th>
-                  <th>Revisión</th>
-                  <th>Aprobación</th>
                 </tr>
               </thead>
               <tbody>
                 {% for doc in los_fmts %}
-                {% ifchanged doc.proceso %}
-                <tr>
-                  <td colspan="5" style="text-align: center;"><strong>{{doc.proceso}}</strong></td>
-                </tr>
-                {% endifchanged %}
                 <tr>
                   <td>
                     <a href="{% url 'docs:detalle' doc.id %}">{{ doc.nombre }}</a>
@@ -109,16 +85,6 @@
                   <td>
                     {{ doc.clave|upper }}
                   </td>
-                  {% if doc.r_actual %}
-                    <td style="text-align: center;">{{ doc.r_actual }}</td>
-                    <td>{{ doc.revision_actual.f_actualizacion|date:"M d, Y" }}</td>
-                  {% else %}
-                    <td colspan="3">
-                      <a href="{% url "docs.views.agregar_control" doc=doc.id %}">
-                        <i class="icon-plus-2"></i> Agregar una nueva revisión
-                      </a>
-                    </td>
-                  {% endif %}
                 </tr>
                 {% endfor %}
               </tbody>
@@ -133,17 +99,10 @@
                 <tr>
                   <th>Documento</th>
                   <th>Código</th>
-                  <th>Revisión</th>
-                  <th>Aprobación</th>
                 </tr>
               </thead>
               <tbody>
                 {% for doc in los_docs %}
-                {% ifchanged doc.proceso %}
-                <tr>
-                  <td colspan="5" style="text-align: center;"><strong>{{doc.proceso}}</strong></td>
-                </tr>
-                {% endifchanged %}
                 <tr>
                   <td>
                     <a href="{% url 'docs:detalle' doc.id %}">{{ doc.nombre }}</a>
@@ -151,16 +110,6 @@
                   <td>
                     {{ doc.clave|upper }}
                   </td>
-                  {% if doc.r_actual %}
-                    <td style="text-align: center;">{{ doc.r_actual }}</td>
-                    <td>{{ doc.revision_actual.f_actualizacion|date:"M d, Y" }}</td>
-                  {% else %}
-                    <td colspan="3">
-                      <a href="{% url "docs.views.agregar_control" doc=doc.id %}">
-                        <i class="icon-plus-2"></i> Agregar una nueva revisión
-                      </a>
-                    </td>
-                  {% endif %}
                 </tr>
                 {% endfor %}
               </tbody>
@@ -175,17 +124,10 @@
                 <tr>
                   <th>Documento</th>
                   <th>Código</th>
-                  <th>Revisión</th>
-                  <th>Aprobación</th>
                 </tr>
               </thead>
               <tbody>
                 {% for doc in los_exts %}
-                {% ifchanged doc.proceso %}
-                <tr>
-                  <td colspan="5" style="text-align: center;"><strong>{{doc.proceso}}</strong></td>
-                </tr>
-                {% endifchanged %}
                 <tr>
                   <td>
                     <a href="{% url 'docs:detalle' doc.id %}">{{ doc.nombre }}</a>
@@ -193,16 +135,6 @@
                   <td>
                     {{ doc.clave|upper }}
                   </td>
-                  {% if doc.r_actual %}
-                    <td style="text-align: center;">{{ doc.r_actual }}</td>
-                    <td>{{ doc.revision_actual.f_actualizacion|date:"M d, Y" }}</td>
-                  {% else %}
-                    <td colspan="3">
-                      <a href="{% url "docs.views.agregar_control" doc=doc.id %}">
-                        <i class="icon-plus-2"></i> Agregar una nueva revisión
-                      </a>
-                    </td>
-                  {% endif %}
                 </tr>
                 {% endfor %}
               </tbody>
@@ -217,17 +149,10 @@
                 <tr>
                   <th>Documento</th>
                   <th>Código</th>
-                  <th>Revisión</th>
-                  <th>Aprobación</th>
                 </tr>
               </thead>
               <tbody>
                 {% for doc in los_regs %}
-                {% ifchanged doc.proceso %}
-                <tr>
-                  <td colspan="5" style="text-align: center;"><strong>{{doc.proceso}}</strong></td>
-                </tr>
-                {% endifchanged %}
                 <tr>
                   <td>
                     <a href="{% url 'docs:detalle' doc.id %}">{{ doc.nombre }}</a>
@@ -235,16 +160,6 @@
                   <td>
                     {{ doc.clave|upper }}
                   </td>
-                  {% if doc.r_actual %}
-                    <td style="text-align: center;">{{ doc.r_actual }}</td>
-                    <td>{{ doc.revision_actual.f_actualizacion|date:"M d, Y" }}</td>
-                  {% else %}
-                    <td colspan="3">
-                      <a href="{% url "docs.views.agregar_control" doc=doc.id %}">
-                        <i class="icon-plus-2"></i> Agregar una nueva revisión
-                      </a>
-                    </td>
-                  {% endif %}
                 </tr>
                 {% endfor %}
               </tbody>
@@ -259,17 +174,10 @@
                 <tr>
                   <th>Documento</th>
                   <th>Código</th>
-                  <th>Revisión</th>
-                  <th>Aprobación</th>
                 </tr>
               </thead>
               <tbody>
                 {% for doc in las_stn %}
-                {% ifchanged doc.proceso %}
-                <tr>
-                  <td colspan="5" style="text-align: center;"><strong>{{doc.proceso}}</strong></td>
-                </tr>
-                {% endifchanged %}
                 <tr>
                   <td>
                     <a href="{% url 'docs:detalle' doc.id %}">{{ doc.nombre }}</a>
@@ -277,16 +185,6 @@
                   <td>
                     {{ doc.clave|upper }}
                   </td>
-                  {% if doc.r_actual %}
-                    <td style="text-align: center;">{{ doc.r_actual }}</td>
-                    <td>{{ doc.revision_actual.f_actualizacion|date:"M d, Y" }}</td>
-                  {% else %}
-                    <td colspan="3">
-                      <a href="{% url "docs.views.agregar_control" doc=doc.id %}">
-                        <i class="icon-plus-2"></i> Agregar una nueva revisión
-                      </a>
-                    </td>
-                  {% endif %}
                 </tr>
                 {% endfor %}
               </tbody>
@@ -301,17 +199,10 @@
                 <tr>
                   <th>Documento</th>
                   <th>Código</th>
-                  <th>Revisión</th>
-                  <th>Aprobación</th>
                 </tr>
               </thead>
               <tbody>
                 {% for doc in los_coc %}
-                {% ifchanged doc.proceso %}
-                <tr>
-                  <td colspan="5" style="text-align: center;"><strong>{{doc.proceso}}</strong></td>
-                </tr>
-                {% endifchanged %}
                 <tr>
                   <td>
                     <a href="{% url 'docs:detalle' doc.id %}">{{ doc.nombre }}</a>
@@ -319,16 +210,6 @@
                   <td>
                     {{ doc.clave|upper }}
                   </td>
-                  {% if doc.r_actual %}
-                    <td style="text-align: center;">{{ doc.r_actual }}</td>
-                    <td>{{ doc.revision_actual.f_actualizacion|date:"M d, Y" }}</td>
-                  {% else %}
-                    <td colspan="3">
-                      <a href="{% url "docs.views.agregar_control" doc=doc.id %}">
-                        <i class="icon-plus-2"></i> Agregar una nueva revisión
-                      </a>
-                    </td>
-                  {% endif %}
                 </tr>
                 {% endfor %}
               </tbody>

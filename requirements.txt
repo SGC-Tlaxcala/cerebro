@@ -12,3 +12,4 @@ django-extensions
 Werkzeug
 django-watson
 django-jsoneditor
+django-debug-toolbar
