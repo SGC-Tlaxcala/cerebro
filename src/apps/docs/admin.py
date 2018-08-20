@@ -32,8 +32,8 @@ class RevisionInline (admin.TabularInline):
 
 class DocumentoAdmin (admin.ModelAdmin):
     prepopulated_fields = {"slug": ("nombre",)}
-    list_display = ('nombre', 'proceso', 'tipo', 'activo')
-    list_filter = ['proceso', 'tipo', 'activo']
+    list_display = ('nombre', 'activo', 'proceso', 'tipo')
+    list_filter = ['proceso', 'activo', 'tipo']
     form = DocumentAdminForm
     inlines = [RevisionInline]
 
