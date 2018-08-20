@@ -18,7 +18,7 @@ class Tipo (models.Model):
     def __str__(self):
         return f'Tipo: {self.tipo}'
 
-  
+
 class Proceso (models.Model):
     proceso = models.CharField(max_length=80)
     slug = models.CharField(max_length=80)
@@ -33,7 +33,7 @@ class Proceso (models.Model):
         else:
             return f'Proceso {self.proceso}'
 
-  
+
 class Documento (models.Model):
     """Definición del Documento:
     - nombre: El nombre del documento
@@ -59,8 +59,8 @@ class Documento (models.Model):
 
     # Trazabilidad
     autor = models.ForeignKey(User, related_name='docs', editable=False, on_delete=models.CASCADE)
-    creacion = models.DateTimeField(auto_now_add=True)
-    actualiza = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ['tipo', 'id']
@@ -70,8 +70,8 @@ class Documento (models.Model):
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.nombre)
-        super(Documento, self).save(*args, **kwargs)      
-        
+        super(Documento, self).save(*args, **kwargs)
+
     def clave(self):
         """Devuelve la clave del documento, que es única y se forma por
         el tipo de documento (tres letras) y la identificación del documento"""
@@ -94,7 +94,7 @@ class Documento (models.Model):
             return x
         except IndexError:
             return ""
-  
+
     def historial(self):
         return self.revision_set.order_by('-revision')[1:]
 
@@ -131,12 +131,12 @@ class Revision (models.Model):
 
     # Trazabilidad
     autor = models.ForeignKey(User, related_name='revisions_user', editable=False, on_delete=models.CASCADE)
-    creacion = models.DateTimeField(auto_now_add=True)
-    actualiza = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return u"%s rev %02d (%s)" % (self.documento, self.revision, self.f_actualizacion)
-    
+
     class Meta:
         unique_together = (("documento", "revision"),)
         verbose_name = "Revisión"
