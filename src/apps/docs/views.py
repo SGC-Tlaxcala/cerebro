@@ -6,26 +6,22 @@
 # pylint: disable=W0613,R0201,R0903
 
 from watson import search as watson
-from django.http import Http404
-from django.shortcuts import render
 from django.db.models import Q
 from django.views.generic import (
+    ListView,
     TemplateView,
     DetailView
 )
 from apps.docs.models import Documento, Tipo, Proceso
 
 
-def index(request):
+class IndexList(ListView):
+    model = Documento
     template_name = 'docs/portada2.html'
-    try:
-        docs = Documento.objects.filter(Q(activo=True)).order_by('proceso', 'nombre').prefetch_related()
-    except Documento.DoesNotExist:
-        raise Http404('No hay documentos')
-    context = {
-        'docs': docs
-    }
-    return render(request, template_name, context)
+    context_object_name = 'docs'
+
+    def get_queryset(self):
+        return Documento.objects.filter(Q(activo=True)).order_by('proceso', 'nombre')
 
 
 class DocIndex(TemplateView):

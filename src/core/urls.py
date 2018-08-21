@@ -11,6 +11,7 @@ urlpatterns = [
     path('auth/', include('djoser.urls.authtoken')),
     path('admin/', admin.site.urls),
     path('docs/', include('apps.docs.urls')),
+    path('mesas/', include('apps.mesas.urls')),
 
 
     path('', index, name='index')
