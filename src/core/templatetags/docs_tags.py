@@ -33,4 +33,4 @@ def current(request, pattern):
 
 @register.filter
 def disqus_hash(value):
-    return value.replace("/","_")
+    return value.replace("/", "_")
