@@ -3,25 +3,17 @@ import environ
 from django.contrib.messages import constants as messages
 import datetime
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = Path(__file__).ancestor(2)
 APPS_DIR = BASE_DIR.child('apps')
 env = environ.Env(DEBUG=(bool, False),)
 environ.Env.read_env(BASE_DIR.child('.env'))
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env('SECRET_KEY', default='5kho_evo8b7font)yy(^p!1w$skj%)#5yw-097cr@=%w=8#i7z')
 
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env("DEBUG", default=True)
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default='*')
 if env('SSL', default=False) is True:
     SECURE_SSL_REDIRECT = False
-
-# Application definition
 
 DJANGO_APPS = [
     'django.contrib.admin',
@@ -82,17 +74,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'core.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/2.0/ref/settings/#databases
-
 DATABASES = {
     'default': env.db()
 }
-
-
-# Password validation
-# https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators
 
 if DEBUG:
     AUTH_PASSWORD_VALIDATORS = [
@@ -120,8 +104,6 @@ else:
     ]
 
 
-# Internationalization
-# https://docs.djangoproject.com/en/2.0/topics/i18n/
 LANGUAGE_CODE = 'es-mx'
 TIME_ZONE = 'Mexico/General'
 USE_I18N = True
@@ -138,10 +120,8 @@ STATICFILES_DIRS = [
 MEDIA_ROOT = APPS_DIR.child('media')
 MEDIA_URL = '/media/'
 
-# CRISPY FORMS SETTINGS
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
-# Rest Framework
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
@@ -188,10 +168,10 @@ LOGGING = {
             'propagate': False,    # this tells logger to send logging message
                                    # to its parent (will send if set to True)
         },
-        # 'django.db': {
-        #     # django also has database level logging
-        #     'level': 'DEBUG'
-        # },
+        'django.db': {
+            # django also has database level logging
+            'level': 'DEBUG'
+        },
     },
 }
 
