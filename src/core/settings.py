@@ -36,6 +36,7 @@ LOCAL_APPS = [
     'core',
     'apps.profiles.config.ProfilesConfig',
     'apps.docs.config.DocsConfig',
+    'apps.mesas.config.MesasConfig',
 
 ]
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -174,10 +175,10 @@ LOGGING = {
             'propagate': False,    # this tells logger to send logging message
                                    # to its parent (will send if set to True)
         },
-        'django.db': {
-            # django also has database level logging
-            'level': 'DEBUG'
-        },
+        # 'django.db': {
+        #     # django also has database level logging
+        #     'level': 'DEBUG'
+        # },
     },
 }
 
