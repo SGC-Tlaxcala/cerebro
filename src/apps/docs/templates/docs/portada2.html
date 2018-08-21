@@ -1,0 +1,38 @@
+{# docs/index.html #}
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="jumbotron p-3 p-md-5 rounded">
+    <div class="col-md-6 px-0">
+      <h1 class="display-5">Control de Documentos</h1>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col">
+      <h3>Documentación del SGC</h3>
+      <div class="table-responsive">
+        <table class="table table-striped table-bordered table-sm table-hover">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Documento</th>
+              <th>Código</th>
+              <th>Grupo</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for doc in docs %}
+            <tr>
+              <td>{{ forloop.counter }}</td>
+              <td><a href="{% url 'docs:detalle' doc.id %}">{{ doc.nombre }}</a></td>
+              <td>{{ doc.clave|upper }}</td>
+              <td>{{ doc.proceso }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div><!-- ./table-responsive -->
+    </div><!-- ./#pro-tab -->
+  </div>
+{% endblock content %}

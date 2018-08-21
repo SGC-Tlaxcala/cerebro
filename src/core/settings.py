@@ -148,6 +148,12 @@ MESSAGE_TAGS = {
     messages.ERROR: 'alert-danger',
 }
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+    }
+}
+
 LOGGING = {
     'disable_existing_loggers': False,
     'version': 1,
