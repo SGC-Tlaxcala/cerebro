@@ -6,7 +6,7 @@ After=network.target
 [Service]
 User=javier
 Group=javier
-WorkingDirectory=/home/javier/proyectos/cerebro
+WorkingDirectory=/home/javier/proyectos/cerebro/src
 ExecStart=/home/javier/.pyenv/versions/cerebro/bin/gunicorn \
   core.wsgi:application \
   --name cerebro \
