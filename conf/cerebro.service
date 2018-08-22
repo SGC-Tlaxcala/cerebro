@@ -12,7 +12,7 @@ ExecStart=/home/javier/.pyenv/versions/cerebro/bin/gunicorn \
   --name cerebro \
   --workers 3 \
   --user=javier --group=javier \
-  --access-logfile \
+  --access-logfile - \
   --log-level=debug \
   --bind=unix:/home/javier/proyectos/goals/run/cerebro.sock
 
