@@ -5,7 +5,7 @@ DJANGODIR=/home/javier/proyectos/cerebro/src
 SOCKFILE=/home/javier/proyectos/goals/run/cerebro.sock
 USER=javier
 GROUP=javier
-NUM_WORKERS=5
+NUM_WORKERS=3
 DJANGO_SETTINGS_MODULE=core.settings
 DJANGO_WSGI_MODULE=core.wsgi
 
@@ -17,7 +17,7 @@ source /home/javier/.pyenv/shims/activate cerebro
 export DJANGO_SETTINGS_MODULE=$DJANGO_SETTINGS_MODULE
 export PYTHONPATH=$DJANGODIR:$PYTHONPATH
 
-exec /home/javier/.pyenv/versions/goals/bin/gunicorn \
+exec /home/javier/.pyenv/versions/cerebro/bin/gunicorn \
   ${DJANGO_WSGI_MODULE}:application \
   --name $NAME \
   --workers $NUM_WORKERS \
