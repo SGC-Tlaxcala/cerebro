@@ -1,0 +1,8 @@
+[Unit]
+Description=cerebro socket
+
+[Socket]
+ListenStream=/home/javier/proyectos/cerebro/run/cerebro.sock
+
+[Install]
+WantedBy=sockets.target
