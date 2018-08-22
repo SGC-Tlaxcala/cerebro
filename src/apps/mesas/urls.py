@@ -6,10 +6,11 @@
 # pylint: disable=W0613,R0201,R0903
 
 from django.urls import path
+from django.contrib.auth.decorators import login_required
 from apps.mesas.views import MesasIndex, MesasAdd
 
 app_name = 'mesas'
 urlpatterns = [
     path('', MesasIndex.as_view(), name='index'),
-    path('add/', MesasAdd.as_view(), name='add')
+    path('add/', login_required(MesasAdd.as_view()), name='add')
 ]
