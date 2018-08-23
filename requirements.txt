@@ -13,3 +13,4 @@ Werkzeug
 django-watson
 django-jsoneditor
 django-debug-toolbar
+django-timedeltafield
