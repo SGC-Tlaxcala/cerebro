@@ -9,7 +9,6 @@
 #        app: cmi.distribucion
 #       desc: Vistas de la apps de distribucion de FCPVF
 
-# Modelo y formulario
 from .models import Envio, EnvioModulo
 from .forms import PreparacionForm, EnvioModuloForm
 from django.db.models import Avg, Sum, Q, Max
@@ -23,29 +22,42 @@ from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 from django.forms.formsets import formset_factory
 from django.http import HttpResponseRedirect, HttpResponse
+from django.shortcuts import render
+from django.views import View
 import logging
 logr = logging.getLogger(__name__)
 
 
 YEAR = 2018
 
+
 # Expediente de envio
 def envio_expediente(request, envio):
     e = Envio.objects.get(pk=envio)
     tran_tmp = e.recibido_vrd - e.envio_cnd
     transito = (tran_tmp.seconds / 60)
-    return render_to_response("paquetes/envio_expediente.html",
-        {'e':e,
-        'transito': transito,
-        'title': 'Expendiente del Envío'},
-        context_instance=RequestContext(request)
-        )
+    return render(
+        request, "paquetes/envio_expediente.html", {
+            'e': e, 'transito': transito,
+            'title': 'Expendiente del Envío'
+        }
+    )
+
 
 # Vista AJAX auxiliar para generar Módulos
 @render_to('paquetes/distrito.html')
 def envio_distrito (request, dist):
     mac = Modulo.objects.filter(dto=dist)
-    return {'mac':mac}
+    return {'mac': mac}
+
+
+class EnvioDistrito(View):
+    template_name = 'paquetes/distrito.html'
+
+    def get(self, request, *args, **kwargs):
+        mac = Modulo.objects.filter(dto=kwargs['dist'])
+        return render(request, self.template_name)
+
 
 def envio_ajax_suma_paquete (request, envio):
     e = Envio.objects.get(pk=envio)
@@ -80,12 +92,13 @@ def distro_index (request):
     return {'title':'Distribución de FCPVF', 'mnDistro':True, 'mnIndicadores':True,
             'tramo_cnd': tramo_cnd, 'tramo_local':tramo_local, 'tabla_local':tabla_local, 'mini_envio':mini_envios}
 
+
 @render_to('paquetes/envio_remesa.html')
 def envio_remesa(request, remesa, distrito):
     r = Remesa.objects.get(remesa=remesa)
     e = Envio.objects.filter(Q(fecha_corte__gte=r.inicio), Q(fecha_corte__lte=r.fin), distrito=distrito)
     emac =  EnvioModulo.objects.filter(Q(lote__fecha_corte__gte=r.inicio), Q(lote__fecha_corte__lte=r.fin), lote__distrito=distrito)
-    return {'title':'Envios por Distrito y Remesa', 'r':r, 'e':e, 'd':distrito, 'emac':emac}
+    return {'title': 'Envios por Distrito y Remesa', 'r': r, 'e': e, 'd': distrito, 'emac': emac}
 
 
 FORMS = [
@@ -96,6 +109,7 @@ TEMPLATES = {
     '0':'paquetes/envio_paso1.html',
     '1':'paquetes/envio_paso2.html'
 }
+
 
 # ################### #
 # ### envio_paso1 ### #
