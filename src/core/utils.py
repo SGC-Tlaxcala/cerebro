@@ -10,6 +10,7 @@ u"""Funciones útiles comunes a cerebro."""
 from datetime import date
 from workdays import networkdays
 from django import forms
+from core.models import Remesa
 
 
 INICIO_PROCESO = date(2017, 9, 1)
@@ -57,3 +58,12 @@ class HorizontalRadioSelect(forms.RadioSelect):
     """Clase auxiliar para botones horizontales."""
 
     template_name = 'forms/radio_horizontal.html'
+
+
+def get_remesa(fecha):
+    try:
+        for rem in Remesa.objects.all():
+            if rem.inicio <= fecha <= rem.fin:
+                return rem
+    except Remesa.DoesNotExist:
+        return None

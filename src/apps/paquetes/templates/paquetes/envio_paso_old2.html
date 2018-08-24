@@ -1,0 +1,37 @@
+{# Template Distribución de FCPVF #}
+{% extends "2014/base.html" %}
+{% load sgc %}
+
+{% block header_js %}
+  {{ form.media }}
+  <link rel="stylesheet" href="{{ STATIC_URL }}2014/css/bootstrap-datetimepicker.min.css">
+{% endblock header_js %}
+
+{% block footer_js %}
+  <script src="{{ STATIC_URL }}2014/js/moment.js"></script>
+  <script src="{{ STATIC_URL }}2014/js/bootstrap-datetimepicker.min.js"></script>
+{% endblock %}
+
+
+{% block contenido %}
+<div class="col-md-12">
+  <div class="page-header">
+    <h1><span class="icon-rocket"></span> {{title}} <span>Paso 2 de 2</span></h1>
+  </div>
+
+  <div class="span12">
+    <form class="form" action="/distribucion/paso2/" method="post">
+      {% csrf_token %}
+
+      {{ form }}
+
+      <div class="control-group">
+        <div class="controls">
+          <button type="submit" class="btn btn-primary">Guardar y <strong>Capturar</strong> datos de Módulos</button>
+        </div>
+      </div>  
+    </form>
+    <hr>
+  </div>
+</div>
+{% endblock contenido %}

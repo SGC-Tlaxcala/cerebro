@@ -1,0 +1,5 @@
+{% for m in mac %}<label class="checkbox-inline">
+  <input type="checkbox" id="id_mac_{{forloop.counter0}}" name="mac" value="{{m.mac}}">
+  {{m}}
+</label>
+{% endfor %}

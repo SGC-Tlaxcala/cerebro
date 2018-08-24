@@ -15,7 +15,7 @@ from .forms import PreparacionForm, EnvioModuloForm
 from django.db.models import Avg, Sum, Q, Max
 from collections import OrderedDict
 from core.models import Modulo, Remesa
-from core.util import remesa
+from core.utils import get_remesa
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from annoying.decorators import render_to
@@ -34,7 +34,7 @@ def envio_expediente(request, envio):
     e = Envio.objects.get(pk=envio)
     tran_tmp = e.recibido_vrd - e.envio_cnd
     transito = (tran_tmp.seconds / 60)
-    return render_to_response("2014/distribucion/envio_expediente.html",
+    return render_to_response("paquetes/envio_expediente.html",
         {'e':e,
         'transito': transito,
         'title': 'Expendiente del Envío'},
@@ -42,7 +42,7 @@ def envio_expediente(request, envio):
         )
 
 # Vista AJAX auxiliar para generar Módulos
-@render_to('2014/distribucion/distrito.html')
+@render_to('paquetes/distrito.html')
 def envio_distrito (request, dist):
     mac = Modulo.objects.filter(dto=dist)
     return {'mac':mac}
@@ -55,7 +55,7 @@ def envio_ajax_suma_paquete (request, envio):
     context_instance=RequestContext(request) )
 
 
-@render_to('2014/distribucion/distro_index.html')
+@render_to('paquetes/distro_index.html')
 def distro_index (request):
     tramo_local = OrderedDict()
     tabla_local = OrderedDict()
@@ -80,7 +80,7 @@ def distro_index (request):
     return {'title':'Distribución de FCPVF', 'mnDistro':True, 'mnIndicadores':True,
             'tramo_cnd': tramo_cnd, 'tramo_local':tramo_local, 'tabla_local':tabla_local, 'mini_envio':mini_envios}
 
-@render_to('2014/distribucion/envio_remesa.html')
+@render_to('paquetes/envio_remesa.html')
 def envio_remesa(request, remesa, distrito):
     r = Remesa.objects.get(remesa=remesa)
     e = Envio.objects.filter(Q(fecha_corte__gte=r.inicio), Q(fecha_corte__lte=r.fin), distrito=distrito)
@@ -93,14 +93,14 @@ FORMS = [
     ('paso2', EnvioModuloForm)
 ]
 TEMPLATES = {
-    '0':'2014/distribucion/envio_paso1.html',
-    '1':'2014/distribucion/envio_paso2.html'
+    '0':'paquetes/envio_paso1.html',
+    '1':'paquetes/envio_paso2.html'
 }
 
 # ################### #
 # ### envio_paso1 ### #
 # ################### #
-@render_to('2014/distribucion/envio_paso1.html')
+@render_to('paquetes/envio_paso1.html')
 @login_required
 def envio_paso1(request):
     if request.method == 'POST':
@@ -118,7 +118,7 @@ def envio_paso1(request):
             request.session['envio_distrito'] = request.POST['distrito']
         if form.is_valid():
             datos = form.cleaned_data
-            rem = remesa(datos['recibido_vrd'].date())
+            rem = get_remesa(datos['recibido_vrd'].date())
             obj = form.save(commit=False)
             obj.fecha_corte = rem.fin
             obj.modulos = len(datos['mac'])
@@ -173,7 +173,7 @@ def envio_paso2(request):
             formset = DistribucionFormSet(initial=macs)
         else:
             return HttpResponse (request.session['envio_fecha_corte'])
-    return render_to_response('2014/distribucion/envio_paso2.html',
+    return render_to_response('paquetes/envio_paso2.html',
         { 'formset': formset,
             'envio':envio,
           'title':'Captura de Distribución de Envios', },

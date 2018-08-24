@@ -1,0 +1,129 @@
+{# Template Distribución de FCPVF #}
+{% extends "comunes/metro.html" %}
+{% load sgc %}
+
+{% block contextual %}
+  <a class="btn btn-large btn-danger" type="button" href="/distribucion/paso1/">
+    Agregar un envio</a>
+{% endblock %}
+
+{% block hook_footer %}
+<script src="http://code.highcharts.com/highcharts.js"></script>
+<script src="http://code.highcharts.com/highcharts-more.js"></script>
+<script src="http://code.highcharts.com/modules/exporting.js"></script>
+
+<script>
+$(function () {
+    $('#container').highcharts({
+        chart: {
+            type: 'line',
+            marginRight: 130,
+            marginBottom: 60
+        },
+        title: {
+            text: 'Tiempos de Tránsito desde CND a VRD',
+            x: -20 //center
+        },
+        subtitle: {
+            text: 'Fuente: SGC Tlaxcala',
+            x: -20
+        },
+        xAxis: {
+            labels: {
+                    rotation: -45,
+                    align: 'right',
+                    style: {
+                        fontSize: '13px',
+                        fontFamily: 'Verdana, sans-serif'
+                    } },
+            categories: [{% for s in data%}'{{s|date:"d/m/Y"}}'{% if forloop.last %}{% else %},{% endif %}{% endfor%}]
+        },
+        yAxis: {
+            title: { text: 'Horas (dd hh:mm)' },
+            min: 0,
+            max: 800,
+            plotLines: [{
+                value: 0,
+                width: 1,
+                color: '#808080'
+            },
+            {
+                color: 'blue',
+                width: 2,
+                value: 48,
+                dashStyle: 'longdashdot'
+            }
+            ]
+        },
+        tooltip: {
+            valueSuffix: ' hrs'
+        },
+        legend: {
+            layout: 'vertical',
+            align: 'right',
+            verticalAlign: 'top',
+            x: 0,
+            y: 100,
+            borderWidth: 0
+        },
+        series: [{
+                name: 'Distrito 01',
+                data: [{% for s,k in data.items %}{{k.1|ceros}}{% if forloop.last %}{% else %},{% endif %}{% endfor%}]
+            }, {
+                name: 'Distrito 02',
+                data: [{% for s,k in data.items %}{{k.2|ceros}}{% if forloop.last %}{% else %},{% endif %}{% endfor%}]
+            }, {
+                name: 'Distrito 03',
+                data: [{% for s,k in data.items %}{{k.3|ceros}}{% if forloop.last %}{% else %},{% endif %}{% endfor%}]
+        }, ]
+    });
+});
+</script>
+{% endblock %}
+
+
+{% block contenido %}
+<div class="page-header">
+  <h1><span class="icon-rocket"></span> {{title}}</h1>
+</div>
+
+<div class="col-md-12">
+    <p>
+        <div id="container" style="min-width: 400px; height: 400px; margin: 0 auto"></div>
+    </p>
+    <div class="border"></div>
+    
+    <table class="table">
+        <thead>
+            <th><i class="icon-calendar"></i> Corte</th>
+            <th><i class="icon-home"></i> Distrito</th>
+            <th><i class="icon-cube-2"></i>Lote</th>
+            <th><i class="icon-bus"></i> Tránsito</th>
+        </thead>
+        <tbody>
+            {% for e in envio %}
+            <tr>
+                <td>{{e.fecha_corte}}</td>
+                <td>{{e.distrito}}</td>
+                <td><a href="envio/{{e.id}}">{{e.lote}}_{{e.tipo_lote}}</a> <i class="icon-pencil-2"></i></td>
+                <td>{{e.transito}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+<!-- Next/Prev page links  -->
+{% if envio.object_list and envio.paginator.num_pages > 1 %}
+<div class="paging">
+    {% if envio.has_previous %}
+    <a href= "?page={{ envio.previous_page_number }}">envio recientes</a>
+    {% endif %}
+  <span class="current">
+    Página {{ envio.number }} de {{ envio.paginator.num_pages }}
+  </span>
+    {% if envio.has_next %}
+    <a href="?page={{ envio.next_page_number }}"> envio anteriores</a>
+    {% endif %}
+</div>
+{% endif %}
+</div>
+{% endblock contenido %}
