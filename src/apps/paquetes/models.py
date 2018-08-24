@@ -50,7 +50,7 @@ class Envio(TimeStampedModel):
     credenciales = models.IntegerField('Número de FCPVF en el envio')
     cajas = models.PositiveSmallIntegerField('Número de cajas')
     envio_cnd = models.DateTimeField('Fecha de envio CND')
-    recibido_vrd=models.DateTimeField('Fecha de recibido en Vocalía Distrital')
+    recibido_vrd = models.DateTimeField('Fecha de recibido en Vocalía Distrital')
     transito = models.DurationField(editable=False)
     tran_sec = models.FloatField(editable=False)
     autor = models.ForeignKey(User, related_name='prod_parcel', editable=False, on_delete=models.CASCADE)
@@ -63,7 +63,7 @@ class Envio(TimeStampedModel):
             for rem in Remesa.objects.all():
                 if rem.inicio <= self.recibido_vrd.date() <= rem.fin:
                     self.fecha_corte = rem.fin
-        except:
+        except Remesa.DoesNotExist:
             self.fecha_corte = None
         self.transito = self.recibido_vrd - self.envio_cnd
         self.tran_sec = self.transito.total_seconds()
@@ -74,7 +74,7 @@ class Envio(TimeStampedModel):
             for rem in Remesa.objects.all():
                 if rem.inicio <= self.fecha_corte <= rem.fin:
                     return rem.remesa
-        except:
+        except Remesa.DoesNotExist:
             return None
 
     remesa.short_description = "Remesa"
@@ -105,7 +105,7 @@ class EnvioModulo (models.Model):
         ('353', '290353'),
     )
     lote = models.ForeignKey(Envio, on_delete=models.CASCADE)
-    mac = models.CharField (max_length=3, choices=MODULO)
+    mac = models.CharField(max_length=3, choices=MODULO)
     paquetes = models.PositiveSmallIntegerField()
     formatos = models.IntegerField()
     recibido_mac = models.DateTimeField()
@@ -120,15 +120,15 @@ class EnvioModulo (models.Model):
     def _get_remesa(self):
             try:
                 for rem in Remesa.objects.all():
-                    if self.lote.fecha_corte >= rem.inicio and self.lote.fecha_corte <= rem.fin:
+                    if rem.inicio <= self.lote.fecha_corte <= rem.fin:
                         return rem
-            except:
+            except Remesa.DoesNotExist:
                 return None
 
     def save(self, *args, **kwargs):
         self.transito = self.disponible_mac - self.lote.recibido_vrd
         self.tran_sec = self.transito.total_seconds()
-        super (EnvioModulo, self).save(*args, **kwargs)
+        super(EnvioModulo, self).save(*args, **kwargs)
 
     class Meta:
         verbose_name = "Paquete"
