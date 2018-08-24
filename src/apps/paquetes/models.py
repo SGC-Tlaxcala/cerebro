@@ -7,43 +7,45 @@
 
 from django.db import models
 from django.contrib.auth.models import User
-from core.models import Remesa
+from core.models import Remesa, TimeStampedModel
 
 
-class Trazabilidad(models.Model):
-    """
-    Una clase abstracta que sirve de base para modelos.
-    Actualiza automáticamente los campos ``creado`` y ``modificado``.
-    """
-    creado = models.DateTimeField(auto_now_add=True)
-    modificado = models.DateTimeField(auto_now=True)
-    class Meta:
-        abstract = True
-
-
-class Envio(Trazabilidad):
+class Envio(TimeStampedModel):
+    ACTUALIZACION = 1
+    APELACION = 2
     TIPO_CINTA = (
-            ('1', 'Actualizaciones'),
-            ('2', 'Recurso de Apelación'),
-        )
+        (ACTUALIZACION, 'Actualizaciones'),
+        (APELACION, 'Recurso de Apelación'),
+    )
+
+    ORD = 'ORD'
+    BIS = 'BIS'
+    REI = 'REI'
+    RA = 'RA'
+    EXT = 'EXT'
     TIPO_LOTE = (
-            ('ORD', 'ORD'),
-            ('BIS', 'BIS'),
-            ('REI', 'REI'),
-            ('RA', 'RA'),
-            ('EXT', 'EXT'),
-        )
+        (ORD, 'ORD'),
+        (BIS, 'BIS'),
+        (REI, 'REI'),
+        (RA, 'RA'),
+        (EXT, 'EXT'),
+    )
+
+    JD01 = 1
+    JD02 = 2
+    JD03 = 3
     DISTRITO = (
-            ('1', 'Apizaco - Distrito 01'),
-            ('2', 'Tlaxcala - Distrito 02'),
-            ('3', 'Zacatelco - Distrito 03'),
-        )
+        (JD01, 'Apizaco - Distrito 01'),
+        (JD02, 'Tlaxcala - Distrito 02'),
+        (JD03, 'Zacatelco - Distrito 03'),
+    )
+
     fecha_corte = models.DateField('Fecha de Corte', editable=False, null=True)
     distrito = models.CharField('Distrito', max_length=1, choices=DISTRITO)
     lote = models.CharField(max_length=11)
     tipo_lote = models.CharField('Tipo de Lote', max_length=3, choices=TIPO_LOTE)
-    num_prod = models.CharField ('Número de Producción', max_length=7)
-    tipo_cinta = models.CharField ('Tipo de Cinta', max_length=1, choices=TIPO_CINTA)
+    num_prod = models.CharField('Número de Producción', max_length=7)
+    tipo_cinta = models.CharField('Tipo de Cinta', max_length=1, choices=TIPO_CINTA)
     modulos = models.PositiveSmallIntegerField('Número de Módulos')
     credenciales = models.IntegerField('Número de FCPVF en el envio')
     cajas = models.PositiveSmallIntegerField('Número de cajas')
