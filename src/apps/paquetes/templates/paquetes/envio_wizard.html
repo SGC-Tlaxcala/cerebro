@@ -1,0 +1,76 @@
+{# Template Distribución de FCPVF #}
+{% extends "2014/base.html" %}
+{% load sgc %}
+
+{% block header_js %}
+  {{ wizard.form.media }}
+  <link rel="stylesheet" href="{{ STATIC_URL }}2014/css/bootstrap-datetimepicker.min.css">
+{% endblock header_js %}
+
+
+{% block footer_js %}
+  <script src="{{ STATIC_URL }}2014/js/moment.js"></script>
+  <script src="{{ STATIC_URL }}2014/js/bootstrap-datetimepicker.min.js"></script>
+<script>
+  function dynamic_Select(ajax_page, distrito) {
+    $.ajax({
+      type: "GET",
+      url: ajax_page + distrito,
+      dataType: "html",
+      success:
+        function(macs){
+          $("#modulos").html(macs);
+        }
+    });
+  }
+
+  $(function() {
+    $('#datetimepicker8').datetimepicker();
+    $('#datetimepicker9').datetimepicker();
+
+    $("#datetimepicker8").on("dp.change",function (e) {
+      $('#datetimepicker9').data("DateTimePicker").setMinDate(e.date);
+    });
+    $("#datetimepicker9").on("dp.change",function (e) {
+      $('#datetimepicker8').data("DateTimePicker").setMaxDate(e.date);
+    });
+  });
+</script>
+{% endblock %}
+
+{% block contenido %}
+  <div class="row">
+    <div class="col-md-12">
+      <div class="page-header">
+        <h1>
+          <span class="icon-rocket"></span> Distribución de Credenciales
+          <small>Paso {{ wizard.steps.step1 }} de {{ wizard.steps.count }}</small>
+        </h1>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <form action="" method="post">
+        {% csrf_token %}
+        <table class="table">
+          {{ wizard.management_form }}
+          {% if wizard.form.forms %}
+            {{ wizard.form.management_form }}
+            {% for form in wizard.form.forms %}
+              Hola
+            {% endfor %}
+          {% else %}
+            Hola
+          {% endif %}
+        </table>
+        {% if wizard.steps.prev %}
+          <button name="wizard_goto_step" type="submit" value="{{ wizard.steps.first }}">Primer Paso</button>
+          <button name="wizard_goto_step" type="submit" value="{{ wizard.steps.prev }}">Paso Anterior</button>
+        {% endif %}
+        <input type="submit" value="Enviar" %}">
+      </form>
+    </div>
+  </div>
+{% endblock contenido %}

@@ -14,6 +14,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('docs/', include('apps.docs.urls')),
     path('mesas/', include('apps.mesas.urls')),
+    path('paquetes/', include('apps.paquetes.urls')),
 
     path('', index, name='index')
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

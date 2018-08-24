@@ -1,0 +1,235 @@
+{# Template Distribución de FCPVF #}
+{% extends "2014/base.html" %}
+{% load sgc %}
+
+{% block header_js %}
+  {{ form.media }}
+  <link rel="stylesheet" href="{{ STATIC_URL }}2014/css/bootstrap-datetimepicker.min.css">
+{% endblock header_js %}
+
+
+{% block footer_js %}
+  <script src="{{ STATIC_URL }}2014/js/moment.js"></script>
+  <script src="{{ STATIC_URL }}2014/js/bootstrap-datetimepicker.min.js"></script>
+<script>
+  function dynamic_Select(ajax_page, distrito) {
+    $.ajax({
+      type: "GET",
+      url: ajax_page + distrito,
+      dataType: "html",
+      success:
+        function(macs){
+          $("#modulos").html(macs);
+        }
+    });
+  }
+
+  {% if request.session.envio_macs %}
+  $(function() {
+    $grupo = $("<div></div>");
+    {% for mac in request.session.envio_macs %}
+      $grupo.append('<label class="checkbox-inline"><input type="checkbox" checked="checked" id="id_mac_{{forloop.counter0}}" name="mac" value="{{mac}}">290{{ mac }}</label>');
+    {% endfor %}
+    $('#modulos').html($grupo)
+  });
+  {% endif %}
+
+  $(function() {
+    $('#datetimepicker8').datetimepicker();
+    $('#datetimepicker9').datetimepicker();
+
+    $("#datetimepicker8").on("dp.change",function (e) {
+      $('#datetimepicker9').data("DateTimePicker").setMinDate(e.date);
+    });
+    $("#datetimepicker9").on("dp.change",function (e) {
+      $('#datetimepicker8').data("DateTimePicker").setMaxDate(e.date);
+    });
+  });
+</script>
+{% endblock %}
+
+{% block contenido %}
+
+<div class="col-sm-12">
+  <div class="page-header">
+    <h1><span class="icon-rocket"></span> Captura de Envíos <small>Paso 1 de 2</small></h1>
+    <h2>{{ request.session.envio_macs }}</h2>
+  </div>
+
+  {% if form.errors %}
+    <div id="form-error">
+      <div class="alert alert-danger">
+        <p>Los datos no pudieron guardarse porque ocurrieron uno o más errores.<br />
+        Por favor, reenvia la información despues de corregir lo siguiente:</p>
+        {{ form.errors }}
+      </div>
+      {% if request.session.env %}
+      <div class="alert alert-info">
+        <p>
+          Si el envío <strong>ya existe</strong>, puedes editarlo en este enlace  <a class="alert-link" href="{% url 'envio_paso2' %}">Lote {{ request.session.lote }} del Distrito {{ request.session.distrito }}</a>.
+        </p>
+      </div>
+      {% endif %}
+    </div>
+  {% endif %}
+
+  <form class="form" action="{% url 'envio_paso1' %}" method="post">
+    {% csrf_token %}
+    <div class="row">
+      <div class="col-xs-2 text-right">
+        <label class="control-label" for="distrito">Distrito</label>
+      </div>
+      <div class="col-xs-3">
+        <div class="control-group">
+          <div class="controls">
+            {{ form.distrito }}
+          </div>
+        </div>
+      </div>
+      {% if form.distrito.errors %}<div class="alert alert-danger">{{form.distrito.errors.0}}</div>{% endif%}
+      <div class="col-md-2 text-right">
+        <label class="control-label" for="modulos">Cantidad de Módulos</label>
+      </div>
+      <div class="col-md-3">
+        {{ form.modulos }}
+      </div>
+    </div>
+    <hr>
+
+    <div class="row">
+      <div class="col-xs-2 text-right">
+        <label class="control-label text-right" for="mac">Módulos</label>
+      </div>
+      <div class="col-xs-5">
+        <div id="txtModulos" class="control-group">
+          <div class="controls">
+            <div id="modulos"></div>
+            {% if form.mac.errors %}<div class="alert alert-danger">{{form.mac.errors.0}}</div>{% endif%}
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr>
+
+    <div class="row">
+      <div class="col-xs-2 text-right">
+        <label class="control-label" for="id_lote">Lote</lote>
+      </div>
+      <div class="col-xs-2">
+        {{form.lote}}
+        {% if form.lote.errors %}<div class="alert alert-danger">{{form.lote.errors.0}}</div>{% endif%}
+        {% if form.lote.help_text %}<span class="help-block">{{form.lote.help_text|safe}}</span>{% endif %}
+      </div>
+      <div class="col-xs-offset-1 col-xs-2 text-right">
+        <label class="control-label" for="id_num_prod">Número de Producción</lote>
+      </div>
+      <div class="col-xs-2">
+        {{form.num_prod}}
+        {% if form.num_prod.errors %}<div class="alert alert-danger">{{form.num_prod.errors.0}}</div>{% endif%}
+        {% if form.num_prod.help_text %}<span class="help-block">{{form.num_prod.help_text|safe}}</span>{% endif %}
+      </div>
+    </div>
+    <hr>
+
+    <div class="row">
+      <div class="col-md-2 text-right">
+        <label class="control-label" for="id_tipo_lote">Tipo de Lote</label>
+      </div>
+      <div class="col-md-4">
+        {% for tipo in form.tipo_lote.field.choices %}
+        <label class="radio-inline">
+          <input type="radio"
+            id="id_tipo_lote_{{forloop.counter0}}"
+            name="tipo_lote"
+            value="{{tipo.0}}"
+            {% ifequal form.tipo_lote.data tipo.0 %}
+              checked="checked"
+            {% endifequal %}>
+          {{tipo.0}}
+        </label>
+        {% endfor %}
+        {% if form.tipo_lote.errors %}<div class="alert alert-danger">{{form.tipo_lote.errors.0}}</div>{% endif%}
+        {% if form.tipo_lote.help_text %}<span class="help-block">{{form.tipo_lote.help_text|safe}}</span>{% endif %}
+      </div>
+      <div class="col-md-2 text-right">
+        <label class="control-label">Tipo de Cinta</label>
+      </div>
+      <div class="col-md-4">
+        {% for tipo in form.tipo_cinta.field.choices %}
+        <label class="radio-inline">
+          <input type="radio"
+            id="id_tipo_cinta_{{forloop.counter0}}"
+            name="tipo_cinta"
+            value="{{tipo.0}}"
+            {% ifequal form.tipo_cinta.data tipo.0 %}
+              checked="checked"
+            {% endifequal %}>
+          {{tipo.1}}
+        </label>
+        {% endfor %}
+        {% if form.tipo_cinta.errors %}<div class="alert alert-danger">{{form.tipo_cinta.errors.0}}</div>{% endif%}
+        {% if form.tipo_cinta.help_text %}<span class="help-block">{{form.tipo_cinta.help_text|safe}}</span>{% endif %}
+      </div>
+    </div>
+    <hr>
+
+    <div class="row">
+      <div class="col-xs-2 text-right">
+        <label class="control-label" for="id_cajas">Cajas</lote>
+      </div>
+      <div class="col-xs-2">
+        {{form.cajas}}
+        {% if form.cajas.errors %}<div class="alert alert-danger">{{form.cajas.errors.0}}</div>{% endif%}
+        {% if form.cajas.help_text %}<span class="help-block">{{form.cajas.help_text|safe}}</span>{% endif %}
+      </div>
+      <div class="col-xs-offset-1 col-xs-2 text-right">
+        <label class="control-label" for="id_credenciales">Credenciales</lote>
+      </div>
+      <div class="col-xs-2">
+        {{form.credenciales}}
+        {% if form.credenciales.errors %}<div class="alert alert-danger">{{form.credenciales.errors}}</div>{% endif%}
+        {% if form.credenciales.help_text %}<span class="help-block">{{form.credenciales.help_text|safe}}</span>{% endif %}
+      </div>
+    </div>
+    <hr>
+
+    <div class="row">
+      <div class="col-xs-2 text-right">
+        <label class="control-label" for="id_envio_cnd">Envío desde CND</lote>
+      </div>
+      <div class="col-xs-3">
+        <div class="form-group">
+          <div class='input-group date' id='datetimepicker8' data-date-format="DD/MM/YYYY HH:mm">
+            {{ form.envio_cnd }}
+            <span class="input-group-addon"><span class="icon-calendar"></span>
+          </div>
+          {% if form.envio_cnd.errors %}<div class="alert alert-danger">{{form.envio_cnd.errors.0}}</div>{% endif%}
+          {% if form.envio_cnd.help_text %}<span class="help-block">{{form.envio_cnd.help_text|safe}}</span>{% endif %}
+        </div>
+      </div>
+      <div class="col-xs-2 text-right">
+        <label class="control-label" for="id_recibido_vrd">Recepción en VRD</lote>
+      </div>
+      <div class="col-xs-3">
+        <div class="form-group">
+          <div class='input-group date' id='datetimepicker9' data-date-format="DD/MM/YYYY HH:mm">
+            {{ form.recibido_vrd }}
+            <span class="input-group-addon"><span class="icon-calendar"></span>
+          </div>
+          {% if form.recibido_vrd.errors %}<div class="alert alert-danger">{{form.recibido_vrd.errors.0}}</div>{% endif%}
+          {% if form.recibido_vrd.help_text %}<span class="help-block">{{form.recibido_vrd.help_text|safe}}</span>{% endif %}
+        </div>
+      </div>
+    </div>
+    <hr>
+
+
+    <div class="control-group">
+      <div class="controls col-md-offset-2">
+        <button type="submit" class="btn btn-primary">Guardar y <strong>Capturar</strong> datos del envio</button>
+      </div>
+    </div>
+
+  </form>
+</div>
+{% endblock contenido %}
