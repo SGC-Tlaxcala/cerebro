@@ -3,16 +3,19 @@
 #      desc: Generación de formularios para Distribucion de FCPVF
 
 # Modelos
+from django import forms
 from .models import Envio, EnvioModulo
 import datetime as dt
 
 # Accesorios
-from django import forms
+
 
 # Formularios
 class EnvioModuloForm(forms.ModelForm):
     class Meta:
         model = EnvioModulo
+        fields = '__all__'
+
     mac = forms.CharField (
         widget=forms.TextInput(
             attrs={'class': 'col-md-1 form-control',}
@@ -60,6 +63,8 @@ class EnvioModuloForm(forms.ModelForm):
 class PreparacionForm(forms.ModelForm):
     class Meta:
         model = Envio
+        fields = '__all__'
+
     DISTRITO =(
         ('#', '-- Seleccionar --'),
         ('1', '1: Apizaco - Distrito 01'),

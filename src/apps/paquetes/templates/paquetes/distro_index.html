@@ -1,24 +1,23 @@
 {# Template Distribución de FCPVF #}
-{% extends "2014/base.html" %}
+{% extends "base.html" %}
 {% load sgc %}
 
-{% block container_before %}
-<div class="bs-header" id="content">
+{% block before_content %}
+<div class="bs-header" id="content" style="padding-top: 70px;">
   <div class="container">
     <h1><span class="icon-rocket"></span> {{title}}</h1>
     <p>
-      Asegurar que los formatos de Credencial para Votar están disponibles en 
+      Asegurar que los formatos de Credencial para Votar están disponibles en
       los MAC en la fecha asegurada es parte del compromiso que tiene el INE
       con los ciudadanos. Con este indicador nos aseguramos que cumplimos con
       nuestra parte de este compromiso.
     </p>
   </div>
 </div>
-{% include "2014/modulos/aviso2013.html" %}
 {% endblock %}
 
 
-{% block footer_js %}
+{% block footer %}
 <script src="http://code.highcharts.com/highcharts.js"></script>
 <script src="http://code.highcharts.com/highcharts-more.js"></script>
 <script src="http://code.highcharts.com/modules/exporting.js"></script>
@@ -105,14 +104,14 @@ $(function () {
         });
     });
 </script>
-{% endblock footer_js %}
+{% endblock footer %}
 
-{% block contenido %}
+{% block content %}
 
 <div class="col-sm-12">
   {% if perms.distribucion.add_envio %}
   <p>
-    <a class="btn btn-lg btn-danger" href="{% url 'envio_paso1' %}">Agregar un envío</a>
+    <a class="btn btn-lg btn-danger" href="{% url 'paquetes:envio_paso1' %}">Agregar un envío</a>
   </p>
   {% endif %}
 </div>
@@ -135,12 +134,12 @@ $(function () {
       {% for rem, data in tabla_local.items %}
       <tr>
         <td>{{rem|remesa}}</td>
-        <td><a href="{% url 'envio_remesa' remesa=rem|remesa distrito=1 %}">{{data.1|txthoras}}</a></td>
-        <td><a href="{% url 'envio_remesa' remesa=rem|remesa distrito=2 %}">{{data.2|txthoras}}</a></td>
-        <td><a href="{% url 'envio_remesa' remesa=rem|remesa distrito=3 %}">{{data.3|txthoras}}</a></td>
+        <td><a href="{% url 'paquetes:envio_remesa' remesa=rem|remesa distrito=1 %}">{{data.1|txthoras}}</a></td>
+        <td><a href="{% url 'paquetes:envio_remesa' remesa=rem|remesa distrito=2 %}">{{data.2|txthoras}}</a></td>
+        <td><a href="{% url 'paquetes:envio_remesa' remesa=rem|remesa distrito=3 %}">{{data.3|txthoras}}</a></td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
 </div>
-{% endblock contenido %}
+{% endblock content %}

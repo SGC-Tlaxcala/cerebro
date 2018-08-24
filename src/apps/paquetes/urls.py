@@ -7,12 +7,24 @@
 
 from django.urls import path
 from django.contrib.auth.decorators import login_required
-from apps.paquetes.views import distro_index
+from apps.paquetes.views import (
+    distro_index,
+    envio_paso1,
+    envio_paso2,
+    envio_distrito,
+    envio_remesa,
+    envio_ajax_suma_paquete
+)
 
 app_name = 'paquetes'
 urlpatterns = [
-    path('', "distro_index", name="index")
+    path('', distro_index, name="index"),
+    path('paso1/', envio_paso1, name='envio_paso1'),
+    path('paso2/', envio_paso2, name='envio_paso2'),
+
+    path('remesa/<str:remesa>/<int:distrito>', envio_remesa, name='envio_remesa')
 ]
+
 #     url(r"^$", "distro_index", name="distribucion"),
 #     url(r'^envio/(?P<envio>\d+)$', 'envio_expediente', name='envio_expediente'),
 #     url(r"^paso1/$", 'envio_paso1', name='envio_paso1'),
