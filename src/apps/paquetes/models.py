@@ -5,7 +5,6 @@
 # author: Javier Sanchez Toledano <js.toledano@me.com>
 # description: Modelos para la app de distribución del paquetes.
 
-import timedelta
 from django.db import models
 from django.contrib.auth.models import User
 from core.models import Remesa
@@ -50,7 +49,7 @@ class Envio(Trazabilidad):
     cajas = models.PositiveSmallIntegerField('Número de cajas')
     envio_cnd = models.DateTimeField('Fecha de envio CND')
     recibido_vrd=models.DateTimeField('Fecha de recibido en Vocalía Distrital')
-    transito = timedelta.fields.TimedeltaField(editable=False)
+    transito = models.DurationField(editable=False)
     tran_sec = models.FloatField(editable=False)
     autor = models.ForeignKey(User, related_name='prod_parcel', editable=False, on_delete=models.CASCADE)
 
@@ -109,10 +108,10 @@ class EnvioModulo (models.Model):
     formatos = models.IntegerField()
     recibido_mac = models.DateTimeField()
     disponible_mac = models.DateTimeField()
-    transito = timedelta.fields.TimedeltaField(editable=False)
+    transito = models.DurationField(editable=False)
     tran_sec = models.FloatField(editable=False)
 
-    def __unicode__(self):
+    def __str__(self):
         return '290%s - %s' % (self.mac, self.lote)
 
     @property
