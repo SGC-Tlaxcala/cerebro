@@ -1,129 +1,160 @@
 {# Template Distribución de FCPVF #}
-{% extends "comunes/metro.html" %}
+{% extends "base.html" %}
 {% load sgc %}
 
-{% block contextual %}
-  <a class="btn btn-large btn-danger" type="button" href="/distribucion/paso1/">
-    Agregar un envio</a>
+{% block before_content %}
+<div class="bs-header" id="content" style="padding-top: 70px;">
+  <div class="container">
+    <h1><span class="icon-rocket"></span> {{title}}</h1>
+    <p>
+      Asegurar que los formatos de Credencial para Votar están disponibles en
+      los MAC en la fecha asegurada es parte del compromiso que tiene el INE
+      con los ciudadanos. Con este indicador nos aseguramos que cumplimos con
+      nuestra parte de este compromiso.
+    </p>
+  </div>
+</div>
 {% endblock %}
 
-{% block hook_footer %}
+
+{% block footer %}
 <script src="http://code.highcharts.com/highcharts.js"></script>
 <script src="http://code.highcharts.com/highcharts-more.js"></script>
 <script src="http://code.highcharts.com/modules/exporting.js"></script>
+<script src="{{STATIC_URL}}2014/highcharts/modules/data.js"></script>
+<script src="{{STATIC_URL}}2014/highcharts/themes/grid.js"></script>
 
 <script>
 $(function () {
-    $('#container').highcharts({
-        chart: {
-            type: 'line',
-            marginRight: 130,
-            marginBottom: 60
-        },
-        title: {
-            text: 'Tiempos de Tránsito desde CND a VRD',
-            x: -20 //center
-        },
+	$('#grafica_tramo_local').highcharts({
+	    title: {
+	        text: 'Indicador «Distribución»',
+	        x: -20 //center
+	    },
         subtitle: {
-            text: 'Fuente: SGC Tlaxcala',
+            text: 'Distribución de FCPV (tramo local)',
             x: -20
         },
         xAxis: {
+            categories: [{% for rem, data in tramo_local.items %}'{{rem|remesa}}'{% if forloop.last %}{% else %},{% endif %}{% endfor %}],
+            minorGridLineWidth: 0,
             labels: {
-                    rotation: -45,
-                    align: 'right',
-                    style: {
-                        fontSize: '13px',
-                        fontFamily: 'Verdana, sans-serif'
-                    } },
-            categories: [{% for s in data%}'{{s|date:"d/m/Y"}}'{% if forloop.last %}{% else %},{% endif %}{% endfor%}]
+              rotation: -90,
+              y: 25
+            }
         },
         yAxis: {
-            title: { text: 'Horas (dd hh:mm)' },
-            min: 0,
-            max: 800,
+            min: 0, max: 120,
+            minorGridLineWidth: 0,
+            title: {
+                text: 'Tiempo en Horas'
+            },
+            plotBands: [
+              { // Meta SGC
+                from: 0,
+                to: 48,
+                color: 'rgba(68,170,213,0.1)',
+                label: {
+                  text: 'Meta SGC',
+                  style: { color:'#606060' }
+                }
+              },
+              { // Meta SGC
+                from: 48,
+                to: 72,
+                color: 'rgba(255,0,255,0.2)',
+                label: {
+                  text: 'Meta Oficinas Centrales',
+                  style: { color:'#606060' }
+                }
+              }
+            ],
+            tooltip: { formatter: function() {
+                return '<b>'+ this.series.name +'</b><br/>'+
+                parseInt(this.y/3600) +' horas - '+ this.x.toLowerCase(); }} ,
             plotLines: [{
                 value: 0,
                 width: 1,
                 color: '#808080'
-            },
-            {
-                color: 'blue',
-                width: 2,
-                value: 48,
-                dashStyle: 'longdashdot'
-            }
-            ]
+            }]
         },
         tooltip: {
-            valueSuffix: ' hrs'
+            valueSuffix: 'h.'
         },
         legend: {
             layout: 'vertical',
             align: 'right',
-            verticalAlign: 'top',
-            x: 0,
-            y: 100,
+            verticalAlign: 'middle',
             borderWidth: 0
         },
-        series: [{
-                name: 'Distrito 01',
-                data: [{% for s,k in data.items %}{{k.1|ceros}}{% if forloop.last %}{% else %},{% endif %}{% endfor%}]
-            }, {
-                name: 'Distrito 02',
-                data: [{% for s,k in data.items %}{{k.2|ceros}}{% if forloop.last %}{% else %},{% endif %}{% endfor%}]
-            }, {
-                name: 'Distrito 03',
-                data: [{% for s,k in data.items %}{{k.3|ceros}}{% if forloop.last %}{% else %},{% endif %}{% endfor%}]
-        }, ]
+        tooltip: {
+            pointFormat: "Intervalo: {point.y:.2f} hrs"
+        },
+        series: [
+            {
+                name: 'Distrtito 01',
+                data: [{% for rem, data in tramo_local.items %}{{data.1|horas}}{% if forloop.last %}{% else %},{% endif %}{% endfor %}]
+            },
+            {
+                name: 'Distrtito 02',
+                data: [{% for rem, data in tramo_local.items %}{{data.2|horas}}{% if forloop.last %}{% else %},{% endif %}{% endfor %}]
+            },
+                                            {
+                name: 'Distrtito 03',
+                data: [{% for rem, data in tramo_local.items %}{{data.3|horas}}{% if forloop.last %}{% else %},{% endif %}{% endfor %}]
+            }
+        ]
+        });
     });
-});
 </script>
-{% endblock %}
+{% endblock footer %}
 
+{% block content %}
 
-{% block contenido %}
-<div class="page-header">
-  <h1><span class="icon-rocket"></span> {{title}}</h1>
+<div class="col-sm-12">
+  {% if perms.distribucion.add_envio %}
+  <p>
+    <a class="btn btn-lg btn-danger" href="{% url 'paquetes:envio_paso1' %}">Agregar un envío</a>
+  </p>
+  {% endif %}
 </div>
 
-<div class="col-md-12">
-    <p>
-        <div id="container" style="min-width: 400px; height: 400px; margin: 0 auto"></div>
-    </p>
-    <div class="border"></div>
-    
-    <table class="table">
-        <thead>
-            <th><i class="icon-calendar"></i> Corte</th>
-            <th><i class="icon-home"></i> Distrito</th>
-            <th><i class="icon-cube-2"></i>Lote</th>
-            <th><i class="icon-bus"></i> Tránsito</th>
-        </thead>
-        <tbody>
-            {% for e in envio %}
-            <tr>
-                <td>{{e.fecha_corte}}</td>
-                <td>{{e.distrito}}</td>
-                <td><a href="envio/{{e.id}}">{{e.lote}}_{{e.tipo_lote}}</a> <i class="icon-pencil-2"></i></td>
-                <td>{{e.transito}}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-<!-- Next/Prev page links  -->
-{% if envio.object_list and envio.paginator.num_pages > 1 %}
-<div class="paging">
-    {% if envio.has_previous %}
-    <a href= "?page={{ envio.previous_page_number }}">envio recientes</a>
-    {% endif %}
-  <span class="current">
-    Página {{ envio.number }} de {{ envio.paginator.num_pages }}
-  </span>
-    {% if envio.has_next %}
-    <a href="?page={{ envio.next_page_number }}"> envio anteriores</a>
-    {% endif %}
+<div class="col-sm-12">
+
+  <div id="grafica_tramo_local" style="min-width: 400px; height: 500px; margin: 0 auto"></div>
+
+  <table id="data_tramo_local" class="table table-striped table-bordered table-hover">
+    <caption>Tramo VRD - Disponible</caption>
+    <thead>
+      <tr>
+        <th>Remesa</th>
+        <th>Distrito 01</th>
+        <th>Distrito 02</th>
+        <th>Distrito 03</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for rem, data in tabla_local.items %}
+      <tr>
+        <td>{{rem|remesa}}</td>
+        <td>
+          <a href="{% url 'paquetes:detalle' remesa=rem|remesa distrito=1 %}">
+            {{ data.1 | txthoras }}
+          </a>
+        </td>
+        <td>
+          <a href="{% url 'paquetes:detalle' remesa=rem|remesa distrito=2 %}">
+            {{ data.2|txthoras }}
+          </a>
+        </td>
+        <td>
+          <a href="{% url 'paquetes:detalle' remesa=rem|remesa distrito=3 %}">
+            {{ data.3|txthoras }}
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 </div>
-{% endif %}
-</div>
-{% endblock contenido %}
+{% endblock content %}

@@ -5,10 +5,6 @@
 # author: Javier Sanchez Toledano <js.toledano@me.com>
 # description: Vistas de la distribución de paquetes
 
-# -*- coding: utf-8 -*-
-#        app: cmi.distribucion
-#       desc: Vistas de la apps de distribucion de FCPVF
-
 from .models import Envio, EnvioModulo
 from .forms import PreparacionForm, EnvioModuloForm
 from django.db.models import Avg, Sum, Q, Max
@@ -24,6 +20,7 @@ from django.forms.formsets import formset_factory
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from django.views import View
+from django.views.generic.detail import DetailView
 import logging
 logr = logging.getLogger(__name__)
 
@@ -39,7 +36,7 @@ def envio_expediente(request, envio):
     return render(
         request, "paquetes/envio_expediente.html", {
             'e': e, 'transito': transito,
-            'title': 'Expendiente del Envío'
+            'title': 'Expediente del Envío'
         }
     )
 
@@ -63,42 +60,74 @@ def envio_ajax_suma_paquete (request, envio):
     e = Envio.objects.get(pk=envio)
     suma = e.enviomodulo_set.aggregate(Sum('formatos'))
     return render_to_response("distribucion/envio_ajax_suma_paquete.html",
-    {'suma':suma['formatos__sum']},
+    {'suma': suma['formatos__sum']},
     context_instance=RequestContext(request) )
 
 
-@render_to('paquetes/distro_index.html')
-def distro_index (request):
-    tramo_local = OrderedDict()
-    tabla_local = OrderedDict()
-    tramo_cnd   = OrderedDict()
+class PaquetesIndex(View):
+    template_name = 'paquetes/index.html'
 
-    envio_modulo = EnvioModulo.objects.values('lote__fecha_corte', 'lote__distrito').annotate(Avg('tran_sec'), Max('lote__recibido_vrd')).order_by('lote__fecha_corte', 'lote__distrito').filter(lote__fecha_corte__year=YEAR)
-    envio_cnd    = Envio.objects.values('fecha_corte', 'distrito').annotate(Avg('tran_sec')).order_by('fecha_corte', 'distrito').filter(fecha_corte__year=YEAR)
+    def get(self, request, *args, **kwargs):
+        tramo_local = OrderedDict()
+        tabla_local = OrderedDict()
+        tramo_cnd = OrderedDict()
 
-    for t in envio_modulo:
-        fecha_vrd   =t['lote__recibido_vrd__max'] # }
-        horas_local = t['tran_sec__avg']
-        tramo_local.setdefault(t['lote__fecha_corte'], {}).update({t['lote__distrito']:horas_local, 'vrd':fecha_vrd} )
-    for t in envio_modulo.order_by('-lote__fecha_corte'):
-        fecha_vrd   =t['lote__recibido_vrd__max'] # }
-        horas_local = t['tran_sec__avg']
-        tabla_local.setdefault(t['lote__fecha_corte'], {}).update({t['lote__distrito']:horas_local, 'vrd':fecha_vrd} )
-    for t in envio_cnd:
-        horas = t['tran_sec__avg']
-        tramo_cnd.setdefault(t['fecha_corte'], {}).update({t['distrito']:horas})
-    mini_envios = Envio.objects.filter(credenciales__lte=5)
+        envio_modulo = EnvioModulo.objects.values('lote__fecha_corte', 'lote__distrito')\
+            .annotate(Avg('tran_sec'), Max('lote__recibido_vrd'))\
+            .order_by('lote__fecha_corte', 'lote__distrito')\
+            .filter(lote__fecha_corte__year=YEAR)\
+            .prefetch_related()
+        envio_cnd = Envio.objects.values('fecha_corte', 'distrito')\
+            .annotate(Avg('tran_sec'))\
+            .order_by('fecha_corte', 'distrito')\
+            .filter(fecha_corte__year=YEAR)\
+            .prefetch_related()
 
-    return {'title':'Distribución de FCPVF', 'mnDistro':True, 'mnIndicadores':True,
-            'tramo_cnd': tramo_cnd, 'tramo_local':tramo_local, 'tabla_local':tabla_local, 'mini_envio':mini_envios}
+        for t in envio_modulo:
+            fecha_vrd =t['lote__recibido_vrd__max']
+            horas_local = t['tran_sec__avg']
+            tramo_local\
+                .setdefault(t['lote__fecha_corte'], {})\
+                .update({t['lote__distrito']: horas_local, 'vrd': fecha_vrd})
+        for t in envio_modulo.order_by('-lote__fecha_corte'):
+            fecha_vrd =t['lote__recibido_vrd__max']
+            horas_local = t['tran_sec__avg']
+            tabla_local\
+                .setdefault(t['lote__fecha_corte'], {})\
+                .update({t['lote__distrito']: horas_local, 'vrd': fecha_vrd})
+        for t in envio_cnd:
+            horas = t['tran_sec__avg']
+            tramo_cnd\
+                .setdefault(t['fecha_corte'], {})\
+                .update({t['distrito']: horas})
+        mini_parcel = Envio.objects.filter(credenciales__lte=5)
+
+        contexto = {
+            'title': 'Distribución de FCPVF',
+            'mnDistro': True, 'mnIndicadores': True,
+            'tramo_cnd': tramo_cnd,
+            'tramo_local': tramo_local,
+            'tabla_local': tabla_local,
+            'mini_envio': mini_parcel
+        }
+
+        return render(request, self.template_name, contexto)
 
 
-@render_to('paquetes/envio_remesa.html')
-def envio_remesa(request, remesa, distrito):
-    r = Remesa.objects.get(remesa=remesa)
-    e = Envio.objects.filter(Q(fecha_corte__gte=r.inicio), Q(fecha_corte__lte=r.fin), distrito=distrito)
-    emac =  EnvioModulo.objects.filter(Q(lote__fecha_corte__gte=r.inicio), Q(lote__fecha_corte__lte=r.fin), lote__distrito=distrito)
-    return {'title': 'Envios por Distrito y Remesa', 'r': r, 'e': e, 'd': distrito, 'emac': emac}
+class PaqueteDetalle(View):
+    template_name = 'paquetes/detalle.html'
+
+    def get(self, request, *args, **kwargs):
+        distrito = kwargs['distrito']
+        r = Remesa.objects.get(remesa=kwargs['remesa'])
+        e = Envio.objects\
+            .filter(Q(fecha_corte__gte=r.inicio), Q(fecha_corte__lte=r.fin), distrito=distrito)\
+            .prefetch_related()
+        emac = EnvioModulo.objects\
+            .filter(Q(lote__fecha_corte__gte=r.inicio), Q(lote__fecha_corte__lte=r.fin), lote__distrito=distrito)\
+            .prefetch_related()
+        contexto = {'title': 'Envíos por Distrito y Remesa', 'r': r, 'e': e, 'd': distrito, 'emac': emac}
+        return render(request, self.template_name, contexto)
 
 
 FORMS = [

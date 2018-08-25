@@ -5,24 +5,26 @@
 # author: Javier Sanchez Toledano <js.toledano@me.com>
 # description: Patrones de búsqueda
 
-from django.urls import path
+from django.urls import path, re_path
 from django.contrib.auth.decorators import login_required
 from apps.paquetes.views import (
-    distro_index,
+    PaquetesIndex,
     envio_paso1,
     envio_paso2,
     envio_distrito,
-    envio_remesa,
+    envio_expediente,
+    PaqueteDetalle,
     envio_ajax_suma_paquete
 )
 
 app_name = 'paquetes'
 urlpatterns = [
-    path('', distro_index, name="index"),
+    path('', PaquetesIndex.as_view(), name="index"),
+    re_path(r'^remesa/(?P<remesa>\d{4}-\d{2})/(?P<distrito>\d)/$', PaqueteDetalle.as_view(), name='detalle'),
     path('paso1/', envio_paso1, name='envio_paso1'),
     path('paso2/', envio_paso2, name='envio_paso2'),
+    re_path(r'^envio/(?P<envio>\d+)$', envio_expediente, name='envio_expediente')
 
-    path('remesa/<str:remesa>/<int:distrito>', envio_remesa, name='envio_remesa')
 ]
 
 #     url(r"^$", "distro_index", name="distribucion"),
