@@ -4,17 +4,17 @@
 
 {% block content %}
 <div class="row">
-    <div class="col-sm-12">
-        <div class="page-header">
-          <h1><span class="icon-rocket"></span> Distrito: 0{{d}} - {{r}}  <small>Tiempo de Distribución</small></h1>
-        </div>
+  <div class="col-sm-12">
+    <div class="page-header">
+      <h1><span class="icon-rocket"></span> Distrito: 0{{d}} - {{r}}  <small>Tiempo de Distribución</small></h1>
     </div>
+  </div>
 </div>
 
 <div class="row">
     <div class="col-sm-12">
       <div class="btn-group">
-        <a class="btn btn-default" href="{% url 'paquetes:index' %}"><i class="icon-back"></i> Regresar</a>
+        <a class="btn btn-secondary" href="{% url 'paquetes:index' %}"><i class="icon-back"></i> Regresar</a>
         {% if perms.distribucion.add_envio %}
           <a class="btn btn-danger" href="{% url 'paquetes:envio_paso1' %}"><i class="icon-plus-alt"></i> Agregar un envío</a>
         {% endif %}
@@ -36,10 +36,10 @@
     <div class="col-sm-12">
   <h3>Paquetes recibidos en el Distrito</h3>
   <div class="table-responsive">
-    <table class="table table-striped table-bordered table-hover">
+    <table class="table table-responsive table-sm table-striped table-bordered table-hover">
       <thead>
         <tr>
-          <thead>
+          <thead class="thead-dark">
             <th>Lote</th>
             <th># Prod.</th>
             <th>Módulos</th>
@@ -74,8 +74,8 @@
     <div class="col-sm-12 ">
   <h3>Paquetes Recibidos por Módulo</h3>
   <div class="table-responsive">
-    <table class="table table-striped table-bordered table-hover">
-      <thead>
+    <table class="table table-responsive table-sm table-striped table-bordered table-hover">
+      <thead class="thead-dark">
         <tr>
           <th>MAC</th>
           <th>Lote</th>
