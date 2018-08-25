@@ -5,13 +5,12 @@
 
 {% block header %}
   {{ form.media }}
-  <link rel="stylesheet" href="{% static 'paquetes/css/bootstrap-datetimepicker.min.css' %}">
 {% endblock header %}
 
 
 {% block footer %}
-  <script src="{% static 'paquetes/js/moment.js' %}"></script>
-  <script src="{% static 'paquetes/js/bootstrap-datetimepicker.min.js' %}"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gijgo@1.9.10/js/gijgo.min.js" type="text/javascript"></script>
+  <link href="https://cdn.jsdelivr.net/npm/gijgo@1.9.10/css/gijgo.min.css" rel="stylesheet" type="text/css" />
   <script>
     function dynamic_Select(ajax_page, distrito) {
       $.ajax({
@@ -36,16 +35,15 @@
     {% endif %}
 
     $(function() {
-      $('#datetimepicker8').datetimepicker();
-      $('#datetimepicker9').datetimepicker();
-
-      $("#datetimepicker8").on("dp.change",function (e) {
-        $('#datetimepicker9').data("DateTimePicker").setMinDate(e.date);
-      });
-      $("#datetimepicker9").on("dp.change",function (e) {
-        $('#datetimepicker8').data("DateTimePicker").setMaxDate(e.date);
-      });
-    });
+      let dtParameters = {
+         uiLibrary: 'bootstrap4',
+         footer: true,
+         modal: false,
+         format: 'dd/mm/yyyy HH:MM'
+       }
+      $('#id_envio_cnd').datetimepicker(dtParameters)
+      $('#id_recibido_vrd').datetimepicker(dtParameters)
+    })
   </script>
 {% endblock %}
 
@@ -80,62 +78,52 @@
 
   <form class="form" action="{% url 'paquetes:envio_paso1' %}" method="post">
     {% csrf_token %}
+
     <div class="row">
       <div class="col">
-        div
-      </div>
-
-      <div class="col-sm-2">
-        <label class="control-label" for="distrito">Distrito</label>
-      </div>
-      <div class="">
-        <div class="control-group">
-          <div class="controls">
-            {{ form.distrito }}
-          </div>
+        <div class="form-group">
+          <label for="id_distrito">Distrito</label>
+          {{ form.distrito }}
         </div>
       </div>
       {% if form.distrito.errors %}<div class="alert alert-danger">{{form.distrito.errors.0}}</div>{% endif%}
-      <div class="col-md-2 text-right">
-        <label class="control-label" for="modulos">Cantidad de Módulos</label>
-      </div>
-      <div class="col-md-3">
-        {{ form.modulos }}
-      </div>
-    </div>
-    <hr>
-
-    <div class="row">
-      <div class="col-xs-2 text-right">
-        <label class="control-label text-right" for="mac">Módulos</label>
-      </div>
-      <div class="col-xs-5">
-        <div id="txtModulos" class="control-group">
-          <div class="controls">
-            <div id="modulos"></div>
-            {% if form.mac.errors %}<div class="alert alert-danger">{{form.mac.errors.0}}</div>{% endif%}
-          </div>
+      <div class="col">
+        <div class="form-group">
+          <label for="id_modulos">Cantidad de módulos</label>
+          {{ form.modulos }}
         </div>
       </div>
     </div>
     <hr>
 
     <div class="row">
-      <div class="col-xs-2 text-right">
-        <label class="control-label" for="id_lote">Lote</label>
+      <div class="col-sm-1 text-left">
+        Módulos
       </div>
-      <div class="col-xs-2">
-        {{form.lote}}
-        {% if form.lote.errors %}<div class="alert alert-danger">{{form.lote.errors.0}}</div>{% endif%}
-        {% if form.lote.help_text %}<span class="help-block">{{form.lote.help_text|safe}}</span>{% endif %}
+      <div class="col-sm-10">
+        <div id="modulos"></div>
+        {% if form.mac.errors %}<div class="alert alert-danger">{{form.mac.errors.0}}</div>{% endif%}
       </div>
-      <div class="col-xs-offset-1 col-xs-2 text-right">
-        <label class="control-label" for="id_num_prod">Número de Producción</label>
+    </div>
+    <hr>
+
+
+    <div class="row">
+      <div class="col">
+        <div class="form-group">
+          <label for="id_lote">Lote</label>
+          {{form.lote}}
+          {% if form.lote.errors %}<div class="alert alert-danger">{{form.lote.errors.0}}</div>{% endif%}
+          {% if form.lote.help_text %}<span class="help-block">{{form.lote.help_text|safe}}</span>{% endif %}
+        </div>
       </div>
-      <div class="col-xs-2">
-        {{form.num_prod}}
-        {% if form.num_prod.errors %}<div class="alert alert-danger">{{form.num_prod.errors.0}}</div>{% endif%}
-        {% if form.num_prod.help_text %}<span class="help-block">{{form.num_prod.help_text|safe}}</span>{% endif %}
+      <div class="col">
+        <div class="form-group">
+          <label for="id_num_prod">Número de producción</label>
+          {{form.num_prod}}
+          {% if form.num_prod.errors %}<div class="alert alert-danger">{{form.num_prod.errors.0}}</div>{% endif%}
+          {% if form.num_prod.help_text %}<span class="help-block">{{form.num_prod.help_text|safe}}</span>{% endif %}
+        </div>
       </div>
     </div>
     <hr>
@@ -158,7 +146,7 @@
         </label>
         {% endfor %}
         {% if form.tipo_lote.errors %}<div class="alert alert-danger">{{form.tipo_lote.errors.0}}</div>{% endif%}
-        {% if form.tipo_lote.help_text %}<span class="help-block">{{form.tipo_lote.help_text|safe}}</span>{% endif %}
+        {% if form.tipo_lote.help_text %}<br /><span class="help-block">{{form.tipo_lote.help_text|safe}}</span>{% endif %}
       </div>
       <div class="col-md-2 text-right">
         <label class="control-label">Tipo de Cinta</label>
@@ -177,61 +165,48 @@
         </label>
         {% endfor %}
         {% if form.tipo_cinta.errors %}<div class="alert alert-danger">{{form.tipo_cinta.errors.0}}</div>{% endif%}
-        {% if form.tipo_cinta.help_text %}<span class="help-block">{{form.tipo_cinta.help_text|safe}}</span>{% endif %}
+        {% if form.tipo_cinta.help_text %}<br /><span class="help-block">{{form.tipo_cinta.help_text|safe}}</span>{% endif %}
       </div>
     </div>
     <hr>
 
     <div class="row">
-      <div class="col-xs-2 text-right">
-        <label class="control-label" for="id_cajas">Cajas</label>
+      <div class="col">
+        <div class="form-group">
+          <label for="id_cajas">Cajas</label>
+          {{form.cajas}}
+          {% if form.cajas.errors %}<div class="alert alert-danger">{{form.cajas.errors.0}}</div>{% endif%}
+          {% if form.cajas.help_text %}<span class="help-block">{{form.cajas.help_text|safe}}</span>{% endif %}
+        </div>
       </div>
-      <div class="col-xs-2">
-        {{form.cajas}}
-        {% if form.cajas.errors %}<div class="alert alert-danger">{{form.cajas.errors.0}}</div>{% endif%}
-        {% if form.cajas.help_text %}<span class="help-block">{{form.cajas.help_text|safe}}</span>{% endif %}
-      </div>
-      <div class="col-xs-offset-1 col-xs-2 text-right">
-        <label class="control-label" for="id_credenciales">Credenciales</label>
-      </div>
-      <div class="col-xs-2">
-        {{form.credenciales}}
-        {% if form.credenciales.errors %}<div class="alert alert-danger">{{form.credenciales.errors}}</div>{% endif%}
-        {% if form.credenciales.help_text %}<span class="help-block">{{form.credenciales.help_text|safe}}</span>{% endif %}
+
+      <div class="col">
+        <div class="form-group">
+          <label for="id_credenciales">Credenciales</label>
+          {{form.credenciales}}
+          {% if form.credenciales.errors %}<div class="alert alert-danger">{{form.credenciales.errors}}</div>{% endif%}
+          {% if form.credenciales.help_text %}<span class="help-block">{{form.credenciales.help_text|safe}}</span>{% endif %}
+        </div>
       </div>
     </div>
     <hr>
 
     <div class="row">
-      <div class="col-xs-2 text-right">
-        <label class="control-label" for="id_envio_cnd">Envío desde CND</label>
+      <div class="col">
+        <label for="id_envio_cnd">Envío desde CND</label>
+        {{ form.envio_cnd }}
+        {% if form.envio_cnd.errors %}<div class="alert alert-danger">{{form.envio_cnd.errors.0}}</div>{% endif%}
+        {% if form.envio_cnd.help_text %}<span class="help-block">{{form.envio_cnd.help_text|safe}}</span>{% endif %}
       </div>
-      <div class="col-xs-3">
-        <div class="form-group">
-          <div class='input-group date' id='datetimepicker8' data-date-format="DD/MM/YYYY HH:mm">
-            {{ form.envio_cnd }}
-            <span class="input-group-addon"><span class="icon-calendar"></span>
-          </div>
-          {% if form.envio_cnd.errors %}<div class="alert alert-danger">{{form.envio_cnd.errors.0}}</div>{% endif%}
-          {% if form.envio_cnd.help_text %}<span class="help-block">{{form.envio_cnd.help_text|safe}}</span>{% endif %}
-        </div>
-      </div>
-      <div class="col-xs-2 text-right">
-        <label class="control-label" for="id_recibido_vrd">Recepción en VRD</label>
-      </div>
-      <div class="col-xs-3">
-        <div class="form-group">
-          <div class='input-group date' id='datetimepicker9' data-date-format="DD/MM/YYYY HH:mm">
-            {{ form.recibido_vrd }}
-            <span class="input-group-addon"><span class="icon-calendar"></span>
-          </div>
-          {% if form.recibido_vrd.errors %}<div class="alert alert-danger">{{form.recibido_vrd.errors.0}}</div>{% endif%}
-          {% if form.recibido_vrd.help_text %}<span class="help-block">{{form.recibido_vrd.help_text|safe}}</span>{% endif %}
-        </div>
+
+      <div class="col">
+        <label for="id_recibido_vrd">Recepción en VRD</label>
+        {{ form.recibido_vrd }}
+        {% if form.recibido_vrd.errors %}<div class="alert alert-danger">{{form.recibido_vrd.errors.0}}</div>{% endif%}
+        {% if form.recibido_vrd.help_text %}<span class="help-block">{{form.recibido_vrd.help_text|safe}}</span>{% endif %}
       </div>
     </div>
-    <hr>
-
+    <hr />
 
     <div class="control-group">
       <div class="controls col-md-offset-2">
