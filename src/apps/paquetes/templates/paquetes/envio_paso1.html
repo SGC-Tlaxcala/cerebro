@@ -1,54 +1,55 @@
 {# Template Distribución de FCPVF #}
-{% extends "2014/base.html" %}
+{% extends "base.html" %}
+{% load staticfiles %}
 {% load sgc %}
 
-{% block header_js %}
+{% block header %}
   {{ form.media }}
-  <link rel="stylesheet" href="{{ STATIC_URL }}2014/css/bootstrap-datetimepicker.min.css">
-{% endblock header_js %}
+  <link rel="stylesheet" href="{% static 'paquetes/css/bootstrap-datetimepicker.min.css' %}">
+{% endblock header %}
 
 
-{% block footer_js %}
-  <script src="{{ STATIC_URL }}2014/js/moment.js"></script>
-  <script src="{{ STATIC_URL }}2014/js/bootstrap-datetimepicker.min.js"></script>
-<script>
-  function dynamic_Select(ajax_page, distrito) {
-    $.ajax({
-      type: "GET",
-      url: ajax_page + distrito,
-      dataType: "html",
-      success:
-        function(macs){
-          $("#modulos").html(macs);
-        }
+{% block footer %}
+  <script src="{% static 'paquetes/js/moment.js' %}"></script>
+  <script src="{% static 'paquetes/js/bootstrap-datetimepicker.min.js' %}"></script>
+  <script>
+    function dynamic_Select(ajax_page, distrito) {
+      $.ajax({
+        type: "GET",
+        url: ajax_page + distrito,
+        dataType: "html",
+        success:
+          function(macs){
+            $("#modulos").html(macs);
+          }
+      });
+    }
+
+    {% if request.session.envio_macs %}
+    $(function() {
+      $grupo = $("<div></div>");
+      {% for mac in request.session.envio_macs %}
+        $grupo.append('<label class="checkbox-inline"><input type="checkbox" checked="checked" id="id_mac_{{forloop.counter0}}" name="mac" value="{{mac}}">290{{ mac }}</label>');
+      {% endfor %}
+      $('#modulos').html($grupo)
     });
-  }
+    {% endif %}
 
-  {% if request.session.envio_macs %}
-  $(function() {
-    $grupo = $("<div></div>");
-    {% for mac in request.session.envio_macs %}
-      $grupo.append('<label class="checkbox-inline"><input type="checkbox" checked="checked" id="id_mac_{{forloop.counter0}}" name="mac" value="{{mac}}">290{{ mac }}</label>');
-    {% endfor %}
-    $('#modulos').html($grupo)
-  });
-  {% endif %}
+    $(function() {
+      $('#datetimepicker8').datetimepicker();
+      $('#datetimepicker9').datetimepicker();
 
-  $(function() {
-    $('#datetimepicker8').datetimepicker();
-    $('#datetimepicker9').datetimepicker();
-
-    $("#datetimepicker8").on("dp.change",function (e) {
-      $('#datetimepicker9').data("DateTimePicker").setMinDate(e.date);
+      $("#datetimepicker8").on("dp.change",function (e) {
+        $('#datetimepicker9').data("DateTimePicker").setMinDate(e.date);
+      });
+      $("#datetimepicker9").on("dp.change",function (e) {
+        $('#datetimepicker8').data("DateTimePicker").setMaxDate(e.date);
+      });
     });
-    $("#datetimepicker9").on("dp.change",function (e) {
-      $('#datetimepicker8').data("DateTimePicker").setMaxDate(e.date);
-    });
-  });
-</script>
+  </script>
 {% endblock %}
 
-{% block contenido %}
+{% block content %}
 
 <div class="col-sm-12">
   <div class="page-header">
@@ -66,20 +67,28 @@
       {% if request.session.env %}
       <div class="alert alert-info">
         <p>
-          Si el envío <strong>ya existe</strong>, puedes editarlo en este enlace  <a class="alert-link" href="{% url 'envio_paso2' %}">Lote {{ request.session.lote }} del Distrito {{ request.session.distrito }}</a>.
+          Si el envío <strong>ya existe</strong>,
+          puedes editarlo en este enlace
+          <a class="alert-link" href="{% url 'envio_paso2' %}">
+            Lote {{ request.session.lote }} del Distrito {{ request.session.distrito }}
+          </a>.
         </p>
       </div>
       {% endif %}
     </div>
   {% endif %}
 
-  <form class="form" action="{% url 'envio_paso1' %}" method="post">
+  <form class="form" action="{% url 'paquetes:envio_paso1' %}" method="post">
     {% csrf_token %}
     <div class="row">
-      <div class="col-xs-2 text-right">
+      <div class="col">
+        div
+      </div>
+
+      <div class="col-sm-2">
         <label class="control-label" for="distrito">Distrito</label>
       </div>
-      <div class="col-xs-3">
+      <div class="">
         <div class="control-group">
           <div class="controls">
             {{ form.distrito }}
@@ -113,7 +122,7 @@
 
     <div class="row">
       <div class="col-xs-2 text-right">
-        <label class="control-label" for="id_lote">Lote</lote>
+        <label class="control-label" for="id_lote">Lote</label>
       </div>
       <div class="col-xs-2">
         {{form.lote}}
@@ -121,7 +130,7 @@
         {% if form.lote.help_text %}<span class="help-block">{{form.lote.help_text|safe}}</span>{% endif %}
       </div>
       <div class="col-xs-offset-1 col-xs-2 text-right">
-        <label class="control-label" for="id_num_prod">Número de Producción</lote>
+        <label class="control-label" for="id_num_prod">Número de Producción</label>
       </div>
       <div class="col-xs-2">
         {{form.num_prod}}
@@ -175,7 +184,7 @@
 
     <div class="row">
       <div class="col-xs-2 text-right">
-        <label class="control-label" for="id_cajas">Cajas</lote>
+        <label class="control-label" for="id_cajas">Cajas</label>
       </div>
       <div class="col-xs-2">
         {{form.cajas}}
@@ -183,7 +192,7 @@
         {% if form.cajas.help_text %}<span class="help-block">{{form.cajas.help_text|safe}}</span>{% endif %}
       </div>
       <div class="col-xs-offset-1 col-xs-2 text-right">
-        <label class="control-label" for="id_credenciales">Credenciales</lote>
+        <label class="control-label" for="id_credenciales">Credenciales</label>
       </div>
       <div class="col-xs-2">
         {{form.credenciales}}
@@ -195,7 +204,7 @@
 
     <div class="row">
       <div class="col-xs-2 text-right">
-        <label class="control-label" for="id_envio_cnd">Envío desde CND</lote>
+        <label class="control-label" for="id_envio_cnd">Envío desde CND</label>
       </div>
       <div class="col-xs-3">
         <div class="form-group">
@@ -208,7 +217,7 @@
         </div>
       </div>
       <div class="col-xs-2 text-right">
-        <label class="control-label" for="id_recibido_vrd">Recepción en VRD</lote>
+        <label class="control-label" for="id_recibido_vrd">Recepción en VRD</label>
       </div>
       <div class="col-xs-3">
         <div class="form-group">
@@ -232,4 +241,4 @@
 
   </form>
 </div>
-{% endblock contenido %}
+{% endblock content %}
