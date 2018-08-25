@@ -7,6 +7,14 @@ locale.setlocale(locale.LC_ALL, 'es_MX.UTF-8')
 register = template.Library()
 DIA = 86400
 
+INTERVALOS = (
+    ('semanas', 604800),  # 60 * 60 * 24 * 7
+    ('días', 86400),    # 60 * 60 * 24
+    ('horas', 3600),    # 60 * 60
+    ('minutos', 60),
+    ('segundos', 1),
+    )
+
 
 @register.filter(name='jsdate')
 def jsdate(d):
@@ -172,23 +180,19 @@ def dias(sec):
 
 
 @register.filter(name='txthoras')
-def txthoras(sec):
-    if sec == '':
+def txthoras(delta):
+    if delta == '':
         return ''
     else:
-        sec = int(sec)
-        hrs = ""
-        tiempo = sec / 60
-        d = tiempo / 1440
-        h = (tiempo - (d * 1440)) / 60
-        m = tiempo % 60
-        if d > 0:
-            hrs = str(d) + 'd '
-        if h > 0:
-            hrs = hrs + str(h) + "h "
-        if m > 0:
-            hrs = hrs + str(m) + 'm'
-        return hrs
+        resultado = []
+        for name, count in INTERVALOS:
+            valor = delta // count
+            if valor:
+                delta -= valor * count
+                if valor == 1:
+                    name = name.rstrip('s')
+                resultado.append("{} {}".format(int(valor), name))
+        return ', '.join(resultado[:2])
 
 
 @register.filter(name='upp')

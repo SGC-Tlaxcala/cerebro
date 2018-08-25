@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# coding: utf-8 -*-
 #       app: cmi.distribucion
 #      desc: Generación de formularios para Distribucion de FCPVF
 

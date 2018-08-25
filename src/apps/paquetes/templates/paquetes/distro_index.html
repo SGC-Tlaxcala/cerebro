@@ -136,15 +136,19 @@ $(function () {
         <td>{{rem|remesa}}</td>
         <td>
           <a href="{% url 'paquetes:envio_remesa' remesa=rem|remesa distrito=1 %}">
-            {{ data.1|txthoras }}
+            {{ data.1 | txthoras }}
           </a>
         </td>
         <td>
           <a href="{% url 'paquetes:envio_remesa' remesa=rem|remesa distrito=2 %}">
-            {{data.2|txthoras}}
+            {{ data.2|txthoras }}
           </a>
         </td>
-        <td><a href="{% url 'paquetes:envio_remesa' remesa=rem|remesa distrito=3 %}">{{data.3|txthoras}}</a></td>
+        <td>
+          <a href="{% url 'paquetes:envio_remesa' remesa=rem|remesa distrito=3 %}">
+            {{ data.3|txthoras }}
+          </a>
+        </td>
       </tr>
       {% endfor %}
     </tbody>
