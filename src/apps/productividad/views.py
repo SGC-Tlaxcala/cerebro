@@ -7,14 +7,17 @@
 from django.urls import reverse_lazy
 from django.shortcuts import render, redirect
 from django.views import View
+from apps.productividad.forms import CargaCifras
 
 
 class CifrasUpload(View):
     template_name = 'productividad/index.html'
+    form_class = CargaCifras
 
     def get(self, request, *args, **kwargs):
         contexto = {
             'title': 'Carga de archivo de cifras',
-            'kpi_path': True
+            'kpi_path': True,
+            'form': self.form_class()
         }
         return render(request, self.template_name, contexto)

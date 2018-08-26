@@ -1,16 +1,30 @@
 {% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load staticfiles %}
+
+{% block footer %}
+  <link rel="stylesheet" href="{% static 'css/datepicker.css' %}" />
+  <script src="{% static 'js/bootstrap-datepicker.js' %}"></script>
+  <script>
+    $('.dateinput').datepicker({
+      format: 'dd/mm/yyyy',
+      locale: 'es'
+    })
+  </script>
+{% endblock footer %}
 
 {% block before_content %}
   <div class="container">
     <div class="row">
-      <div class="bs-header" id="content" style="padding-top: 70px;">
-        <div class="container">
-          <h1><span class="fa fa-bar-chart"></span> {{title}}</h1>
-        </div>
+      <div class="page-header" id="content" style="padding-top: 70px;">
+        <h1><span class="fa fa-bar-chart"></span> {{title}}</h1>
       </div>
     </div>
   </div>
 {% endblock before_content %}
 
 {% block content %}
+  <form method="post" class="form">
+    {% crispy form %}
+  </form>
 {% endblock content %}
