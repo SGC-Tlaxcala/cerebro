@@ -8,8 +8,6 @@
 from django.db import models
 from django.contrib.auth.models import User
 from core.models import Remesa, TimeStampedModel
-from core.utils import get_remesa
-
 
 class Envio(TimeStampedModel):
     """Modelo para control de envíos de CND a VRD/MAC"""
@@ -65,6 +63,7 @@ class Envio(TimeStampedModel):
     def __str__(self):
         return f'Distrito 0{self.distrito} Lote: {self.lote}_{self.tipo_lote}'
 
+    # pylint: disable=W0221
     def save(self, *args, **kwargs):
         try:
             for rem in Remesa.objects.all():
@@ -99,6 +98,7 @@ class Envio(TimeStampedModel):
 
 
 class EnvioModulo(models.Model):
+    """Modelo para controlar las entregas a los MAC"""
     MODULO = (
         ('151', '290151'),
         ('152', '290152'),
@@ -134,6 +134,7 @@ class EnvioModulo(models.Model):
         except Remesa.DoesNotExist:
             return None
 
+    # pylint: disable=W0221
     def save(self, *args, **kwargs):
         self.transito = self.disponible_mac - self.lote.recibido_vrd
         self.tran_sec = self.transito.total_seconds()
