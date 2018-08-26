@@ -3,6 +3,8 @@ import environ
 from django.contrib.messages import constants as messages
 import datetime
 
+VERSION = '1.4.1'
+
 BASE_DIR = Path(__file__).ancestor(2)
 APPS_DIR = BASE_DIR.child('apps')
 env = environ.Env(DEBUG=(bool, False),)
