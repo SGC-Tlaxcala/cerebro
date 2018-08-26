@@ -3,69 +3,92 @@
 {% load sgc %}
 
 {% block content %}
-<div class="row">
-  <div class="col-sm-12">
-    <div class="page-header">
-      <h1><span class="icon-rocket"></span> Distrito: 0{{d}} - {{r}}  <small>Tiempo de Distribución</small></h1>
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="pb-2 mt-4 mb-2 border-bottom">
+        <h1><span class="fa fa-truck"></span> Distrito: 0{{d}} - {{r}} <small>Tiempo de Distribución</small></h1>
+      </div>
     </div>
   </div>
-</div>
 
-<div class="row">
+  <div class="row">
     <div class="col-sm-12">
       <div class="btn-group">
-        <a class="btn btn-secondary" href="{% url 'paquetes:index' %}"><i class="icon-back"></i> Regresar</a>
+        <a
+          class="btn btn-secondary"
+          href="{% url 'paquetes:index' %}">
+          <i class="fa fa-backward"></i>
+          Regresar
+        </a>
         {% if perms.distribucion.add_envio %}
-          <a class="btn btn-danger" href="{% url 'paquetes:envio_paso1' %}"><i class="icon-plus-alt"></i> Agregar un envío</a>
+          <a
+            class="btn btn-danger"
+            href="{% url 'paquetes:envio_paso1' %}">
+            <i class="fa fa-plus-circle"></i>
+            Agregar un envío
+          </a>
         {% endif %}
         {% if perms.distribucion.change_envio %}
           <div class="btn-group">
-            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="icon-pencil-2"></i> Editar envío <span class="caret"></span></button>
+            <button
+              type="button"
+              class="btn btn-primary dropdown-toggle"
+              data-toggle="dropdown">
+              <i class="fa fa-pencil"></i>
+              Editar envío
+              <span class="caret"></span>
+            </button>
             <ul class="dropdown-menu" role="menu">
               {% for data in e%}
-              <li><a href="/admin/distribucion/envio/{{data.id}}/"><i class=" icon-pencil"></i> Lote {{data.lote}} {{data.tipo_lote}}</a></li>
+              <li><a href="/admin/paquetes/envio/{{data.id}}/"><i class=" icon-pencil"></i> Lote {{data.lote}} {{data.tipo_lote}}</a></li>
               {% endfor %}
             </ul>
           </div>
         {% endif %}
       </div>
     </div>
-</div>
+  </div>
 
-<div class="row">
+  <div class="row">
     <div class="col-sm-12">
-  <h3>Paquetes recibidos en el Distrito</h3>
-  <div class="table-responsive">
-    <table class="table table-responsive table-sm table-striped table-bordered table-hover">
-      <thead>
-        <tr>
-          <thead class="thead-dark">
-            <th>Lote</th>
-            <th># Prod.</th>
-            <th>Módulos</th>
-            <th>Cajas</th>
-            <th>Credenciales</th>
-            <th>Envío CND</th>
-            <th>Recibido VRD</th>
-            <th>Tránsito</th>
+      <h3>Paquetes recibidos en el Distrito</h3>
+      <div class="table-responsive">
+        <table class="table table-responsive table-sm table-striped table-bordered table-hover">
+          <thead>
+            <tr>
+              <thead class="thead-dark">
+                <th>Lote</th>
+                <th># Prod.</th>
+                <th>Módulos</th>
+                <th>Cajas</th>
+                <th>Credenciales</th>
+                <th>Envío CND</th>
+                <th>Recibido VRD</th>
+                <th>Tránsito</th>
+              </thead>
+            </tr>
           </thead>
-        </tr>
-      </thead>
-      <tbody>
-        {% for data in e %}
-        <tr>
-          <td><a href="/admin/distribucion/envio/{{data.id}}/">{{data.lote}} {{data.tipo_lote}} <i class="icon-pencil-2"></i></a></td>
-          <td>{{data.num_prod}}</td>
-          <td>{{data.enviomodulo_set.count}}</td>
-          <td>{{data.cajas}}</td>
-          <td>{{data.credenciales}}</td>
-          <td>{{data.envio_cnd|date:"SHORT_DATE_FORMAT"}} {{ data.envio_cnd|time:"H:i" }} hrs.</td>
-          <td>{{data.recibido_vrd|date:"SHORT_DATE_FORMAT"}} {{ data.recibido_vrd|time:"H:i" }} hrs.</td>
-          <td>{{data.tran_sec|txthoras}}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+          <tbody>
+            {% for data in e %}
+            <tr>
+              <td>
+                {% if perms.distribucion.change_envio %}
+                  <a href="/admin/distribucion/envio/{{data.id}}/">{{data.lote}} {{data.tipo_lote}} <i class="fa fa-pencil"></i></a>
+                {% else %}
+                  {{data.lote}} {{data.tipo_lote}}
+                {% endif %}
+              </td>
+              <td>{{data.num_prod}}</td>
+              <td>{{data.enviomodulo_set.count}}</td>
+              <td>{{data.cajas}}</td>
+              <td>{{data.credenciales}}</td>
+              <td>{{data.envio_cnd|date:"SHORT_DATE_FORMAT"}} {{ data.envio_cnd|time:"H:i" }} hrs.</td>
+              <td>{{data.recibido_vrd|date:"SHORT_DATE_FORMAT"}} {{ data.recibido_vrd|time:"H:i" }} hrs.</td>
+              <td>{{data.tran_sec|txthoras}}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
   </div>
 </div>
 </div>

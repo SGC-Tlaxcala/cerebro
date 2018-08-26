@@ -5,25 +5,20 @@
 # author: Javier Sanchez Toledano <js.toledano@me.com>
 # description: Vistas de la distribución de paquetes
 
-from .models import Envio, EnvioModulo
-from .forms import PreparacionForm, EnvioModuloForm
-from django.db.models import Avg, Sum, Q, Max
 from collections import OrderedDict
-from core.models import Modulo, Remesa
-from core.utils import get_remesa
 from django.shortcuts import render_to_response
-from django.template import RequestContext
-from annoying.decorators import render_to
+from django.db.models import Avg, Sum, Q, Max
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 from django.forms.formsets import formset_factory
 from django.http import HttpResponseRedirect, HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views import View
-from django.views.generic.detail import DetailView
-import logging
-logr = logging.getLogger(__name__)
-
+from django.urls import reverse
+from core.models import Modulo, Remesa
+from core.utils import get_remesa
+from .models import Envio, EnvioModulo
+from .forms import PrepareForm, EnvioModuloForm
 
 YEAR = 2018
 
@@ -41,32 +36,28 @@ def envio_expediente(request, envio):
     )
 
 
-# Vista AJAX auxiliar para generar Módulos
-@render_to('paquetes/distrito.html')
-def envio_distrito (request, dist):
-    mac = Modulo.objects.filter(dto=dist)
-    return {'mac': mac}
-
-
 class EnvioDistrito(View):
     template_name = 'paquetes/distrito.html'
 
+    # noinspection PyUnusedLocal
     def get(self, request, *args, **kwargs):
-        mac = Modulo.objects.filter(dto=kwargs['dist'])
-        return render(request, self.template_name)
+        macs = Modulo.objects.filter(distrito=kwargs['distrito'])
+        return render(request, self.template_name, {'macs': macs})
 
 
-def envio_ajax_suma_paquete (request, envio):
+def envio_ajax_suma_paquete(request, envio):
     e = Envio.objects.get(pk=envio)
     suma = e.enviomodulo_set.aggregate(Sum('formatos'))
-    return render_to_response("distribucion/envio_ajax_suma_paquete.html",
-    {'suma': suma['formatos__sum']},
-    context_instance=RequestContext(request) )
+    return render_to_response(
+        "paquetes/envio_ajax_suma_paquete.html",
+        {'suma': suma['formatos__sum']},
+    )
 
 
 class PaquetesIndex(View):
     template_name = 'paquetes/index.html'
 
+    # noinspection PyUnusedLocal
     def get(self, request, *args, **kwargs):
         tramo_local = OrderedDict()
         tabla_local = OrderedDict()
@@ -84,13 +75,13 @@ class PaquetesIndex(View):
             .prefetch_related()
 
         for t in envio_modulo:
-            fecha_vrd =t['lote__recibido_vrd__max']
+            fecha_vrd = t['lote__recibido_vrd__max']
             horas_local = t['tran_sec__avg']
             tramo_local\
                 .setdefault(t['lote__fecha_corte'], {})\
                 .update({t['lote__distrito']: horas_local, 'vrd': fecha_vrd})
         for t in envio_modulo.order_by('-lote__fecha_corte'):
-            fecha_vrd =t['lote__recibido_vrd__max']
+            fecha_vrd = t['lote__recibido_vrd__max']
             horas_local = t['tran_sec__avg']
             tabla_local\
                 .setdefault(t['lote__fecha_corte'], {})\
@@ -117,6 +108,7 @@ class PaquetesIndex(View):
 class PaqueteDetalle(View):
     template_name = 'paquetes/detalle.html'
 
+    # noinspection PyUnusedLocal
     def get(self, request, *args, **kwargs):
         distrito = kwargs['distrito']
         r = Remesa.objects.get(remesa=kwargs['remesa'])
@@ -131,27 +123,23 @@ class PaqueteDetalle(View):
 
 
 FORMS = [
-    ('paso1', PreparacionForm),
+    ('paso1', PrepareForm),
     ('paso2', EnvioModuloForm)
 ]
 TEMPLATES = {
-    '0':'paquetes/envio_paso1.html',
-    '1':'paquetes/envio_paso2.html'
+    '0': 'paquetes/envio_paso1.html',
+    '1': 'paquetes/envio_paso2.html'
 }
 
 
-# ################### #
-# ### envio_paso1 ### #
-# ################### #
-@render_to('paquetes/envio_paso1.html')
 @login_required
 def envio_paso1(request):
     if request.method == 'POST':
         contexto = request.POST.copy()
-        form = PreparacionForm(contexto)
+        form = PrepareForm(contexto)
         try:
             envio = Envio.objects.get(lote=request.POST['lote'], distrito=request.POST['distrito'])
-        except:
+        except Envio.DoesNotExist:
             envio = False
         if envio:
             request.session["env"] = True
@@ -173,51 +161,58 @@ def envio_paso1(request):
             request.session['envio_id'] = obj.id
             request.session['envio_macs'] = datos['mac']
             request.session['envio_distrito'] = datos['distrito']
-            return HttpResponseRedirect ('/distribucion/paso2/')
+            return HttpResponseRedirect('/paquetes/paso2/')
     else:
         try:
             del request.session['envio_fecha_corte']
             del request.session['envio_macs']
             del request.session['envio_distrito']
-            # request.session.flush()
-        except:
+        except KeyError:
             pass
-        form = PreparacionForm()
-    return {'form': form, 'title':'Captura de Envio de FCPVF',
-            'mnIndicadores':True, 'mnDistro':True
-    }
+        form = PrepareForm()
+    return render(
+        request,
+        'paquetes/envio_paso1.html',
+        {
+            'form': form,
+            'title': 'Captura de Envio de FCPVF',
+            'mnIndicadores': True,
+            'mnDistro': True
+        }
+    )
 
 
-# ################### #
-# ### envio_paso2 ### #
-# ################### #
+# noinspection PyUnusedLocal
 @login_required
 def envio_paso2(request):
-    DistribucionFormSet = formset_factory (EnvioModuloForm, extra=0)
+    paquetes_form_set = formset_factory(EnvioModuloForm, extra=0)
     try:
         envio = Envio.objects.get(pk=request.session['envio_id'])
-    except:
-        envio=''
+    except Envio.DoesNotExist:
+        envio = ''
     if request.method == "POST":
-        formset = DistribucionFormSet(request.POST)
+        formset = paquetes_form_set(request.POST)
         if formset.is_valid():
-            lote = '' # pylint disable:
+            lote = ''
             for form in formset:
                 f = form.save(commit=False)
                 lote = f.lote
                 f.save()
-            return HttpResponseRedirect('/distribucion/envio/%s' % request.session['envio_id'])
+            return redirect(reverse('paquetes:envio_expediente', kwargs={'envio': request.session['envio_id']}))
     else:
-        if (request.session['envio_fecha_corte'] and request.session['envio_macs'] and request.session['envio_distrito']):
-            # macs_old = Modulo.objects.filter(dto=request.session['envio_distrito']).values('mac')
+        if request.session['envio_fecha_corte'] and request.session['envio_macs'] and request.session['envio_distrito']:
             macs = []
-            for m in request.session['envio_macs'] :
-                macs.append({'mac':m, 'lote':request.session['envio_id']})
-            formset = DistribucionFormSet(initial=macs)
+            for m in request.session['envio_macs']:
+                macs.append({'mac': m, 'lote': request.session['envio_id']})
+            formset = paquetes_form_set(initial=macs)
         else:
-            return HttpResponse (request.session['envio_fecha_corte'])
-    return render_to_response('paquetes/envio_paso2.html',
-        { 'formset': formset,
-            'envio':envio,
-          'title':'Captura de Distribución de Envios', },
-        context_instance = RequestContext(request), )
+            return HttpResponse(request.session['envio_fecha_corte'])
+    return render(
+        request,
+        'paquetes/envio_paso2.html',
+        {
+            'formset': formset,
+            'envio': envio,
+            'title': 'Captura de Distribución de Envíos'
+        }
+    )

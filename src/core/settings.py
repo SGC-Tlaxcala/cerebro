@@ -118,6 +118,7 @@ STATIC_ROOT = APPS_DIR.child('assets')
 STATIC_URL = '/assets/'
 STATICFILES_DIRS = [
     APPS_DIR.child('static'),
+    'static'
 ]
 
 MEDIA_ROOT = APPS_DIR.child('media')

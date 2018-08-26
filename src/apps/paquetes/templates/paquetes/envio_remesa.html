@@ -3,21 +3,21 @@
 {% load sgc %}
 
 {% block contenido %}
-<div class="row">
+  <div class="row">
     <div class="col-sm-12">
-        <div class="page-header">
-          <h1><span class="icon-rocket"></span> Distrito: 0{{d}} - {{r}}  <small>Tiempo de Distribución</small></h1>
-        </div>
+      <div class="page-header">
+        <h1><span class="icon-rocket"></span> Distrito: 0{{d}} - {{r}}  <small>Tiempo de Distribución</small></h1>
+      </div>
     </div>
-</div>
+  </div>
 
-<div class="row">
+  <div class="row">
     <div class="col-sm-12">
       <div class="btn-group">
-        <a class="btn btn-default" href="{% url 'distribucion' %}"><i class="icon-back"></i> Regresar</a>
+        <a class="btn btn-default" href="{% url 'distribucion' %}"><i class="fa fa-backward"></i> Regresar</a>
         {% if perms.distribucion.add_envio %}
           <a class="btn btn-danger" href="{% url 'envio_paso1' %}"><i class="icon-plus-alt"></i> Agregar un envío</a>
-        {% endif %} 
+        {% endif %}
         {% if perms.distribucion.change_envio %}
           <div class="btn-group">
             <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="icon-pencil-2"></i> Editar envío <span class="caret"></span></button>

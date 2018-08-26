@@ -11,8 +11,8 @@ from core.models import Remesa, TimeStampedModel
 
 
 class Envio(TimeStampedModel):
-    ACTUALIZACION = 1
-    APELACION = 2
+    ACTUALIZACION = '1'
+    APELACION = '2'
     TIPO_CINTA = (
         (ACTUALIZACION, 'Actualizaciones'),
         (APELACION, 'Recurso de Apelación'),
@@ -31,9 +31,9 @@ class Envio(TimeStampedModel):
         (EXT, 'EXT'),
     )
 
-    JD01 = 1
-    JD02 = 2
-    JD03 = 3
+    JD01 = '1'
+    JD02 = '2'
+    JD03 = '3'
     DISTRITO = (
         (JD01, 'Apizaco - Distrito 01'),
         (JD02, 'Tlaxcala - Distrito 02'),
@@ -100,6 +100,7 @@ class EnvioModulo (models.Model):
         ('252', '290252'),
         ('253', '290253'),
         ('254', '290254'),
+        ('291', '290291'),
         ('351', '290351'),
         ('352', '290352'),
         ('353', '290353'),
