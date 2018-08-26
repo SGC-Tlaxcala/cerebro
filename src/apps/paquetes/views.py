@@ -42,7 +42,7 @@ class EnvioDistrito(View):
     # noinspection PyUnusedLocal
     def get(self, request, *args, **kwargs):
         macs = Modulo.objects.filter(distrito=kwargs['distrito'])
-        return render(request, self.template_name, {'macs': macs})
+        return render(request, self.template_name, {'macs': macs, 'kpi_path': True})
 
 
 def envio_ajax_suma_paquete(request, envio):
@@ -99,7 +99,8 @@ class PaquetesIndex(View):
             'tramo_cnd': tramo_cnd,
             'tramo_local': tramo_local,
             'tabla_local': tabla_local,
-            'mini_envio': mini_parcel
+            'mini_envio': mini_parcel,
+            'kpi_path': True
         }
 
         return render(request, self.template_name, contexto)
@@ -118,7 +119,9 @@ class PaqueteDetalle(View):
         emac = EnvioModulo.objects\
             .filter(Q(lote__fecha_corte__gte=r.inicio), Q(lote__fecha_corte__lte=r.fin), lote__distrito=distrito)\
             .prefetch_related()
-        contexto = {'title': 'Envíos por Distrito y Remesa', 'r': r, 'e': e, 'd': distrito, 'emac': emac}
+        contexto = {
+            'title': 'Envíos por Distrito y Remesa', 'kpi_path': True,
+            'r': r, 'e': e, 'd': distrito, 'emac': emac}
         return render(request, self.template_name, contexto)
 
 
@@ -177,7 +180,8 @@ def envio_paso1(request):
             'form': form,
             'title': 'Captura de Envio de FCPVF',
             'mnIndicadores': True,
-            'mnDistro': True
+            'mnDistro': True,
+            'kpi_path': True
         }
     )
 
@@ -213,6 +217,7 @@ def envio_paso2(request):
         {
             'formset': formset,
             'envio': envio,
-            'title': 'Captura de Distribución de Envíos'
+            'title': 'Captura de Distribución de Envíos',
+            'kpi_path': True
         }
     )

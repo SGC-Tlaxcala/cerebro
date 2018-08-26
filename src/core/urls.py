@@ -1,4 +1,6 @@
-# coding: utf-8
+#coding: utf-8
+"""Patrones de rutas generales."""
+
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
