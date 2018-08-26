@@ -3,14 +3,16 @@
 # module: models
 # date: 23 Aug 2018
 # author: Javier Sanchez Toledano <js.toledano@me.com>
-# description: Modelos para la app de distribución del paquetes.
+"""Modelos para la app de distribución del paquetes."""
 
 from django.db import models
 from django.contrib.auth.models import User
 from core.models import Remesa, TimeStampedModel
+from core.utils import get_remesa
 
 
 class Envio(TimeStampedModel):
+    """Modelo para control de envíos de CND a VRD/MAC"""
     ACTUALIZACION = '1'
     APELACION = '2'
     TIPO_CINTA = (
@@ -53,7 +55,12 @@ class Envio(TimeStampedModel):
     recibido_vrd = models.DateTimeField('Fecha de recibido en Vocalía Distrital')
     transito = models.DurationField(editable=False)
     tran_sec = models.FloatField(editable=False)
-    autor = models.ForeignKey(User, related_name='prod_parcel', editable=False, on_delete=models.CASCADE)
+    autor = models.ForeignKey(
+        User,
+        related_name='prod_parcel',
+        editable=False,
+        on_delete=models.CASCADE
+    )
 
     def __str__(self):
         return f'Distrito 0{self.distrito} Lote: {self.lote}_{self.tipo_lote}'
@@ -70,6 +77,7 @@ class Envio(TimeStampedModel):
         super(Envio, self).save(*args, **kwargs)
 
     def remesa(self):
+        """Calcula la remesa de una fecha dada."""
         try:
             for rem in Remesa.objects.all():
                 if rem.inicio <= self.fecha_corte <= rem.fin:
@@ -90,7 +98,7 @@ class Envio(TimeStampedModel):
         unique_together = ('lote', 'distrito', 'recibido_vrd',)
 
 
-class EnvioModulo (models.Model):
+class EnvioModulo(models.Model):
     MODULO = (
         ('151', '290151'),
         ('152', '290152'),
@@ -119,12 +127,12 @@ class EnvioModulo (models.Model):
 
     @property
     def _get_remesa(self):
-            try:
-                for rem in Remesa.objects.all():
-                    if rem.inicio <= self.lote.fecha_corte <= rem.fin:
-                        return rem
-            except Remesa.DoesNotExist:
-                return None
+        try:
+            for rem in Remesa.objects.all():
+                if rem.inicio <= self.lote.fecha_corte <= rem.fin:
+                    return rem
+        except Remesa.DoesNotExist:
+            return None
 
     def save(self, *args, **kwargs):
         self.transito = self.disponible_mac - self.lote.recibido_vrd
