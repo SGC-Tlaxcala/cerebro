@@ -2,4 +2,4 @@ from django.apps import AppConfig
 
 
 class ProductividadConfig(AppConfig):
-    name = 'productividad'
+    name = 'apps.productividad'
