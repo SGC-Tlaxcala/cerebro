@@ -1,0 +1,107 @@
+{# Template Distribución de FCPVF #}
+{% extends "base.html" %}
+{% load sgc %}
+
+{% block content %}
+<div class="col-md-12">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="pb-2 mt-4 mb-2 border-bottom">
+        <h1><span class="fa fa-truck"></span> {{title}}</h1>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="btn-group">
+        <a
+          class="btn btn-secondary"
+          href="{% url 'paquetes:detalle' e.remesa e.distrito %}">
+          <i class="fa fa-step-backward"></i>
+          Remesa
+        </a>
+        <a
+          class="btn btn-info"
+          href="{% url 'paquetes:index' %}">
+          <i class="fa fa-truck"></i>
+          Distribución
+        </a>
+        {% if perms.distribucion.add_envio %}
+          <a class="btn btn-danger" href="{% url 'paquetes:envio_paso1' %}"><i class="fa fa-plus-circle"></i> Agregar un envío</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <h3>{{e}}</h3>
+      <div class="table-responsive">
+        <table class="table table-striped table-bordered table-hover">
+          <tr>
+            <td><strong>Lote</strong></td>
+            <td>{{e.lote}}_{{e.tipo_lote}}</td>
+          </tr>
+          <tr>
+            <td><strong>Número de producción</strong></td>
+            <td>{{e.num_prod}}</td>
+          </tr>
+          <tr>
+            <td><strong>Tipo de Cinta</strong></td>
+            <td>{% if e.tipo_cinta == "1" %}Actualizacion{% endif %}</td>
+          </tr>
+          <tr>
+            <td><strong>Empacado en</strong></td>
+            <td>{{e.cajas}} Caja(s)</td>
+          </tr>
+          <tr>
+            <td><strong>Enviado por CND</strong></td>
+            <td>{{e.envio_cnd}}</td>
+          </tr>
+          <tr>
+            <td><strong>Recibido por VRD</strong></td>
+            <td>{{e.recibido_vrd}}</td>
+          </tr>
+          <tr>
+            <td><strong>Tiempo en Tránsito</strong></td>
+            <td>{{e.transito}} horas</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <h4>Paquetes</h4>
+      <div class="table-responsive">
+        <table class="table table-striped table-bordered table-hover">
+          <thead class="thead-dark">
+            <tr>
+              <th>Módulo</th>
+              <th>Paquetes</th>
+              <th>Formatos</th>
+              <th>Recibido</th>
+              <th>Disponible</th>
+              <th>Tránsito</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for p in e.enviomodulo_set.all %}
+              <tr>
+                <td>290{{p.mac}}</td>
+                <td>{{p.paquetes}}</td>
+                <td>{{p.formatos}}</td>
+                <td>{{p.recibido_mac}}</td>
+                <td>{{p.disponible_mac}}</td>
+                <td>{{p.transito}}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}

@@ -37,7 +37,7 @@ LOCAL_APPS = [
     'apps.profiles.config.ProfilesConfig',
     'apps.docs.config.DocsConfig',
     'apps.mesas.config.MesasConfig',
-
+    'apps.paquetes.config.PaquetesConfig'
 ]
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
@@ -118,6 +118,7 @@ STATIC_ROOT = APPS_DIR.child('assets')
 STATIC_URL = '/assets/'
 STATICFILES_DIRS = [
     APPS_DIR.child('static'),
+    'static'
 ]
 
 MEDIA_ROOT = APPS_DIR.child('media')

@@ -68,6 +68,9 @@ class Modulo(TimeStampedModel):
     def __str__(self):
         return self.modulo
 
+    def clave(self):
+        return self.modulo[-3:]
+
     @property
     def actual(self):
         """Regresa la revisión actual."""
