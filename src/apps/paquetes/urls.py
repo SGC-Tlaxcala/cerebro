@@ -24,6 +24,6 @@ urlpatterns = [
     path('paso2/', login_required(envio_paso2), name='envio_paso2'),
     path('distrito/<int:distrito>', EnvioDistrito.as_view(), name="envio_distrito"),
     re_path(r'^remesa/(?P<remesa>\d{4}-\d{2})/(?P<distrito>\d)/$', PaqueteDetalle.as_view(), name='detalle'),
-    re_path(r'^envio/(?P<envio>\d+)$', login_required(envio_expediente), name='envio_expediente'),
+    re_path(r'^envio/(?P<envio>\d+)$', envio_expediente, name='envio_expediente'),
     re_path(r'^suma/(?P<envio>\d+)$', envio_ajax_suma_paquete)
 ]

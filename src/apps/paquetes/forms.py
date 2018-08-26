@@ -17,30 +17,42 @@ class EnvioModuloForm(forms.ModelForm):
 
     mac = forms.CharField(
         widget=forms.TextInput(
-            attrs={'class': 'col-md-1 form-control'}
+            attrs={'class': 'form-control'}
         )
     )
     paquetes = forms.CharField(
         label='Número de paquetes',
         initial=1,
         widget=forms.TextInput(
-            attrs={'class': 'form-control'}
+            attrs={
+                'class': 'form-control',
+                'type': 'number'
+            }
         )
     )
     formatos = forms.CharField(
         label='Número de FCPVF',
         widget=forms.TextInput(
-            attrs={'class': 'form-control'}
+            attrs={
+                'class': 'form-control',
+                'type': 'number'
+            }
         )
     )
     recibido_mac = forms.DateTimeField(
         widget=forms.TextInput(
-            attrs={'class': 'form-control'}
+            attrs={
+                'class': 'form-control',
+                'placeholder': 'dd/mm/aaaa hh:mm'
+            }
         )
     )
     disponible_mac = forms.DateTimeField(
         widget=forms.TextInput(
-            attrs={'class': 'form-control'}
+            attrs={
+                'class': 'form-control',
+                'placeholder': 'dd/mm/aaaa hh:mm'
+            }
         )
     )
 
