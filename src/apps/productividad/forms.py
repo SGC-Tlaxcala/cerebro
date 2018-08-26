@@ -5,13 +5,15 @@
 """formulario para subir el archivo de cifras"""
 
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Submit, Div, HTML, Field, Button
+from crispy_forms.layout import Layout, Submit, HTML, Div, Field, Button
 from crispy_forms.bootstrap import FormActions
 from django import forms
 
 
 class CargaCifras(forms.Form):
+    """Clase para crear el formulario que carga las cifras"""
     fecha_corte = forms.DateField()
+    archivo = forms.FileField()
 
     def __init__(self, *args, **kwargs):
         super(CargaCifras, self).__init__(*args, **kwargs)
@@ -19,6 +21,15 @@ class CargaCifras(forms.Form):
         self.helper.layout = Layout(
             Div(
                 Field('fecha_corte', wrapper_class='col-md-2', autocomplete='off'),
+                Field('archivo', wrapper_class="col-md-6"),
+                css_class='row'
+            ),
+            Div(
+                HTML('<hr>'),
+                FormActions(
+                    Submit('save', 'Guardar cambios'),
+                    Button('cancel', 'Cancelar')
+                ),
                 css_class='row'
             )
 
