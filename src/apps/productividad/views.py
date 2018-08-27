@@ -7,7 +7,6 @@
 import math
 import xlrd
 from django.urls import reverse_lazy
-from django.shortcuts import render
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from django.views.generic.edit import FormView
@@ -82,5 +81,27 @@ class CifrasUpload(FormView):
                 'usuario': self.request.user
             }
         )
-        print(reporte, created)
+        print(f"cerebro:: El reporte {reporte} se creó en {created}")
+        for mac in macs:
+            cifras, created = Cifras.objects.update_or_create(
+                reporte_semanal=reporte, modulo=mac,
+                defaults={
+                    'reporte_semanal': reporte,
+                    'distrito': macs[mac]['distrito'],
+                    'modulo': mac,
+                    'tipo': macs[mac]['tipo'],
+                    'dias_trabajados': macs[mac]['dias_trabajados'],
+                    'jornada_trabajada': macs[mac]['jornada_trabajada'],
+                    'configuracion': macs[mac]['configuracion'],
+                    'tramites': macs[mac]['tramites'],
+                    'credenciales_entregadas_actualizacion':
+                        macs[mac]['credenciales_entregadas_actualizacion'],
+                    'credenciales_reimpresion': macs[mac]['credenciales_reimpresion'],
+                    'total_atenciones': macs[mac]['total_atenciones'],
+                    'productividad_x_dia': macs[mac]['productividad_x_dia'],
+                    'productividad_x_dia_x_estacion': macs[mac]['productividad_x_dia_x_estacion'],
+                    'credenciales_recibidas': macs[mac]['credenciales_recibidas']
+                }
+            )
+            print(f'cerebro:: Se crearon los datos {mac} en el registro {cifras} el {created}')
         return super().form_valid(form)

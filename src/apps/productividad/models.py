@@ -34,7 +34,11 @@ class Reporte(TimeStampedModel):
 
 class Cifras(models.Model):
     """Modelo de productividad."""
-    reporte_semanal = models.ForeignKey(Reporte, related_name='reporte_cifras', on_delete=models.CASCADE)
+    reporte_semanal = models.ForeignKey(
+        Reporte,
+        related_name='reporte_cifras',
+        on_delete=models.CASCADE
+    )
     distrito = models.CharField('Distrito', max_length=2)
     modulo = models.CharField('Módulo', max_length=6)
     tipo = models.CharField('Tipo de módulo', max_length=20)
