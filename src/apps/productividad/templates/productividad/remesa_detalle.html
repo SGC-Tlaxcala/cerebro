@@ -23,34 +23,34 @@
           <thead class="thead-dark">
             <tr>
               <th>Módulo</th>
-              <th>Tipo</th>
-              <th>Días trabajados</th>
-              <th>Jornada trabajada</th>
-              <th>Configuración</th>
-              <th>Trámites realizados</th>
-              <th>Cred. entregadas<sup>1</sup></th>
-              <th>Cred. reimpresión<sup>2</sup></th>
-              <th>Total de atenciones</th>
-              <th>Productividad por día</th>
-              <th>Productividad por estación</th>
-              <th>Credenciales recibidas</th>
+              <th class="text-center">Tipo</th>
+              <th class="text-center">Días trabajados</th>
+              <th class="text-center">Jornada trabajada</th>
+              <th class="text-center">Configuración</th>
+              <th class="text-center">Trámites realizados</th>
+              <th class="text-center">Cred. entregadas<sup>1</sup></th>
+              <th class="text-center">Cred. reimpresión<sup>2</sup></th>
+              <th class="text-center">Total de atenciones</th>
+              <th class="text-center">Productividad por día</th>
+              <th class="text-center">Productividad por estación</th>
+              <th class="text-center">Credenciales recibidas</th>
             </tr>
           </thead>
           <tbody>
           {% for mac in reporte.reporte_cifras.all %}
             <tr>
-              <td>{{ mac.modulo }}</td>
-              <td>{{ mac.tipo }}</td>
-              <td>{{ mac.dias_trabajados }}</td>
-              <td>{{ mac.jornada_trabajada }}</td>
-              <td>{{ mac.configuracion }}</td>
-              <td>{{ mac.tramites }}</td>
-              <td>{{ mac.credenciales_entregadas_actualizacion }}</td>
-              <td>{{ mac.credenciales_reimpresion }}</td>
-              <td>{{ mac.total_atenciones }}</td>
-              <td>{{ mac.productividad_x_dia }}</td>
-              <td>{{ mac.productividad_x_dia_x_estacion }}</td>
-              <td>{{ mac.credenciales_recibidas }}</td>
+              <td class="text-center">{{ mac.modulo }}</td>
+              <td class="text-nowrap text-center">{{ mac.tipo }}</td>
+              <td class="text-right">{{ mac.dias_trabajados }}</td>
+              <td class="text-right">{{ mac.jornada_trabajada }}</td>
+              <td class="text-center">{{ mac.configuracion }}</td>
+              <td class="text-right">{{ mac.tramites }}</td>
+              <td class="text-right">{{ mac.credenciales_entregadas_actualizacion }}</td>
+              <td class="text-right">{{ mac.credenciales_reimpresion }}</td>
+              <td class="text-right">{{ mac.total_atenciones }}</td>
+              <td class="text-right">{{ mac.productividad_x_dia }}</td>
+              <td class="text-right">{{ mac.productividad_x_dia_x_estacion }}</td>
+              <td class="text-right">{{ mac.credenciales_recibidas }}</td>
             </tr>
           {% endfor %}
           </tbody>
