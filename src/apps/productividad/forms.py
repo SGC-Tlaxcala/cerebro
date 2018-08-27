@@ -12,8 +12,8 @@ from django import forms
 
 class CargaCifras(forms.Form):
     """Clase para crear el formulario que carga las cifras"""
-    fecha_corte = forms.DateField()
-    archivo = forms.FileField()
+    fecha_corte = forms.DateField(help_text='Escribe la fecha de corte')
+    archivo = forms.FileField(help_text='Selecciona el archivo de Excel con la productividad semanal')
 
     def __init__(self, *args, **kwargs):
         super(CargaCifras, self).__init__(*args, **kwargs)
@@ -32,5 +32,4 @@ class CargaCifras(forms.Form):
                 ),
                 css_class='row'
             )
-
         )

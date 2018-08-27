@@ -16,15 +16,14 @@
 {% block before_content %}
   <div class="container">
     <div class="row">
-      <div class="page-header" id="content" style="padding-top: 70px;">
+      <div class="pb-2 mt-4 mb-2 border-bottom" id="content" style="padding-top: 70px;">
         <h1><span class="fa fa-bar-chart"></span> {{title}}</h1>
+        {{ message }}
       </div>
     </div>
   </div>
 {% endblock before_content %}
 
 {% block content %}
-  <form method="post" class="form">
-    {% crispy form %}
-  </form>
+  {% crispy form %}
 {% endblock content %}

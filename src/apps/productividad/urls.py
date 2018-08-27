@@ -5,7 +5,7 @@
 # author: Javier Sanchez Toledano <js.toledano@me.com>
 """Patrones de URI para productividad"""
 
-from django.urls import path, re_path
+from django.urls import path
 from django.contrib.auth.decorators import login_required
 from apps.productividad.views import CifrasUpload
 
