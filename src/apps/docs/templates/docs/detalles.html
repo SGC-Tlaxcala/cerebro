@@ -8,7 +8,7 @@
 
 {% block contextual %}
   <a class="btn btn-large btn-danger" type="button" href="{% url "docs.views.agregar_control" doc.id %}">
-    Agregar Nueva <strong>Revisión</strong></a>   
+    Agregar Nueva <strong>Revisión</strong></a>
 {% endblock %}
 
 
@@ -19,20 +19,20 @@
 </script>
 
   {% if doc.ext == 'pdf' %}
-    <script type="text/javascript"> 
-      var fp = new FlexPaperViewer(   
+    <script type="text/javascript">
+      var fp = new FlexPaperViewer(
         '{% static "flex/FlexPaperViewer" %}',
-        'viewerPlaceHolder', { 
+        'viewerPlaceHolder', {
           config : {
             PDFFile : '{{doc.revision_actual.archivo.url}}',
             FitPageOnLoad : false,
-            FitWidthOnLoad : true, 
+            FitWidthOnLoad : true,
             InitViewMode : 'SinglePage',
             ViewModeToolsVisible : true,
             ZoomToolsVisible : true,
             NavToolsVisible : true,
             CursorToolsVisible : true,
-            SearchToolsVisible : true          
+            SearchToolsVisible : true
           }
         });
     </script>
@@ -46,7 +46,7 @@
   <div class="page-header">
     <h1>{{ doc.nombre }} <small>{% if doc.proceso.slug != "stn" %}ver. {{ doc.r_actual }}{% endif %} ({{ doc.revision_actual.f_actualizacion }})</small></h1>
   </div><!-- ./page-header -->
-  
+
   <div class="row"><!-- presentacion documento -->
     <div class="col-md-9"><!-- documento en flash -->
       {% if doc.proceso.slug == "stn" %}
@@ -63,7 +63,7 @@
           <!-- presentacion archivo -->
           <div>
             <iframe style="float:left;" id="viewer" src = "{% static 'viewerjs/index.html' %}#{{MEDIA_URL}}{{doc.revision_actual.archivo}}" width='100%' height='600px' allowfullscreen webkitallowfullscreen></iframe>
-          </div>     
+          </div>
           <!-- ./presentacion-archivo -->
 
         {% else %}
@@ -98,7 +98,7 @@
     </div><!-- ./col-md-9 documento en flash -->
 
     <div class="col-md-3"><!-- meta docs -->
-    
+
       {% if perms.docs.add_revision %}
       <div class="panel panel-danger">
         <div class="panel-heading">
@@ -109,7 +109,7 @@
         </div>
       </div>
       {% endif %}
-    
+
       <div class="panel panel-primary">
         <div class="panel-heading">
           <h3 class="panel-title"><i class="fa fa-key"></i> Código</h3>
@@ -139,7 +139,7 @@
       </div><!-- ./revision -->
       {% endif %}
 
-      {% if doc.proceso.slug == "stn" %}      
+      {% if doc.proceso.slug == "stn" %}
       <div class="panel panel-info">
         <div class="panel-heading">
           <h3 class="panel-title"><i class="fa fa-calendar"></i> Fecha la Opinión</h3>
@@ -155,10 +155,10 @@
           <h3 class="panel-title"><i class="fa fa-cloud-download"></i> Descargar archivo</h3>
         </div>
         <div class="panel-body">
-          <a href="/media/{{doc.revision_actual.archivo.url}}">Descargar</a>
+			<a href="{{doc.revision_actual.archivo.url}}">Descargar</a>
         </div>
-      </div><!-- ./Descarga -->   
-      
+      </div><!-- ./Descarga -->
+
       {% if perms.docs.change_revision %}
         <div class="panel panel-danger">
           <div class="panel-heading">
@@ -169,7 +169,7 @@
           </div>
         </div><!-- ./Descarga -->
       {% endif %}
-      
+
     </div><!-- ./meta docs -->
   </div><!-- ./row presentacion documento -->
 </div><!-- ./contenido col-md-12 -->
@@ -182,12 +182,12 @@
       <div class="panel panel-default">
         <div class="panel-heading">
           <h4 class="panel-title">
-            <a data-toggle="collapse" 
-              data-parent="#revsiones" 
+            <a data-toggle="collapse"
+              data-parent="#revsiones"
               href="#cambio{{ r.revision }}">
               Revisión <strong>{{ r.revision }}</strong></a>
           </h4>
-        </div><!-- ./panel-heading --> 
+        </div><!-- ./panel-heading -->
         <div id="cambio{{ r.revision }}" class="panel-collapse collapse {% if forloop.first %}in{% endif %}">
           <div class="panel-body">
             {{ r.cambios }}
