@@ -8,7 +8,7 @@
 {% block  head_title %}{{ doc.nombre }}{% endblock %}
 
 {% block content %}
-  <div class="row">
+  <div class="row" style="padding-top: 65px;">
     <div class="col"><!-- contenido -->
       <div class="page-header">
         <h1 class="display-4">{{ doc.nombre }} <small>{% if doc.proceso.slug != "stn" %}ver. {{ doc.r_actual }}{% endif %} ({{ doc.revision_actual.f_actualizacion }})</small></h1>
@@ -27,7 +27,7 @@
     </div>
   </div>
   <div class="row" id="documento">
-    <div class="col-md-9" id=""mostrarPDF>
+    <div class="col-md-9" id="mostrarPDF">
       <div class="row">
         <div class="col">
           {% if doc.ext == 'pdf' %}
@@ -140,7 +140,8 @@
               <i class="fa fa-cloud-download"></i> Descargar archivo
             </div>
             <div class="card-body">
-              <span><a href="{{doc.revision_actual.archivo.url}}">Descargar</a></span>
+
+              <span><a href="http://10.29.0.79/media/{{doc.revision_actual.archivo}}">Descargar</a></span>
             </div>
           </div>
         </div>
