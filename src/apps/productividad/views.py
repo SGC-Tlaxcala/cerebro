@@ -6,7 +6,7 @@
 
 import math
 import xlrd
-from django.urls import reverse_lazy
+from django.urls import reverse
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from django.views.generic.list import ListView
@@ -88,8 +88,8 @@ class RemesaDetalle(DetailView):
 class CifrasUpload(FormView):
     """Con esta clase subo el archivo"""
     form_class = CargaCifras
-    success_url = reverse_lazy('cifras:index')
     template_name = 'productividad/add.html'
+    reporte = 1
 
     def form_valid(self, form):
         fecha = form.cleaned_data['fecha_corte']
@@ -99,7 +99,7 @@ class CifrasUpload(FormView):
             ContentFile(archivo.read())
         )
         (observaciones, remesa, macs) = procesar_cifras(path)
-        reporte, created = Reporte.objects.update_or_create(
+        self.reporte, created = Reporte.objects.update_or_create(
             remesa=remesa,
             defaults={
                 'fecha_corte': fecha,
@@ -109,12 +109,12 @@ class CifrasUpload(FormView):
                 'usuario': self.request.user
             }
         )
-        print(f"cerebro:: El reporte {reporte} se creó en {created}")
+        print(f"cerebro:: El reporte {self.reporte} se creó en {created}")
         for mac in macs:
             cifras, created = Cifras.objects.update_or_create(
-                reporte_semanal=reporte, modulo=mac,
+                reporte_semanal=self.reporte, modulo=mac,
                 defaults={
-                    'reporte_semanal': reporte,
+                    'reporte_semanal': self.reporte,
                     'distrito': macs[mac]['distrito'],
                     'modulo': mac,
                     'tipo': macs[mac]['tipo'],
@@ -133,3 +133,6 @@ class CifrasUpload(FormView):
             )
             print(f'cerebro:: Se crearon los datos {mac} en el registro {cifras} el {created}')
         return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse('cifras:detalle', kwargs={'pk': self.reporte.id})

@@ -6,6 +6,12 @@
       <div class="pb-2 mt-4 mb-2 border-bottom">
         <h1><span class="fa fa-bar-chart"></span> Reporte de Productividad en los MAC <small>{{ rem }}</small></h1>
         <p class="well"><strong>Periodo:</strong> Del {{ rem.inicio|date:'d M' }} al {{ rem.fin|date:'d M Y' }}</p>
+        <p>
+          {% if perms.productividad.change_reporte %}
+            <a href="{% url 'cifras:add' %}" class="btn btn-danger"><i class="fa fa-plus-circle"></i> Agregar remesa</a>
+          {% endif %}
+          <a href="{% url 'cifras:index' %}" class="btn btn-primary"><i class="fa fa-reply"></i> Regresar</a>
+        </p>
       </div>
     </div>
   </div>
