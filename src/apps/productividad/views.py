@@ -6,11 +6,14 @@
 
 import math
 import xlrd
-from django.urls import reverse_lazy
+from django.urls import reverse
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
+from django.views.generic.list import ListView
 from django.views.generic.edit import FormView
+from django.views.generic.detail import DetailView
 from django.conf import settings
+from core.utils import Remesa
 from apps.productividad.forms import CargaCifras
 from apps.productividad.models import Reporte, Cifras
 
@@ -54,14 +57,57 @@ def procesar_cifras(archivo_excel):
         except ValueError:
             pass
 
+        if '290260' not in macs:
+            macs['290260'] = {
+                'distrito': '02',
+                'tipo': 'Urbano',
+                'dias_trabajados': 0,
+                'jornada_trabajada': 0,
+                'configuracion': 'B',
+                'tramites': 0,
+                'credenciales_entregadas_actualizacion': 0,
+                'credenciales_reimpresion': 0,
+                'total_atenciones': 0,
+                'productividad_x_dia': 0,
+                'productividad_x_dia_x_estacion': 0,
+                'credenciales_recibidas': 0
+            }
+
     return observaciones, remesa, macs
+
+
+class CifrasPortada(ListView):
+    """Para crear la portada"""
+    model = Reporte
+    template_name = 'productividad/index.html'
+    context_object_name = 'reportes'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = "Productividad"
+        context['kpi_path'] = True
+        return context
+
+
+class RemesaDetalle(DetailView):
+    """Clase para visualizar el informe de productividad"""
+    model = Reporte
+    template_name = 'productividad/remesa_detalle.html'
+    context_object_name = 'reporte'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['rem'] = Remesa.objects.get(remesa=self.object.remesa[:7])
+        context['title'] = 'Reporte de productividad en los módulos de atención ciudadana'
+        context['kpi_path'] = True
+        return context
 
 
 class CifrasUpload(FormView):
     """Con esta clase subo el archivo"""
     form_class = CargaCifras
-    success_url = reverse_lazy('docs:index')
-    template_name = 'productividad/index.html'
+    template_name = 'productividad/add.html'
+    reporte = 1
 
     def form_valid(self, form):
         fecha = form.cleaned_data['fecha_corte']
@@ -71,7 +117,7 @@ class CifrasUpload(FormView):
             ContentFile(archivo.read())
         )
         (observaciones, remesa, macs) = procesar_cifras(path)
-        reporte, created = Reporte.objects.update_or_create(
+        self.reporte, created = Reporte.objects.update_or_create(
             remesa=remesa,
             defaults={
                 'fecha_corte': fecha,
@@ -81,12 +127,13 @@ class CifrasUpload(FormView):
                 'usuario': self.request.user
             }
         )
-        print(f"cerebro:: El reporte {reporte} se creó en {created}")
+        reporte_actividad = 'creó' if {created} else 'actualizó'
+        print(f"cerebro:: El reporte {self.reporte} se {reporte_actividad}")
         for mac in macs:
             cifras, created = Cifras.objects.update_or_create(
-                reporte_semanal=reporte, modulo=mac,
+                reporte_semanal=self.reporte, modulo=mac,
                 defaults={
-                    'reporte_semanal': reporte,
+                    'reporte_semanal': self.reporte,
                     'distrito': macs[mac]['distrito'],
                     'modulo': mac,
                     'tipo': macs[mac]['tipo'],
@@ -103,5 +150,15 @@ class CifrasUpload(FormView):
                     'credenciales_recibidas': macs[mac]['credenciales_recibidas']
                 }
             )
-            print(f'cerebro:: Se crearon los datos {mac} en el registro {cifras} el {created}')
+            actividad = 'crearon' if {created} else 'actualizaron'
+            print(f'cerebro:: Se {actividad} los datos {mac} en el registro {cifras}')
         return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse('cifras:detalle', kwargs={'pk': self.reporte.id})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Carga de archivo de cifras'
+        context['kpi_path'] = True
+        return context

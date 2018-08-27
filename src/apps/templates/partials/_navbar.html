@@ -28,12 +28,17 @@
             <i class="fa fa-line-chart"></i> Indicadores
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <a 
-              class="dropdown-item {% current request 'mesas' %}" 
+            <a
+              class="dropdown-item {% current request 'cifras' %}"
+              href="{% url 'cifras:index' %}">
+              <i class="fa fa-bar-chart"></i> Productividad
+            </a>
+            <a
+              class="dropdown-item {% current request 'mesas' %}"
               href="{% url 'mesas:index' %}">
               <i class="fa fa-user-times"></i> Control recepción
             </a>
-            <a 
+            <a
               class="dropdown-item {% current request 'paquetes' %}"
               href="{% url 'paquetes:index' %}">
               <i class="fa fa-truck"></i> Distribución de paquetes
