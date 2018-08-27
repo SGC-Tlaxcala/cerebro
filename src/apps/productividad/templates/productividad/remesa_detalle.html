@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="row">
+    <div class="col">
+      <div class="pb-2 mt-4 mb-2 border-bottom">
+        <h1><span class="fa fa-bar-chart"></span> Reporte de Productividad en los MAC <small>{{ rem }}</small></h1>
+        <p class="well"><strong>Periodo:</strong> Del {{ rem.inicio|date:'d M' }} al {{ rem.fin|date:'d M Y' }}</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col">
+      <div class="table-responsive">
+        <table class="table table-hover table-bordered table-condensed table-striped table-responsive">
+          <thead class="thead-dark">
+            <tr>
+              <th>Módulo</th>
+              <th>Tipo</th>
+              <th>Días trabajados</th>
+              <th>Jornada trabajada</th>
+              <th>Configuración</th>
+              <th>Trámites realizados</th>
+              <th>Cred. entregadas<sup>1</sup></th>
+              <th>Cred. reimpresión<sup>2</sup></th>
+              <th>Total de atenciones</th>
+              <th>Productividad por día</th>
+              <th>Productividad por estación</th>
+              <th>Credenciales recibidas</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for mac in reporte.reporte_cifras.all %}
+            <tr>
+              <td>{{ mac.modulo }}</td>
+              <td>{{ mac.tipo }}</td>
+              <td>{{ mac.dias_trabajados }}</td>
+              <td>{{ mac.jornada_trabajada }}</td>
+              <td>{{ mac.configuracion }}</td>
+              <td>{{ mac.tramites }}</td>
+              <td>{{ mac.credenciales_entregadas_actualizacion }}</td>
+              <td>{{ mac.credenciales_reimpresion }}</td>
+              <td>{{ mac.total_atenciones }}</td>
+              <td>{{ mac.productividad_x_dia }}</td>
+              <td>{{ mac.productividad_x_dia_x_estacion }}</td>
+              <td>{{ mac.credenciales_recibidas }}</td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+        <p>
+          <sup>1</sup> Credenciales entregadas producto de solicitudes de actualización en entidades sin proceso local.
+          <br>
+          <sup>2</sup> Credenciales entregadas producto de solicitudes de reimpresión.
+        </p>
+        <h4>Observaciones</h4>
+        <p>
+          {{ reporte.notas }}
+        </p>
+      </div>
+    </div>
+  </div>
+
+{% endblock content %}

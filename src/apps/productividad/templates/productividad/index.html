@@ -1,29 +1,5 @@
 {% extends 'base.html' %}
-{% load crispy_forms_tags %}
-{% load staticfiles %}
-
-{% block footer %}
-  <link rel="stylesheet" href="{% static 'css/datepicker.css' %}" />
-  <script src="{% static 'js/bootstrap-datepicker.js' %}"></script>
-  <script>
-    $('.dateinput').datepicker({
-      format: 'dd/mm/yyyy',
-      locale: 'es'
-    })
-  </script>
-{% endblock footer %}
-
-{% block before_content %}
-  <div class="container">
-    <div class="row">
-      <div class="pb-2 mt-4 mb-2 border-bottom" id="content" style="padding-top: 70px;">
-        <h1><span class="fa fa-bar-chart"></span> {{title}}</h1>
-        {{ message }}
-      </div>
-    </div>
-  </div>
-{% endblock before_content %}
 
 {% block content %}
-  {% crispy form %}
+  {{ reportes }}
 {% endblock content %}

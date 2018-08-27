@@ -7,9 +7,11 @@
 
 from django.urls import path
 from django.contrib.auth.decorators import login_required
-from apps.productividad.views import CifrasUpload
+from apps.productividad.views import CifrasUpload, CifrasPortada, RemesaDetalle
 
 app_name = 'cifras'
 urlpatterns = [
-    path('', login_required(CifrasUpload.as_view()), name="index")
+    path('', CifrasPortada.as_view(), name='index'),
+    path('detalle/<int:pk>/', RemesaDetalle.as_view(), name='detalle'),
+    path('add', login_required(CifrasUpload.as_view()), name="add")
 ]

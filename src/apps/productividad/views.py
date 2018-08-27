@@ -9,8 +9,11 @@ import xlrd
 from django.urls import reverse_lazy
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
+from django.views.generic.list import ListView
 from django.views.generic.edit import FormView
+from django.views.generic.detail import DetailView
 from django.conf import settings
+from core.utils import Remesa
 from apps.productividad.forms import CargaCifras
 from apps.productividad.models import Reporte, Cifras
 
@@ -57,11 +60,36 @@ def procesar_cifras(archivo_excel):
     return observaciones, remesa, macs
 
 
+class CifrasPortada(ListView):
+    """Para crear la portada"""
+    model = Reporte
+    template_name = 'productividad/index.html'
+    context_object_name = 'reportes'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = "Productividad"
+        return context
+
+
+class RemesaDetalle(DetailView):
+    """Clase para visualizar el informe de productividad"""
+    model = Reporte
+    template_name = 'productividad/remesa_detalle.html'
+    context_object_name = 'reporte'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['rem'] = Remesa.objects.get(remesa=self.object.remesa[:7])
+        context['title'] = 'Reporte de productividad en los módulos de atención ciudadana'
+        return context
+
+
 class CifrasUpload(FormView):
     """Con esta clase subo el archivo"""
     form_class = CargaCifras
-    success_url = reverse_lazy('docs:index')
-    template_name = 'productividad/index.html'
+    success_url = reverse_lazy('cifras:index')
+    template_name = 'productividad/add.html'
 
     def form_valid(self, form):
         fecha = form.cleaned_data['fecha_corte']
