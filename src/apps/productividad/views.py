@@ -85,6 +85,7 @@ class CifrasPortada(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = "Productividad"
+        context['kpi_path'] = True
         return context
 
 
@@ -98,6 +99,7 @@ class RemesaDetalle(DetailView):
         context = super().get_context_data(**kwargs)
         context['rem'] = Remesa.objects.get(remesa=self.object.remesa[:7])
         context['title'] = 'Reporte de productividad en los módulos de atención ciudadana'
+        context['kpi_path'] = True
         return context
 
 
@@ -154,3 +156,9 @@ class CifrasUpload(FormView):
 
     def get_success_url(self):
         return reverse('cifras:detalle', kwargs={'pk': self.reporte.id})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Carga de archivo de cifras'
+        context['kpi_path'] = True
+        return context
