@@ -7,6 +7,7 @@
     google.charts.setOnLoadCallback(drawChart)
 
     function drawChart() {
+
       let data = google.visualization.arrayToDataTable([
         ['Remesa', {% for mac in reportes.1.reporte_cifras.all %}'{{ mac.modulo }}'{% if not forloop.last %}, {% endif %}{% endfor %}],
         {% for r in reportes %}['{{ r.remesa }}', {% for m in r.reporte_cifras.all %}{{ m.productividad_x_dia_x_estacion }}{% if not forloop.last %}, {% endif %}{% endfor %}]{% if not forloop.last %},{% endif %}
@@ -16,7 +17,14 @@
       let options = {
         title: 'Productividad de Módulos',
         curveType: 'function',
-        legend: {position: 'bottom'}
+        legend: {position: 'bottom'},
+        vAxis: {
+          title: 'Productividad',
+          viewWindow: {
+            min: 0
+          }
+        },
+        xAxis: {title: 'Remesa'}
       }
 
       let chart = new google.visualization.LineChart(document.getElementById('chart_productividad'))
@@ -66,7 +74,11 @@
           <tbody>
             {% for r in reportes %}
               <tr>
-                <td class="text-nowrap">{{ r.remesa }}</td>
+                <td class="text-nowrap text-center">
+                  <a href="{% url 'cifras:detalle' pk=r.id %}">
+                    {{ r.remesa }}
+                  </a>
+                </td>
                 {% for m in r.reporte_cifras.all %}
                   <td class="text-right">{{ m.productividad_x_dia_x_estacion }}</td>
                 {% endfor %}

@@ -57,6 +57,22 @@ def procesar_cifras(archivo_excel):
         except ValueError:
             pass
 
+        if '290260' not in macs:
+            macs['290260'] = {
+                'distrito': '02',
+                'tipo': 'Urbano',
+                'dias_trabajados': 0,
+                'jornada_trabajada': 0,
+                'configuracion': 'B',
+                'tramites': 0,
+                'credenciales_entregadas_actualizacion': 0,
+                'credenciales_reimpresion': 0,
+                'total_atenciones': 0,
+                'productividad_x_dia': 0,
+                'productividad_x_dia_x_estacion': 0,
+                'credenciales_recibidas': 0
+            }
+
     return observaciones, remesa, macs
 
 
@@ -109,7 +125,8 @@ class CifrasUpload(FormView):
                 'usuario': self.request.user
             }
         )
-        print(f"cerebro:: El reporte {self.reporte} se creó en {created}")
+        reporte_actividad = 'creó' if {created} else 'actualizó'
+        print(f"cerebro:: El reporte {self.reporte} se {reporte_actividad}")
         for mac in macs:
             cifras, created = Cifras.objects.update_or_create(
                 reporte_semanal=self.reporte, modulo=mac,
@@ -131,7 +148,8 @@ class CifrasUpload(FormView):
                     'credenciales_recibidas': macs[mac]['credenciales_recibidas']
                 }
             )
-            print(f'cerebro:: Se crearon los datos {mac} en el registro {cifras} el {created}')
+            actividad = 'crearon' if {created} else 'actualizaron'
+            print(f'cerebro:: Se {actividad} los datos {mac} en el registro {cifras}')
         return super().form_valid(form)
 
     def get_success_url(self):
