@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block footer %}
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <script type="text/javascript">
+    google.charts.load('current', {'packages':['corechart']})
+    google.charts.setOnLoadCallback(drawChart)
+
+    function drawChart() {
+
+      let data = google.visualization.arrayToDataTable([
+        ['Remesa', {% for mac in reportes.1.reporte_cifras.all %}'{{ mac.modulo }}'{% if not forloop.last %}, {% endif %}{% endfor %}],
+        {% for r in reportes %}['{{ r.remesa }}', {% for m in r.reporte_cifras.all %}{{ m.productividad_x_dia_x_estacion }}{% if not forloop.last %}, {% endif %}{% endfor %}]{% if not forloop.last %},{% endif %}
+        {% endfor %}
+      ])
+
+      let options = {
+        title: 'Productividad de Módulos',
+        curveType: 'function',
+        legend: {position: 'bottom'},
+        vAxis: {
+          title: 'Productividad',
+          viewWindow: {
+            min: 0
+          }
+        },
+        xAxis: {title: 'Remesa'}
+      }
+
+      let chart = new google.visualization.LineChart(document.getElementById('chart_productividad'))
+      chart.draw(data, options)
+    }
+  </script>
+{% endblock %}
+
+{% block content %}
+  <div class="row">
+      <div class="col">
+        <div class="jumbotron">
+          <h1 class="display-4"><i class="fa fa-bar-chart"></i> {{ title }}</h1>
+          <p class="lead">
+            Este indicador apoya directamente al objetivo <strong>Cobertura</strong>
+          </p>
+          {% if perms.productividad.change_reporte %}
+            <hr class="my-4">
+            <a href="{% url 'cifras:add' %}" class="btn btn-danger">
+              <i class="fa fa-plus-circle"></i> Agregar remesa
+            </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+  <div class="row">
+    <div class="col">
+      <div
+        id="chart_productividad"
+        style="width: 100%; min-height: 500px;"></div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col">
+      <div class="table-responsive">
+        <table class="table table-hover table-bordered table-condensed table-striped table-responsive">
+          <thead class="thead-dark">
+            <tr>
+              <th>Remesa</th>
+              {% for mac in reportes.1.reporte_cifras.all %}
+                <th>{{ mac.modulo }}</th>
+              {% endfor %}
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in reportes %}
+              <tr>
+                <td class="text-nowrap text-center">
+                  <a href="{% url 'cifras:detalle' pk=r.id %}">
+                    {{ r.remesa }}
+                  </a>
+                </td>
+                {% for m in r.reporte_cifras.all %}
+                  <td class="text-right">{{ m.productividad_x_dia_x_estacion }}</td>
+                {% endfor %}
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+{% endblock content %}

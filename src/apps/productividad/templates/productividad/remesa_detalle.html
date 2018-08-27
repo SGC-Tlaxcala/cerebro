@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="row">
+    <div class="col">
+      <div class="pb-2 mt-4 mb-2 border-bottom">
+        <h1><span class="fa fa-bar-chart"></span> Reporte de Productividad en los MAC <small>{{ rem }}</small></h1>
+        <p class="well"><strong>Periodo:</strong> Del {{ rem.inicio|date:'d M' }} al {{ rem.fin|date:'d M Y' }}</p>
+        <p>
+          {% if perms.productividad.change_reporte %}
+            <a href="{% url 'cifras:add' %}" class="btn btn-danger"><i class="fa fa-plus-circle"></i> Agregar remesa</a>
+          {% endif %}
+          <a href="{% url 'cifras:index' %}" class="btn btn-primary"><i class="fa fa-reply"></i> Regresar</a>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col">
+      <div class="table-responsive">
+        <table class="table table-hover table-bordered table-condensed table-striped table-responsive">
+          <thead class="thead-dark">
+            <tr>
+              <th>Módulo</th>
+              <th class="text-center">Tipo</th>
+              <th class="text-center">Días trabajados</th>
+              <th class="text-center">Jornada trabajada</th>
+              <th class="text-center">Configuración</th>
+              <th class="text-center">Trámites realizados</th>
+              <th class="text-center">Cred. entregadas<sup>1</sup></th>
+              <th class="text-center">Cred. reimpresión<sup>2</sup></th>
+              <th class="text-center">Total de atenciones</th>
+              <th class="text-center">Productividad por día</th>
+              <th class="text-center">Productividad por estación</th>
+              <th class="text-center">Credenciales recibidas</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for mac in reporte.reporte_cifras.all %}
+            <tr>
+              <td class="text-center">{{ mac.modulo }}</td>
+              <td class="text-nowrap text-center">{{ mac.tipo }}</td>
+              <td class="text-right">{{ mac.dias_trabajados }}</td>
+              <td class="text-right">{{ mac.jornada_trabajada }}</td>
+              <td class="text-center">{{ mac.configuracion }}</td>
+              <td class="text-right">{{ mac.tramites }}</td>
+              <td class="text-right">{{ mac.credenciales_entregadas_actualizacion }}</td>
+              <td class="text-right">{{ mac.credenciales_reimpresion }}</td>
+              <td class="text-right">{{ mac.total_atenciones }}</td>
+              <td class="text-right">{{ mac.productividad_x_dia }}</td>
+              <td class="text-right">{{ mac.productividad_x_dia_x_estacion }}</td>
+              <td class="text-right">{{ mac.credenciales_recibidas }}</td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+        <p>
+          <sup>1</sup> Credenciales entregadas producto de solicitudes de actualización en entidades sin proceso local.
+          <br>
+          <sup>2</sup> Credenciales entregadas producto de solicitudes de reimpresión.
+        </p>
+        <h4>Observaciones</h4>
+        <p>
+          {{ reporte.notas }}
+        </p>
+      </div>
+    </div>
+  </div>
+
+{% endblock content %}
