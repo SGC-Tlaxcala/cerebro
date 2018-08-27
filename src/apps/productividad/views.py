@@ -13,6 +13,7 @@ from django.core.files.base import ContentFile
 from django.views.generic.edit import FormView
 from django.conf import settings
 from apps.productividad.forms import CargaCifras
+from apps.productividad.models import Reporte, Cifras
 
 
 def get_int(celda):
@@ -71,4 +72,15 @@ class CifrasUpload(FormView):
             ContentFile(archivo.read())
         )
         (observaciones, remesa, macs) = procesar_cifras(path)
+        reporte, created = Reporte.objects.update_or_create(
+            remesa=remesa,
+            defaults={
+                'fecha_corte': fecha,
+                'remesa': remesa,
+                'notas': observaciones,
+                'archivo': path,
+                'usuario': self.request.user
+            }
+        )
+        print(reporte, created)
         return super().form_valid(form)
