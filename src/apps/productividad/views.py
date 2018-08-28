@@ -193,19 +193,22 @@ class TramitesIndex(View):
                 if f'0{_pt.distrito}' == _distrito:
                     _pronostico = _pt.tramites
                     dlist.append(_pronostico)
-            dlist.append('')
-            dlist.append(_tramites / _pronostico)
+            dlist.append(_pronostico - _tramites)
+            dlist.append((_tramites / _pronostico) * 100 )
             chart_data.append(dlist)
 
         estatal = {
             'tramites': sum(r[1] for r in chart_data),
+            'faltantes': sum(r[2] for r in chart_data) - sum(r[1] for r in chart_data),
             'pronostico': sum(r[2] for r in chart_data),
-            'porcentaje': sum(r[1] for r in chart_data)/ sum(r[2] for r in chart_data)
+            'porcentaje': (sum(r[1] for r in chart_data)/ sum(r[2] for r in chart_data)) * 100
         }
 
         data = {
             'chart_data': chart_data,
-            'estatal': estatal
+            'estatal': estatal,
+            'kpi_path': True,
+            'title': 'Control de Trámites'
         }
 
         return render(request, self.template_name, data)
