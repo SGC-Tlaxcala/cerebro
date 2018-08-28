@@ -34,6 +34,11 @@
               <i class="fa fa-bar-chart"></i> Productividad
             </a>
             <a
+              class="dropdown-item {% current request 'tramites' %}"
+              href="{% url 'cifras:tramites' %}">
+              <i class="fa fa-edit"></i> Trámites
+            </a>
+            <a
               class="dropdown-item {% current request 'mesas' %}"
               href="{% url 'mesas:index' %}">
               <i class="fa fa-user-times"></i> Control recepción
