@@ -17,7 +17,8 @@
       ])
 
       const options = {
-        title: 'Seguimiento al pronóstico estatal'
+        title: 'Seguimiento al pronóstico estatal',
+        legend: 'none'
       }
 
       let chart = new google.visualization.PieChart(document.getElementById('estatal_chart'))
@@ -48,9 +49,11 @@
 <div class="row">
   <div class="col">
     <div class="jumbotron">
-      <h1 class="display-4"><i class="fa fa-bar-chart"></i> {{ title }}</h1>
+      <h1 class="display-4"><i class="fa fa-edit"></i> {{ title }}</h1>
       <p class="lead">
         Contribuye al seguimiento del pronóstico de trámites.
+        <hr>
+        <a href="{% url 'cifras:index' %}" class="btn btn-primary">Productividad</a>
       </p>
     </div>
   </div>

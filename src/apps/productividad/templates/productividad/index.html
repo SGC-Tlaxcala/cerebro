@@ -40,12 +40,11 @@
           <p class="lead">
             Este indicador apoya directamente al objetivo <strong>Cobertura</strong>
           </p>
-          {% if perms.productividad.change_reporte %}
             <hr class="my-4">
             <a href="{% url 'cifras:add' %}" class="btn btn-danger">
               <i class="fa fa-plus-circle"></i> Agregar remesa
             </a>
-          {% endif %}
+            <a href="{% url 'cifras:tramites' %}" class="btn btn-primary">Trámites</a>
         </div>
       </div>
     </div>
