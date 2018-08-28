@@ -9,6 +9,7 @@ import xlrd
 from django.urls import reverse
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
+from django.views import View
 from django.views.generic.list import ListView
 from django.views.generic.edit import FormView
 from django.views.generic.detail import DetailView
@@ -162,3 +163,43 @@ class CifrasUpload(FormView):
         context['title'] = 'Carga de archivo de cifras'
         context['kpi_path'] = True
         return context
+
+
+class TramitesIndex(View):
+    template_name = 'productividad/tramites.html'
+
+    def get(self, request, *args, **kwargs):
+        cifras = Cifras.objects.values('distrito').order_by('distrito').annotate(suma_modulo=Sum('tramites'))
+        pronostico = PronosticoTramites.objects.all()
+
+        chart_data = [
+        ]
+
+        for d in ('01', '02', '03'):
+            dlist = [d]
+            t1 = 0
+            p1 = 0
+            for c in cifras:
+                if c['distrito'] == d:
+                    t1 = c['suma_modulo']
+                    dlist.append(t1)
+            for p in pronostico:
+                if f'0{p.distrito}' == d:
+                    p1 = p.tramites
+                    dlist.append(p1)
+            dlist.append('')
+            dlist.append(t1 / p1)
+            chart_data.append(dlist)
+
+        estatal = {
+            'tramites': sum(r[1] for r in chart_data),
+            'pronostico': sum(r[2] for r in chart_data),
+            'porcentaje': sum(r[1] for r in chart_data)/ sum(r[2] for r in chart_data)
+        }
+
+        data = {
+            'chart_data': chart_data,
+            'estatal': estatal
+        }
+
+        return render(request, self.template_name, data)
