@@ -24,8 +24,14 @@ class PronosticoTramites(models.Model):
     """Modelo para el control de trámites"""
     year = models.PositiveSmallIntegerField('Año')
     distrito = models.PositiveSmallIntegerField(choices=DISTRITOS)
-    tramites = models.SmallIntegerField()
+    tramites = models.IntegerField()
     historial = HistoricalRecords()
+
+    class Meta:
+        ordering = ('year', 'distrito')
+        unique_together = (('year', 'distrito'), )
+        verbose_name = 'Pronóstico'
+        verbose_name_plural = 'Pronósticos de trámites'
 
     def __str__(self):
         return f'{self.get_distrito_display()} - {self.year}: {self.tramites}'
