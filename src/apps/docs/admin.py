@@ -17,11 +17,11 @@ class DocumentAdminForm (forms.ModelForm):
         )
 
 
-class TipoAdmin (admin.ModelAdmin):
+class TipoAdmin(admin.ModelAdmin):
     prepopulated_fields = {"slug": ("tipo",)}
 
 
-class ProcesoAdmin (admin.ModelAdmin):
+class ProcesoAdmin(admin.ModelAdmin):
     prepopulated_fields = {"slug": ("proceso",)}
 
 
@@ -30,7 +30,7 @@ class RevisionInline (admin.TabularInline):
     extra = 1
 
 
-class DocumentoAdmin (admin.ModelAdmin):
+class DocumentoAdmin(admin.ModelAdmin):
     prepopulated_fields = {"slug": ("nombre",)}
     list_display = ('nombre', 'activo', 'proceso', 'tipo')
     list_filter = ['activo', 'proceso', 'tipo']
@@ -49,7 +49,7 @@ class DocumentoAdmin (admin.ModelAdmin):
         formset.save_m2m()
 
 
-class RevisionAdmin (admin.ModelAdmin):
+class RevisionAdmin(admin.ModelAdmin):
     list_filter = ['documento']
     fieldsets = [
         (None, {'fields': ['revision', 'f_actualizacion']}),

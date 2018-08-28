@@ -24,6 +24,7 @@ DJANGO_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize'
 ]
 THIRD_PARTY_APPS = [
     'rest_framework',
@@ -33,6 +34,7 @@ THIRD_PARTY_APPS = [
     'django_extensions',
     'watson',
     'debug_toolbar',
+    'simple_history'
 ]
 LOCAL_APPS = [
     'core',

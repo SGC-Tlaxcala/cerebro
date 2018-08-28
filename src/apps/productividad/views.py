@@ -6,16 +6,19 @@
 
 import math
 import xlrd
-from django.urls import reverse
+from django.conf import settings
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
+from django.db.models import Sum
+from django.views import View
 from django.views.generic.list import ListView
 from django.views.generic.edit import FormView
 from django.views.generic.detail import DetailView
-from django.conf import settings
+from django.shortcuts import render
+from django.urls import reverse
 from core.utils import Remesa
 from apps.productividad.forms import CargaCifras
-from apps.productividad.models import Reporte, Cifras
+from apps.productividad.models import Reporte, Cifras, PronosticoTramites
 
 
 def get_int(celda):
@@ -162,3 +165,50 @@ class CifrasUpload(FormView):
         context['title'] = 'Carga de archivo de cifras'
         context['kpi_path'] = True
         return context
+
+
+class TramitesIndex(View):
+    """Vista para indicador de trámites"""
+    template_name = 'productividad/tramites.html'
+
+    def get(self, request, *args, **kwargs):
+        """Control para el verbo GET"""
+        cifras = Cifras.objects.values('distrito')\
+            .order_by('distrito')\
+            .annotate(suma_modulo=Sum('tramites'))
+        pronostico = PronosticoTramites.objects.all()
+
+        chart_data = [
+        ]
+
+        for _distrito in ('01', '02', '03'):
+            dlist = [_distrito]
+            _tramites = 0
+            _pronostico = 0
+            for _cifras in cifras:
+                if _cifras['distrito'] == _distrito:
+                    _tramites = _cifras['suma_modulo']
+                    dlist.append(_tramites)
+            for _pt in pronostico:
+                if f'0{_pt.distrito}' == _distrito:
+                    _pronostico = _pt.tramites
+                    dlist.append(_pronostico)
+            dlist.append(_pronostico - _tramites)
+            dlist.append((_tramites / _pronostico) * 100 )
+            chart_data.append(dlist)
+
+        estatal = {
+            'tramites': sum(r[1] for r in chart_data),
+            'faltantes': sum(r[2] for r in chart_data) - sum(r[1] for r in chart_data),
+            'pronostico': sum(r[2] for r in chart_data),
+            'porcentaje': (sum(r[1] for r in chart_data)/ sum(r[2] for r in chart_data)) * 100
+        }
+
+        data = {
+            'chart_data': chart_data,
+            'estatal': estatal,
+            'kpi_path': True,
+            'title': 'Control de Trámites'
+        }
+
+        return render(request, self.template_name, data)
