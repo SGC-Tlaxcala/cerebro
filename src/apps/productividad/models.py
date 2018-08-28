@@ -4,9 +4,31 @@
 # date: 26/08/2018
 """Modelos para control de la productividad."""
 
+from simple_history.models import HistoricalRecords
 from django.db import models
 from django.contrib.auth.models import User
 from core.models import TimeStampedModel
+
+
+JD01 = 1
+JD02 = 2
+JD03 = 3
+DISTRITOS = (
+    (JD01, 'Distrito 01'),
+    (JD02, 'Distrito 02'),
+    (JD03, 'Distrito 03')
+)
+
+
+class PronosticoTramites(models.Model):
+    """Modelo para el control de trámites"""
+    year = models.PositiveSmallIntegerField('Año')
+    distrito = models.PositiveSmallIntegerField(choices=DISTRITOS)
+    tramites = models.SmallIntegerField()
+    historial = HistoricalRecords()
+
+    def __str__(self):
+        return f'{self.get_distrito_display()} - {self.year}: {self.tramites}'
 
 
 class Reporte(TimeStampedModel):

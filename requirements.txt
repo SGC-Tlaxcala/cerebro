@@ -16,3 +16,4 @@ django-debug-toolbar
 django-timedeltafield
 django-annoying
 xlrd
+django-simple-history

@@ -33,6 +33,7 @@ THIRD_PARTY_APPS = [
     'django_extensions',
     'watson',
     'debug_toolbar',
+    'simple_history'
 ]
 LOCAL_APPS = [
     'core',
