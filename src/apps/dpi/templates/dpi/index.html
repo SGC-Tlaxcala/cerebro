@@ -1,6 +1,42 @@
 {% extends 'base.html' %}
 {% load staticfiles %}
 
+{% block footer %}
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <script type="text/javascript">
+    google.charts.load('current', {'packages':['corechart']})
+    google.charts.setOnLoadCallback(pieTotal)
+    google.charts.setOnLoadCallback(pieTlaxcala)
+
+    function pieTotal() {
+      const data = google.visualization.arrayToDataTable([
+        ['Tipo', 'Expedientes'],
+        ['DPI', {{ total_dpi.count }}],
+        ['USI', {{ total_usi.count }}]
+      ])
+
+      const options = { legend: 'none' }
+
+      const chart = new google.visualization.PieChart(document.getElementById('total_chart'))
+      chart.draw(data, options)
+    }
+
+    function pieTlaxcala() {
+      const data = google.visualization.arrayToDataTable([
+        ['Tipo', 'Expedientes'],
+        ['DPI', {{ tlaxcala_total_dpi.count }}],
+        ['USI', {{ tlaxcala_total_usi.count }}]
+      ])
+
+      const options = { legend: 'none' }
+
+      const chart = new google.visualization.PieChart(document.getElementById('tlaxcala_chart'))
+      chart.draw(data, options)
+    }
+
+  </script>
+{% endblock footer %}
+
 {% block before_content %}
 
 {% endblock before_content %}
@@ -8,25 +44,27 @@
 {% block content %}
   <div class="row">
     <div class="col">
-      <h1 class="display-3">Estadísticas DPI/USI <small class="text-muted">{{ 2017 }}</small></h1>
+      <h1 class="display-3">Estadísticas DPI/USI <small class="text-muted">{{ year }}</small></h1>
     </div>
   </div>
   <div class="row">
     <div class="col">
       <h3>Estadísticas totales</h3>
       <ul>
-        <li><strong>Total de registros:</strong> {{ total_count }}</li>
-        <li><strong>Total de registros DPI:</strong> {{ total_dpi }}</li>
-        <li><strong>Total de registros USI:</strong> {{ total_usi }}</li>
+        <li><strong>Total de registros:</strong> {{ total.count }}</li>
+        <li><strong>Total de registros DPI:</strong> {{ total_dpi.count }}</li>
+        <li><strong>Total de registros USI:</strong> {{ total_usi.count }}</li>
       </ul>
+      <div id="total_chart" style="min-width: 500px; width: 100px;"></div>
     </div>
     <div class="col">
       <h3>Estadísticas para Tlaxcala</h3>
       <ul>
-        <li><strong>Total de registros:</strong> {{ tlaxcala_count }}</li>
-        <li><strong>Total de registros DPI:</strong> {{ tlaxcala_total_dpi }}</li>
-        <li><strong>Total de registros USI:</strong> {{ tlaxcala_total_usi }}</li>
+        <li><strong>Total de registros:</strong> {{ tlaxcala.count }}</li>
+        <li><strong>Total de registros DPI:</strong> {{ tlaxcala_total_dpi.count }}</li>
+        <li><strong>Total de registros USI:</strong> {{ tlaxcala_total_usi.count }}</li>
       </ul>
+      <div id="tlaxcala_chart" style="min-width: 500px; width: 100px;"></div>
     </div>
   </div>
 
@@ -62,28 +100,28 @@
             <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
             <a href="#" class="btn btn-primary">Go somewhere</a>
           </div>
-        </div>   
+        </div>
       </div>
 
       <div class="col">
-        <div class="card">  
+        <div class="card">
           <div class="card-body">
             <h5 class="card-title">Card title</h5>
             <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
             <a href="#" class="btn btn-primary">Go somewhere</a>
           </div>
-        </div>        
+        </div>
       </div>
 
       <div class="col">
-        <div class="card">  
+        <div class="card">
           <div class="card-body">
             <h5 class="card-title">Card title</h5>
             <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
             <a href="#" class="btn btn-primary">Go somewhere</a>
           </div>
-        </div>        
-      </div>      
+        </div>
+      </div>
     </div>
 
   </div>

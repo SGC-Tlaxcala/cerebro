@@ -9,8 +9,9 @@ u"""Vistas de Depuración."""
 
 from django.contrib import messages
 from django.db.models import Q
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse_lazy
+from django.views import View
 from django.views.generic import TemplateView, ListView
 from django.views.generic.edit import CreateView, UpdateView
 
@@ -39,45 +40,42 @@ class ExpedientesIncompletos(ListView):
         return context
 
 
-class DPIIndex(TemplateView):
+class DPIIndex(View):
     template_name = 'dpi/index.html'
-    YEAR = 2017
-    total = ExpedienteDPI.objects.all()
-    total_dpi = total.filter(DPI)
-    total_usi = total.filter(USI)
-
-    tlaxcala_total = ExpedienteDPI.objects.filter(TLAXCALA)
-    tlaxcala_total_dpi = tlaxcala_total.filter(DPI)
-    tlaxcala_total_usi = tlaxcala_total.filter(USI)
+    year = '2018'
+    total = ExpedienteDPI.objects.all().prefetch_related()
+    tlaxcala_total = ExpedienteDPI.objects.filter(TLAXCALA).prefetch_related()
 
     hay_tramite = Q(fecha_tramite__isnull=False)
     hay_notificacion = Q(fecha_notificacion_aclaracion__isnull=False)
     hay_fecha_entrevista = Q(fecha_entrevista__isnull=False)
     hay_fecha_envio_expediente = Q(fecha_envio_expediente__isnull=False)
 
-    tlx_dpi_exp_completo = tlaxcala_total_dpi.filter(
-        hay_tramite,
-        hay_notificacion,
-        hay_fecha_entrevista,
-        hay_fecha_envio_expediente
-    )
+    def get(self, request, *args, **kwargs):
+        total_dpi = self.total.filter(DPI)
+        total_usi = self.total.filter(USI)
+        tlaxcala_total_dpi = self.tlaxcala_total.filter(DPI)
+        tlaxcala_total_usi = self.tlaxcala_total.filter(USI)
 
-    contexto = {
-        'year': YEAR,
-        'total_count': total.count(),
-        'total_dpi': total_dpi.count(),
-        'total_usi': total_usi.count(),
-        'tlaxcala_count': tlaxcala_total.count(),
-        'tlaxcala_total_dpi': tlaxcala_total_dpi.count(),
-        'tlaxcala_total_usi': tlaxcala_total_usi.count(),
-        'tlx_dpi_exp_completo': tlx_dpi_exp_completo.count()
-    }
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update({'kpi_path': True})
-        context.update(self.contexto)
-        return context
+        tlx_dpi_exp_completo = tlaxcala_total_dpi.filter(
+            self.hay_tramite,
+            self.hay_notificacion,
+            self.hay_fecha_entrevista,
+            self.hay_fecha_envio_expediente
+        )
+        data = {
+            'title': 'Control de DPI',
+            'year': self.year,
+            'total': self.total,
+            'total_dpi': total_dpi,
+            'total_usi': total_usi,
+            'tlaxcala': self.tlaxcala_total,
+            'tlaxcala_total_dpi': tlaxcala_total_dpi,
+            'tlaxcala_total_usi': tlaxcala_total_usi,
+            'tlx_dpi_exp_completo': tlx_dpi_exp_completo,
+            'kpi_path': True
+        }
+        return render(request, self.template_name, data)
 
 
 class DPIAdd(CreateView):
