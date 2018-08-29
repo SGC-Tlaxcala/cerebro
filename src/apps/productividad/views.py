@@ -43,12 +43,16 @@ def get_int(celda):
 def procesar_cifras(archivo_excel):
     """Procesa el archivo de cifras"""
     cifras = xlrd.open_workbook(archivo_excel).sheet_by_name("CIFRAS_PRODUCCION DIARIA")
-    remesa = cifras.cell(6, 10).value[8:].replace('_', '-')
-    observaciones = cifras.cell(33, 0).value
+    remesa = list(filter(None, cifras.row_values(6)))[0][8:].replace('_', '-')
+    if cifras.cell(31, 0).value.find('Observaciones') > 0:
+        observaciones = cifras.cell(32, 0).value
+    else:
+        observaciones = cifras.cell(33, 0).value
     macs = {}
 
     for row in range(8, 30):
         mac = cifras.row(row)
+        size = len(mac)
         try:
             modulo = str(int(mac[0].value))
             if modulo[:3] == '290':
@@ -60,11 +64,11 @@ def procesar_cifras(archivo_excel):
                     'configuracion': mac[4].value,
                     'tramites': get_int(mac[5]),
                     'credenciales_entregadas_actualizacion': get_int(mac[6]),
-                    'credenciales_reimpresion': get_int(mac[7]),
-                    'total_atenciones': get_int(mac[8]),
-                    'productividad_x_dia': get_int(mac[9]),
-                    'productividad_x_dia_x_estacion': get_int(mac[10]),
-                    'credenciales_recibidas': get_int(mac[12])
+                    'credenciales_reimpresion': get_int(mac[7]) if size == 13 else 0,
+                    'total_atenciones': get_int(mac[8]) if size == 13 else get_int(mac[7]),
+                    'productividad_x_dia': get_int(mac[9]) if size == 13 else get_int(mac[8]),
+                    'productividad_x_dia_x_estacion': get_int(mac[10]) if size == 13 else get_int(mac[9]),
+                    'credenciales_recibidas': get_int(mac[12]) if size == 13 else get_int(mac[11])
                 }
         except ValueError:
             pass
