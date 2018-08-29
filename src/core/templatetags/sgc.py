@@ -139,6 +139,11 @@ def fmeta(persona, meta):
         return False
 
 
+@register.filter(name='porcentaje')
+def porcentaje(num):
+    return "%.2f" % float(num)
+
+
 @register.filter(name='porciento')
 def porciento(num):
     if float(num) > 100:
@@ -203,8 +208,8 @@ def upp(txt):
 
 @register.filter(name='barrita')
 def barrita(acuerdos, completos):
-    porcentaje = float(completos) / float(acuerdos) * 100
-    return porcentaje
+    fill = float(completos) / float(acuerdos) * 100
+    return fill
 
 
 @register.filter

@@ -21,6 +21,15 @@ from apps.productividad.forms import CargaCifras
 from apps.productividad.models import Reporte, Cifras, PronosticoTramites
 
 
+TRAMITES = Cifras.objects.values('distrito')\
+    .order_by('distrito')\
+    .annotate(suma_modulo=Sum('tramites'))
+
+ENTREGAS = Cifras.objects.values('distrito')\
+            .order_by('distrito')\
+            .annotate(entregas_distrito=Sum('credenciales_entregadas_actualizacion'))
+
+
 def get_int(celda):
     """Convierte el valor de una celda en entero"""
     try:
@@ -173,9 +182,7 @@ class TramitesIndex(View):
 
     def get(self, request, *args, **kwargs):
         """Control para el verbo GET"""
-        cifras = Cifras.objects.values('distrito')\
-            .order_by('distrito')\
-            .annotate(suma_modulo=Sum('tramites'))
+
         pronostico = PronosticoTramites.objects.all()
 
         chart_data = [
@@ -185,7 +192,7 @@ class TramitesIndex(View):
             dlist = [_distrito]
             _tramites = 0
             _pronostico = 0
-            for _cifras in cifras:
+            for _cifras in TRAMITES:
                 if _cifras['distrito'] == _distrito:
                     _tramites = _cifras['suma_modulo']
                     dlist.append(_tramites)
@@ -194,7 +201,7 @@ class TramitesIndex(View):
                     _pronostico = _pt.tramites
                     dlist.append(_pronostico)
             dlist.append(_pronostico - _tramites)
-            dlist.append((_tramites / _pronostico) * 100 )
+            dlist.append((_tramites / _pronostico) * 100)
             chart_data.append(dlist)
 
         estatal = {
@@ -211,4 +218,47 @@ class TramitesIndex(View):
             'title': 'Control de Trámites'
         }
 
+        return render(request, self.template_name, data)
+
+
+class EntregasIndex(View):
+    """Visualización de cobertura"""
+    template_name = 'productividad/entregas.html'
+
+    def get(self, request, *args, **kwargs):
+        """verbo get de entregas"""
+        _data_entregas = {'01': {}, '02': {}, '03': {}}
+        for _distrito in _data_entregas.keys():
+            for row in ENTREGAS:
+                if row['distrito'] == _distrito:
+                    _data_entregas[_distrito]['entregas'] = row['entregas_distrito']
+            for row in TRAMITES:
+                if row['distrito'] == _distrito:
+                    _data_entregas[_distrito]['tramites'] = row['suma_modulo']
+            _data_entregas[_distrito]['relacion'] =\
+                (
+                    _data_entregas[_distrito]['entregas'] / _data_entregas[_distrito]['tramites']
+                ) * 100
+            _data_entregas[_distrito]['diferencia'] = (
+                    _data_entregas[_distrito]['tramites'] - _data_entregas[_distrito]['entregas']
+            )
+        entregas_estatal = 0
+        tramites_estatal = 0
+        for k, values in _data_entregas.items():
+            entregas_estatal += _data_entregas[k]['entregas']
+            tramites_estatal += _data_entregas[k]['tramites']
+        relacion_estatal = (entregas_estatal / tramites_estatal) * 100
+        diferencia_estatal = tramites_estatal - entregas_estatal
+        estatal = {
+            'entregas': entregas_estatal,
+            'tramites': tramites_estatal,
+            'diferencia': diferencia_estatal,
+            'relacion': relacion_estatal
+        }
+        data = {
+            'title': 'Control de Entregas',
+            'distritos': _data_entregas,
+            'estatal': estatal,
+            'kpi_path': True,
+        }
         return render(request, self.template_name, data)

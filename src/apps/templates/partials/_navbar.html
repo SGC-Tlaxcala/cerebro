@@ -39,6 +39,11 @@
               <i class="fa fa-edit"></i> Trámites
             </a>
             <a
+              class="dropdown-item {% current request 'entregas' %}"
+              href="{% url 'cifras:entregas' %}">
+              <i class="fa fa-id-card-o"></i> Entregas
+            </a>
+            <a
               class="dropdown-item {% current request 'mesas' %}"
               href="{% url 'mesas:index' %}">
               <i class="fa fa-user-times"></i> Control recepción

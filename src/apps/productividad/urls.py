@@ -11,13 +11,15 @@ from apps.productividad.views import (
     CifrasUpload,
     CifrasPortada,
     RemesaDetalle,
-    TramitesIndex
+    TramitesIndex,
+    EntregasIndex
 )
 
 app_name = 'cifras'
 urlpatterns = [
     path('', CifrasPortada.as_view(), name='index'),
     path('tramites/', TramitesIndex.as_view(), name='tramites'),
+    path('entregas/', EntregasIndex.as_view(), name='entregas'),
     path('detalle/<int:pk>/', RemesaDetalle.as_view(), name='detalle'),
     path('add', login_required(CifrasUpload.as_view()), name="add")
 ]
