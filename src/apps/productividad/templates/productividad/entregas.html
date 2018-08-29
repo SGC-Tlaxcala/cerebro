@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+{% load humanize %} 
+{% load sgc %}
+
+{% block footer %}
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <script type="text/javascript">
+    google.charts.load('current', {'packages':['corechart']})
+    google.charts.setOnLoadCallback(chartEntregasDistritos)
+    google.charts.setOnLoadCallback(estatalChart)
+
+  function estatalChart() {
+    const data = google.visualization.arrayToDataTable([
+      ['Tramites', 'Cantidad'],
+      ['Realizados', {{ estatal.entregas }}],
+      ['Faltantes', {{ estatal.tramites }}]
+    ])
+
+    const options = {
+      title: '',
+      legend: 'none'
+    }
+
+    let chart = new google.visualization.PieChart(document.getElementById('estatal_chart'))
+    chart.draw(data, options)
+  }
+
+    function chartEntregasDistritos() {
+      let formatter = new google.visualization.NumberFormat({
+        fractionDigits: 2,
+        suffix: '%'
+      })
+
+      let data = new google.visualization.arrayToDataTable([
+        ['Distrito', 'Entregas', 'Trámites', 'Diferencia', 'Relación'],
+        {% for distrito, datos in distritos.items %}
+        ['Distrito {{ distrito }}', {{ datos.entregas }}, {{datos.tramites}}, {{datos.diferencia}}, {{datos.relacion}}]{% if not forloop.last %},{% endif %}{% endfor %}
+      ])
+
+      formatter.format(data, 4)
+
+      let options = {
+        title: 'Entregas por Distrito',
+        seriesType: 'bars',
+        series: {
+          3: {
+            type: 'line',
+            targetAxisIndex: 1
+          }
+        },
+        vAxes: {
+          0: {logScale: false, maxValue: 25000, minValue: -1000},
+          1: {logScale: false, maxValue: 100, minValue: 95, format: '#.00\'%\''}
+        },
+      }
+      let chartDistritos = new google.visualization.ComboChart(document.getElementById('distritos_div'))
+      chartDistritos.draw(data, options);
+    }
+  </script>
+{% endblock footer %}
+
+{% block content %}
+  <div class="row">
+    <div class="col">
+      <div class="jumbotron">
+        <h1 class="display-4"><i class="fa fa-id-card-o"></i> {{ title }}</h1>
+        <p class="lead">
+          Contribuye al seguimiento de la Cobertura.
+          <hr>
+          <a href="{% url 'cifras:index' %}" class="btn btn-primary"><i class="fa fa-bar-chart"></i> Productividad</a>
+          <a href="{% url 'cifras:tramites' %}" class="btn btn-success"><i class="fa fa-edit"></i> Trámites</a>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col">
+      <div id="distritos_div" style="width: 100%; height: 500px;"></div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col">
+      <table class="table table-striped table-bordered table-hover table-sm">
+        <thead class="thead-dark">
+          <th>Distrito</th>
+          <th>Entregas</th>
+          <th>Trámites</th>
+          <th>Diferencia</th>
+          <th>Relación</th>
+        </thead>
+        <tbody>
+          {% for distrito, datos in distritos.items %}
+          <tr>
+            <th>Distrito {{ distrito }}</th>
+            <td>{{ datos.entregas|intcomma }}</td>
+            <td>{{ datos.tramites|intcomma }}</td>
+            <td>{{ datos.diferencia|intcomma }}</td>
+            <td>{{ datos.relacion|porcentaje }}%</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="row">
+      <div class="col">
+        <h3>Seguimiento a Entregas - Estatal</h3>
+      </div>
+    </div>
+
+  <div class="row">
+      <div class="col">
+        <div id="estatal_chart" style="width: 100%; height: 500px;"></div>
+      </div>
+      <div class="col">
+        <table class="table table-bordered table-sm table-hover">
+          <tr>
+            <th>Entregas</th>
+            <td>{{ estatal.entregas|intcomma }} credenciales</td>
+          </tr>
+          <tr>
+            <th>Trámites</th>
+            <td>{{ estatal.tramites|intcomma }} trámites</td>
+          </tr>
+          <tr>
+            <th>Difrencia</th>
+            <td>{{ estatal.diferencia|intcomma }} credenciales</td>
+          </tr>
+          <tr>
+            <th>Relación</th>
+            <td>{{ estatal.relacion|porcentaje }}% de entregas</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+{% endblock content %}

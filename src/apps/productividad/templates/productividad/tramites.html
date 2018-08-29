@@ -53,7 +53,8 @@
       <p class="lead">
         Contribuye al seguimiento del pronóstico de trámites.
         <hr>
-        <a href="{% url 'cifras:index' %}" class="btn btn-primary">Productividad</a>
+        <a href="{% url 'cifras:index' %}" class="btn btn-primary"><i class="fa fa-bar-chart"></i> Productividad</a>
+        <a href="{% url 'cifras:entregas' %}" class="btn btn-info"><i class="fa fa-id-card-o"></i> Entregas</a>
       </p>
     </div>
   </div>
@@ -116,7 +117,7 @@
       </tr>
       <tr>
         <th>Avance</th>
-        <td>{{ estatal.porcentaje|porciento }}</td>
+        <td>{{ estatal.porcentaje|porciento }}%</td>
       </tr>
     </table>
   </div>
