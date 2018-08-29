@@ -112,11 +112,9 @@ $(function () {
 {% block content %}
 
 <div class="col-sm-12">
-  {% if perms.distribucion.add_envio %}
   <p>
     <a class="btn btn-lg btn-danger" href="{% url 'paquetes:envio_paso1' %}">Agregar un envío</a>
   </p>
-  {% endif %}
 </div>
 
 <div class="col-sm-12">
