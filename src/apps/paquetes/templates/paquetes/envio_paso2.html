@@ -54,25 +54,25 @@
         <tr {% if form.disponible_mac.errors %}class="error"{% endif %}>
           {{ form.id }}
           {{form.lote.as_hidden}}
-          <td class="col-md-1">
+          <td class="">
             {{form.mac}}
             {% if form.mac.errors %}
               <span class="error">{{form.mac.errors}}</span>
             {% endif %}
           </td>
-          <td class="col-md-1">
+          <td class="">
             {{form.paquetes}}
             {% if form.paquetes.errors %}
               <span class="error">{{form.paquetes.errors}}</span>
             {% endif %}
           </td>
-          <td class="col-md-2">
+          <td class="">
             {{form.formatos}}
             {% if form.formatos.errors %}
               <span class="error">{{form.formatos.errors}}</span>
             {% endif %}
           </td>
-          <td class="col-md-3">
+          <td class="">
             <div class="form-group">
               <div class='input-group date' id='dtRecibido{{ forloop.counter }}' data-date-format="DD/MM/YYYY HH:mm">
                 {{ form.recibido_mac }}
@@ -81,7 +81,7 @@
             </div>
             {% if form.recibido_mac.errors %}<span class="error">{{form.recibido_mac.errors}}{% endif %}
           </td>
-          <td class="col-md-3">
+          <td class="">
             <div class="form-group">
               <div class='input-group date' id='dtDisponible{{ forloop.counter }}' data-date-format="DD/MM/YYYY HH:mm">
                 {{ form.disponible_mac }}

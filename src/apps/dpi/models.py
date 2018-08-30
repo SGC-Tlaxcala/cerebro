@@ -1,4 +1,5 @@
 # coding: utf-8
+"""Modelos para depuración"""
 #         app: DPI
 #      module: Modelos para DPI y USI
 #        date: lunes, 28 de mayo de 2018 - 12:30
@@ -7,11 +8,12 @@
 
 
 import uuid
+
 from django.contrib.auth.models import User
 from django.db import models
+
 from core.models import TimeStampedModel
 from core.utils import delta
-
 
 DPI = 'DPI'
 USI = 'USI'
@@ -32,6 +34,7 @@ ESTADO = (
 
 
 class ExpedienteDPI(TimeStampedModel):
+    """modelo de expediente"""
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     tipo = models.CharField(choices=TIPOS, max_length=3)
     folio = models.CharField(max_length=13)
@@ -103,8 +106,14 @@ class ExpedienteDPI(TimeStampedModel):
     )
 
     # Cálculo de intervalos de tiempo
-    entidad = models.PositiveSmallIntegerField(help_text='Entidad', editable=False)
-    distrito = models.PositiveSmallIntegerField(help_text='Distrito', editable=False)
+    entidad = models.PositiveSmallIntegerField(
+        help_text='Entidad',
+        editable=False
+    )
+    distrito = models.PositiveSmallIntegerField(
+        help_text='Distrito',
+        editable=False
+    )
     delta_notificar = models.SmallIntegerField(
         help_text="Delta entre tramite y notificación",
         editable=False, null=True
@@ -126,13 +135,18 @@ class ExpedienteDPI(TimeStampedModel):
         editable=False, null=True
     )
     delta_verificar = models.SmallIntegerField(
-        help_text="Delta entre solicitud de verificación y ejecución de la cédula",
+        help_text="Delta entre solicitud de verificación\
+            y ejecución de la cédula",
         editable=False, null=True,
     )
 
-    completo = models.PositiveSmallIntegerField(editable=False, null=False, default=0)
+    completo = models.PositiveSmallIntegerField(
+        editable=False,
+        null=False,
+        default=0
+    )
     usuario = models.ForeignKey(
-        User, related_name='dpi_user', 
+        User, related_name='dpi_user',
         editable=False, on_delete=models.CASCADE
     )
 
@@ -148,16 +162,37 @@ class ExpedienteDPI(TimeStampedModel):
     def __str__(self):
         return f'{self.tipo}_{self.folio}'
 
-    def save(self, *args, **kwargs):
+    def fullfill(self):
+        return 'SI' if self.completo == 1 else 'NO'
+
+    def save(self, *args, **kwargs): # pylint: disable=W0221
         self.nombre = self.nombre.upper()
         self.entidad = self.folio[2:4]
         self.distrito = self.folio[4:6]
-        self.delta_notificar = delta(self.fecha_tramite, self.fecha_notificacion_aclaracion)
-        self.delta_aclarar = delta(self.fecha_notificacion_aclaracion, self.fecha_entrevista)
-        self.delta_entrevista = delta(self.fecha_notificacion_aclaracion, self.fecha_entrevista)
-        self.delta_enviar = delta(self.fecha_entrevista, self.fecha_envio_expediente)
-        self.delta_distrito = delta(self.fecha_tramite, self.fecha_envio_expediente)
-        self.delta_verificar = delta(self.fecha_solicitud_cedula, self.fecha_ejecucion_cedula)
+        self.delta_notificar = delta(
+            self.fecha_tramite,
+            self.fecha_notificacion_aclaracion
+        )
+        self.delta_aclarar = delta(
+            self.fecha_notificacion_aclaracion,
+            self.fecha_entrevista
+        )
+        self.delta_entrevista = delta(
+            self.fecha_notificacion_aclaracion,
+            self.fecha_entrevista
+        )
+        self.delta_enviar = delta(
+            self.fecha_entrevista,
+            self.fecha_envio_expediente
+        )
+        self.delta_distrito = delta(
+            self.fecha_tramite,
+            self.fecha_envio_expediente
+        )
+        self.delta_verificar = delta(
+            self.fecha_solicitud_cedula,
+            self.fecha_ejecucion_cedula
+        )
         if (self.fecha_tramite is not None and
                 self.fecha_entrevista is not None and
                 self.fecha_envio_expediente is not None and
