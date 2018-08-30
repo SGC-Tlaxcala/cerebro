@@ -59,7 +59,7 @@ class DPIIndex(View):
         _distritos = {}
 
         for distrito in (1, 2, 3):
-            _total = tlx.filter(distrito=distrito)
+            _total = tlx.filter(distrito=distrito).order_by('folio')
             _completos = _total.filter(completo).count()
             _incompletos = _total.count() - _completos
             _distritos[distrito] = {
@@ -71,6 +71,7 @@ class DPIIndex(View):
             }
 
         data = {
+            'year': year,
             'title': 'Control de DPI',
             'estatal': estatal,
             'distritos': (1, 2, 3),

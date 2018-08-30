@@ -162,6 +162,9 @@ class ExpedienteDPI(TimeStampedModel):
     def __str__(self):
         return f'{self.tipo}_{self.folio}'
 
+    def fullfill(self):
+        return 'SI' if self.completo == 1 else 'NO'
+
     def save(self, *args, **kwargs): # pylint: disable=W0221
         self.nombre = self.nombre.upper()
         self.entidad = self.folio[2:4]
