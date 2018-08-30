@@ -1,96 +1,334 @@
 {% extends 'base.html' %}
 {% load staticfiles %}
 
-{% block before_content %}
+{% block header %}
+  <link rel="stylesheet" href="//cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+{% endblock header%}
 
-{% endblock before_content %}
+{% block footer %}
+  <script src="//cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <script type="text/javascript" src="https://cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"></script>
+  <script type="text/javascript">
+    google.charts.load('current', {'packages':['corechart']})
+    google.charts.setOnLoadCallback(pieTotal)
+    google.charts.setOnLoadCallback(pieDistrito01)
+    google.charts.setOnLoadCallback(pieDistrito02)
+    google.charts.setOnLoadCallback(pieDistrito03)
+    google.charts.setOnLoadCallback(atencionDistritos)
+
+    $.extend($.fn.dataTable.defaults, {
+      searching: false,
+      pageLength: 20
+    })
+
+    $(document).ready(() => $('#tabla_distrito_01').DataTable({"language": {"url":"https://cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"}}))
+    $(document).ready(() => $('#tabla_distrito_02').DataTable({"language": {"url":"https://cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"}}))
+    $(document).ready(() => $('#tabla_distrito_03').DataTable({"language": {"url":"https://cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"}}))
+
+    function pieTotal() {
+      const data = google.visualization.arrayToDataTable([
+        ['Expediente', 'Cuenta'],
+        ['Completo', {{ estatal.completos }}],
+        ['Incompleto', {{ estatal.incompletos }}]
+      ])
+      const options = { 
+        legend: 'none',
+        'width': 400,
+        'height': 400,
+        'chartArea': {'width': '100%', 'height': '90%'},
+      }
+      const chart = new google.visualization.PieChart(document.getElementById('total_chart'))
+      chart.draw(data, options)
+    }
+
+    function pieDistrito01() {
+      const data = google.visualization.arrayToDataTable([
+        ['Expediente', 'Cuenta'],
+        ['Completo', {{ distrito.1.completos }}],
+        ['Incompleto', {{ distrito.1.incompletos }}]
+      ])
+      const options = { 
+        legend: 'none',
+        'width': 400,
+        'height': 400,
+        'chartArea': {'width': '100%', 'height': '90%'},
+      }
+      const chart = new google.visualization.PieChart(document.getElementById('distrito_1'))
+      chart.draw(data, options)
+    }
+
+    function pieDistrito02() {
+      const data = google.visualization.arrayToDataTable([
+        ['Expediente', 'Cuenta'],
+        ['Completo', {{ distrito.2.completos }}],
+        ['Incompleto', {{ distrito.2.incompletos }}]
+      ])
+      const options = { 
+        legend: 'none',
+        'width': 400,
+        'height': 400,
+        'chartArea': {'width': '100%', 'height': '90%'},
+      }
+      const chart = new google.visualization.PieChart(document.getElementById('distrito_2'))
+      chart.draw(data, options)
+    }
+
+    function pieDistrito03() {
+      const data = google.visualization.arrayToDataTable([
+        ['Expediente', 'Cuenta'],
+        ['Completo', {{ distrito.3.completos }}],
+        ['Incompleto', {{ distrito.3.incompletos }}]
+      ])
+      const options = { 
+        legend: 'none',
+        'width': 400,
+        'height': 400,
+        'chartArea': {'width': '100%', 'height': '90%'},
+      }
+      const chart = new google.visualization.PieChart(document.getElementById('distrito_3'))
+      chart.draw(data, options)
+    }     
+
+    function atencionDistritos() {
+      const data = google.visualization.arrayToDataTable([
+        ['Distrito', 'Promedio', 'Límite'],{% for row in estatal.delta %}
+          ['Distrito 0{{ row.distrito }}', {{ row.atencion|floatformat:2 }}, 9]{% if not forloop.last %},{% endif %}{% endfor %}
+        ])
+
+      const options = { 
+        title: 'Promedio de días de atención por expediente',
+        legend: 'none',
+        vAxis: {title: 'Días'},
+        hAxis: {},
+        height: 600,
+        chartArea: {'width': '100%', 'height': '90%'},
+        seriesType: 'bars',
+        series: {1: {type: 'line'}}
+      }
+
+      const chart = new google.visualization.ComboChart(document.getElementById('atencion_chart'))
+      chart.draw(data, options)
+    }
+
+  </script>
+{% endblock footer %}
 
 {% block content %}
   <div class="row">
     <div class="col">
-      <h1 class="display-3">Estadísticas DPI/USI <small class="text-muted">{{ 2017 }}</small></h1>
+      <h1 class="display-3"><i class="fa fa-user-secret"></i> Control de DPI <small class="text-muted">{{ year }}</small></h1>
     </div>
   </div>
+
   <div class="row">
     <div class="col">
       <h3>Estadísticas totales</h3>
       <ul>
-        <li><strong>Total de registros:</strong> {{ total_count }}</li>
-        <li><strong>Total de registros DPI:</strong> {{ total_dpi }}</li>
-        <li><strong>Total de registros USI:</strong> {{ total_usi }}</li>
+        <li><strong>Total de registros:</strong> {{ estatal.total }}</li>
+        <li><strong>Expedientes completos:</strong> {{ estatal.completos }}</li>
+        <li><strong>Expedientes incompletos:</strong> {{ estatal.incompletos }}</li>
+        <li><strong>Avance:</strong> {{ estatal.porcentaje|floatformat:2 }}%</li>
       </ul>
     </div>
     <div class="col">
-      <h3>Estadísticas para Tlaxcala</h3>
-      <ul>
-        <li><strong>Total de registros:</strong> {{ tlaxcala_count }}</li>
-        <li><strong>Total de registros DPI:</strong> {{ tlaxcala_total_dpi }}</li>
-        <li><strong>Total de registros USI:</strong> {{ tlaxcala_total_usi }}</li>
-      </ul>
+      <div id="total_chart" style="min-width: 400px; height: 400px;"></div>
     </div>
   </div>
 
   <div class="row">
     <div class="col">
-      <h1 class="display-5">Estadísticas DPI <small class="text-muted">{{ 2017 }}</small></h1>
+      <h1 class="display-5">Control DPI por distrito <small class="text-muted">{{ year }}</small></h1>
     </div>
   </div>
   <div class="row">
     <div class="col">
-<ul class="nav nav-tabs" id="myTab" role="tablist" style="margin-bottom: 15px">
-  <li class="nav-item">
-    <a class="nav-link active" id="local-tab" data-toggle="tab" href="#local" role="tab" aria-controls="local" aria-selected="true">Estatal</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" id="apizaco-tab" data-toggle="tab" href="#apizaco" role="tab" aria-controls="apizaco" aria-selected="false">Distrito 1</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" id="tlaxcala-tab" data-toggle="tab" href="#tlaxcala" role="tab" aria-controls="tlaxcala" aria-selected="false">Distrito 02</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" id="zacatelco-tab" data-toggle="tab" href="#zacatelco" role="tab" aria-controls="zacatelco" aria-selected="false">Distrito 03</a>
-  </li>
-</ul>
-<div class="tab-content" id="myTabContent">
-  <div class="tab-pane fade show active" id="local" role="tabpanel" aria-labelledby="local-tab">
-
-    <div class="row">
-      <div class="col">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">Card title</h5>
-            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-            <a href="#" class="btn btn-primary">Go somewhere</a>
+      <ul class="nav nav-tabs" id="myTab" role="tablist" style="margin-bottom: 15px">
+        <li class="nav-item">
+          <a class="nav-link active" id="local-tab" data-toggle="tab" href="#local" role="tab" aria-controls="local" aria-selected="true">Estatal</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" id="apizaco-tab" data-toggle="tab" href="#apizaco" role="tab" aria-controls="apizaco" aria-selected="false">Distrito 1</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" id="tlaxcala-tab" data-toggle="tab" href="#tlaxcala" role="tab" aria-controls="tlaxcala" aria-selected="false">Distrito 02</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" id="zacatelco-tab" data-toggle="tab" href="#zacatelco" role="tab" aria-controls="zacatelco" aria-selected="false">Distrito 03</a>
+        </li>
+      </ul>
+      <div class="tab-content" id="myTabContent">
+        <div class="tab-pane fade show active" id="local" role="tabpanel" aria-labelledby="local-tab">
+          <div class="row">
+            <div class="col">
+              <div id="atencion_chart" style="width: 100%; height: 700px;"></div>
+            </div>
           </div>
-        </div>   
+        </div>
+
+        <div class="tab-pane fade" id="apizaco" role="tabpanel" aria-labelledby="apizaco-tab">
+          <div class="row">
+            <div class="col">
+              <h3>Estadísticas Distrito 01</h3>
+              <ul>
+                <li><strong>Total de registros:</strong> {{ distrito.1.total }}</li>
+                <li><strong>Expedientes completos:</strong> {{ distrito.1.completos }}</li>
+                <li><strong>Expedientes incompletos:</strong> {{ distrito.1.incompletos }}</li>
+                <li><strong>Avance:</strong> {{ distrito.1.porcentaje|floatformat:2 }}%</li>
+              </ul>
+            </div>
+            <div class="col">
+              <div id="distrito_1" style="min-width: 400px; height: 400px;"></div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <table class="table" id="tabla_distrito_01">
+                <thead>
+                  <th>Folio</th>
+                  <th>Fecha de trámite</th>
+                  <th>Fecha de notificación</th>
+                  <th>Fecha de entrevista o acta</th>
+                  <th>Fecha de envío de expediente</th>
+                  <th>Duración</th>
+                  <th>Completo</th>
+                </thead>
+                <tbody>
+                  {% for row in distrito.1.registros %}
+                    <tr>
+                      <td>{{ row.folio }}</td>
+                      <td>{{ row.fecha_tramite|date:"M d, Y" }}</td>
+                      <td>{{ row.fecha_notificacion_aclaracion|date:"M d, Y" }}</td>
+                      <td>{{ row.fecha_entrevista|date:"M d, Y" }}</td>
+                      <td>{{ row.fecha_envio_expediente|date:"M d, Y" }}</td>
+                      <td>{{ row.delta_distrito }}</td>
+                      <td>{{ row.fullfill }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+                <tfoot>
+                  <th>Folio</th>
+                  <th>Fecha de trámite</th>
+                  <th>Fecha de notificación</th>
+                  <th>Fecha de entrevista o acta</th>
+                  <th>Fecha de envío de expediente</th>
+                  <th>Duración</th>
+                  <th>Completo</th>
+                </tfoot>                   
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-pane fade" id="tlaxcala" role="tabpanel" aria-labelledby="tlaxcala-tab">
+          <div class="row">
+            <div class="col">
+              <h3>Estadísticas Distrito 02</h3>
+              <ul>
+                <li><strong>Total de registros:</strong> {{ distrito.2.total }}</li>
+                <li><strong>Expedientes completos:</strong> {{ distrito.2.completos }}</li>
+                <li><strong>Expedientes incompletos:</strong> {{ distrito.2.incompletos }}</li>
+                <li><strong>Avance:</strong> {{ distrito.2.porcentaje|floatformat:2 }}%</li>
+              </ul>
+            </div>
+            <div class="col">
+              <div id="distrito_2" style="min-width: 400px; height: 400px;"></div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <table class="table" id="tabla_distrito_02">
+                <thead>
+                  <th>Folio</th>
+                  <th>Fecha de trámite</th>
+                  <th>Fecha de notificación</th>
+                  <th>Fecha de entrevista o acta</th>
+                  <th>Fecha de envío de expediente</th>
+                  <th>Duración</th>
+                  <th>Completo</th>
+                </thead>
+                <tbody>
+                  {% for row in distrito.2.registros %}
+                    <tr>
+                      <td>{{ row.folio }}</td>
+                      <td>{{ row.fecha_tramite|date:"M d, Y" }}</td>
+                      <td>{{ row.fecha_notificacion_aclaracion|date:"M d, Y" }}</td>
+                      <td>{{ row.fecha_entrevista|date:"M d, Y" }}</td>
+                      <td>{{ row.fecha_envio_expediente|date:"M d, Y" }}</td>
+                      <td>{{ row.delta_distrito }}</td>
+                      <td>{{ row.fullfill }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+                <tfoot>
+                  <th>Folio</th>
+                  <th>Fecha de trámite</th>
+                  <th>Fecha de notificación</th>
+                  <th>Fecha de entrevista o acta</th>
+                  <th>Fecha de envío de expediente</th>
+                  <th>Duración</th>
+                  <th>Completo</th>
+                </tfoot>                   
+              </table>
+            </div>
+          </div>                  
+        </div>
+
+        <div class="tab-pane fade" id="zacatelco" role="tabpanel" aria-labelledby="zacatelco-tab">
+          <div class="row">
+            <div class="col">
+              <h3>Estadísticas Distrito 03</h3>
+              <ul>
+                <li><strong>Total de registros:</strong> {{ distrito.3.total }}</li>
+                <li><strong>Expedientes completos:</strong> {{ distrito.3.completos }}</li>
+                <li><strong>Expedientes incompletos:</strong> {{ distrito.3.incompletos }}</li>
+                <li><strong>Avance:</strong> {{ distrito.3.porcentaje|floatformat:2 }}%</li>
+              </ul>
+            </div>
+            <div class="col">
+              <div id="distrito_3" style="min-width: 400px; height: 400px;"></div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <table class="table" id="tabla_distrito_03">
+                <thead>
+                  <th>Folio</th>
+                  <th>Fecha de trámite</th>
+                  <th>Fecha de notificación</th>
+                  <th>Fecha de entrevista o acta</th>
+                  <th>Fecha de envío de expediente</th>
+                  <th>Duración</th>
+                  <th>Completo</th>
+                </thead>
+                <tbody>
+                  {% for row in distrito.3.registros %}
+                    <tr>
+                      <td>{{ row.folio }}</td>
+                      <td>{{ row.fecha_tramite|date:"M d, Y" }}</td>
+                      <td>{{ row.fecha_notificacion_aclaracion|date:"M d, Y" }}</td>
+                      <td>{{ row.fecha_entrevista|date:"M d, Y" }}</td>
+                      <td>{{ row.fecha_envio_expediente|date:"M d, Y" }}</td>
+                      <td>{{ row.delta_distrito }}</td>
+                      <td>{{ row.fullfill }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+                <tfoot>
+                  <th>Folio</th>
+                  <th>Fecha de trámite</th>
+                  <th>Fecha de notificación</th>
+                  <th>Fecha de entrevista o acta</th>
+                  <th>Fecha de envío de expediente</th>
+                  <th>Duración</th>
+                  <th>Completo</th>
+                </tfoot>                
+              </table>
+            </div>
+          </div>                      
+        </div>
+
       </div>
-
-      <div class="col">
-        <div class="card">  
-          <div class="card-body">
-            <h5 class="card-title">Card title</h5>
-            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-            <a href="#" class="btn btn-primary">Go somewhere</a>
-          </div>
-        </div>        
-      </div>
-
-      <div class="col">
-        <div class="card">  
-          <div class="card-body">
-            <h5 class="card-title">Card title</h5>
-            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-            <a href="#" class="btn btn-primary">Go somewhere</a>
-          </div>
-        </div>        
-      </div>      
-    </div>
-
-  </div>
-  <div class="tab-pane fade" id="apizaco" role="tabpanel" aria-labelledby="apizaco-tab">En el 01</div>
-  <div class="tab-pane fade" id="tlaxcala" role="tabpanel" aria-labelledby="tlaxcala-tab">Estoy en el 02</div>
-  <div class="tab-pane fade" id="zacatelco" role="tabpanel" aria-labelledby="zacatelco-tab">En Zacatelco</div>
-</div>
     </div>
   </div>
 

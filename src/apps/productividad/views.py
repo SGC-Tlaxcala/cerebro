@@ -5,21 +5,22 @@
 """Vista para subir el archivo de la productividad."""
 
 import math
+
 import xlrd
 from django.conf import settings
-from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
+from django.core.files.storage import default_storage
 from django.db.models import Sum
-from django.views import View
-from django.views.generic.list import ListView
-from django.views.generic.edit import FormView
-from django.views.generic.detail import DetailView
 from django.shortcuts import render
 from django.urls import reverse
-from core.utils import Remesa
-from apps.productividad.forms import CargaCifras
-from apps.productividad.models import Reporte, Cifras, PronosticoTramites
+from django.views import View
+from django.views.generic.detail import DetailView
+from django.views.generic.edit import FormView
+from django.views.generic.list import ListView
 
+from apps.productividad.forms import CargaCifras
+from apps.productividad.models import Cifras, PronosticoTramites, Reporte
+from core.utils import Remesa
 
 TRAMITES = Cifras.objects.values('distrito')\
     .order_by('distrito')\

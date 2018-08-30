@@ -18,6 +18,7 @@ urlpatterns = [
     path('mesas/', include('apps.mesas.urls')),
     path('paquetes/', include('apps.paquetes.urls')),
     path('cifras/', include('apps.productividad.urls')),
+    path('dpi/', include('apps.dpi.urls')),
 
     path('', index, name='index')
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
