@@ -53,6 +53,11 @@
               href="{% url 'paquetes:index' %}">
               <i class="fa fa-truck"></i> Distribución de paquetes
             </a>
+            <a
+            class="dropdown-item {% current request 'dpi' %}" 
+              href="{% url 'dpi:index' %}">
+              <i class="fa fa-user-secret"></i> Control de DPI
+            </a>
           </div>
         </li>
 
