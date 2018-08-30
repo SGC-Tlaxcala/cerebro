@@ -33,7 +33,7 @@ def porciento(completo, total):
 class DPIIndex(View):
     """Portada de DPI"""
     template_name = 'dpi/index.html'
-    year = 2018
+    year = 2017
 
     def get(self, request, *args, **kwargs):
         """Verbo GET de la vista"""
