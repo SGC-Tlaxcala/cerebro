@@ -63,7 +63,7 @@ class Tramites(models.Model):
         self.mac = self.folio[2:8]
         self.tramo_entrega = get_tramo(self.fecha_cpv_entregada, self.fecha_cpv_disponible)
         self.tramo_disponible = get_tramo(self.fecha_cpv_disponible, self.fecha_tramite)
-        self.tramo_exitoso = get_tramo(self.fecha_exitoso,  self.fecha_tramite)
+        self.tramo_exitoso = get_tramo(self.fecha_exitoso, self.fecha_tramite)
         super(Tramites, self).save(
             force_insert=False,
             force_update=False,
