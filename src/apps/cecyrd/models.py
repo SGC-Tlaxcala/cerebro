@@ -8,6 +8,13 @@
 from django.db import models
 
 
+def get_tramo(reciente, anterior):
+    try:
+        return reciente - anterior
+    except TypeError:
+        return None
+
+
 class Tramites(models.Model):
     # Identificación del trámite
     folio = models.CharField(primary_key=True, max_length=13)
@@ -15,9 +22,9 @@ class Tramites(models.Model):
     mac = models.CharField(max_length=6, editable=False)
 
     # Tramos de respuesta
-    tramo_exitoso = models.DurationField(editable=False)
-    tramo_disponible = models.DurationField(editable=False)
-    tramo_entrega = models.DurationField(editable=False)
+    tramo_exitoso = models.DurationField(editable=False, blank=True, null=True)
+    tramo_disponible = models.DurationField(editable=False, blank=True, null=True)
+    tramo_entrega = models.DurationField(editable=False, blank=True, null=True)
 
     # Estatus del trámite
     estatus = models.TextField(blank=True, null=True)
@@ -54,11 +61,12 @@ class Tramites(models.Model):
              update_fields=None):
         self.distrito = int(self.folio[5])
         self.mac = self.folio[2:8]
-        self.tramo_entrega = self.fecha_cpv_entregada - self.fecha_cpv_disponible
-        self.tramo_disponible = self.fecha_cpv_disponible - self.fecha_tramite
-        self.tramo_exitoso = self.fecha_exitoso - self.fecha_tramite
+        self.tramo_entrega = get_tramo(self.fecha_cpv_entregada, self.fecha_cpv_disponible)
+        self.tramo_disponible = get_tramo(self.fecha_cpv_disponible, self.fecha_tramite)
+        self.tramo_exitoso = get_tramo(self.fecha_exitoso,  self.fecha_tramite)
         super(Tramites, self).save(
             force_insert=False,
             force_update=False,
             using=None,
-            update_fields=None)
+            update_fields=None
+        )
