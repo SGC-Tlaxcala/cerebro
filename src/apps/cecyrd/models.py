@@ -9,14 +9,23 @@ from django.db import models
 
 
 class Tramites(models.Model):
+    # Identificación del trámite
     folio = models.CharField(primary_key=True, max_length=13)
-    distrito = models.PositiveSmallIntegerField()
-    mac = models.CharField(max_length=6)
+    distrito = models.PositiveSmallIntegerField(editable=False)
+    mac = models.CharField(max_length=6, editable=False)
 
+    # Tramos de respuesta
+    tramo_exitoso = models.DurationField(editable=False)
+    tramo_disponible = models.DurationField(editable=False)
+    tramo_entrega = models.DurationField(editable=False)
+
+    # Estatus del trámite
     estatus = models.TextField(blank=True, null=True)
     causa_rechazo = models.TextField(blank=True, null=True)
     movimiento_solicitado = models.TextField(blank=True, null=True)
     movimiento_definitivo = models.TextField(blank=True, null=True)
+
+    # timestamps
     fecha_tramite = models.DateTimeField(blank=True, null=True)
     fecha_recibido_cecyrd = models.DateTimeField(blank=True, null=True)
     fecha_registrado_cecyrd = models.DateTimeField(blank=True, null=True)
