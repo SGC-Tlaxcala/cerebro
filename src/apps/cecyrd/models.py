@@ -9,6 +9,7 @@ from django.db import models
 
 
 def get_tramo(reciente, anterior):
+    """Calcula timedeltas sin error."""
     try:
         return reciente - anterior
     except TypeError:
@@ -16,6 +17,7 @@ def get_tramo(reciente, anterior):
 
 
 class Tramites(models.Model):
+    """Modelo para evaluar al proveedor"""
     # Identificación del trámite
     folio = models.CharField(primary_key=True, max_length=13)
     distrito = models.PositiveSmallIntegerField(editable=False)
