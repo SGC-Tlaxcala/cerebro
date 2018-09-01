@@ -10,6 +10,9 @@ from django.db import models
 
 class Tramites(models.Model):
     folio = models.CharField(primary_key=True, max_length=13)
+    distrito = models.PositiveSmallIntegerField()
+    mac = models.CharField(max_length=6)
+
     estatus = models.TextField(blank=True, null=True)
     causa_rechazo = models.TextField(blank=True, null=True)
     movimiento_solicitado = models.TextField(blank=True, null=True)
