@@ -19,6 +19,7 @@ urlpatterns = [
     path('paquetes/', include('apps.paquetes.urls')),
     path('cifras/', include('apps.productividad.urls')),
     path('dpi/', include('apps.dpi.urls')),
+    path('cecyrd/', include('apps.cecyrd.urls')),
 
     path('', index, name='index')
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
