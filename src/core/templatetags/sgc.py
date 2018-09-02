@@ -21,10 +21,17 @@ def jsdate(d):
     """formats a python date into a js Date() constructor."""
     try:
         # return "new Date({0},{1},{2})".format(d.year, d.month - 1, d.day)
-        return "Date.UTC({0},{1},{2})".format(d.year, d.month - 1, d.day)
+        return "Date.UTC({0},{1},{2})".format(d.year, d.month - 1, d.day + 1)
     except AttributeError:
         return 'null'
 
+
+@register.filter(name="mas20")
+def mas20(dias):
+    try:
+        return dias if dias <= 20 else 20
+    except TypeError:
+        return None
 
 @register.filter(name='remesa')
 def remesa(fecha):
