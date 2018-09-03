@@ -3,7 +3,7 @@ import environ
 from django.contrib.messages import constants as messages
 import datetime
 
-VERSION = '1.4.1'
+VERSION = '1.6.2'
 
 BASE_DIR = Path(__file__).ancestor(2)
 APPS_DIR = BASE_DIR.child('apps')
@@ -130,7 +130,7 @@ STATICFILES_DIRS = [
 
 MEDIA_ROOT = APPS_DIR.child('media')
 MEDIA_URL = '/media/'
-FILE_UPLOAD_PERMISSIONS = 0644
+FILE_UPLOAD_PERMISSIONS = 0o644
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
