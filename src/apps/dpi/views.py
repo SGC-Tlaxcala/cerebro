@@ -43,6 +43,8 @@ class DPIIndex(View):
         dpi = Q(tipo='DPI')
         tlaxcala = Q(entidad=29)
 
+        italia = ExpedienteDPI.objects.filter(fecha)
+
         tlx = ExpedienteDPI.objects.filter(tlaxcala, fecha, dpi).prefetch_related()
 
         delta = tlx.values('distrito').order_by('distrito').annotate(atencion=Avg('delta_proceso'))
@@ -67,6 +69,7 @@ class DPIIndex(View):
             'estatal': estatal,
             'distritos': (1, 2, 3),
             'distrito': _distritos,
+            'italia': italia,
             'kpi_path': True
         }
         return render(request, self.template_name, data)
