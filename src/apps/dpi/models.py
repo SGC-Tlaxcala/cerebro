@@ -43,67 +43,10 @@ class ExpedienteDPI(TimeStampedModel):
     # Etapa de VRD
     fecha_tramite = models.DateField(null=True, blank=True)
 
-    # Notificación/Aclaración de TRAMITE
-    fecha_notificacion_aclaracion = models.DateField(
-        'TRÁMITE: Notificación',
-        help_text='Fecha de notificación de aclaración al ciudadano AC',
-        null=True, blank=True
-    )
-    fecha_entrevista = models.DateField(
-        help_text='TRÁMITE: Fecha de la entrevista o Acta Administrativa',
-        null=True, blank=True
-    )
-    fecha_envio_expediente = models.DateField(
-        help_text='TRÁMITE: Fecha de envío de expediente a la JL',
-        null=True, blank=True
-    )
-
-    # Notificación/Aclaración de REGISTRO
-    fecha_notificacion_registro = models.DateField(
-        'REGISTRO: Notificación',
-        help_text='Fecha de notificación de aclaración al ciudadano AC',
-        null=True, blank=True
-    )
-    fecha_entrevista_registro = models.DateField(
-        'REGISTRO: Entrevista/Acta',
-        help_text='Fecha de la entrevista o Acta Administrativa',
-        null=True, blank=True
-    )
-    fecha_envio_expediente_registro = models.DateField(
-        'REGISTRO: Envio a JL',
-        help_text='REGISTRO: Fecha de envío de expediente a la JL',
-        null=True, blank=True
-    )
-
-    # Etapa VRL-VRD - Cédula de Verificación
-    fecha_solicitud_cedula = models.DateField(
-        help_text='Fecha de solicitud de cédula',
-        null=True, blank=True
-    )
-    fecha_ejecucion_cedula = models.DateField(
-        help_text='Fecha de ejecución de la cédula',
-        null=True, blank=True
-    )
-
-    fecha_validacion_expediente = models.DateField(
-        help_text='Fecha de validación de expediente',
-        null=True, blank=True
-    )
-
-    # Notificación de estatus de trámite
-    estado = models.PositiveSmallIntegerField(
-        help_text='Estado del trámite',
-        choices=ESTADO,
-        default=NO_INDICA
-    )
-    fecha_notificacion_rechazo = models.DateField(
-        help_text='Fecha de notificación de trámite rechazado RE',
-        null=True, blank=True
-    )
-    fecha_notificacion_exclusion = models.DateField(
-        help_text='Fecha de notificación de exclusión de registro',
-        null=True, blank=True
-    )
+    tratamiento = models.DateField(help_text="Enviado a tratamiento de análisis registral")
+    captura = models.DateField(help_text="Situación en proceso de captura")
+    atencion = models.DateField(help_text="Pendiente de atención en la Vocalía Local")
+    resolucion = models.DateField(help_text="Pendiente de resolución en análisis registral")
 
     # Cálculo de intervalos de tiempo
     entidad = models.PositiveSmallIntegerField(
@@ -114,37 +57,11 @@ class ExpedienteDPI(TimeStampedModel):
         help_text='Distrito',
         editable=False
     )
-    delta_notificar = models.SmallIntegerField(
-        help_text="Delta entre tramite y notificación",
+    delta_proceso = models.SmallIntegerField(
+        help_text="Control de proceso",
         editable=False, null=True
-    )
-    delta_aclarar = models.SmallIntegerField(
-        help_text="Delta entre notificación y entrevista",
-        editable=False, null=True
-    )
-    delta_entrevista = models.SmallIntegerField(
-        help_text="Delta entre notificación y entrevista",
-        editable=False, null=True
-    )
-    delta_enviar = models.SmallIntegerField(
-        help_text="Delta entre entrevista y envío a JL",
-        editable=False, null=True
-    )
-    delta_distrito = models.SmallIntegerField(
-        help_text="Delta entre tramite y envío a JL",
-        editable=False, null=True
-    )
-    delta_verificar = models.SmallIntegerField(
-        help_text="Delta entre solicitud de verificación\
-            y ejecución de la cédula",
-        editable=False, null=True,
     )
 
-    completo = models.PositiveSmallIntegerField(
-        editable=False,
-        null=False,
-        default=0
-    )
     usuario = models.ForeignKey(
         User, related_name='dpi_user',
         editable=False, on_delete=models.CASCADE
@@ -162,42 +79,12 @@ class ExpedienteDPI(TimeStampedModel):
     def __str__(self):
         return f'{self.tipo}_{self.folio}'
 
-    def fullfill(self):
-        return 'SI' if self.completo == 1 else 'NO'
-
-    def save(self, *args, **kwargs): # pylint: disable=W0221
+    def save(self, *args, **kwargs):  # pylint: disable=W0221
         self.nombre = self.nombre.upper()
         self.entidad = self.folio[2:4]
         self.distrito = self.folio[4:6]
         self.delta_notificar = delta(
-            self.fecha_tramite,
-            self.fecha_notificacion_aclaracion
+            self.tratamiento,
+            self.resolucion
         )
-        self.delta_aclarar = delta(
-            self.fecha_notificacion_aclaracion,
-            self.fecha_entrevista
-        )
-        self.delta_entrevista = delta(
-            self.fecha_notificacion_aclaracion,
-            self.fecha_entrevista
-        )
-        self.delta_enviar = delta(
-            self.fecha_entrevista,
-            self.fecha_envio_expediente
-        )
-        self.delta_distrito = delta(
-            self.fecha_tramite,
-            self.fecha_envio_expediente
-        )
-        self.delta_verificar = delta(
-            self.fecha_solicitud_cedula,
-            self.fecha_ejecucion_cedula
-        )
-        if (self.fecha_tramite is not None and
-                self.fecha_entrevista is not None and
-                self.fecha_envio_expediente is not None and
-                self.fecha_notificacion_aclaracion is not None):
-            self.completo = 1
-        else:
-            self.completo = 0
         super(ExpedienteDPI, self).save(*args, **kwargs)

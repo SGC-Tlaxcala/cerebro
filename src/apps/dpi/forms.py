@@ -39,61 +39,23 @@ class ExpedienteForm(forms.ModelForm):
                     InlineRadios('estado')
                 ),
                 HTML('<hr>'),
-                TabHolder(
-                    Tab('Etapa de Aclaración',
-                        Div(
-                            HTML('<h4 class="col-xs-2 col-md-1">Trámite</h4>'),
-                            Field(
-                                'fecha_notificacion_aclaracion',
-                                autocomplete='off',
-                                wrapper_class='col-xs-2 col-md-3'
-                            ),
-                            Field('fecha_entrevista', autocomplete='off', wrapper_class='col-xs-2 col-md-3'),
-                            Field('fecha_envio_expediente', autocomplete='off', wrapper_class='col-xs-2 col-md-3'),
-                            css_class='row',
-                            id='aclaracion-tramite'
-                        ),
-                        Div(
-                            HTML('<h4 class="col-xs-2 col-md-1">Registro</h4>'),
-                            Field(
-                                'fecha_notificacion_registro',
-                                autocomplete='off',
-                                wrapper_class='col-xs-2 col-md-3'
-                            ),
-                            Field('fecha_entrevista_registro', autocomplete='off', wrapper_class='col-xs-2 col-md-3'),
-                            Field('fecha_envio_expediente_registro', autocomplete='off',
-                                  wrapper_class='col-xs-2 col-md-3'),
-                            css_class='row',
-                            id='aclaracion-registro'
-                        )
-                    ),
-                    Tab(
-                        'Etapa de Validación',
-                        Div(
-                            Field('fecha_solicitud_cedula', autocomplete='off', wrapper_class='col-xs-2 col-md-3'),
-                            Field('fecha_ejecucion_cedula', autocomplete='off', wrapper_class='col-xs-2 col-md-3'),
-                            Field('fecha_validacion_expediente', autocomplete='off', wrapper_class='col-xs-2 col-md-3'),
-                            css_class='row'
-                        )
-                    ),
-                    Tab('Etapa de notificación de rechazo',
-                        Div(
-                            Field('fecha_notificacion_rechazo', autocomplete='off', wrapper_class='col-xs-2 col-md-3'),
-                            Field(
-                                'fecha_notificacion_exclusion',
-                                autocomplete='off',
-                                wrapper_class='col-xs-2 col-md-3'
-                            ),
-                            css_class='row'
-                            )
-                        )
+                Div(
+                    Field('tratamiento', wrapper_class='col', autocomplete='off'),
+                    Field('captura', wrapper_class='col', autocomplate='off'),
+                    css_class='row'
+                ),
+                Div(
+                    Field('atencion', wrapper_class='col', autocomplete='off'),
+                    Field('resolucion', wrapper_class='col', autocomplate='off'),
+                    css_class='row'
                 ),
                 Div(
                     HTML('<hr>'),
                     FormActions(
                         Submit('save', 'Guardar cambios'),
                         Button('cancel', 'Cancelar')
-                    )
+                    ),
+                    css_class='row'
                 )
             ),
         )
