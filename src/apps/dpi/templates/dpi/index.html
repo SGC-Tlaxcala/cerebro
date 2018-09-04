@@ -32,7 +32,7 @@
         ['Completo', {{ estatal.completos }}],
         ['Incompleto', {{ estatal.incompletos }}]
       ])
-      const options = { 
+      const options = {
         legend: 'none',
         'width': 400,
         'height': 400,
@@ -48,7 +48,7 @@
         ['Completo', {{ distrito.1.completos }}],
         ['Incompleto', {{ distrito.1.incompletos }}]
       ])
-      const options = { 
+      const options = {
         legend: 'none',
         'width': 400,
         'height': 400,
@@ -64,7 +64,7 @@
         ['Completo', {{ distrito.2.completos }}],
         ['Incompleto', {{ distrito.2.incompletos }}]
       ])
-      const options = { 
+      const options = {
         legend: 'none',
         'width': 400,
         'height': 400,
@@ -80,7 +80,7 @@
         ['Completo', {{ distrito.3.completos }}],
         ['Incompleto', {{ distrito.3.incompletos }}]
       ])
-      const options = { 
+      const options = {
         legend: 'none',
         'width': 400,
         'height': 400,
@@ -88,7 +88,7 @@
       }
       const chart = new google.visualization.PieChart(document.getElementById('distrito_3'))
       chart.draw(data, options)
-    }     
+    }
 
     function atencionDistritos() {
       const data = google.visualization.arrayToDataTable([
@@ -96,7 +96,7 @@
           ['Distrito 0{{ row.distrito }}', {{ row.atencion|floatformat:2 }}, 9]{% if not forloop.last %},{% endif %}{% endfor %}
         ])
 
-      const options = { 
+      const options = {
         title: 'Promedio de días de atención por expediente',
         legend: 'none',
         vAxis: {title: 'Días'},
@@ -142,197 +142,20 @@
 
   <div class="row">
     <div class="col">
-      <h1 class="display-5">Control DPI por distrito <small class="text-muted">{{ year }}</small></h1>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col">
-      <ul class="nav nav-tabs" id="myTab" role="tablist" style="margin-bottom: 15px">
-        <li class="nav-item">
-          <a class="nav-link active" id="local-tab" data-toggle="tab" href="#local" role="tab" aria-controls="local" aria-selected="true">Estatal</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" id="apizaco-tab" data-toggle="tab" href="#apizaco" role="tab" aria-controls="apizaco" aria-selected="false">Distrito 1</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" id="tlaxcala-tab" data-toggle="tab" href="#tlaxcala" role="tab" aria-controls="tlaxcala" aria-selected="false">Distrito 02</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" id="zacatelco-tab" data-toggle="tab" href="#zacatelco" role="tab" aria-controls="zacatelco" aria-selected="false">Distrito 03</a>
-        </li>
-      </ul>
-      <div class="tab-content" id="myTabContent">
-        <div class="tab-pane fade show active" id="local" role="tabpanel" aria-labelledby="local-tab">
-          <div class="row">
-            <div class="col">
-              <div id="atencion_chart" style="width: 100%; height: 700px;"></div>
-            </div>
-          </div>
-        </div>
-
-        <div class="tab-pane fade" id="apizaco" role="tabpanel" aria-labelledby="apizaco-tab">
-          <div class="row">
-            <div class="col">
-              <h3>Estadísticas Distrito 01</h3>
-              <ul>
-                <li><strong>Total de registros:</strong> {{ distrito.1.total }}</li>
-                <li><strong>Expedientes completos:</strong> {{ distrito.1.completos }}</li>
-                <li><strong>Expedientes incompletos:</strong> {{ distrito.1.incompletos }}</li>
-                <li><strong>Avance:</strong> {{ distrito.1.porcentaje|floatformat:2 }}%</li>
-              </ul>
-            </div>
-            <div class="col">
-              <div id="distrito_1" style="min-width: 400px; height: 400px;"></div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col">
-              <table class="table" id="tabla_distrito_01">
-                <thead>
-                  <th>Folio</th>
-                  <th>Fecha de trámite</th>
-                  <th>Fecha de notificación</th>
-                  <th>Fecha de entrevista o acta</th>
-                  <th>Fecha de envío de expediente</th>
-                  <th>Duración</th>
-                  <th>Completo</th>
-                </thead>
-                <tbody>
-                  {% for row in distrito.1.registros %}
-                    <tr>
-                      <td>{{ row.folio }}</td>
-                      <td>{{ row.fecha_tramite|date:"M d, Y" }}</td>
-                      <td>{{ row.fecha_notificacion_aclaracion|date:"M d, Y" }}</td>
-                      <td>{{ row.fecha_entrevista|date:"M d, Y" }}</td>
-                      <td>{{ row.fecha_envio_expediente|date:"M d, Y" }}</td>
-                      <td>{{ row.delta_distrito }}</td>
-                      <td>{{ row.fullfill }}</td>
-                    </tr>
-                  {% endfor %}
-                </tbody>
-                <tfoot>
-                  <th>Folio</th>
-                  <th>Fecha de trámite</th>
-                  <th>Fecha de notificación</th>
-                  <th>Fecha de entrevista o acta</th>
-                  <th>Fecha de envío de expediente</th>
-                  <th>Duración</th>
-                  <th>Completo</th>
-                </tfoot>                   
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <div class="tab-pane fade" id="tlaxcala" role="tabpanel" aria-labelledby="tlaxcala-tab">
-          <div class="row">
-            <div class="col">
-              <h3>Estadísticas Distrito 02</h3>
-              <ul>
-                <li><strong>Total de registros:</strong> {{ distrito.2.total }}</li>
-                <li><strong>Expedientes completos:</strong> {{ distrito.2.completos }}</li>
-                <li><strong>Expedientes incompletos:</strong> {{ distrito.2.incompletos }}</li>
-                <li><strong>Avance:</strong> {{ distrito.2.porcentaje|floatformat:2 }}%</li>
-              </ul>
-            </div>
-            <div class="col">
-              <div id="distrito_2" style="min-width: 400px; height: 400px;"></div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col">
-              <table class="table" id="tabla_distrito_02">
-                <thead>
-                  <th>Folio</th>
-                  <th>Fecha de trámite</th>
-                  <th>Fecha de notificación</th>
-                  <th>Fecha de entrevista o acta</th>
-                  <th>Fecha de envío de expediente</th>
-                  <th>Duración</th>
-                  <th>Completo</th>
-                </thead>
-                <tbody>
-                  {% for row in distrito.2.registros %}
-                    <tr>
-                      <td>{{ row.folio }}</td>
-                      <td>{{ row.fecha_tramite|date:"M d, Y" }}</td>
-                      <td>{{ row.fecha_notificacion_aclaracion|date:"M d, Y" }}</td>
-                      <td>{{ row.fecha_entrevista|date:"M d, Y" }}</td>
-                      <td>{{ row.fecha_envio_expediente|date:"M d, Y" }}</td>
-                      <td>{{ row.delta_distrito }}</td>
-                      <td>{{ row.fullfill }}</td>
-                    </tr>
-                  {% endfor %}
-                </tbody>
-                <tfoot>
-                  <th>Folio</th>
-                  <th>Fecha de trámite</th>
-                  <th>Fecha de notificación</th>
-                  <th>Fecha de entrevista o acta</th>
-                  <th>Fecha de envío de expediente</th>
-                  <th>Duración</th>
-                  <th>Completo</th>
-                </tfoot>                   
-              </table>
-            </div>
-          </div>                  
-        </div>
-
-        <div class="tab-pane fade" id="zacatelco" role="tabpanel" aria-labelledby="zacatelco-tab">
-          <div class="row">
-            <div class="col">
-              <h3>Estadísticas Distrito 03</h3>
-              <ul>
-                <li><strong>Total de registros:</strong> {{ distrito.3.total }}</li>
-                <li><strong>Expedientes completos:</strong> {{ distrito.3.completos }}</li>
-                <li><strong>Expedientes incompletos:</strong> {{ distrito.3.incompletos }}</li>
-                <li><strong>Avance:</strong> {{ distrito.3.porcentaje|floatformat:2 }}%</li>
-              </ul>
-            </div>
-            <div class="col">
-              <div id="distrito_3" style="min-width: 400px; height: 400px;"></div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col">
-              <table class="table" id="tabla_distrito_03">
-                <thead>
-                  <th>Folio</th>
-                  <th>Fecha de trámite</th>
-                  <th>Fecha de notificación</th>
-                  <th>Fecha de entrevista o acta</th>
-                  <th>Fecha de envío de expediente</th>
-                  <th>Duración</th>
-                  <th>Completo</th>
-                </thead>
-                <tbody>
-                  {% for row in distrito.3.registros %}
-                    <tr>
-                      <td>{{ row.folio }}</td>
-                      <td>{{ row.fecha_tramite|date:"M d, Y" }}</td>
-                      <td>{{ row.fecha_notificacion_aclaracion|date:"M d, Y" }}</td>
-                      <td>{{ row.fecha_entrevista|date:"M d, Y" }}</td>
-                      <td>{{ row.fecha_envio_expediente|date:"M d, Y" }}</td>
-                      <td>{{ row.delta_distrito }}</td>
-                      <td>{{ row.fullfill }}</td>
-                    </tr>
-                  {% endfor %}
-                </tbody>
-                <tfoot>
-                  <th>Folio</th>
-                  <th>Fecha de trámite</th>
-                  <th>Fecha de notificación</th>
-                  <th>Fecha de entrevista o acta</th>
-                  <th>Fecha de envío de expediente</th>
-                  <th>Duración</th>
-                  <th>Completo</th>
-                </tfoot>                
-              </table>
-            </div>
-          </div>                      
-        </div>
-
-      </div>
+      <table class="table">
+        <thead>
+          <th>Tipo</th>
+          <th>Folio</th>
+          <th>Fecha de Trámite</th>
+        </thead>
+        <tbody>{% for r in italia %}
+          <tr>
+            <td>{{ r.tipo }}</td>
+            <td><a href="{% url 'dpi:edit' r.folio %}">{{ r.folio }}</a></td>
+            <td>{{ r.fecha_tramite }}</td>
+          </tr>{% endfor %}
+        </tbody>
+      </table>
     </div>
   </div>
 

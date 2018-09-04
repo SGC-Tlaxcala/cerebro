@@ -13,12 +13,13 @@
     dataTable.addColumn({type: 'number', id: 'Promedio'})
     dataTable.addColumn({'type': 'string', 'role': 'tooltip', 'p': {'html': true} })
     dataTable.addRows([{% for dia in tramites%}
-      [new Date({{dia.fecha_tramite__date|jsdate}}), {{dia.disponible.days|mas20}}, 'Día: {{dia.fecha_tramite__date|date:"d/M/Y"}}<br>Promedio: {{dia.disponible.days}} días']{% if not forloop.last%},{% endif %}{% endfor%}
+      [new Date({{dia.fecha_tramite__date|jsdate}}), {{dia.disponible.days}}, 'Día: {{dia.fecha_tramite__date|date:"d/M/Y"}}<br>Promedio: {{dia.disponible.days}} días']{% if not forloop.last%},{% endif %}{% endfor%}
     ])
     let chart = new google.visualization.Calendar(document.getElementById('calendar_basic'))
     let options = {
       title: "Días para entrega",
       height: 600,
+      width: 1000,
       calendar: {
         daysOfWeek: 'DLMMJVS',
       }
@@ -43,7 +44,7 @@
 
   <div class="row">
     <div class="col">
-      <div id="calendar_basic" style="width: 1000px; height: 500px;"></div>
+      <div id="calendar_basic" style="width: 1000px; height: 600px;"></div>
     </div>
   </div>
 

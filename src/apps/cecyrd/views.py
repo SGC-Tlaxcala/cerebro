@@ -1,7 +1,7 @@
-# cofing: utf-8
+# coding: utf-8
 """Vistas para evaluar al proveedor."""
 
-
+from datetime import date
 from django.db.models import Avg
 from django.views import View
 from django.shortcuts import render
@@ -15,6 +15,7 @@ class CecyrdIndex(View):
     def get(self, request, *args, **kwargs):
         """Función del verbo GET."""
         tramites = Tramites.objects\
+            .filter(fecha_tramite__gte=date(year=2016, month=7, day=4))\
             .exclude(tramo_entrega__isnull=True)\
             .values('fecha_tramite__date')\
             .annotate(disponible=Avg('tramo_disponible'))
