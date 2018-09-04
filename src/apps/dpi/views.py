@@ -42,17 +42,13 @@ class DPIIndex(View):
         fecha = Q(fecha_tramite__year=year)
         dpi = Q(tipo='DPI')
         tlaxcala = Q(entidad=29)
-        completo = Q(completo=1)
 
         tlx = ExpedienteDPI.objects.filter(tlaxcala, fecha, dpi).prefetch_related()
 
-        delta = tlx.values('distrito').order_by('distrito').annotate(atencion=Avg('delta_distrito'))
+        delta = tlx.values('distrito').order_by('distrito').annotate(atencion=Avg('delta_proceso'))
 
         estatal = {
             'total': tlx.count(),
-            'completos': tlx.filter(completo).count(),
-            'incompletos': tlx.count()- tlx.filter(completo).count(),
-            'porcentaje': porciento(tlx.filter(completo).count(), tlx.count()),
             'delta': delta
         }
 
@@ -60,13 +56,8 @@ class DPIIndex(View):
 
         for distrito in (1, 2, 3):
             _total = tlx.filter(distrito=distrito).order_by('folio')
-            _completos = _total.filter(completo).count()
-            _incompletos = _total.count() - _completos
             _distritos[distrito] = {
                 'total': _total.count(),
-                'completos': _completos,
-                'incompletos': _incompletos,
-                'porcentaje': porciento(_completos, _total.count()),
                 'registros': _total
             }
 
@@ -142,10 +133,3 @@ class ExpedienteSimpleViewSet(viewsets.ViewSet):
         expediente = get_object_or_404(queryset, folio=folio)
         serializer = ExpedienteSerializer(expediente)
         return Response(serializer.data)
-
-
-class ExpedienteIncompletoViewSet(viewsets.ReadOnlyModelViewSet):
-    """Busca expedientes incompletos"""
-    queryset = ExpedienteDPI.objects.filter(Q(completo=1), Q(entidad=29))
-    serializer_class = ExpedienteSerializer
-    permission_classes = [AllowAny, ]
