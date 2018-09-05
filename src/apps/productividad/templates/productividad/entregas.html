@@ -66,6 +66,9 @@
         <h1 class="display-4"><i class="fa fa-id-card-o"></i> {{ title }}</h1>
         <p class="lead">
           Contribuye al seguimiento de la Cobertura.
+          <br>
+        <span class="text-muted"><small>Periodo reportado:  desde {{ periodo.inicio.fecha_corte }} hasta {{ periodo.fin.fecha_corte }}.</small></span>
+
           <hr>
           <a href="{% url 'cifras:index' %}" class="btn btn-primary"><i class="fa fa-bar-chart"></i> Productividad</a>
           <a href="{% url 'cifras:tramites' %}" class="btn btn-success"><i class="fa fa-edit"></i> Trámites</a>

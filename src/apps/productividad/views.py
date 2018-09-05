@@ -30,6 +30,10 @@ ENTREGAS = Cifras.objects.values('distrito')\
             .order_by('distrito')\
             .annotate(entregas_distrito=Sum('credenciales_entregadas_actualizacion'))
 
+periodo = {
+    'inicio': Reporte.objects.order_by('fecha_corte').first(),
+    'fin': Reporte.objects.order_by('fecha_corte').last()
+}
 
 def get_int(celda):
     """Convierte el valor de una celda en entero"""
@@ -98,11 +102,16 @@ class CifrasPortada(ListView):
     model = Reporte
     template_name = 'productividad/index.html'
     context_object_name = 'reportes'
+    query = Reporte.objects.order_by('fecha_corte')
+
+    def get_queryset(self, **kwargs):
+        return self.query
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = "Productividad"
         context['kpi_path'] = True
+        context['periodo'] = periodo
         return context
 
 
@@ -220,7 +229,8 @@ class TramitesIndex(View):
             'chart_data': chart_data,
             'estatal': estatal,
             'kpi_path': True,
-            'title': 'Control de Trámites'
+            'title': 'Control de Trámites',
+            'periodo': periodo
         }
 
         return render(request, self.template_name, data)
@@ -265,5 +275,6 @@ class EntregasIndex(View):
             'distritos': _data_entregas,
             'estatal': estatal,
             'kpi_path': True,
+            'periodo': periodo
         }
         return render(request, self.template_name, data)
