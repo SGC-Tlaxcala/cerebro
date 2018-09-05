@@ -83,8 +83,5 @@ class ExpedienteDPI(TimeStampedModel):
         self.nombre = self.nombre.upper()
         self.entidad = self.folio[2:4]
         self.distrito = self.folio[4:6]
-        self.delta_notificar = delta(
-            self.tratamiento,
-            self.resolucion
-        )
+        self.delta_proceso = delta(self.tratamiento, self.resolucion)
         super(ExpedienteDPI, self).save(*args, **kwargs)

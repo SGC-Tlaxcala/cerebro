@@ -11,10 +11,6 @@
   <script type="text/javascript" src="https://cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"></script>
   <script type="text/javascript">
     google.charts.load('current', {'packages':['corechart']})
-    google.charts.setOnLoadCallback(pieTotal)
-    google.charts.setOnLoadCallback(pieDistrito01)
-    google.charts.setOnLoadCallback(pieDistrito02)
-    google.charts.setOnLoadCallback(pieDistrito03)
     google.charts.setOnLoadCallback(atencionDistritos)
 
     $.extend($.fn.dataTable.defaults, {
@@ -25,70 +21,6 @@
     $(document).ready(() => $('#tabla_distrito_01').DataTable({"language": {"url":"https://cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"}}))
     $(document).ready(() => $('#tabla_distrito_02').DataTable({"language": {"url":"https://cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"}}))
     $(document).ready(() => $('#tabla_distrito_03').DataTable({"language": {"url":"https://cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"}}))
-
-    function pieTotal() {
-      const data = google.visualization.arrayToDataTable([
-        ['Expediente', 'Cuenta'],
-        ['Completo', {{ estatal.completos }}],
-        ['Incompleto', {{ estatal.incompletos }}]
-      ])
-      const options = {
-        legend: 'none',
-        'width': 400,
-        'height': 400,
-        'chartArea': {'width': '100%', 'height': '90%'},
-      }
-      const chart = new google.visualization.PieChart(document.getElementById('total_chart'))
-      chart.draw(data, options)
-    }
-
-    function pieDistrito01() {
-      const data = google.visualization.arrayToDataTable([
-        ['Expediente', 'Cuenta'],
-        ['Completo', {{ distrito.1.completos }}],
-        ['Incompleto', {{ distrito.1.incompletos }}]
-      ])
-      const options = {
-        legend: 'none',
-        'width': 400,
-        'height': 400,
-        'chartArea': {'width': '100%', 'height': '90%'},
-      }
-      const chart = new google.visualization.PieChart(document.getElementById('distrito_1'))
-      chart.draw(data, options)
-    }
-
-    function pieDistrito02() {
-      const data = google.visualization.arrayToDataTable([
-        ['Expediente', 'Cuenta'],
-        ['Completo', {{ distrito.2.completos }}],
-        ['Incompleto', {{ distrito.2.incompletos }}]
-      ])
-      const options = {
-        legend: 'none',
-        'width': 400,
-        'height': 400,
-        'chartArea': {'width': '100%', 'height': '90%'},
-      }
-      const chart = new google.visualization.PieChart(document.getElementById('distrito_2'))
-      chart.draw(data, options)
-    }
-
-    function pieDistrito03() {
-      const data = google.visualization.arrayToDataTable([
-        ['Expediente', 'Cuenta'],
-        ['Completo', {{ distrito.3.completos }}],
-        ['Incompleto', {{ distrito.3.incompletos }}]
-      ])
-      const options = {
-        legend: 'none',
-        'width': 400,
-        'height': 400,
-        'chartArea': {'width': '100%', 'height': '90%'},
-      }
-      const chart = new google.visualization.PieChart(document.getElementById('distrito_3'))
-      chart.draw(data, options)
-    }
 
     function atencionDistritos() {
       const data = google.visualization.arrayToDataTable([
@@ -120,6 +52,10 @@
       <h1 class="display-3"><i class="fa fa-user-secret"></i> Control de DPI <small class="text-muted">{{ year }}</small></h1>
       <hr>
       <p>
+        Se muestran los expedientes con resolución en Tlaxcala, por lo que se excluyen las solicitudes de colaboración
+        a otras entidades. <br>
+        <span class="text-muted"><small>Periodo trabajado: desde {{ periodo.inicio }} hasta {{ periodo.fin }}</small></span>
+        <hr>
         <a class="btn btn-danger"  href="{% url 'dpi:dpi_add' %}"><i class="fa fa-plus"></i> Agregar expediente</a>
       </p>
     </div>
@@ -129,14 +65,11 @@
     <div class="col">
       <h3>Estadísticas totales</h3>
       <ul>
-        <li><strong>Total de registros:</strong> {{ estatal.total }}</li>
-        <li><strong>Expedientes completos:</strong> {{ estatal.completos }}</li>
-        <li><strong>Expedientes incompletos:</strong> {{ estatal.incompletos }}</li>
-        <li><strong>Avance:</strong> {{ estatal.porcentaje|floatformat:2 }}%</li>
+        <li><strong>Total de registros:</strong> {{ expedientes.count }}</li>
       </ul>
     </div>
     <div class="col">
-      <div id="total_chart" style="min-width: 400px; height: 400px;"></div>
+      <div id="atencion_chart" style="min-width: 800px; height: 600px;"></div>
     </div>
   </div>
 
@@ -144,15 +77,17 @@
     <div class="col">
       <table class="table">
         <thead>
-          <th>Tipo</th>
+          <th>Distrito</th>
           <th>Folio</th>
           <th>Fecha de Trámite</th>
+          <th>Días de procesamiento</th>
         </thead>
-        <tbody>{% for r in italia %}
+        <tbody>{% for r in expedientes %}
           <tr>
-            <td>{{ r.tipo }}</td>
+            <td>{{ r.distrito }}</td>
             <td><a href="{% url 'dpi:edit' r.folio %}">{{ r.folio }}</a></td>
             <td>{{ r.fecha_tramite }}</td>
+            <td>{{ r.delta_proceso }}</td>
           </tr>{% endfor %}
         </tbody>
       </table>

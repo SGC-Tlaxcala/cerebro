@@ -14,7 +14,6 @@ from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic.edit import CreateView, UpdateView
 from rest_framework import viewsets
-from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from apps.dpi.forms import ExpedienteForm
@@ -43,9 +42,7 @@ class DPIIndex(View):
         dpi = Q(tipo='DPI')
         tlaxcala = Q(entidad=29)
 
-        italia = ExpedienteDPI.objects.filter(fecha)
-
-        tlx = ExpedienteDPI.objects.filter(tlaxcala, fecha, dpi).prefetch_related()
+        tlx = ExpedienteDPI.objects.filter(tlaxcala, fecha, dpi).order_by('-fecha_tramite').prefetch_related()
 
         delta = tlx.values('distrito').order_by('distrito').annotate(atencion=Avg('delta_proceso'))
 
@@ -63,13 +60,19 @@ class DPIIndex(View):
                 'registros': _total
             }
 
+        periodo = {
+            'fin': tlx.first().fecha_tramite,
+            'inicio': tlx.last().fecha_tramite
+        }
+
         data = {
             'year': year,
+            'expedientes': tlx,
             'title': 'Control de DPI',
             'estatal': estatal,
             'distritos': (1, 2, 3),
             'distrito': _distritos,
-            'italia': italia,
+            'periodo': periodo,
             'kpi_path': True
         }
         return render(request, self.template_name, data)
