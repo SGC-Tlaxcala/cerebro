@@ -56,7 +56,6 @@ class Reporte(TimeStampedModel):
     class Meta:
         verbose_name = "Reporte de Productividad"
         verbose_name_plural = "Reportes de Productividad"
-        ordering = ["-remesa"]
         get_latest_by = 'fecha_corte'
 
 
