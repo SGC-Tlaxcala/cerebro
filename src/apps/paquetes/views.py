@@ -74,6 +74,11 @@ class PaquetesIndex(View):
             .filter(fecha_corte__year=YEAR)\
             .prefetch_related()
 
+        periodo = {
+            'inicio': envio_modulo.first(),
+            'fin': envio_modulo.last()
+        }
+
         for t in envio_modulo:
             fecha_vrd = t['lote__recibido_vrd__max']
             horas_local = t['tran_sec__avg']
@@ -100,6 +105,7 @@ class PaquetesIndex(View):
             'tramo_local': tramo_local,
             'tabla_local': tabla_local,
             'mini_envio': mini_parcel,
+            'periodo': periodo,
             'kpi_path': True
         }
 
