@@ -21,14 +21,16 @@ no_entrega = Q(causa=ENTREGA)
 class MesasIndex(TemplateView):
     template_name = 'mesas/index.html'
 
-    base = Registro.objects.all().exclude(no_info).exclude(no_otro).exclude(no_entrega)
+    base = Registro.objects.all().exclude(no_info).exclude(no_otro).exclude(no_entrega).order_by('fecha', 'id')
     sexo = base.values('sexo').annotate(total=Count('sexo'))
     causas = base.values('causa').annotate(total=Count('causa')).order_by('causa')
 
     data = {
         'sexo': sexo,
         'causas': causas,
-        'txt_causas': CAUSAS
+        'txt_causas': CAUSAS,
+        'inicio': base.first(),
+        'fin': base.last()
     }
 
     def get_context_data(self, **kwargs):
