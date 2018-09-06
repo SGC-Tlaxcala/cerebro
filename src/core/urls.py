@@ -5,7 +5,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
-from core.views import index
+from core.views import index, EncuestasIndex
 
 urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls')),
@@ -20,6 +20,7 @@ urlpatterns = [
     path('cifras/', include('apps.productividad.urls')),
     path('dpi/', include('apps.dpi.urls')),
     path('cecyrd/', include('apps.cecyrd.urls')),
+    path('encuestas/', EncuestasIndex.as_view(), name='encuestas'),
 
     path('', index, name='index')
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

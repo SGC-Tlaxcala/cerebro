@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block footer %}
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <script type="text/javascript">
+    google.charts.load("current", {packages:['corechart']});
+    google.charts.setOnLoadCallback(drawChart);
+    function drawChart() {
+      let data = google.visualization.arrayToDataTable([
+        ["Módulo", "Aprobación"],
+        ["151",9.55],
+        ["152",9.83],
+        ["153",9.50],
+        ["154",9.17],
+        ["251",9.65],
+        ["252",9.50],
+        ["253",9.18],
+        ["254",9.38],
+        ["351",9.26],
+        ["352",9.46],
+        ["353",9.09]
+      ]);
+
+      var view = new google.visualization.DataView(data);
+
+      var options = {
+        title: "Promedio de aprobación ciudadana por MAC",
+        subtitle: "Línea base mínima 95% según el Plan Estratégico del INE",
+        width: 900,
+        height: 400,
+        bar: {groupWidth: "95%"},
+        legend: { position: "none" },
+      };
+      var chart = new google.visualization.ColumnChart(document.getElementById("columnchart_values"));
+      chart.draw(view, options);
+  }
+  </script>
+{% endblock footer %}
+
+{% block content %}
+  <div class="row">
+    <div class="col">
+      <div class="jumbotron">
+        <h1 class="display-4"><i class="fa fa-thumbs-o-up"></i> Aprobación ciudadana</h1>
+        <p class="lead">
+          Seguimiento al objetivo estratégico.
+        </p>
+        <hr class="my-4">
+        <p class="text-muted">
+          <small>Periodo reportado: Julio 2018</small>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col align-items-center justify-content-center">
+      <div id="columnchart_values" style="width: 900px; height: 600px;"></div>
+    </div>
+  </div>
+{% endblock content %}
