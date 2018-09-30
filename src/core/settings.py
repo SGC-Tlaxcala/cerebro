@@ -2,6 +2,14 @@ from unipath import Path
 import environ
 from django.contrib.messages import constants as messages
 import datetime
+try:
+    import locale
+    locale.setlocale(locale.LC_ALL, 'en_US.utf8')
+except Exception:
+    try:
+        locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
+    except Exception as e:
+        messages.error(request, 'An error occurred: {0}'.format(e))
 
 VERSION = '1.6.2'
 
@@ -112,7 +120,7 @@ else:
     ]
 
 
-LANGUAGE_CODE = 'es-mx'
+LANGUAGE_CODE = env('LOCALE', default='es-mx')
 TIME_ZONE = 'Mexico/General'
 USE_I18N = True
 USE_L10N = True
@@ -124,8 +132,7 @@ LOGIN_REDIRECT_URL = '/'
 STATIC_ROOT = APPS_DIR.child('assets')
 STATIC_URL = '/assets/'
 STATICFILES_DIRS = [
-    APPS_DIR.child('static'),
-    'static'
+    APPS_DIR.child('static')
 ]
 
 MEDIA_ROOT = APPS_DIR.child('media')

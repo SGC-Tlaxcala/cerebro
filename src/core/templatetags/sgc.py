@@ -3,7 +3,7 @@ from django.contrib.humanize.templatetags.humanize import intcomma
 from django.urls import reverse
 import locale
 
-locale.setlocale(locale.LC_ALL, 'es_MX.UTF-8')
+# locale.setlocale(locale.LC_ALL, 'es_MX.UTF-8')
 register = template.Library()
 DIA = 86400
 
