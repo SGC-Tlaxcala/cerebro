@@ -11,7 +11,7 @@ except Exception:
     except Exception as e:
         messages.error(request, 'An error occurred: {0}'.format(e))
 
-VERSION = '1.6.2'
+VERSION = '1.7.0'
 
 BASE_DIR = Path(__file__).ancestor(2)
 APPS_DIR = BASE_DIR.child('apps')
