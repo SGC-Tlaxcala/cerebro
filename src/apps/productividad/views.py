@@ -37,6 +37,8 @@ periodo = {
 
 def get_int(celda):
     """Convierte el valor de una celda en entero"""
+    if celda.value == '':
+        return 0
     try:
         if celda.ctype == 5:
             return 0
