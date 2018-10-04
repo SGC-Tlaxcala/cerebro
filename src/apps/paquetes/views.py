@@ -146,18 +146,24 @@ def envio_paso1(request):
     if request.method == 'POST':
         contexto = request.POST.copy()
         form = PrepareForm(contexto)
-        try:
-            envio = Envio.objects.get(lote=request.POST['lote'], distrito=request.POST['distrito'])
-        except Envio.DoesNotExist:
-            envio = False
-        if envio:
-            request.session["env"] = True
-            request.session['envio_id'] = envio.id
-            request.session['envio_macs'] = request.POST['mac']
-            request.session['lote'] = request.POST['lote']
-            request.session['envio_distrito'] = request.POST['distrito']
+
         if form.is_valid():
             datos = form.cleaned_data
+            try:
+                envio = Envio.objects.get(
+                    lote=datos['lote'], distrito=datos['distrito'],
+                    recibido_vrd=datos['recibido_vrd']
+                )
+            except Envio.DoesNotExist:
+                envio = False
+
+            if envio:
+                request.session["env"] = True
+                request.session['envio_id'] = envio.id
+                request.session['envio_macs'] = request.POST['mac']
+                request.session['lote'] = request.POST['lote']
+                request.session['envio_distrito'] = request.POST['distrito']
+
             rem = get_remesa(datos['recibido_vrd'].date())
             obj = form.save(commit=False)
             obj.fecha_corte = rem.fin
@@ -193,7 +199,6 @@ def envio_paso1(request):
 
 
 # noinspection PyUnusedLocal
-@login_required
 def envio_paso2(request):
     paquetes_form_set = formset_factory(EnvioModuloForm, extra=0)
     try:

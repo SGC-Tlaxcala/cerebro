@@ -15,7 +15,7 @@ class CecyrdIndex(View):
     def get(self, request, *args, **kwargs):
         """Función del verbo GET."""
         tramites = Tramites.objects\
-            .filter(fecha_tramite__gte=date(year=2016, month=7, day=4))\
+            .filter(fecha_tramite__gte=date(year=2017, month=1, day=1))\
             .exclude(tramo_entrega__isnull=True)\
             .values('fecha_tramite__date')\
             .annotate(disponible=Avg('tramo_disponible'))
