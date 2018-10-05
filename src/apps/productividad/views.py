@@ -47,6 +47,16 @@ def get_int(celda):
         return 0
 
 
+def get_float(celda):
+    """"Convierte el valor de una velda en un número flotante"""
+    # valor = 0
+    try:
+        valor = float(celda.value)
+    except ValueError:
+        valor = 0
+    return valor
+
+
 def procesar_cifras(archivo_excel):
     """Procesa el archivo de cifras"""
     cifras = xlrd.open_workbook(archivo_excel).sheet_by_name("CIFRAS_PRODUCCION DIARIA")
@@ -67,7 +77,7 @@ def procesar_cifras(archivo_excel):
                     'distrito': modulo[2:4],
                     'tipo': mac[1].value,
                     'dias_trabajados': get_int(mac[2]),
-                    'jornada_trabajada': mac[3].value,
+                    'jornada_trabajada': get_float(mac[3]),
                     'configuracion': mac[4].value,
                     'tramites': get_int(mac[5]),
                     'credenciales_entregadas_actualizacion': get_int(mac[6]),
