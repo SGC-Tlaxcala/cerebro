@@ -1,0 +1,24 @@
+- hosts: all
+  become: true
+  become_method: sudo
+
+  tasks:
+    - name: Actualizar el manifiesto
+      apt: 
+        update_cache: yes
+        upgrade: yes
+        cache_valid_time: 86400
+
+    - name: Instalar paquetes de Ubuntu
+      apt: 
+        name: ["debconf-utils", "python3-pip",  "python3-venv","python-dev", "libpq-dev", "ntp", "htop"] 
+        state: present
+      tags:
+        - packages
+
+    - name: Actualizar pip
+      pip:
+        state: latest
+        requirements: /vagrant/requirements.txt
+        virtualenv: /home/vagrant/venv
+        virtualenv_command: /usr/bin/python3.6 -m venv

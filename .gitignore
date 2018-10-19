@@ -7,6 +7,9 @@ media/
 fixtures/
 *.ipynb
 src/apps/assets/
+venv/
+.vagrant/
+*.retry
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
