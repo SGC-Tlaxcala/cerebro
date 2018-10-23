@@ -1,7 +1,7 @@
 Vagrant.configure("2") do |config|
 
   config.vm.box = "ubuntu/bionic64"
-  config.vm.network "forwarded_port", guest: 8000, host: 8008, host_ip: "127.0.0.1"
+  config.vm.network "forwarded_port", guest: 8000, host: 8000, host_ip: "127.0.0.1"
 
   config.vm.provider "virtualbox" do |vb|
     vb.gui = false
@@ -14,6 +14,7 @@ Vagrant.configure("2") do |config|
   config.ssh.shell = "bash -c 'BASH_ENV=/etc/profile exec bash'"
 
   config.vm.provision "ansible_local" do |ansible|
+    ansible.install_mode = "pip"
     ansible.compatibility_mode = '2.0'
     ansible.playbook = "playbook.yml"
   end
