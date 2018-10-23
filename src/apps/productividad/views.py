@@ -40,7 +40,7 @@ def get_int(celda):
     if celda.value == '':
         return 0
     try:
-        if celda.ctype == 5:
+        if celda.ctype != 2:
             return 0
         return math.ceil(celda.value)
     except ValueError:
