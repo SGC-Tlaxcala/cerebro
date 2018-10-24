@@ -21,4 +21,4 @@
         state: latest
         requirements: /vagrant/requirements.txt
         virtualenv: /home/vagrant/venv
-        virtualenv_command: /usr/bin/python3.6 -m venv
+        virtualenv_command: /usr/bin/python3 -m venv
