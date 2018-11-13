@@ -9,6 +9,13 @@
         upgrade: yes
         cache_valid_time: 86400
 
+    - name: Instalar Aptitude
+      apt:
+        name: ['aptitude']
+        state: present
+      tags:
+        - packages
+
     - name: Instalar paquetes de Ubuntu
       apt: 
         name: ["debconf-utils", "python3-pip",  "python3-venv","python-dev", "libpq-dev", "ntp", "htop"] 

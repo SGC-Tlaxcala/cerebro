@@ -5,6 +5,30 @@
   <link rel="stylesheet" href="{% static 'docs/estilos.css' %}">
 {% endblock header %}
 
+{% block footer %}
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.0/jquery-confirm.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.0/jquery-confirm.min.js"></script>
+  <script type="application/javascript">
+
+    $('#btn-descarga').on('click', function(){
+      $.confirm({
+        title: 'Control de documentos',
+        content: 'La impresión de este documento se considerará una copia no controlada.',
+        closeIcon: true,
+        closeIconClass: 'fa fa-close',
+        backgroundDismiss: true,
+        buttons: {
+          confirmar: function () {
+            window.location = "http://10.29.0.79/media/{{doc.revision_actual.archivo}}";
+          },
+          cerrar: function () {}
+        }
+      })
+    })
+
+  </script>
+{% endblock footer%}
+
 {% block  head_title %}{{ doc.nombre }}{% endblock %}
 
 {% block content %}
@@ -13,6 +37,9 @@
       <div class="page-header">
         <h1 class="display-4">{{ doc.nombre }} <small>{% if doc.proceso.slug != "stn" %}ver. {{ doc.r_actual }}{% endif %} ({{ doc.revision_actual.f_actualizacion }})</small></h1>
       </div><!-- ./page-header -->
+        <div class="alert alert-danger" role="alert">
+          La impresión de este documento será considerada una <strong>copia no controlada.</strong>
+        </div>
     </div>
   </div>
   <div class="row">
@@ -32,7 +59,7 @@
         <div class="col">
           {% if doc.ext == 'pdf' %}
             <div class="col">
-              <embed src="http://10.29.0.79/media/{{doc.revision_actual.archivo}}" type="application/pdf" width="100%" height="600px" />
+              <embed src="http://10.29.0.79/media/{{doc.revision_actual.archivo}}#toolbar=0" type="application/pdf" width="100%" height="600px" />
             </div>
           {% endif %}
         </div>
@@ -140,8 +167,7 @@
               <i class="fa fa-cloud-download"></i> Descargar archivo
             </div>
             <div class="card-body">
-
-              <span><a href="http://10.29.0.79/media/{{doc.revision_actual.archivo}}">Descargar</a></span>
+              <button id="btn-descarga" class="btn btn-outline-danger">Descargar</button>
             </div>
           </div>
         </div>

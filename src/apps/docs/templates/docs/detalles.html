@@ -40,7 +40,6 @@
 {% endblock footer_js %}
 
 {% block contenido %}
-{% include "2014/docs/docs_navbar.html" %}
 
 <div class="col-md-12"><!-- contenido -->
   <div class="page-header">
@@ -54,6 +53,9 @@
         <h4>Resumen de la opinión técnica</h4>
         {{doc.revision_actual.cambios | safe }}
       </div>
+        <div class="alert alert-danger" role="alert">
+          La impresión de este documento será considerada una <strong>copia no controlada.</strong>
+        </div>
       <hr>
       {% endif %}
 
