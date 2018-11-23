@@ -29,6 +29,10 @@
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdown">
             <a
+              class="dropdown-item {% current request 'cobertura' %}"
+              href="{% url 'cobertura:index' %}">
+              <i class="fa fa-globe"></i> Cobertura</a>
+            <a
               class="dropdown-item {% current request 'cifras' %}"
               href="{% url 'cifras:index' %}">
               <i class="fa fa-bar-chart"></i> Productividad
@@ -43,7 +47,7 @@
               href="{% url 'cifras:entregas' %}">
               <i class="fa fa-id-card-o"></i> Entregas
             </a>
-            <a
+            {% comment %}<a
               class="dropdown-item {% current request 'mesas' %}"
               href="{% url 'mesas:index' %}">
               <i class="fa fa-user-times"></i> Control recepción
@@ -62,7 +66,7 @@
               class="dropdown-item {% current request 'cecyrd' %}"
               href="{% url 'cecyrd:index' %}">
               <i class="fa fa-bolt"></i> Control de Entregas
-            </a>
+            </a>{% endcomment %}
             <div class="dropdown-divider"></div>
             <a
               class="dropdown-item {% current request 'cecyrd' %}"

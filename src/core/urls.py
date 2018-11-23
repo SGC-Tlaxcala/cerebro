@@ -21,6 +21,7 @@ urlpatterns = [
     path('dpi/', include('apps.dpi.urls')),
     path('cecyrd/', include('apps.cecyrd.urls')),
     path('encuestas/', EncuestasIndex.as_view(), name='encuestas'),
+    path('cobertura/', include('apps.cobertura.urls')),
 
     path('', index, name='index')
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
