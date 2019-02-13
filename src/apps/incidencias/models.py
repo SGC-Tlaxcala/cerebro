@@ -19,7 +19,7 @@ def remesa(fecha):
 class Tipo(models.Model):
     nombre = models.CharField(max_length=255)
 
-    def str(self):
+    def __str__(self):
         return f'{self.nombre}'
 
 
@@ -39,7 +39,7 @@ class Incidencia(TimeStampedModel):
         verbose_name = 'Incidencia'
         verbose_name_plural = 'Incidencias'
 
-    def str(self):
+    def __str__(self):
         return f'{self.modulo} - {self.caso_cau}'
 
     def save(self, *args, **kwargs):
