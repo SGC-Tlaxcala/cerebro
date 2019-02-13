@@ -53,7 +53,8 @@ LOCAL_APPS = [
     'apps.productividad.config.ProductividadConfig',
     'apps.dpi.config.DpiConfig',
     'apps.cecyrd.config.CecyrdConfig',
-    'apps.cobertura.config.CoberturaConfig'
+    'apps.cobertura.config.CoberturaConfig',
+    'apps.incidencias.config.IncidenciasConfig'
 ]
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
