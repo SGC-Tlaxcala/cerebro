@@ -19,6 +19,9 @@ def remesa(fecha):
 class Tipo(models.Model):
     nombre = models.CharField(max_length=255)
 
+    def str(self):
+        return f'{self.nombre}'
+
 
 class Incidencia(TimeStampedModel):
     distrito = models.PositiveSmallIntegerField()
