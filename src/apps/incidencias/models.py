@@ -5,7 +5,7 @@
 # description: Modelos para el control de incidencias
 # pylint: disable=W0613,R0201,R0903
 
-
+from datetime import timedelta
 from django.db import models
 from core.models import TimeStampedModel, Remesa
 
@@ -34,15 +34,17 @@ class Incidencia(TimeStampedModel):
     tipo = models.ForeignKey(Tipo, on_delete=models.CASCADE)
     descripcion = models.TextField()
     solucion = models.TextField()
+    duracion = models.DurationField(editable=False, null=True)
 
     class Meta:
         verbose_name = 'Incidencia'
         verbose_name_plural = 'Incidencias'
 
     def __str__(self):
-        return f'{self.modulo} - {self.caso_cau}'
+        return f'{self.modulo} - {self.caso_cau} - {self.remesa}'
 
     def save(self, *args, **kwargs):
         self.remesa = remesa(self.fecha_inicio)
         self.distrito = self.modulo[3]
+        self.duracion = self.fecha_final - self.fecha_inicio + timedelta(days=1)
         super(Incidencia, self).save(*args, **kwargs)

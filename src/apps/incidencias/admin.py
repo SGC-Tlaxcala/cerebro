@@ -17,6 +17,8 @@ class TipoAdmin(admin.ModelAdmin):
 
 
 class IncidenciaAdmin(admin.ModelAdmin):
+    list_display = ('caso_cau', 'modulo', 'remesa', 'tipo')
+    list_filter = ('distrito', 'modulo', 'remesa', 'tipo')
     class Meta:
         fields = '__all__'
         model = Incidencia
