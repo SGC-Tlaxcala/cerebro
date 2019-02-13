@@ -24,7 +24,7 @@ class Tipo(models.Model):
 
 
 class Incidencia(TimeStampedModel):
-    distrito = models.PositiveSmallIntegerField()
+    distrito = models.PositiveSmallIntegerField('Distrito', editable=False)
     modulo = models.CharField(max_length=6)
     fecha_inicio = models.DateField()
     fecha_final = models.DateField()

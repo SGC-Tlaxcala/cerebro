@@ -10,6 +10,12 @@ from django.contrib import admin
 from apps.incidencias.models import Tipo, Incidencia
 
 
+class TipoAdmin(admin.ModelAdmin):
+    class Meta:
+        fields = '__all__'
+        model = Tipo
+
+
 class IncidenciaAdmin(admin.ModelAdmin):
     class Meta:
         fields = '__all__'
@@ -17,3 +23,4 @@ class IncidenciaAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Incidencia, IncidenciaAdmin)
+admin.site.register(Tipo, TipoAdmin)
