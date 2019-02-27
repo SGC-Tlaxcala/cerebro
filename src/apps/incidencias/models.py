@@ -40,8 +40,8 @@ class Tipo(models.Model):
 class Incidencia(TimeStampedModel):
     distrito = models.PositiveSmallIntegerField('Distrito', editable=False)
     modulo = models.CharField(max_length=6, choices=MODULOS)
-    fecha_inicio = models.DateField()
-    fecha_final = models.DateField()
+    fecha_inicio = models.DateTimeField()
+    fecha_final = models.DateTimeField()
     remesa = models.CharField('Remesa', max_length=7, editable=False, null=True)
     inhabilitado = models.BooleanField()
     caso_cau = models.CharField(max_length=15)
