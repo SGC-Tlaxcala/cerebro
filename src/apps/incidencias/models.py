@@ -10,6 +10,20 @@ from django.db import models
 from core.models import TimeStampedModel, Remesa
 
 
+MODULOS = (
+    ('290151', '290151'),
+    ('290152', '290152'),
+    ('290153', '290153'),
+    ('290251', '290251'),
+    ('290252', '290252'),
+    ('290253', '290253'),
+    ('290254', '290254'),
+    ('290351', '290351'),
+    ('290352', '290352'),
+    ('290353', '290353')
+)
+
+
 def remesa(fecha):
     for r in Remesa.objects.all():
         if r.inicio <= fecha <= r.fin:
@@ -25,7 +39,7 @@ class Tipo(models.Model):
 
 class Incidencia(TimeStampedModel):
     distrito = models.PositiveSmallIntegerField('Distrito', editable=False)
-    modulo = models.CharField(max_length=6)
+    modulo = models.CharField(max_length=6, choices=MODULOS)
     fecha_inicio = models.DateField()
     fecha_final = models.DateField()
     remesa = models.CharField('Remesa', max_length=7, editable=False, null=True)
