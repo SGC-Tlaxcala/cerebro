@@ -4,6 +4,39 @@
 
 {% block head_title %}Gestión de Incidencias en MAC{% endblock %}
 
+{% block footer %}
+  <link rel="stylesheet" href="{% static 'incidencias/fullcalendar/fullcalendar.min.css' %}">
+  <script src="{% static 'incidencias/fullcalendar/lib/moment.min.js' %}"></script>
+  <script src="{% static 'incidencias/fullcalendar/lib/jquery-ui.min.js' %}"></script>
+  <script src="{% static 'incidencias/fullcalendar/fullcalendar.min.js' %}"></script>
+  <script src="{% static 'incidencias/fullcalendar/locale/es.js' %}"></script>
+
+  <script>
+
+    $(function() {
+
+      $('#calendar').fullCalendar({
+        themeSystem: 'bootstrap4',
+        header: {
+          left: 'prev,next today',
+          center: 'title',
+          right: 'month,agendaWeek,agendaDay,listMonth'
+        },
+        eventLimit: true, // allow "more" link when too many events
+        events: 'https://fullcalendar.io/demo-events.json',
+        dayClick: function(date, jsEvent, view) {
+          alert('Clicked on: ' + date.format());
+          alert('Coordinates: ' + jsEvent.pageX + ',' + jsEvent.pageY);
+          alert('Current view: ' + view.name);
+          $(this).css('background-color', 'red');
+        }
+      })
+
+    })
+
+  </script>
+{% endblock footer%}
+
 {% block content %}
   <div class="jumbotron p-3 p-md-5 rounded">
     <div class="px-0">
@@ -16,7 +49,7 @@
   <hr>
   <div class="row">
     <div class="col">
-
+      <div id='calendar'></div>
     </div>
   </div>
 

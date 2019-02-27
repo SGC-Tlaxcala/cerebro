@@ -11,5 +11,5 @@ from apps.incidencias.views import Portada
 
 app_name = 'incidencias'
 urlpatterns = [
-    path('', Portada.as_view(), name='incidencias:index')
+    path('', Portada.as_view(), name='index')
 ]
