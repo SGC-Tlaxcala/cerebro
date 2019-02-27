@@ -57,3 +57,5 @@ ALTER ROLE admin SET client_encoding TO 'utf8';
 ALTER ROLE admin SET default_transaction_isolation TO 'read committed';
 ALTER ROLE admin SET timezone TO 'Mexico/General';
 ```
+
+> Versión 201902.1 (27/febrero/2019)
