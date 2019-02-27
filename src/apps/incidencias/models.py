@@ -3,9 +3,7 @@
 #      module: models
 #        date: miércoles, 13 de febrero de 2018 - 10:15
 # description: Modelos para el control de incidencias
-# pylint: disable=W0613,R0201,R0903
 
-from datetime import timedelta
 from django.db import models
 from core.models import TimeStampedModel, Remesa
 
