@@ -26,7 +26,7 @@ MODULOS = (
 
 def remesa(fecha):
     for r in Remesa.objects.all():
-        if r.inicio <= fecha <= r.fin:
+        if r.inicio <= fecha.date() <= r.fin:
             return r.remesa
 
 
@@ -60,5 +60,5 @@ class Incidencia(TimeStampedModel):
     def save(self, *args, **kwargs):
         self.remesa = remesa(self.fecha_inicio)
         self.distrito = self.modulo[3]
-        self.duracion = self.fecha_final - self.fecha_inicio + timedelta(days=1)
+        self.duracion = self.fecha_final - self.fecha_inicio
         super(Incidencia, self).save(*args, **kwargs)
