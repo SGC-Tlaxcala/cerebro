@@ -23,7 +23,17 @@
           right: 'month,agendaWeek,agendaDay,listMonth'
         },
         eventLimit: true, // allow "more" link when too many events
-        events: 'https://fullcalendar.io/demo-events.json',
+        events: [{% for evento in object_list %}
+          {
+            id: '{{ evento.id }}',
+            title: '{{ evento.caso_cau }}',
+            start: new Date('{{ evento.fecha_inicio|date:"c" }}'),
+            end: new Date('{{ evento.fecha_final|date:"c" }}'),
+            url: '{% url 'incidencias:evento' evento.id %}',
+            editable: false,{% if evento.inhabilitado %}
+            color: 'indianred'{% endif %}
+          },
+          {% endfor %}],
         dayClick: function(date, jsEvent, view) {
           alert('Clicked on: ' + date.format());
           alert('Coordinates: ' + jsEvent.pageX + ',' + jsEvent.pageY);
@@ -50,14 +60,6 @@
   <div class="row">
     <div class="col">
       <div id='calendar'></div>
-    </div>
-  </div>
-
-  <hr>
-
-  <div class="row">
-    <div class="col">
-      <p>Control de incidencias</p>
     </div>
   </div>
 {% endblock content %}

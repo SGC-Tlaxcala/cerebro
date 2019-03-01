@@ -7,9 +7,10 @@
 
 
 from django.urls import path
-from apps.incidencias.views import Portada
+from apps.incidencias.views import Portada, EventoDetail
 
 app_name = 'incidencias'
 urlpatterns = [
-    path('', Portada.as_view(), name='index')
+    path('', Portada.as_view(), name='index'),
+    path('<int:pk>/', EventoDetail.as_view(), name='evento')
 ]

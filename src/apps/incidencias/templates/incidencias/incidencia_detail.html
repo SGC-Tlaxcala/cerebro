@@ -1,0 +1,26 @@
+{# incidencias/index.html #}
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block head_title %}Evento: {{ object.caso_cau }} - Gestión de Incidencias en MAC{% endblock %}
+
+
+{% block content %}
+  <div class="jumbotron p-3 p-md-5 rounded">
+    <div class="px-0">
+      <h1 class="display-4">Evento: {{ object.caso_cau }}</h1>
+    </div>
+  </div>
+
+  <hr>
+
+  <div class="row">
+    <div class="col">
+      <p>Control de incidencias</p>
+      Módulo: {{ object.modulo }}<br>
+      Duracion: {{ object.duracion }}
+
+    </div>
+  </div>
+
+{% endblock content %}
