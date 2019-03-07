@@ -18,7 +18,8 @@ MODULOS = (
     ('290254', '290254'),
     ('290351', '290351'),
     ('290352', '290352'),
-    ('290353', '290353')
+    ('290353', '290353'),
+    ('999999', 'Todos los MAC')
 )
 
 
@@ -40,6 +41,7 @@ class Incidencia(TimeStampedModel):
     modulo = models.CharField(max_length=6, choices=MODULOS)
     fecha_inicio = models.DateTimeField()
     fecha_final = models.DateTimeField()
+    all_day = models.BooleanField("Todo el día")
     remesa = models.CharField('Remesa', max_length=7, editable=False, null=True)
     inhabilitado = models.BooleanField()
     caso_cau = models.CharField(max_length=15)
