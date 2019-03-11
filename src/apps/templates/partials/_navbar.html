@@ -54,6 +54,8 @@
               href="{% url 'cifras:entregas' %}">
               <i class="fa fa-id-card-o"></i> Entregas
             </a>
+
+
             {% comment %}<a
               class="dropdown-item {% current request 'mesas' %}"
               href="{% url 'mesas:index' %}">
@@ -81,6 +83,11 @@
               <i class="fa fa-thumbs-o-up"></i> Aprobación ciudadana
             </a>
           </div>
+        </li>
+
+              <li class="nav-item">
+          <a href="http://10.29.0.79:2014/" class="nav-link {% current request 'metas' %}">
+            <i class="fa fa-map"></i> Cartografía</a>
         </li>
 
       </ul>
