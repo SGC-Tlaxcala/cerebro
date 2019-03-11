@@ -29,6 +29,17 @@ def remesa(fecha):
             return r.remesa
 
 
+class Modulo(models.Model):
+    distrito = models.PositiveSmallIntegerField()
+    mac = models.CharField('Módulo', max_length=6)
+    doble_turno = models.BooleanField()
+    sabados = models.BooleanField()
+    horas = models.PositiveIntegerField()
+
+    def __str__(self):
+        return self.mac
+
+
 class Tipo(models.Model):
     nombre = models.CharField(max_length=255)
 
