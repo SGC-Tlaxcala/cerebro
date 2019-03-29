@@ -3,6 +3,10 @@ Vagrant.configure("2") do |config|
   config.vm.box = "ubuntu/bionic64"
   config.vm.network "forwarded_port", guest: 8000, host: 8000, host_ip: "127.0.0.1"
 
+  Vagrant.configure("2") do |config|
+    config.vm.network "public_network", ip: "10.29.0.59"
+  end
+
   config.vm.provider "virtualbox" do |vb|
     vb.gui = false
     vb.customize ["modifyvm", :id, "--memory", "512"]
