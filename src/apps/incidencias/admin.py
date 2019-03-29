@@ -7,7 +7,14 @@
 
 
 from django.contrib import admin
-from apps.incidencias.models import Tipo, Incidencia
+from apps.incidencias.models import Tipo, Incidencia, Modulo
+
+
+class ModuloAdmin(admin.ModelAdmin):
+    list_display = ('mac', 'distrito', 'doble_turno', 'sabados', 'configuracion', 'dias')
+    class Meta:
+        fields = '__all__'
+        model = Modulo
 
 
 class TipoAdmin(admin.ModelAdmin):
@@ -18,7 +25,7 @@ class TipoAdmin(admin.ModelAdmin):
 
 class IncidenciaAdmin(admin.ModelAdmin):
     list_display = ('caso_cau', 'modulo', 'remesa', 'tipo', 'duracion', 'inhabilitado')
-    list_filter = ('distrito', 'modulo', 'remesa', 'tipo')
+    list_filter = ('modulo__distrito', 'modulo', 'remesa', 'tipo')
     class Meta:
         fields = '__all__'
         model = Incidencia
@@ -26,3 +33,4 @@ class IncidenciaAdmin(admin.ModelAdmin):
 
 admin.site.register(Incidencia, IncidenciaAdmin)
 admin.site.register(Tipo, TipoAdmin)
+admin.site.register(Modulo, ModuloAdmin)
