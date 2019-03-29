@@ -1,4 +1,4 @@
-#coding: utf-8
+# coding: utf-8
 """Patrones de rutas generales."""
 
 from django.conf import settings

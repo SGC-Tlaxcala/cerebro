@@ -79,14 +79,14 @@ class Tipo(models.Model):
 class Incidencia(TimeStampedModel):
     modulo = models.ForeignKey(Modulo, on_delete=models.CASCADE)
     fecha_inicio = models.DateTimeField()
-    fecha_final = models.DateTimeField()
+    fecha_final = models.DateTimeField(null=True, blank=True)
     all_day = models.BooleanField("Todo el día")
     remesa = models.CharField('Remesa', max_length=7, editable=False, null=True)
     inhabilitado = models.BooleanField()
     caso_cau = models.CharField(max_length=15)
     tipo = models.ForeignKey(Tipo, on_delete=models.CASCADE)
     descripcion = models.TextField()
-    solucion = models.TextField()
+    solucion = models.TextField(null=True, blank=True)
     duracion = models.DurationField(editable=False, null=True)
 
     class Meta:
@@ -98,5 +98,5 @@ class Incidencia(TimeStampedModel):
 
     def save(self, *args, **kwargs):
         self.remesa = remesa(self.fecha_inicio)
-        self.duracion = self.fecha_final - self.fecha_inicio
+        self.duracion = self.fecha_final - self.fecha_inicio if self.fecha_final else None
         super(Incidencia, self).save(*args, **kwargs)
