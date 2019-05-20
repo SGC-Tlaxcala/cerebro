@@ -4,43 +4,50 @@
 {% block footer %}
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
   <script>
-    google.charts.load('current', {'packages':['corechart']})
-    google.charts.setOnLoadCallback(drawChart)
+      google.charts.load('current', {'packages':['sankey']});
+      google.charts.setOnLoadCallback(drawChart);
 
-    function drawChart() {
-      var data = google.visualization.arrayToDataTable([
-        ['Sexo', 'Cantidad'],
-        ['Mujeres', {{ sexo.1.total }}],
-        ['Hombres', {{ sexo.0.total }}]
-      ])
+      function drawChart() {
+        // let colors = ['#a6cee3', '#b2df8a', '#fb9a99', '#fdbf6f',
+        //               '#cab2d6', '#ffff99', '#1f78b4', '#33a02c'];
 
-      var options = {
-        legend: {
-          position: 'bottom'
-        }
+        let data = new google.visualization.DataTable();
+        data.addColumn('string', 'Ciudadanos');
+        data.addColumn('string', 'Causa');
+        data.addColumn('number', 'Cantidad');
+        data.addRows([
+        	['Sin trámite', 'Rechazos', 2220],
+          ['Sin trámite', 'Sin rechazo', 2331],
+
+          ['Sin rechazo', 'Solo va por información', 2218],
+          ['Sin rechazo', 'Va por su CPV', 57],
+          ['Sin rechazo', 'Otras causas', 56],
+
+          ['Rechazos', 'Falta acta de nacimiento', 919],
+          ['Rechazos', 'Falta identificación', 660],
+          ['Rechazos', 'Falta comprobante domicilio', 412],
+					['Rechazos', 'Sin fichas', 23],
+          ['Rechazos', 'Menor de 18 años', 167],
+          ['Rechazos', 'No pasó la huella', 39]
+        ]);
+
+        // Sets chart options.
+        let options = {
+          sankey: {
+          	node: {
+            	// colors
+            },
+            link: {
+            	colorMode: 'gradient',
+              //  colors
+            }
+          }
+        };
+
+        // Instantiates and draws our chart, passing in some options.
+        var chart = new google.visualization.Sankey(document.getElementById('sankey_basic'));
+        chart.draw(data, options);
       }
-      var chart = new google.visualization.PieChart(document.getElementById('por_sexo'))
-      chart.draw(data, options)
-    }
-  </script>
-  <script>
-    google.charts.load('current', {'packages':['corechart']})
-    google.charts.setOnLoadCallback(drawChart)
-    function drawChart() {
-      var data = google.visualization.arrayToDataTable([
-        ['Causa', 'Cantidad'],
-        {% for causa in causas %}
-          ['{{ causa.causa|causas }}', {{ causa.total }}],
-        {% endfor %}
-      ])
-      var options = {
-        legend: {
-          position: 'none'
-        }
-      }
-      var chart = new google.visualization.PieChart(document.getElementById('por_causa'))
-      chart.draw(data, options)
-    }
   </script>
 {% endblock footer %}
 
@@ -56,34 +63,63 @@
   <hr>
   <div class="row">
     <div class="col">
-      <h3>Estadísticas Básicas Generales</h3>
+      <div id="sankey_basic" style="width: 100%; height: 500px;"></div>
     </div>
   </div>
-  <div class="row">
-    <dvi class="col-md-4">
-      <h4>Por sexo</h4>
-      <div id="por_sexo" style="width: 100%; height: 300px;"></div>
-      <ul>
-        <li>Mujeres: {{ sexo.1.total }} - Hombres: {{ sexo.0.total }} - <strong>Total: {{ sexo.0.total|add:sexo.1.total }}</strong></li>
-      </ul>
-    </dvi>
-  <div class="col-md-8">
-    <h4>Por causa</h4>
-    <div id="por_causa" style="width: 100%; height: 500px;"></div>
-    <table class="table table-hover table-sm">
-      <thead class="thead-light">
-        <tr>
-          <th>Causa</th>
-          <th>Cantidad</th>
-        </tr>
-      </thead>
-      <tbody>{% for causa in causas %}
-        <tr>
-          <td>{{ causa.causa|causas }}</td>
-          <td>{{ causa.total }}</td>
-        </tr>
-      {% endfor %}</tbody>
-    </table>
-  </div>
-  </div>
+
+    <div class="row">
+      <div class="col">
+        <table class="table">
+          <thead>
+            <tr>
+              <td>Tipo</td>
+              <td>Causa</td>
+              <td>Cantidad</td>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td rowspan="3">Sin rechazo</td>
+              <td>Información</td>
+              <td>2,218</td>
+            </tr>
+            <tr>
+              <td>Va por su credencial</td>
+              <td>57</td>
+            </tr>
+            <tr>
+              <td>Otras causas</td>
+              <td>56</td>
+            </tr>
+
+            <tr>
+              <td rowspan="6">Rechazo</td>
+              <td>Falta acta de nacimiento</td>
+              <td>919</td>
+            </tr>
+            <tr>
+              <td>Falta identificación con fotografía</td>
+              <td>660</td>
+            </tr>
+            <tr>
+              <td>Falta comprobante de domicilio</td>
+              <td>412</td>
+            </tr>
+            <tr>
+              <td>Menor de 18 años</td>
+              <td>167</td>
+            </tr>
+            <tr>
+              <td>No pasó la huella</td>
+              <td>39</td>
+            </tr>
+            <tr>
+              <td>No hay fichas</td>
+              <td>23</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
 {% endblock content %}
