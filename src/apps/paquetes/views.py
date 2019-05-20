@@ -20,7 +20,7 @@ from core.utils import get_remesa
 from .models import Envio, EnvioModulo
 from .forms import PrepareForm, EnvioModuloForm
 
-YEAR = 2018
+YEAR = 2019
 
 
 # Expediente de envio

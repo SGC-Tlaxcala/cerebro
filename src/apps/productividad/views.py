@@ -22,9 +22,12 @@ from apps.productividad.forms import CargaCifras
 from apps.productividad.models import Cifras, PronosticoTramites, Reporte
 from core.utils import Remesa
 
-TRAMITES = Cifras.objects.values('distrito')\
-    .order_by('distrito')\
-    .annotate(suma_modulo=Sum('tramites'))
+TRAMITES = Cifras.objects\
+            .filter(reporte_semanal__fecha_corte__year=2018)\
+            .values('distrito')\
+            .order_by('distrito')\
+            .annotate(suma_modulo=Sum('tramites'))
+
 
 ENTREGAS = Cifras.objects.values('distrito')\
             .order_by('distrito')\
@@ -209,7 +212,7 @@ class TramitesIndex(View):
     def get(self, request, *args, **kwargs):
         """Control para el verbo GET"""
 
-        pronostico = PronosticoTramites.objects.all()
+        pronostico = PronosticoTramites.objects.all().filter().filter(year='2018')
 
         chart_data = [
         ]
