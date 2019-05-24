@@ -105,6 +105,7 @@ if DEBUG:
             'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
         }
     ]
+    SITE_URL = "http://127.0.0.1:8000"
 else:
     AUTH_PASSWORD_VALIDATORS = [
         {
