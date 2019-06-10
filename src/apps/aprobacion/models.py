@@ -5,6 +5,7 @@ MODULOS = (
     ('290151', '290151'),
     ('290152', '290152'),
     ('290153', '290153'),
+    ('290154', '290154'),
     ('290251', '290251'),
     ('290252', '290252'),
     ('290253', '290253'),
@@ -20,7 +21,7 @@ class Aprobacion(models.Model):
     distrito = models.PositiveSmallIntegerField('Distrito', editable=False)
     fecha = models.DateField('Fecha')
     calificacion = models.FloatField('Calificación')
-    nota = models.TextField()
+    nota = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return f'{self.mac} - {self.fecha.strftime("%Y-%m")}'
