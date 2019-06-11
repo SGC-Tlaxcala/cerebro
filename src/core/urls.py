@@ -21,6 +21,7 @@ urlpatterns = [
     path('dpi/', include('apps.dpi.urls')),
     path('cecyrd/', include('apps.cecyrd.urls')),
     path('encuestas/', EncuestasIndex.as_view(), name='encuestas'),
+    path('aprobacion/', include('apps.aprobacion.urls')),
     path('cobertura/', include('apps.cobertura.urls')),
     path('incidencias/', include('apps.incidencias.urls')),
     path('', index, name='index')

@@ -2,14 +2,6 @@ from unipath import Path
 import environ
 from django.contrib.messages import constants as messages
 import datetime
-try:
-    import locale
-    locale.setlocale(locale.LC_ALL, 'en_US.utf8')
-except Exception:
-    try:
-        locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
-    except Exception as e:
-        messages.error(request, 'An error occurred: {0}'.format(e))
 
 VERSION = '1.7.0'
 
@@ -54,7 +46,8 @@ LOCAL_APPS = [
     'apps.dpi.config.DpiConfig',
     'apps.cecyrd.config.CecyrdConfig',
     'apps.cobertura.config.CoberturaConfig',
-    'apps.incidencias.config.IncidenciasConfig'
+    'apps.incidencias.config.IncidenciasConfig',
+    'apps.aprobacion.config.AprobacionConfig'
 ]
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
