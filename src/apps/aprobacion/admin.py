@@ -4,7 +4,7 @@ from apps.aprobacion.models import Aprobacion
 
 class AprobacionAdmin(admin.ModelAdmin):
     list_display = ('mac', 'distrito', 'fecha', 'calificacion')
-    list_filter = ('mac', 'distrito')
+    list_filter = ('fecha', 'mac', 'distrito')
 
     class Meta:
         fields = '__all__'
