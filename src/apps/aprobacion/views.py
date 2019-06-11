@@ -1,3 +1,7 @@
-from django.shortcuts import render
+from django.views.generic.list import ListView
+from apps.aprobacion.models import Aprobacion
 
-# Create your views here.
+
+class Portada(ListView):
+    model = Aprobacion
+    ordering = ['fecha', 'mac']

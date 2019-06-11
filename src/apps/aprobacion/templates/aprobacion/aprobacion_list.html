@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block head_title %}Resultados de la encuesta de aprobación ciudadana{% endblock %}
+
+
+{% block content %}
+
+    {% for mac in object_list %}
+      {{ mac.mac }} - {{ mac.distrito }} - {{ mac.fecha|date:"N Y" }} - {{ mac.calificacion }}<br>
+    {% endfor %}
+
+    {% regroup object_list by fecha as meses %}
+    <ul>
+      {% for mac in meses %}
+      <li>{{ mac.grouper }}
+        <ul>
+          {% for m in mac.list %}
+            <li>{{ m }}</li>
+          {% endfor %}
+        </ul>
+      </li>
+      {% endfor %}
+    </ul>
+
+{% endblock content %}
