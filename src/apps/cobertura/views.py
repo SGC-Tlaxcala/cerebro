@@ -1,5 +1,8 @@
-from django.views.generic import TemplateView
+from django.views.generic.list import ListView
+from apps.cobertura.models import Cobertura
 
 
-class Portada(TemplateView):
+class Portada(ListView):
     template_name = 'cobertura/index.html'
+    model = Cobertura
+    ordering = ['fecha', ]

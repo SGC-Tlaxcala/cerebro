@@ -33,6 +33,7 @@ def mas20(dias):
     except TypeError:
         return None
 
+
 @register.filter(name='remesa')
 def remesa(fecha):
     """Devuelve una remesa, dada una fecha cualquiera"""
@@ -157,6 +158,14 @@ def porciento(num):
         return 100
     else:
         return "%.2f" % float(num)
+
+
+@register.filter(name='porcentaje2')
+def porcentaje2(numero):
+    if float(numero) > 1:
+        return 1
+    else:
+        return "{:.2%}".format(numero)
 
 
 @register.filter(name='ceros')

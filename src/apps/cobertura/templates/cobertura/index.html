@@ -1,13 +1,64 @@
 {# docs/index.html #}
 {% extends "base.html" %}
 {% load staticfiles %}
+{% load sgc %}
 
 {% block head_title %}Cobertura Electoral{% endblock %}
+
+{% block footer %}
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <script type="text/javascript">
+    google.charts.load('current', {'packages':['corechart']})
+    google.charts.setOnLoadCallback(gráficaCobertura)
+
+    function gráficaCobertura() {
+
+      let tablaCobertura = new google.visualization.DataTable()
+      tablaCobertura.addColumn('string', 'Mes')
+      tablaCobertura.addColumn('number', 'Padrón Electoral')
+      tablaCobertura.addColumn('number', 'Lista Nominal')
+      tablaCobertura.addColumn('number', 'Cobertura')
+      tablaCobertura.addColumn({'type': 'string', 'role': 'tooltip', 'p': {'html': true}})
+
+      tablaCobertura.addRows([
+        {% for cob in cobertura_list %}['{{ cob.fecha|date:"N Y" }}', {{ cob.padron }}, {{ cob.lista }}, {{ cob.cob }}, 'Cobertura para {{ cob.fecha|date:"N Y" }}: <strong>{{ cob.cob|porcentaje2 }}</strong>']{% if not forloop.last %},{% endif %}
+        {% endfor %}
+      ])
+
+      let datos = google.visualization.arrayToDataTable([
+        ['Mes', 'Padrón Electoral', 'Lista Nominal', 'Cobertura'],
+        {% for cob in cobertura_list %}['{{ cob.fecha|date:"N Y" }}', {{ cob.padron }}, {{ cob.lista }}, {{ cob.cob }}]{% if not forloop.last %},{% endif %}
+        {% endfor %}])
+
+      const opciones = {
+        seriesType: 'bars',
+        series: {
+          0: {targetAxisIndex: 0, type: 'bars'},
+          1: {targetAxisIndex: 0, type: 'bars'},
+          2: {targetAxisIndex: 1, type: 'line', formatValue: '#.00%'},
+        },
+        hAxes: {
+          0: {title: 'Mes'}
+        },
+        vAxes: {
+          0: {title: 'Cantidad', viewWindow: {min: 875000, max: 950000}},
+          1: {title: '% de Cobertura', viewWindow: {min: .97, max: 1}, format: 'percent'}
+        },
+        tooltip: { isHtml: true },
+        legend: 'none'
+      }
+
+      const gráfico = new google.visualization.ComboChart(document.getElementById('cobertura'))
+      gráfico.draw(tablaCobertura, opciones)
+    }
+  </script>
+{% endblock footer %}
+
 
 {% block content %}
   <div class="jumbotron p-3 p-md-5 rounded">
     <div class="px-0">
-      <h1 class="display-4">Cobertura Electoral</h1>
+      <h1 class="display-4"><i class="fa fa-globe"></i> Cobertura Electoral</h1>
       <p>
         Establece la relación entre la Lista Nominal de Electores y el Padrón Electoral.
       </p>
@@ -16,7 +67,7 @@
   <hr>
   <div class="row">
     <div class="col">
-      <img class="rounded mx-auto d-block" src="{% static 'cobertura/20181123_cobertura.png' %}" alt="">
+      <div id="cobertura" style="width: 100%; height: 600px;"></div>
     </div>
   </div>
 
@@ -28,88 +79,23 @@
       <table class="table table-striped table-bordered table-hover table-sm">
         <thead class="thead-dark">
           <tr>
-            <th>Proceso</th>
-            <th>Fecha</th>
-            <th>Tipo</th>
-            <th>Padrón</th>
-            <th>Lista Nominal</th>
-            <th>Diferencia</th>
-            <th>Cobertura</th>
+            <th scope="col">Fecha</th>
+            <th scope="col">Padrón</th>
+            <th scope="col">Lista Nominal</th>
+            <th scope="col">Diferencia</th>
+            <th scope="col">Cobertura</th>
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <th scope="row">PEL 2010</th>
-            <td>04/07/2010</td>
-            <td>Local</td>
-            <td>792,938</td>
-            <td>790,532</td>
-            <td>2,406</td>
-            <td>99.70%</td>
-          </tr>
-          <tr>
-            <th scope="row">PEF 2012</th>
-            <td>01/07/2012</td>
-            <td>Federal</td>
-            <td>845,612</td>
-            <td>813,608</td>
-            <td>32,004</td>
-            <td>96.22%</td>
-          </tr>
-          <tr>
-            <th scope="row">PEL 2013</th>
-            <td>07/07/2013</td>
-            <td>Local</td>
-            <td>864,935</td>
-            <td>836,909</td>
-            <td>28,026</td>
-            <td>96.76%</td>
-          </tr>
-          <tr>
-            <th scope="row">PEF 2015</th>
-            <td>05/07/2015</td>
-            <td>Federal</td>
-            <td>880,644</td>
-            <td>863,976</td>
-            <td>16,668</td>
-            <td>98.11%</td>
-          </tr>
-          <tr>
-            <th scope="row">PEL 2016</th>
-            <td>05/07/2016</td>
-            <td>Local</td>
-            <td>882,969</td>
-            <td>880,010</td>
-            <td>2,959</td>
-            <td>99.66%</td>
-          </tr>
-          <tr>
-            <th scope="row">PEF 2018</th>
-            <td>01/07/2018</td>
-            <td>Federal</td>
-            <td>930,081</td>
-            <td>920,431</td>
-            <td>9,650</td>
-            <td>98.96%</td>
-          </tr>
-          <tr>
-            <th scope="row">Sep. 2018</th>
-            <td>28/09/2018</td>
-            <td>-</td>
-            <td>935,468</td>
-            <td>925,032</td>
-            <td>10,436</td>
-            <td>98.88%</td>
-          </tr>
-          <tr>
-            <th scope="row">Oct. 2018</th>
-            <td>09/11/2018</td>
-            <td>-</td>
-            <td>938,824</td>
-            <td>929,098</td>
-            <td>9,726</td>
-            <td>98.96%</td>
-          </tr>
+          {% for cob in cobertura_list %}
+            <tr>
+              <th scope="row">{{ cob.fecha|date:"N Y" }}</th>
+              <td class="text-center">{{ cob.padron }}</td>
+              <td class="text-center">{{ cob.lista }}</td>
+              <td class="text-center">{{ cob.diferencia }}</td>
+              <td class="text-center">{{ cob.cob|porcentaje2 }}</td>
+            </tr>
+          {% endfor %}
         </tbody>
       </table>
 
