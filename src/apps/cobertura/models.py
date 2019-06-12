@@ -5,8 +5,8 @@ class Cobertura(models.Model):
     fecha = models.DateField('mes', help_text='Seleccione el último día del mes')
     padron = models.PositiveIntegerField('Padrón Electoral')
     lista = models.PositiveIntegerField('Lista Nominal')
-    diferencia = models.IntegerField('Diferencia')
-    cob = models.FloatField('Cobertura')
+    diferencia = models.IntegerField('Diferencia', editable=False)
+    cob = models.FloatField('Cobertura', editable=False)
 
     def __str__(self):
         return f'{self.fecha.strftime("%Y-%m")}: {"{:.2%}".format(self.cob)}'
