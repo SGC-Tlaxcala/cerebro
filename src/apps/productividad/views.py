@@ -10,7 +10,7 @@ import xlrd
 from django.conf import settings
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
-from django.db.models import Sum
+from django.db.models import Sum, F
 from django.shortcuts import render
 from django.urls import reverse
 from django.views import View
@@ -22,21 +22,27 @@ from apps.productividad.forms import CargaCifras
 from apps.productividad.models import Cifras, PronosticoTramites, Reporte
 from core.utils import Remesa
 
+scope = F('fecha_corte__year=2019')
+
+YEAR = 2019
+
 TRAMITES = Cifras.objects\
-            .filter(reporte_semanal__fecha_corte__year=2018)\
+            .filter(reporte_semanal__fecha_corte__year=YEAR)\
             .values('distrito')\
             .order_by('distrito')\
             .annotate(suma_modulo=Sum('tramites'))
 
 
 ENTREGAS = Cifras.objects.values('distrito')\
+            .filter(reporte_semanal__fecha_corte__year=YEAR)\
             .order_by('distrito')\
             .annotate(entregas_distrito=Sum('credenciales_entregadas_actualizacion'))
 
 periodo = {
-    'inicio': Reporte.objects.order_by('fecha_corte').first(),
-    'fin': Reporte.objects.order_by('fecha_corte').last()
+    'inicio': Reporte.objects.filter(fecha_corte__year=2019).order_by('fecha_corte').first(),
+    'fin': Reporte.objects.filter(fecha_corte__year=2019).order_by('fecha_corte').last()
 }
+
 
 def get_int(celda):
     """Convierte el valor de una celda en entero"""
@@ -51,7 +57,7 @@ def get_int(celda):
 
 
 def get_float(celda):
-    """"Convierte el valor de una velda en un número flotante"""
+    """"Convierte el valor de una celda en un número flotante"""
     # valor = 0
     try:
         valor = float(celda.value)
@@ -62,7 +68,10 @@ def get_float(celda):
 
 def procesar_cifras(archivo_excel):
     """Procesa el archivo de cifras"""
-    cifras = xlrd.open_workbook(archivo_excel).sheet_by_name("CIFRAS_PRODUCCION DIARIA")
+    try:
+        cifras = xlrd.open_workbook(archivo_excel).sheet_by_name("CIFRAS_PRODUCCION DIARIA")
+    except xlrd.XLRDError:
+        cifras = xlrd.open_workbook(archivo_excel).sheet_by_name("CIFRAS_PRODUCCION SEMANAL")
     remesa = list(filter(None, cifras.row_values(6)))[0][8:].replace('_', '-')
     if cifras.cell(31, 0).value.find('Observaciones') > 0:
         observaciones = cifras.cell(32, 0).value
@@ -117,7 +126,7 @@ class CifrasPortada(ListView):
     model = Reporte
     template_name = 'productividad/index.html'
     context_object_name = 'reportes'
-    query = Reporte.objects.order_by('fecha_corte')
+    query = Reporte.objects.filter(fecha_corte__year=2019).order_by('fecha_corte')
 
     def get_queryset(self, **kwargs):
         return self.query
@@ -212,7 +221,7 @@ class TramitesIndex(View):
     def get(self, request, *args, **kwargs):
         """Control para el verbo GET"""
 
-        pronostico = PronosticoTramites.objects.all().filter().filter(year='2018')
+        pronostico = PronosticoTramites.objects.all().filter().filter(year=YEAR)
 
         chart_data = [
         ]

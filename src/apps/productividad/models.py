@@ -42,7 +42,7 @@ class Reporte(TimeStampedModel):
     fecha_corte = models.DateField('Fecha de Corte')
     remesa = models.CharField('Remesa', max_length=8, unique=True)
     notas = models.TextField('Observaciones')
-    archivo = models.FileField('Archivo de cifras', upload_to='productividad')
+    archivo = models.FileField('Archivo de cifras', upload_to='productividad', max_length=500)
     usuario = models.ForeignKey(
         User,
         related_name='cifras_user',
