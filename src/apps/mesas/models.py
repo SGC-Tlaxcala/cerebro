@@ -6,13 +6,16 @@
 # pylint: disable=W0613,R0201,R0903
 
 from django.db import models
+from django.db.models import Q
 from core.models import TimeStampedModel, Remesa
+
+YEAR = 2019
 
 HOMBRE = 'H'
 MUJER = 'M'
 SEXO = (
-           (HOMBRE, 'Hombre'),
-           (MUJER, 'Mujer')
+   (HOMBRE, 'Hombre'),
+   (MUJER, 'Mujer')
 )
 
 ACTA = 1
@@ -43,6 +46,8 @@ LUGAR = (
     (MESA, 'Mesa: Mesa de atención')
 )
 
+SIN_RECHAZO = Q(INFORMACION, ENTREGA, OTRO)
+CON_RECHAZO = ~SIN_RECHAZO
 
 def remesa(fecha):
     for r in Remesa.objects.all():

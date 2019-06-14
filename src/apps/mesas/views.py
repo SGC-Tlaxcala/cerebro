@@ -10,27 +10,54 @@ from django.views.generic import TemplateView
 from django.views.generic.edit import CreateView
 from django.urls import reverse_lazy
 from django.db.models import Count, Q
-from apps.mesas.models import Registro, CAUSAS, INFORMACION, ENTREGA, OTRO
+from apps.mesas.models import Registro, CAUSAS, ACTA, IDENTIFICACION, COMPROBANTE, INFORMACION, ENTREGA, FICHA, EDAD, HUELLA, OTRO
 from apps.mesas.forms import MesaForm
 
-no_info = Q(causa=INFORMACION)
-no_otro = Q(causa=OTRO)
-no_entrega = Q(causa=ENTREGA)
+
+SIN_RECHAZO = Q(causa__in=[INFORMACION, ENTREGA, OTRO])
+CON_RECHAZO = ~SIN_RECHAZO
+YEAR = 2019
 
 
 class MesasIndex(TemplateView):
     template_name = 'mesas/index.html'
 
-    base = Registro.objects.all().exclude(no_info).exclude(no_otro).exclude(no_entrega).order_by('fecha', 'id')
+    base = Registro.objects.filter(fecha__year=YEAR).order_by('-fecha')
     sexo = base.values('sexo').annotate(total=Count('sexo'))
     causas = base.values('causa').annotate(total=Count('causa')).order_by('causa')
 
+    sin_rechazo = base.filter(SIN_RECHAZO).count()
+    informacion = base.filter(causa=INFORMACION).count()
+    entrega = base.filter(causa=ENTREGA).count()
+    otro = base.filter(causa=OTRO).count()
+
+    con_rechazo = base.filter(CON_RECHAZO).count()
+    acta = base.filter(causa=ACTA).count()
+    id = base.filter(causa=IDENTIFICACION).count()
+    dom = base.filter(causa=COMPROBANTE).count()
+    ficha = base.filter(causa=FICHA).count()
+    edad = base.filter(causa=EDAD).count()
+    huella = base.filter(causa=HUELLA).count()
+
     data = {
-        'sexo': sexo,
-        'causas': causas,
+        'total': base.count(),
+
+        'sin_rechazo': sin_rechazo,
+        'informacion': informacion,
+        'entrega': entrega,
+        'otro': otro,
+
+        'con_rechazo': con_rechazo,
+        'acta': acta,
+        'id': id,
+        'dom': dom,
+        'ficha': ficha,
+        'edad': edad,
+        'huella': huella,
+
         'txt_causas': CAUSAS,
-        'inicio': base.first(),
-        'fin': base.last()
+        'inicio': base.last(),
+        'fin': base.first()
     }
 
     def get_context_data(self, **kwargs):

@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load docs_tags %}
+{% load humanize %}
 
 {% block footer %}
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
@@ -16,19 +17,19 @@
         data.addColumn('string', 'Causa');
         data.addColumn('number', 'Cantidad');
         data.addRows([
-        	['Sin trámite', 'Rechazos', 2220],
-          ['Sin trámite', 'Sin rechazo', 2331],
+        	['Sin trámite', 'Rechazos', {{ con_rechazo }}],
+          ['Sin trámite', 'Sin rechazo', {{ sin_rechazo }}],
 
-          ['Sin rechazo', 'Solo va por información', 2218],
-          ['Sin rechazo', 'Va por su CPV', 57],
-          ['Sin rechazo', 'Otras causas', 56],
+          ['Sin rechazo', 'Solo va por información', {{ informacion }}],
+          ['Sin rechazo', 'Va por su CPV', {{ entrega }}],
+          ['Sin rechazo', 'Otras causas', {{ otro }}],
 
-          ['Rechazos', 'Falta acta de nacimiento', 919],
-          ['Rechazos', 'Falta identificación', 660],
-          ['Rechazos', 'Falta comprobante domicilio', 412],
-					['Rechazos', 'Sin fichas', 23],
-          ['Rechazos', 'Menor de 18 años', 167],
-          ['Rechazos', 'No pasó la huella', 39]
+          ['Rechazos', 'Falta acta de nacimiento', {{ acta }}],
+          ['Rechazos', 'Falta identificación', {{ id }}],
+          ['Rechazos', 'Falta comprobante domicilio', {{ dom }}],
+					['Rechazos', 'Sin fichas', {{ ficha }}],
+          ['Rechazos', 'Menor de 18 años', {{ edad }}],
+          ['Rechazos', 'No pasó la huella', {{ huella }}]
         ]);
 
         // Sets chart options.
@@ -55,7 +56,8 @@
   <div class="jumbotron p-3 p-md-5 rounded">
     <div class="px-0">
       <h1 class="display-4">Bitácora de Ciudadanos Rechazados MAC</h1>
-      <span class="text-muted"><small>Periodo considerado: desde {{ inicio.fecha }} hasta {{ fin.fecha }}</small></span>
+      <span class="text-muted"><small>Periodo considerado: desde el {{ inicio.fecha }} hasta el {{ fin.fecha }}</small></span><br>
+      <span class="text-muted"><small>En el periodo se han registrado {{ total|intcomma }} ciudadanos en fila sin trámite</small></span>
       <hr>
       <a href="{% url 'mesas:add' %}" role="button" class="btn btn-danger btn-lg">Agregar bitácoras</a>
     </div>
@@ -70,6 +72,7 @@
     <div class="row">
       <div class="col">
         <table class="table">
+          <caption>En el periodo se han registrado {{ total|intcomma }} ciudadanos en fila sin trámite</caption>
           <thead>
             <tr>
               <td>Tipo</td>
@@ -79,43 +82,43 @@
           </thead>
           <tbody>
             <tr>
-              <td rowspan="3">Sin rechazo</td>
+              <td rowspan="3">Sin rechazo<br><strong>{{ sin_rechazo|intcomma }}</strong></td>
               <td>Información</td>
-              <td>2,218</td>
+              <td>{{ informacion|intcomma }}</td>
             </tr>
             <tr>
               <td>Va por su credencial</td>
-              <td>57</td>
+              <td>{{ entrega|intcomma }}</td>
             </tr>
             <tr>
               <td>Otras causas</td>
-              <td>56</td>
+              <td>{{ otro|intcomma }}</td>
             </tr>
 
             <tr>
-              <td rowspan="6">Rechazo</td>
+              <td rowspan="6">Rechazo<br><strong>{{ con_rechazo|intcomma }}</strong></td>
               <td>Falta acta de nacimiento</td>
-              <td>919</td>
+              <td>{{ acta|intcomma }}</td>
             </tr>
             <tr>
               <td>Falta identificación con fotografía</td>
-              <td>660</td>
+              <td>{{ id|intcomma }}</td>
             </tr>
             <tr>
               <td>Falta comprobante de domicilio</td>
-              <td>412</td>
+              <td>{{ dom|intcomma }}</td>
             </tr>
             <tr>
               <td>Menor de 18 años</td>
-              <td>167</td>
+              <td>{{ edad|intcomma }}</td>
             </tr>
             <tr>
               <td>No pasó la huella</td>
-              <td>39</td>
+              <td>{{ huella|intcomma }}</td>
             </tr>
             <tr>
               <td>No hay fichas</td>
-              <td>23</td>
+              <td>{{ ficha|intcomma }}</td>
             </tr>
           </tbody>
         </table>
