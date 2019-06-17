@@ -27,24 +27,7 @@ scope = F('fecha_corte__year=2019')
 
 
 YEAR = 2019
-
-TRAMITES = Cifras.objects\
-            .filter(reporte_semanal__fecha_corte__year=YEAR)\
-            .values('distrito')\
-            .order_by('distrito')\
-            .annotate(suma_modulo=Sum('tramites'))
-
-
-ENTREGAS = Cifras.objects.values('distrito')\
-            .filter(reporte_semanal__fecha_corte__year=YEAR)\
-            .order_by('distrito')\
-            .annotate(entregas_distrito=Sum('credenciales_entregadas_actualizacion'))
-
-periodo = {
-    'inicio': Reporte.objects.filter(fecha_corte__year=YEAR).order_by('fecha_corte').first(),
-    'fin': Reporte.objects.filter(fecha_corte__year=YEAR
-                                  ).order_by('fecha_corte').last()
-}
+YEARS = (2018, 2019)
 
 
 def get_int(celda):
@@ -144,8 +127,10 @@ class CifrasPortada(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['year'] = int(self.year)
+        context['years'] = YEARS
         context['title'] = f"Productividad {self.year}"
         context['current_year'] = int(datetime.now().year)
+        context['same_year'] = int(self.year) == int(datetime.now().year)
         context['kpi_path'] = True
         context['periodo'] = {
             'inicio': self.get_queryset().first(),
@@ -233,6 +218,7 @@ class Productividad(View):
     def __init__(self):
         super(View, self).__init__()
         self.year = YEAR
+        self.years = YEARS
         self.tramites = None
         self.entregas = None
         self.periodo = {}
@@ -291,6 +277,7 @@ class TramitesIndex(Productividad):
 
         data = {
             'chart_data': chart_data,
+            'years': self.years,
             'year': int(self.year),
             'current_year': self.current_year,
             'same_year': int(self.year) == int(datetime.now().year),
@@ -339,6 +326,7 @@ class EntregasIndex(Productividad):
         }
         data = {
             'title': f'Control de Entregas {self.year}',
+            'years': self.years,
             'year': int(self.year),
             'current_year': self.current_year,
             'same_year': int(self.year) == int(datetime.now().year),

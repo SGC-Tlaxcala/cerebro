@@ -60,18 +60,35 @@
         Contribuye al seguimiento del pronóstico de trámites.
         <br>
         <span class="text-muted"><small>Periodo reportado:  desde {{ periodo.inicio.fecha_corte }} hasta {{ periodo.fin.fecha_corte }}.</small></span>
-
         <hr>
-        <a href="{% url 'cifras:index' %}?year={{ year }}" class="btn btn-primary"><i class="fa fa-bar-chart"></i> Productividad {{ year }}</a>
-        <a href="{% url 'cifras:entregas' %}?year={{ year }}" class="btn btn-info"><i class="fa fa-id-card-o"></i> Entregas {{ year }}</a>
-      </p>
-      {% if same_year %}
-        <p><a class="btn btn-danger" href="{% url 'cifras:index' %}?year=2018"><i class="fa fa-bar-chart"></i> Productividad <strong>2018</strong></a></p>
-      {% else %}
-        <p>
-          <a class="btn btn-danger" href="{% url 'cifras:index' %}"><i class="fa fa-bar-chart"></i> Productividad <strong>{{ current_year }}</strong></a>
-        </p>
-      {% endif %}
+          <hr class="my-4">
+          <p>
+            {% if same_year %}
+              <a href="{% url 'cifras:index' %}?year={{ current_year }}" class="btn btn-warning"><i class="fa fa-bar-chart"></i> Productividad <strong>{{ current_year }}</strong></a>
+            {% else %}
+              <a href="{% url 'cifras:index' %}?year={{ year }}" class="btn btn-primary"><i class="fa fa-bar-chart"></i> Productividad <strong>{{ year }}</strong></a>
+            {% endif %}
+            <a href="{% url 'cifras:tramites' %}?year={{ year }}" class="btn btn-success"><i class="fa fa-edit"></i> Trámites {{ year }}</a>
+            <a href="{% url 'cifras:entregas' %}?year={{ year }}" class="btn btn-info"><i class="fa fa-id-card-o"></i> Entregas {{ year }}</a>
+            {% if not same_year %}
+              <a href="{% url 'cifras:index' %}?year={{ current_year }}" class="btn btn-warning"><i class="fa fa-bar-chart"></i> Productividad <strong>{{ current_year }}</strong></a>
+            {% endif %}
+          </p>
+
+          <p>
+            {% for y in years %}
+              <div class="btn-group">
+                <button type="button" class="btn btn-{% cycle 'primary' 'success' 'info' 'warning' 'danger' %} dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  {{ y }}
+                </button>
+                <div class="dropdown-menu">
+                  <a class="dropdown-item" href="{% url 'cifras:index' %}?year={{ y }}"><i class="fa fa-bar-chart"></i> Productividad <strong>{{ y }}</strong></a>
+                  <a class="dropdown-item" href="{% url 'cifras:tramites' %}?year={{ y }}"><i class="fa fa-edit"></i> Trámites <strong>{{ y }}</strong></a>
+                  <a class="dropdown-item" href="{% url 'cifras:entregas' %}?year={{ y }}"><i class="fa fa-id-card-o"></i> Entregas <strong>{{ y }}</strong></a>
+                </div>
+              </div>
+            {% endfor %}
+          </p>
     </div>
   </div>
 </div>
