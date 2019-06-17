@@ -12,8 +12,8 @@
   function estatalChart() {
     const data = google.visualization.arrayToDataTable([
       ['Concepto', 'Cantidad'],
-      ['Credenciales entregadas', {{ estatal.entregas }}],
-      ['Trámites realizados', {{ estatal.tramites }}]
+      ['Credenciales entregadas {{ year }}', {{ estatal.entregas }}],
+      ['Trámites realizados {{ year }}', {{ estatal.tramites }}]
     ])
 
     const options = {
@@ -40,7 +40,7 @@
       formatter.format(data, 4)
 
       let options = {
-        title: 'Entregas por Distrito',
+        title: 'Entregas por Distrito {{ year }}',
         seriesType: 'bars',
         series: {
           3: {
@@ -70,9 +70,12 @@
         <span class="text-muted"><small>Periodo reportado:  desde {{ periodo.inicio.fecha_corte }} hasta {{ periodo.fin.fecha_corte }}.</small></span>
 
           <hr>
-          <a href="{% url 'cifras:index' %}" class="btn btn-primary"><i class="fa fa-bar-chart"></i> Productividad</a>
-          <a href="{% url 'cifras:tramites' %}" class="btn btn-success"><i class="fa fa-edit"></i> Trámites</a>
+          <a href="{% url 'cifras:index' %}?year={{ year }}" class="btn btn-primary"><i class="fa fa-bar-chart"></i> Productividad {{ year }}</a>
+          <a href="{% url 'cifras:tramites' %}?year={{ year }}" class="btn btn-success"><i class="fa fa-edit"></i> Trámites {{ year }}</a>
         </p>
+        {% if not same_year %}
+          <a href="{% url 'cifras:index' %}?year={{ current_year }}" class="btn btn-warning"><i class="fa fa-bar-chart"></i> Productividad {{ current_year }}</a>
+        {% endif %}
       </div>
     </div>
   </div>

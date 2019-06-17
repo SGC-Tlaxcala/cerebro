@@ -229,6 +229,32 @@ class CifrasUpload(FormView):
         return context
 
 
+class Productividad(View):
+    def __init__(self):
+        super(View, self).__init__()
+        self.year = YEAR
+        self.tramites = None
+        self.entregas = None
+        self.periodo = {}
+
+    def dispatch(self, request, *args, **kwargs):
+        self.year = self.request.GET.get("year", YEAR)
+        self.tramites = Cifras.objects\
+            .filter(reporte_semanal__fecha_corte__year=self.year)\
+            .values('distrito')\
+            .order_by('distrito')\
+            .annotate(suma_modulo=Sum('tramites'))
+        self.entregas = Cifras.objects.values('distrito')\
+            .filter(reporte_semanal__fecha_corte__year=self.year)\
+            .order_by('distrito')\
+            .annotate(entregas_distrito=Sum('credenciales_entregadas_actualizacion'))
+        self.periodo = {
+            'inicio': Reporte.objects.filter(fecha_corte__year=self.year).order_by('fecha_corte').first(),
+            'fin': Reporte.objects.filter(fecha_corte__year=self.year).order_by('fecha_corte').last()
+        }
+        return super(Productividad, self).dispatch(request, *args, **kwargs)
+
+
 class TramitesIndex(View):
     """Vista para indicador de trámites"""
     template_name = 'productividad/tramites.html'
@@ -247,7 +273,7 @@ class TramitesIndex(View):
             .annotate(suma_modulo=Sum('tramites'))
         return super(TramitesIndex, self).dispatch(request, *args, **kwargs)
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request):
         """Control para el verbo GET"""
 
         pronostico = PronosticoTramites.objects.all().filter().filter(year=self.year)
@@ -284,27 +310,24 @@ class TramitesIndex(View):
             'estatal': estatal,
             'kpi_path': True,
             'title': f'Control de Trámites {self.year}',
-            'periodo': {
-                'inicio': Reporte.objects.filter(fecha_corte__year=self.year).order_by('fecha_corte').first(),
-                'fin': Reporte.objects.filter(fecha_corte__year=self.year).order_by('fecha_corte').last()
-            }
+            'periodo': self.periodo
         }
 
         return render(request, self.template_name, data)
 
 
-class EntregasIndex(View):
+class EntregasIndex(Productividad):
     """Visualización de cobertura"""
     template_name = 'productividad/entregas.html'
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request):
         """verbo get de entregas"""
         _data_entregas = {'01': {}, '02': {}, '03': {}}
         for _distrito in _data_entregas.keys():
-            for row in ENTREGAS:
+            for row in self.entregas:
                 if row['distrito'] == _distrito:
                     _data_entregas[_distrito]['entregas'] = row['entregas_distrito']
-            for row in TRAMITES:
+            for row in self.tramites:
                 if row['distrito'] == _distrito:
                     _data_entregas[_distrito]['tramites'] = row['suma_modulo']
             _data_entregas[_distrito]['relacion'] =\
@@ -328,10 +351,13 @@ class EntregasIndex(View):
             'relacion': relacion_estatal
         }
         data = {
-            'title': 'Control de Entregas',
+            'title': f'Control de Entregas {self.year}',
+            'year': int(self.year),
+            'current_year': int(datetime.now().year),
+            'same_year': int(self.year) == int(datetime.now().year),
             'distritos': _data_entregas,
             'estatal': estatal,
             'kpi_path': True,
-            'periodo': periodo
+            'periodo': self.periodo
         }
         return render(request, self.template_name, data)
