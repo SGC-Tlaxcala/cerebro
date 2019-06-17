@@ -5,8 +5,9 @@
 """Vista para subir el archivo de la productividad."""
 
 import math
-
 import xlrd
+from datetime import datetime
+
 from django.conf import settings
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
@@ -24,6 +25,7 @@ from core.utils import Remesa
 
 scope = F('fecha_corte__year=2019')
 
+
 YEAR = 2019
 
 TRAMITES = Cifras.objects\
@@ -39,8 +41,9 @@ ENTREGAS = Cifras.objects.values('distrito')\
             .annotate(entregas_distrito=Sum('credenciales_entregadas_actualizacion'))
 
 periodo = {
-    'inicio': Reporte.objects.filter(fecha_corte__year=2019).order_by('fecha_corte').first(),
-    'fin': Reporte.objects.filter(fecha_corte__year=2019).order_by('fecha_corte').last()
+    'inicio': Reporte.objects.filter(fecha_corte__year=YEAR).order_by('fecha_corte').first(),
+    'fin': Reporte.objects.filter(fecha_corte__year=YEAR
+                                  ).order_by('fecha_corte').last()
 }
 
 
@@ -126,16 +129,24 @@ class CifrasPortada(ListView):
     model = Reporte
     template_name = 'productividad/index.html'
     context_object_name = 'reportes'
-    query = Reporte.objects.filter(fecha_corte__year=2019).order_by('fecha_corte')
+
+    def dispatch(self, request, *args, **kwargs):
+        self.year = self.request.GET.get("year", 2019)
+        return super(CifrasPortada, self).dispatch(request, *args, **kwargs)
 
     def get_queryset(self, **kwargs):
-        return self.query
+        return Reporte.objects.filter(fecha_corte__year=self.year).order_by('fecha_corte')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = "Productividad"
+        context['year'] = self.year
+        context['title'] = f"Productividad {self.year}"
+        context['current_year'] = datetime.now().year
         context['kpi_path'] = True
-        context['periodo'] = periodo
+        context['periodo'] = {
+            'inicio': self.get_queryset().first(),
+            'fin': self.get_queryset().last()
+        }
         return context
 
 
