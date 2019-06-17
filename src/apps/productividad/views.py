@@ -255,23 +255,9 @@ class Productividad(View):
         return super(Productividad, self).dispatch(request, *args, **kwargs)
 
 
-class TramitesIndex(View):
+class TramitesIndex(Productividad):
     """Vista para indicador de trámites"""
     template_name = 'productividad/tramites.html'
-
-    def __init__(self):
-        super().__init__()
-        self.year = YEAR
-        self.tramites = None
-
-    def dispatch(self, request, *args, **kwargs):
-        self.year = self.request.GET.get("year", YEAR)
-        self.tramites = Cifras.objects\
-            .filter(reporte_semanal__fecha_corte__year=self.year)\
-            .values('distrito')\
-            .order_by('distrito')\
-            .annotate(suma_modulo=Sum('tramites'))
-        return super(TramitesIndex, self).dispatch(request, *args, **kwargs)
 
     def get(self, request):
         """Control para el verbo GET"""
