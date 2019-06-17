@@ -236,6 +236,7 @@ class Productividad(View):
         self.tramites = None
         self.entregas = None
         self.periodo = {}
+        self.current_year = int(datetime.now().year)
 
     def dispatch(self, request, *args, **kwargs):
         self.year = self.request.GET.get("year", YEAR)
@@ -291,7 +292,7 @@ class TramitesIndex(Productividad):
         data = {
             'chart_data': chart_data,
             'year': int(self.year),
-            'current_year': int(datetime.now().year),
+            'current_year': self.current_year,
             'same_year': int(self.year) == int(datetime.now().year),
             'estatal': estatal,
             'kpi_path': True,
@@ -339,7 +340,7 @@ class EntregasIndex(Productividad):
         data = {
             'title': f'Control de Entregas {self.year}',
             'year': int(self.year),
-            'current_year': int(datetime.now().year),
+            'current_year': self.current_year,
             'same_year': int(self.year) == int(datetime.now().year),
             'distritos': _data_entregas,
             'estatal': estatal,
