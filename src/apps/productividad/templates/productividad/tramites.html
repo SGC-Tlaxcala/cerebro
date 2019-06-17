@@ -12,12 +12,18 @@
     function estatalChart() {
       const data = google.visualization.arrayToDataTable([
         ['Tramites', 'Cantidad'],
-        ['Realizados', {{ estatal.tramites }}],
-        ['Faltantes', {{ estatal.faltantes }}]
+        ['Realizado', {{ estatal.tramites }}],
+        {% if estatal.faltantes < 0 %}
+          <!-- {{ estatal.faltantes }} -->
+          ['Pronóstico', {{ estatal.pronostico }}],
+          ['Excedente', {% widthratio estatal.faltantes 1 -1 %}],
+        {% else %}
+          ['Faltantes', {{ estatal.faltantes }}]
+        {% endif %}
       ])
 
       const options = {
-        title: 'Seguimiento al pronóstico estatal',
+        title: 'Seguimiento al pronóstico estatal {{ year }}',
         legend: 'none'
       }
 
@@ -33,7 +39,7 @@
       ])
 
       const options = {
-        title: "Seguimiento de trámites por distrito",
+        title: "Seguimiento de trámites por distrito {{ year }}",
         height: 400,
         legend: {position: 'top', maxLines: 3},
         isStacked: true
@@ -56,9 +62,16 @@
         <span class="text-muted"><small>Periodo reportado:  desde {{ periodo.inicio.fecha_corte }} hasta {{ periodo.fin.fecha_corte }}.</small></span>
 
         <hr>
-        <a href="{% url 'cifras:index' %}" class="btn btn-primary"><i class="fa fa-bar-chart"></i> Productividad</a>
-        <a href="{% url 'cifras:entregas' %}" class="btn btn-info"><i class="fa fa-id-card-o"></i> Entregas</a>
+        <a href="{% url 'cifras:index' %}?year={{ year }}" class="btn btn-primary"><i class="fa fa-bar-chart"></i> Productividad {{ year }}</a>
+        <a href="{% url 'cifras:entregas' %}?year={{ year }}" class="btn btn-info"><i class="fa fa-id-card-o"></i> Entregas {{ year }}</a>
       </p>
+      {% if same_year %}
+        <p><a class="btn btn-danger" href="{% url 'cifras:index' %}?year=2018"><i class="fa fa-bar-chart"></i> Productividad <strong>2018</strong></a></p>
+      {% else %}
+        <p>
+          <a class="btn btn-danger" href="{% url 'cifras:index' %}"><i class="fa fa-bar-chart"></i> Productividad <strong>{{ current_year }}</strong></a>
+        </p>
+      {% endif %}
     </div>
   </div>
 </div>
@@ -76,7 +89,7 @@
         <th>Distrito</th>
         <th>Trámites realizados</th>
         <th>Pronóstico</th>
-        <th>Faltantes</th>
+        <th>{% if row.3 < 0 %}Excedente{% else %}Faltantes{% endif %}</th>
         <th>Avance</th>
       </thead>
       <tbody>
@@ -96,7 +109,7 @@
 
 <div class="row">
   <div class="col">
-    <h3>Pronóstico Estatal</h3>
+    <h3>Pronóstico Estatal {{ year }}</h3>
   </div>
 </div>
 
@@ -107,19 +120,19 @@
   <div class="col">
     <table class="table table-bordered table-sm table-hover">
       <tr>
-        <th>Trámites</th>
+        <th>Trámites {{ year }}</th>
         <td>{{ estatal.tramites|intcomma }}</td>
       </tr>
       <tr>
-        <th>Pronóstico</th>
+        <th>Pronóstico {{ year }}</th>
         <td>{{ estatal.pronostico|intcomma }}</td>
       </tr>
-      <tr>
-        <th>Faltantes</th>
-        <td>{{ estatal.faltantes|intcomma }}</td>
+      <tr>{% widthratio estatal.faltantes 1 -1 %}
+        <th>{% if estatal.faltantes < 0 %}Excedente{% else %}Faltantes{% endif %} {{ year }}</th>
+        <td>{% if estatal.faltantes < 0 %}{% widthratio estatal.faltantes 1 -1 %}{% else %}{{ estatal.faltantes|intcomma }}{% endif %}</td>
       </tr>
       <tr>
-        <th>Avance</th>
+        <th>Avance {{ year }}</th>
         <td>{{ estatal.porcentaje|porciento }}%</td>
       </tr>
     </table>

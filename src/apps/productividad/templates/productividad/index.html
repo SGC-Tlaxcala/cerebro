@@ -51,8 +51,8 @@
             {% else %}
               <a class="btn btn-danger" href="{% url 'cifras:index' %}"><i class="fa fa-bar-chart"></i> Productividad <strong>{{ current_year }}</strong></a>
             {% endif %}
-            <a href="{% url 'cifras:tramites' %}" class="btn btn-success"><i class="fa fa-edit"></i> Trámites {{ year }}</a>
-            <a href="{% url 'cifras:entregas' %}" class="btn btn-info"><i class="fa fa-id-card-o"></i> Entregas {{ year }}</a>
+            <a href="{% url 'cifras:tramites' %}?year={{ year }}" class="btn btn-success"><i class="fa fa-edit"></i> Trámites {{ year }}</a>
+            <a href="{% url 'cifras:entregas' %}?year={{ year }}" class="btn btn-info"><i class="fa fa-id-card-o"></i> Entregas {{ year }}</a>
             {% if year == current_year %}
               <a href="{% url 'cifras:index' %}?year=2018" class="btn btn-warning"><i class="fa fa-bar-chart"></i> Productividad <strong>2018</strong></a>
             {% endif %}

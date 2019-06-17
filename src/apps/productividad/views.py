@@ -130,6 +130,10 @@ class CifrasPortada(ListView):
     template_name = 'productividad/index.html'
     context_object_name = 'reportes'
 
+    def __init__(self):
+        super().__init__()
+        self.year = YEAR
+
     def dispatch(self, request, *args, **kwargs):
         self.year = self.request.GET.get("year", 2019)
         return super(CifrasPortada, self).dispatch(request, *args, **kwargs)
@@ -139,9 +143,9 @@ class CifrasPortada(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['year'] = self.year
+        context['year'] = int(self.year)
         context['title'] = f"Productividad {self.year}"
-        context['current_year'] = datetime.now().year
+        context['current_year'] = int(datetime.now().year)
         context['kpi_path'] = True
         context['periodo'] = {
             'inicio': self.get_queryset().first(),
@@ -229,19 +233,31 @@ class TramitesIndex(View):
     """Vista para indicador de trámites"""
     template_name = 'productividad/tramites.html'
 
+    def __init__(self):
+        super().__init__()
+        self.year = YEAR
+        self.tramites = None
+
+    def dispatch(self, request, *args, **kwargs):
+        self.year = self.request.GET.get("year", YEAR)
+        self.tramites = Cifras.objects\
+            .filter(reporte_semanal__fecha_corte__year=self.year)\
+            .values('distrito')\
+            .order_by('distrito')\
+            .annotate(suma_modulo=Sum('tramites'))
+        return super(TramitesIndex, self).dispatch(request, *args, **kwargs)
+
     def get(self, request, *args, **kwargs):
         """Control para el verbo GET"""
 
-        pronostico = PronosticoTramites.objects.all().filter().filter(year=YEAR)
-
-        chart_data = [
-        ]
+        pronostico = PronosticoTramites.objects.all().filter().filter(year=self.year)
+        chart_data = []
 
         for _distrito in ('01', '02', '03'):
             dlist = [_distrito]
             _tramites = 0
             _pronostico = 0
-            for _cifras in TRAMITES:
+            for _cifras in self.tramites:
                 if _cifras['distrito'] == _distrito:
                     _tramites = _cifras['suma_modulo']
                     dlist.append(_tramites)
@@ -257,15 +273,21 @@ class TramitesIndex(View):
             'tramites': sum(r[1] for r in chart_data),
             'faltantes': sum(r[2] for r in chart_data) - sum(r[1] for r in chart_data),
             'pronostico': sum(r[2] for r in chart_data),
-            'porcentaje': (sum(r[1] for r in chart_data)/ sum(r[2] for r in chart_data)) * 100
+            'porcentaje': (sum(r[1] for r in chart_data) / sum(r[2] for r in chart_data)) * 100
         }
 
         data = {
             'chart_data': chart_data,
+            'year': int(self.year),
+            'current_year': int(datetime.now().year),
+            'same_year': int(self.year) == int(datetime.now().year),
             'estatal': estatal,
             'kpi_path': True,
-            'title': 'Control de Trámites',
-            'periodo': periodo
+            'title': f'Control de Trámites {self.year}',
+            'periodo': {
+                'inicio': Reporte.objects.filter(fecha_corte__year=self.year).order_by('fecha_corte').first(),
+                'fin': Reporte.objects.filter(fecha_corte__year=self.year).order_by('fecha_corte').last()
+            }
         }
 
         return render(request, self.template_name, data)
