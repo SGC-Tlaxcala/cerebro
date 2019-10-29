@@ -9,13 +9,17 @@
 import re
 from django import template
 
-from apps.mesas.models import CAUSAS
+try:
+    from apps.mesas.models import CAUSAS
+except RuntimeError:
+    pass
 
 register = template.Library()
 
-
-dict_causas = {key: value for key, value in CAUSAS}
-
+try:
+    dict_causas = {key: value for key, value in CAUSAS}
+except NameError:
+    pass
 
 @register.filter
 def causas(causa):
