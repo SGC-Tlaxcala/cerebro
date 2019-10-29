@@ -17,12 +17,13 @@ from apps.mesas.forms import MesaForm
 SIN_RECHAZO = Q(causa__in=[INFORMACION, ENTREGA, OTRO])
 CON_RECHAZO = ~SIN_RECHAZO
 YEAR = 2019
+MONTH = 4
 
 
 class MesasIndex(TemplateView):
     template_name = 'mesas/index.html'
 
-    base = Registro.objects.filter(fecha__year=YEAR).order_by('-fecha')
+    base = Registro.objects.filter(fecha__year=YEAR, fecha__month__gte=MONTH).order_by('-fecha')
     sexo = base.values('sexo').annotate(total=Count('sexo'))
     causas = base.values('causa').annotate(total=Count('causa')).order_by('causa')
 

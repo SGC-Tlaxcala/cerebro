@@ -11,7 +11,7 @@ from datetime import datetime
 from django.conf import settings
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
-from django.db.models import Sum, F
+from django.db.models import Sum, F, Q
 from django.shortcuts import render
 from django.urls import reverse
 from django.views import View
@@ -87,22 +87,6 @@ def procesar_cifras(archivo_excel):
                 }
         except ValueError:
             pass
-
-        if '290260' not in macs:
-            macs['290260'] = {
-                'distrito': '02',
-                'tipo': 'Urbano',
-                'dias_trabajados': 0,
-                'jornada_trabajada': 0,
-                'configuracion': 'B',
-                'tramites': 0,
-                'credenciales_entregadas_actualizacion': 0,
-                'credenciales_reimpresion': 0,
-                'total_atenciones': 0,
-                'productividad_x_dia': 0,
-                'productividad_x_dia_x_estacion': 0,
-                'credenciales_recibidas': 0
-            }
 
     return observaciones, remesa, macs
 
