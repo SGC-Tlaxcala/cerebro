@@ -24,6 +24,7 @@ urlpatterns = [
     path('aprobacion/', include('apps.aprobacion.urls')),
     path('cobertura/', include('apps.cobertura.urls')),
     path('incidencias/', include('apps.incidencias.urls')),
+    path('mc/', include('apps.mc.urls')),
     path('', index, name='index')
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
