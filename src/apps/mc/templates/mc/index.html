@@ -1,10 +1,109 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "base.html" %}
+{% load docs_tags %}
+{% load humanize %}
 
-</body>
-</html>
+{% block content %}
+  <div class="jumbotron p-3 p-md-5 rounded">
+    <div class="px-0">
+      <h1 class="display-4"><i class="fa fa-building-o"></i>   Modelo de Calidad DERFE</h1>
+      <p class="text-muted">
+        <span class="h3">Objetivos de calidad</span> <br>
+        <ol type="1">
+          <li>
+            Actualizar el Padrón Electoral en la entidad mediante la tramitación
+            de solicitudes de expedición de credencial requeridas por la ciudadanía
+            en los Módulos de Atención Ciudadana instalados.
+          </li>
+          <li>
+            Elevar el índice de aprovechamiento de infraestructura en los Módulos
+            de Atención Ciudadana en la entidad.
+          </li>
+          <li>
+            Brindar el servicio en todos los Módulos de Atención Ciudadana
+            autorizados en el estado, conforme al calendario de operación de
+            Módulos de Atención Ciudadana de la campaña de actualización en turno.
+          </li>
+          <li>
+            Promover la inscripción de jóvenes al Padrón Electoral.
+          </li>
+          <li>
+            Mantener el servicio de atención a domicilio, acorde a lo que establece
+            el artículo 141 de la LGIPE.
+          </li>
+          <li>
+            Conocer la opinión ciudadana sobre el sercivicio de los Módulos de Atención
+            Ciudadana.
+          </li>
+        </ol>
+      </p>
+    </div>
+  </div>
+  <hr>
+
+  <div class="row">
+    <div class="col-md-12">
+      <h2>Indicadores</h2>
+    </div>
+    <div class="col-md-12">
+      <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item"><a class="nav-link active" id="obj1-tab" data-toggle="tab" href="#obj1" role="tab" aria-controls="obj1" aria-selected="true">Objetivo 1</a></li>
+        <li class="nav-item"><a class="nav-link" id="obj2-tab" data-toggle="tab" href="#obj2" role="tab" aria-controls="obj2" aria-selected="false">Objetivo 2</a></li>
+        <li class="nav-item"><a class="nav-link" id="obj3-tab" data-toggle="tab" href="#obj3" role="tab" aria-controls="obj3" aria-selected="false">Objetivo 3</a></li>
+        <li class="nav-item"><a class="nav-link" id="obj4-tab" data-toggle="tab" href="#obj4" role="tab" aria-controls="obj4" aria-selected="false">Objetivo 4</a></li>
+        <li class="nav-item"><a class="nav-link" id="obj5-tab" data-toggle="tab" href="#obj5" role="tab" aria-controls="obj5" aria-selected="false">Objetivo 5</a></li>
+        <li class="nav-item"><a class="nav-link" id="obj6-tab" data-toggle="tab" href="#obj6" role="tab" aria-controls="obj6" aria-selected="false">Objetivo 6</a></li>
+      </ul>
+      <div class="tab-content" id="myTabContent">
+        <div class="tab-pane fade show active" id="obj1" role="tabpanel" aria-labelledby="obj1-tab">
+          <div class="row">
+            <div class="col">
+              <h4>Actualizar el Padrón Electoral en la entidad mediante la tramitación
+                  de solicitudes de expedición de credencial requeridas por la ciudadanía
+                  en los Módulos de Atención Ciudadana instalados.</h4>
+            </div>
+          </div>
+        </div><!-- ./obj1-tab -->
+        <div class="tab-pane fade" id="obj2" role="tabpanel" aria-labelledby="obj2-tab">
+          <div class="row">
+            <div class="col">
+              <h4>Elevar el índice de aprovechamiento de infraestructura en los Módulos
+                  de Atención Ciudadana en la entidad.</h4>
+            </div>
+          </div>
+        </div>
+        <div class="tab-pane fade" id="obj3" role="tabpanel" aria-labelledby="obj3-tab">
+          <div class="row">
+            <div class="col">
+              <h4>Brindar el servicio en todos los Módulos de Atención Ciudadana
+                  autorizados en el estado, conforme al calendario de operación de
+                  Módulos de Atención Ciudadana de la campaña de actualización en turno.</h4>
+            </div>
+          </div>
+        </div>
+        <div class="tab-pane fade" id="obj4" role="tabpanel" aria-labelledby="obj4-tab">
+          <div class="row">
+            <div class="col">
+              <h4>Promover la inscripción de jóvenes al Padrón Electoral.</h4>
+            </div>
+          </div>
+        </div>
+        <div class="tab-pane fade" id="obj5" role="tabpanel" aria-labelledby="obj5-tab">
+          <div class="row">
+            <div class="col">
+              <h4>Mantener el servicio de atención a domicilio, acorde a lo que establece
+                  el artículo 141 de la LGIPE.</h4>
+            </div>
+          </div>
+        </div>
+        <div class="tab-pane fade" id="obj6" role="tabpanel" aria-labelledby="obj6-tab">
+          <div class="row">
+            <div class="col">
+              <h4>Conocer la opinión ciudadana sobre el sercivicio de los Módulos de Atención
+                  Ciudadana.</h4>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}
