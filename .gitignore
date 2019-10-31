@@ -10,6 +10,7 @@ src/apps/assets/
 venv/
 .vagrant/
 *.retry
+cerebro.db
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
