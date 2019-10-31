@@ -47,7 +47,8 @@ LOCAL_APPS = [
     'apps.cecyrd.config.CecyrdConfig',
     'apps.cobertura.config.CoberturaConfig',
     'apps.incidencias.config.IncidenciasConfig',
-    'apps.aprobacion.config.AprobacionConfig'
+    'apps.aprobacion.config.AprobacionConfig',
+    'apps.mc.config.MCConfig'
 ]
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
@@ -205,4 +206,3 @@ NOTEBOOK_ARGUMENTS = [
     # disables the browser
     '--no-browser',
 ]
-
