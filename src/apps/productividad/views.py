@@ -11,7 +11,7 @@ from datetime import datetime
 from django.conf import settings
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
-from django.db.models import Sum, F, Q
+from django.db.models import Sum, F
 from django.shortcuts import render
 from django.urls import reverse
 from django.views import View

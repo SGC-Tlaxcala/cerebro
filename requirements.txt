@@ -18,3 +18,7 @@ django-timedeltafield
 django-annoying
 xlrd
 django-simple-history
+ipython
+jupyter
+pandas
+django-pandas
