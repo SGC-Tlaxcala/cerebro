@@ -82,6 +82,13 @@
               href="{% url 'aprobacion:index' %}">
               <i class="fa fa-thumbs-o-up"></i> Aprobación ciudadana
             </a>
+
+            <div class="dropdown-divider"></div>
+            <a
+              class="dropdown-item {% current request 'mc' %}"
+              href="{% url 'mc:index' %}">
+              <i class="fa fa-building-o"></i> Modelo de Calidad DERFE
+            </a>
           </div>
         </li>
 

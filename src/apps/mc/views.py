@@ -5,6 +5,7 @@ from django.shortcuts import render
 from django.db.models import Sum
 
 from apps.productividad.models import PronosticoTramites, Cifras
+from apps.productividad.models import Reporte
 
 
 YEAR = 2019
@@ -25,12 +26,14 @@ class Index(View):
         self.cifras_estatal = None
         self.cifras = None
         self.entregas = None
+        self.productividad = None
         self.periodo = {}
         self.current_year = int(datetime.now().year)
 
     def dispatch(self, request, *args, **kwargs):
         self.year = self.request.GET.get("year", YEAR)
         self.pronostico = PronosticoTramites.objects.all().filter().filter(year=2019)
+        self.productividad = Reporte.objects.filter(fecha_corte__year=self.year).order_by('fecha_corte')
         for d in self.pronostico:
             print(d)
             self.pronostico_estatal += d.tramites
@@ -54,6 +57,8 @@ class Index(View):
             'pronostico_estatal': self.pronostico_estatal,
             'cifras': self.cifras,
             'cifras_estatal': self.cifras_estatal['suma_modulo'],
-            'faltantes': self.pronostico_estatal - self.cifras_estatal['suma_modulo']
+            'productividad': self.productividad,
+            'faltantes': self.pronostico_estatal - self.cifras_estatal['suma_modulo'],
+            'kpi_path': True
         }
         return render(request, self.template_name, data)

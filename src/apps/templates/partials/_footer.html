@@ -1,7 +1,7 @@
 {% load staticfiles %}
 <footer class="py-5 bg-secondary text-light container-fluid">
   <div class="row justify-content-center">
-    <div class="col-md-6">
+    <div class="col-md-5">
       <h3>Sistema de Gestión de la Calidad</h3>
       <p>
         El Cuadro de Mando Integral es un desarrollo de la Junta Local de Tlaxcala
@@ -17,7 +17,7 @@
         <li><a class="text-light bg-secondary" href="#"><i class="fa fa-map"></i> Cartografía</a></li>
       </ul>
     </div>
-    <div class="col-md-2">
+    <div class="col-md-3">
       <h4>Indicadores</h4>
       <ul>
         <li><a class="text-light bg-secondary" href="{% url 'cobertura:index' %}"><i class="fa fa-globe"></i> Cobertura</a></li>
@@ -27,6 +27,7 @@
         <li><a class="text-light bg-secondary" href="{% url 'aprobacion:index' %}"><i class="fa fa-thumbs-o-up"></i> Aprobación Ciudadana</a></li>
         <li><a class="text-light bg-secondary" href="{% url 'paquetes:index' %}"><i class="fa fa-truck"></i> Distribución</a></li>
         <li><a class="text-light bg-secondary" href="{% url 'mesas:index' %}"><i class="fa fa-user-times"></i> Rechazos en Mesa de Atención</a></li>
+        <li><a class="text-light bg-secondary" href="{% url 'mc:index' %}"><i class="fa fa-building-o"></i> Modelo de Calidad DERFE</a></li>
       </ul>
     </div>
     <div class="col-md-2">
