@@ -25,7 +25,53 @@
     google.charts.setOnLoadCallback(dibujaPronosticoEstatal)
     google.charts.setOnLoadCallback(graficaReemplazo)
     google.charts.setOnLoadCallback(graficaProductividad)
+    google.charts.setOnLoadCallback(graficarDiasOperativos)
+    google.charts.setOnLoadCallback(tablaDiasOperativos)
 
+    let diasOperativos = [
+          ['Mes','Operativos','Operados','Porcentaje'],
+          ['Febrero',228,208,91.2280701754386],
+          ['Marzo',248,238,95.9677419354839],
+          ['Abril',249,223,89.5582329317269],
+          ['Mayo',259,248,95.7528957528958],
+          ['Junio',234,234,100],
+          ['Julio',258,258,100],
+          ['Agosto',253,253,100],
+          ['Septiembre',242,217,89.6694214876033]
+    ]
+
+    function tablaDiasOperativos() {
+        let dataDiasOperativos = google.visualization.arrayToDataTable(diasOperativos)
+        let tabla = new google.visualization.Table(document.getElementById('tabla_dias_operativos'))
+        tabla.draw(dataDiasOperativos, {showRowNumber: true, width: 960, height: '100%'})
+    }
+    function graficarDiasOperativos() {
+        let dataDiasOperativos = google.visualization.arrayToDataTable(diasOperativos)
+        let opciones = {
+            focusTarget: 'category',
+            width: 960,
+            height: 500,
+            title : 'Porcentaje de días operados durante la campaña',
+            vAxes: {
+                0: {
+                    title: 'Días totales a nivel Entidad'
+                },
+                1: {
+                    title: 'Porcentaje'
+                }
+            },
+            hAxes: {
+                0: {
+                    title: 'Mes'
+                }
+            },
+            seriesType: 'bars',
+            series: {2: {targetAxisIndex: 1, type: 'line', formatValue: '#.00%'}}
+        }
+
+        var grafica = new google.visualization.ComboChart(document.getElementById('grafica_dias_operativos'));
+        grafica.draw(dataDiasOperativos, opciones);
+    }
     function graficaProductividad() {
 
       let data = google.visualization.arrayToDataTable([
@@ -261,12 +307,14 @@
             <p class="lead">Ver el indicador <a class="btn btn-primary" href="{% url 'cifras:index' %}">Productividad</a> </p>
         </div>
         <div class="tab-pane fade" id="obj3" role="tabpanel" aria-labelledby="obj3-tab">
-          <div class="row">
-            <div class="col">
-              <h4>Brindar el servicio en todos los Módulos de Atención Ciudadana
-                  autorizados en el estado, conforme al calendario de operación de
-                  Módulos de Atención Ciudadana de la campaña de actualización en turno.</h4>
-            </div>
+          <div class="col">
+            <h4>
+              Brindar el servicio en todos los Módulos de Atención Ciudadana
+              autorizados en el estado, conforme al calendario de operación de
+              Módulos de Atención Ciudadana de la campaña de actualización en turno.
+            </h4>
+            <div id="grafica_dias_operativos"></div>
+            <div id="tabla_dias_operativos"></div>
           </div>
         </div>
         <div class="tab-pane fade" id="obj4" role="tabpanel" aria-labelledby="obj4-tab">
