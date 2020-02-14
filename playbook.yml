@@ -18,7 +18,7 @@
 
     - name: Instalar paquetes de Ubuntu
       apt: 
-        name: ["debconf-utils", "python3-pip",  "python3-venv","python-dev", "libpq-dev", "ntp", "htop"] 
+        name: ["debconf-utils", "python3-pip",  "python3-venv","python-dev", "libpq-dev", "ntp", "htop", "postgresql-client"]
         state: present
       tags:
         - packages

@@ -6,7 +6,7 @@
 # description: Vistas de la distribución de paquetes
 
 from collections import OrderedDict
-from django.shortcuts import render_to_response
+from django.shortcuts import render
 from django.db.models import Avg, Sum, Q, Max
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
@@ -48,7 +48,7 @@ class EnvioDistrito(View):
 def envio_ajax_suma_paquete(request, envio):
     e = Envio.objects.get(pk=envio)
     suma = e.enviomodulo_set.aggregate(Sum('formatos'))
-    return render_to_response(
+    return render(
         "paquetes/envio_ajax_suma_paquete.html",
         {'suma': suma['formatos__sum']},
     )

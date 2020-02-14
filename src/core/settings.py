@@ -38,9 +38,9 @@ THIRD_PARTY_APPS = [
 ]
 LOCAL_APPS = [
     'core',
+    'apps.mesas.config.MesasConfig',
     'apps.profiles.config.ProfilesConfig',
     'apps.docs.config.DocsConfig',
-    'apps.mesas.config.MesasConfig',
     'apps.paquetes.config.PaquetesConfig',
     'apps.productividad.config.ProductividadConfig',
     'apps.dpi.config.DpiConfig',
