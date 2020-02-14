@@ -206,3 +206,7 @@ NOTEBOOK_ARGUMENTS = [
     # disables the browser
     '--no-browser',
 ]
+
+SENDGRID_API_KEY = env('SENDGRID_API_KEY')
+EMAIL_BACKEND = "sgbackend.SendGridBackend"
+SENDGRID_SANDBOX_MODE_IN_DEBUG = True
