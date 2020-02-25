@@ -208,5 +208,6 @@ NOTEBOOK_ARGUMENTS = [
 ]
 
 SENDGRID_API_KEY = env('SENDGRID_API_KEY')
-EMAIL_BACKEND = "sgbackend.SendGridBackend"
+EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"
 SENDGRID_SANDBOX_MODE_IN_DEBUG = True
+SENDGRID_ECHO_TO_STDOUT = True
