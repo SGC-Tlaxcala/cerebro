@@ -10,7 +10,8 @@ from django.views.generic import TemplateView
 from django.views.generic.edit import CreateView
 from django.urls import reverse_lazy
 from django.db.models import Count, Q
-from apps.mesas.models import Registro, CAUSAS, ACTA, IDENTIFICACION, COMPROBANTE, INFORMACION, ENTREGA, FICHA, EDAD, HUELLA, OTRO
+from apps.mesas.models import Registro, CAUSAS, ACTA, IDENTIFICACION, COMPROBANTE, INFORMACION, ENTREGA, \
+    FICHA, EDAD, HUELLA, OTRO
 from apps.mesas.forms import MesaForm
 
 
