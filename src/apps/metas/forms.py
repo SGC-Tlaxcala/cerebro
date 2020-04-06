@@ -28,8 +28,11 @@ class AddRolForm(forms.ModelForm):
         self.helper.layout = Layout(
             Div(
                 Field('clave', wrapper_class='col-md-2 col-sm-4'),
-                Field('description', wrapper_class='col-md-2 col-sm-3'),
                 Field('order', wrapper_class='col-md-2 col-sm-3'),
+                css_class='row'
+            ),
+            Div(
+                Field('description', wrapper_class='col-md-6'),
                 css_class='row'
             )
         )
