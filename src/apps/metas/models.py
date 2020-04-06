@@ -39,6 +39,14 @@ def subir_archivo(instancia, archivo):
     return ruta
 
 
+class Site(models.Model):
+    site = models.CharField("Sitio", max_length=4)
+    address = models.CharField("Dirección", max_length=100)
+
+    def __str__(self):
+        return f'{self.site}'
+
+
 class Rol(models.Model):
     clave = models.CharField("Clave del Puesto", max_length=7)
     description = models.CharField("Descripción", max_length=75)
@@ -46,6 +54,16 @@ class Rol(models.Model):
 
     def __str__(self):
         return f'{self.clave}'
+
+
+class Member(models.Model):
+    name = models.CharField("Nombre", max_length=50)
+    mail = models.CharField("Correo Electrónico", max_length=50)
+    role = models.ForeignKey(Rol, related_name='member_rol', on_delete=models.CASCADE)
+    site = models.ForeignKey(Site, related_name='member_site', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'{self.name}'
 
 
 # Meta información sobre las Metas
