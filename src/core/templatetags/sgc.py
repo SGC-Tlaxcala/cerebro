@@ -154,10 +154,14 @@ def porcentaje(num):
 
 @register.filter(name='porciento')
 def porciento(num):
-    if float(num) > 100:
+    try:
+        n = float(num)
+    except ValueError:
+        n = 0
+    if n > 100:
         return 100
     else:
-        return "%.2f" % float(num)
+        return "%.2f" % n
 
 
 @register.filter(name='porcentaje2')

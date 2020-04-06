@@ -249,7 +249,10 @@ class TramitesIndex(Productividad):
                     _pronostico = _pt.tramites
                     dlist.append(_pronostico)
             dlist.append(_pronostico - _tramites)
-            dlist.append((_tramites / _pronostico) * 100)
+            try:
+                dlist.append((_tramites / _pronostico) * 100)
+            except ZeroDivisionError:
+                dlist.append(0)
             chart_data.append(dlist)
 
         estatal = {
