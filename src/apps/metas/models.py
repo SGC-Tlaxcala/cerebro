@@ -41,6 +41,7 @@ def subir_archivo(instancia, archivo):
 
 class Site(models.Model):
     site = models.CharField("Sitio", max_length=4)
+    name = models.CharField("Nombre", max_length=50, default='')
     address = models.CharField("Dirección", max_length=100)
 
     def __str__(self):
