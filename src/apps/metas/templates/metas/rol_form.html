@@ -4,11 +4,13 @@
 {% block content %}
   <div class="container">
     <div class="row">
-      <div class="col"><h2>JMM01</h2></div>
+      <div class="col"><h1>Agregar rol</h1></div>
     </div>
     <div class="row">
       <div class="col">
-
+        <form method="post" class="form">
+          {% crispy form %}
+        </form>
       </div>
     </div>
   </div>

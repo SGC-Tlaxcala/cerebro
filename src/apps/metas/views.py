@@ -5,9 +5,19 @@
 # description: Vistas para las metas
 # pylint: disable=W0613,R0201,R0903
 
-from django.shortcuts import render
+from django.views.generic import TemplateView
+from django.views.generic.edit import CreateView
+from django.urls import reverse_lazy
 from django.contrib.auth.models import User
+from .models import Rol
+from .forms import AddRolForm
 
 
-def index(request):
-    return render(request, 'metas/index.html', {'user': User})
+class MetasIndex(TemplateView):
+    template_name = 'metas/index.html'
+
+
+class MetasAddRol(CreateView):
+    model = Rol
+    form_class = AddRolForm
+    success_url = reverse_lazy('metas:add_rol')

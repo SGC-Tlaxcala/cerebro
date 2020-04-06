@@ -7,9 +7,10 @@
 
 
 from django.urls import path
-from apps.metas.views import index
+from apps.metas.views import MetasIndex, MetasAddRol
 
 app_name = 'metas'
 urlpatterns = [
-    path('', index, name='index')
+    path('', MetasIndex.as_view(), name='index'),
+    path('add_rol/', MetasAddRol.as_view(), name='add_rol')
 ]

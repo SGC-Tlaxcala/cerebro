@@ -11,7 +11,7 @@ from crispy_forms.bootstrap import FormActions, InlineCheckboxes
 from crispy_forms.layout import Submit
 from django import forms
 
-from apps.metas.models import Evidencia, MetasSPE
+from apps.metas.models import Evidencia, MetasSPE, Rol
 
 
 class EvidenciaForm(forms.ModelForm):
@@ -19,6 +19,25 @@ class EvidenciaForm(forms.ModelForm):
     class Meta:
         model = Evidencia
         exclude = ['campos', ]
+
+
+class AddRolForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(AddRolForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.layout = Layout(
+            Div(
+                Field('clave', wrapper_class='col-md-2 col-sm-4'),
+                Field('description', wrapper_class='col-md-2 col-sm-3'),
+                Field('order', wrapper_class='col-md-2 col-sm-3'),
+                css_class='row'
+            )
+        )
+        self.helper.add_input(Submit('submit', 'Enviar'))
+
+    class Meta:
+        model = Rol
+        fields = '__all__'
 
 
 class MetasSPEForm(forms.ModelForm):
