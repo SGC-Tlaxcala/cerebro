@@ -6,9 +6,8 @@
 # pylint: disable=W0613,R0201,R0903
 
 from django.shortcuts import render
-from apps.metas.forms import MetasSPEForm
+from django.contrib.auth.models import User
 
 
 def index(request):
-    form = MetasSPEForm()
-    return render(request, 'metas/index.html', {'form': form})
+    return render(request, 'metas/index.html', {'user': User})

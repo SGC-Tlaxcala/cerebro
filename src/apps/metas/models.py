@@ -39,6 +39,15 @@ def subir_archivo(instancia, archivo):
     return ruta
 
 
+class Puesto(models.Model):
+    clave = models.CharField("Clave del Puesto", max_length=7)
+    description = models.CharField(max_length=30)
+    order = models.PositiveSmallIntegerField()
+
+    def __str__(self):
+        return f'{self.clave}'
+
+
 # Meta información sobre las Metas
 class MetasSPE(models.Model):
     """Descripción de las metas del SPEN"""
