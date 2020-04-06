@@ -41,8 +41,8 @@ def subir_archivo(instancia, archivo):
 
 class Rol(models.Model):
     clave = models.CharField("Clave del Puesto", max_length=7)
-    description = models.CharField(max_length=75)
-    order = models.PositiveSmallIntegerField()
+    description = models.CharField("Descripción", max_length=75)
+    order = models.PositiveSmallIntegerField("Orden")
 
     def __str__(self):
         return f'{self.clave}'
