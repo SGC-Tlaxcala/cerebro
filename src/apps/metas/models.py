@@ -72,13 +72,13 @@ class Member(models.Model):
 class Goal(models.Model):
     """Descripción de las metas del SPEN"""
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    role = models.ForeignKey(Role, related_name='goal_role', on_delete=models.CASCADE)
+    role = models.ForeignKey(Role, verbose_name="Puesto", related_name='goal_role', on_delete=models.CASCADE)
     key = models.CharField("Clave de la Meta", max_length=2)
     name = models.CharField('Identificación', max_length=25)
     year = models.PositiveIntegerField("Año")
 
     # Seguimiento y Medición
-    cicles = models.PositiveSmallIntegerField('Repeticiones')
+    loops = models.PositiveSmallIntegerField('Repeticiones')
 
     # Descripción de la Meta
     description = models.TextField('Descripción de la Meta')
