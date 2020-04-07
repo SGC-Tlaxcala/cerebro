@@ -15,6 +15,12 @@ from .forms import AddRolForm, AddSiteForm, AddMemberForm
 class MetasIndex(TemplateView):
     template_name = 'metas/index.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        members = Member.objects.all().order_by('role__order')
+        context.update({'members': members})
+        return context
+
 
 class MetasAddMember(CreateView):
     model = Member
