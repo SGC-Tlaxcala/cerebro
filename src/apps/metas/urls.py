@@ -12,7 +12,7 @@ from apps.metas.views import MetasIndex, MetasAddRole, MetasAddSite, MetasAddMem
 app_name = 'metas'
 urlpatterns = [
     path('', MetasIndex.as_view(), name='index'),
-    path('add_rol/', MetasAddRole.as_view(), name='add_rol'),
+    path('add_role/', MetasAddRole.as_view(), name='add_role'),
     path('add_site/', MetasAddSite.as_view(), name='add_site'),
     path('add_member/', MetasAddMember.as_view(), name='add_member')
 ]

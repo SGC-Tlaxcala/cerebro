@@ -43,7 +43,7 @@ class MetasAddSite(CreateView):
 class MetasAddRole(CreateView):
     model = Role
     form_class = AddRolForm
-    success_url = reverse_lazy('metas:add_rol')
+    success_url = reverse_lazy('metas:add_role')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
