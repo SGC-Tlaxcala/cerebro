@@ -8,7 +8,7 @@
 from django.views.generic import TemplateView
 from django.views.generic.edit import CreateView
 from django.urls import reverse_lazy
-from .models import Rol, Site, Member
+from .models import Role, Site, Member
 from .forms import AddRolForm, AddSiteForm, AddMemberForm
 
 
@@ -40,13 +40,13 @@ class MetasAddSite(CreateView):
         return context
 
 
-class MetasAddRol(CreateView):
-    model = Rol
+class MetasAddRole(CreateView):
+    model = Role
     form_class = AddRolForm
     success_url = reverse_lazy('metas:add_rol')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        roles = Rol.objects.all().order_by('order')
+        roles = Role.objects.all().order_by('order')
         context.update({'kpi_path': True, 'roles': roles})
         return context

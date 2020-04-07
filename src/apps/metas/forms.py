@@ -9,13 +9,13 @@ from crispy_forms.layout import Layout, Submit, Div, Field
 from crispy_forms.helper import FormHelper
 from django import forms
 
-from apps.metas.models import Evidencia, MetasSPE, Rol, Site, Member
+from apps.metas.models import Proof, Goal, Role, Site, Member
 
 
-class EvidenciaForm(forms.ModelForm):
+class ProofForm(forms.ModelForm):
 
     class Meta:
-        model = Evidencia
+        model = Proof
         exclude = ['campos', ]
 
 
@@ -56,7 +56,7 @@ class AddRolForm(forms.ModelForm):
         self.helper.add_input(Submit('submit', 'Enviar'))
 
     class Meta:
-        model = Rol
+        model = Role
         fields = '__all__'
 
 
@@ -86,25 +86,25 @@ class AddMemberForm(forms.ModelForm):
         fields = '__all__'
 
 
-class MetasSPEForm(forms.ModelForm):
+class GoalForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
-        super(MetasSPEForm, self).__init__(*args, **kwargs)
+        super(GoalForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.layout = Layout(
             Div(
-                Field('puesto', wrapper_class='col-md-6 col-sm-8'),
+                Field('role', wrapper_class='col-md-6 col-sm-8'),
                 css_class='row'
             ),
             Div(
-                Field('clave', wrapper_class='col-md-2 col-sm-4'),
-                Field('nom_corto', wrapper_class='col-md-4 col-sm-8'),
+                Field('key', wrapper_class='col-md-2 col-sm-4'),
+                Field('name', wrapper_class='col-md-4 col-sm-8'),
                 Field('year', wrapper_class='col-md-2 col-sm-3'),
-                Field('ciclos', wrapper_class='col-md-2 col-sm-3'),
+                Field('loops', wrapper_class='col-md-2 col-sm-3'),
                 css_class='row'
             ),
             Div(
                 Field('description', wrapper_class='col', rows='2'),
-                Field('soporte', wrapper_class='col'),
+                Field('support', wrapper_class='col'),
                 css_class='row'
             ),
             Div(
@@ -115,5 +115,5 @@ class MetasSPEForm(forms.ModelForm):
         self.helper.add_input(Submit('submit', 'Enviar'))
 
     class Meta:
-        model = MetasSPE
+        model = Goal
         fields = '__all__'
