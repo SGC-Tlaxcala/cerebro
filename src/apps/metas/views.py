@@ -8,8 +8,8 @@
 from django.views.generic import TemplateView
 from django.views.generic.edit import CreateView
 from django.urls import reverse_lazy
-from .models import Role, Site, Member
-from .forms import AddRolForm, AddSiteForm, AddMemberForm
+from .models import Role, Site, Member, Goal
+from .forms import AddRolForm, AddSiteForm, AddMemberForm, AddGoalForm
 
 
 class MetasIndex(TemplateView):
@@ -19,6 +19,18 @@ class MetasIndex(TemplateView):
         context = super().get_context_data(**kwargs)
         members = Member.objects.all().order_by('role__order')
         context.update({'members': members})
+        return context
+
+
+class MetasAddGoal(CreateView):
+    model = Goal
+    form_class = AddGoalForm
+    success_url = reverse_lazy('metas:add_goal')
+
+    def get_context_data(self, **kwargs):
+        context = super(MetasAddGoal, self).get_context_data(**kwargs)
+        goals = Goal.objects.all().order_by('role__order')
+        context.update({'goals': goals})
         return context
 
 

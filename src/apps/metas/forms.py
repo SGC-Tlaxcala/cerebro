@@ -86,13 +86,13 @@ class AddMemberForm(forms.ModelForm):
         fields = '__all__'
 
 
-class GoalForm(forms.ModelForm):
+class AddGoalForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
-        super(GoalForm, self).__init__(*args, **kwargs)
+        super(AddGoalForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.layout = Layout(
             Div(
-                Field('role', wrapper_class='col-md-6 col-sm-8'),
+                Field('role', wrapper_class='col-md-2 col-sm-6'),
                 css_class='row'
             ),
             Div(
