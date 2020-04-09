@@ -15,7 +15,7 @@ class GoalAdmin(admin.ModelAdmin):
     list_filter = ('role',)
 
     def save_model(self, request, obj, form, change):
-        obj.usuario = request.user
+        obj.user = request.user
         obj.save()
 
 
@@ -23,7 +23,7 @@ class ProofAdmin(admin.ModelAdmin):
     pass
 
     def save_model(self, request, obj, form, change):
-        obj.usuario = request.user
+        obj.user = request.user
         obj.save()
 
 

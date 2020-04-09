@@ -116,4 +116,4 @@ class AddGoalForm(forms.ModelForm):
 
     class Meta:
         model = Goal
-        fields = '__all__'
+        exclude = ['user', 'created', 'updated']

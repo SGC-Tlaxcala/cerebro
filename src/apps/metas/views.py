@@ -5,6 +5,7 @@
 # description: Vistas para las metas
 # pylint: disable=W0613,R0201,R0903
 
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import TemplateView
 from django.views.generic.edit import CreateView
 from django.urls import reverse_lazy
@@ -22,7 +23,7 @@ class MetasIndex(TemplateView):
         return context
 
 
-class MetasAddGoal(CreateView):
+class MetasAddGoal(LoginRequiredMixin, CreateView):
     model = Goal
     form_class = AddGoalForm
     success_url = reverse_lazy('metas:add_goal')
@@ -33,8 +34,14 @@ class MetasAddGoal(CreateView):
         context.update({'goals': goals})
         return context
 
+    def form_valid(self, form):
+        obj = form.save(commit=False)
+        obj.user = self.request.user
+        print(self.request.user)
+        return super(MetasAddGoal, self).form_valid(form)
 
-class MetasAddMember(CreateView):
+
+class MetasAddMember(LoginRequiredMixin, CreateView):
     model = Member
     form_class = AddMemberForm
     success_url = reverse_lazy('metas:add_member')
@@ -46,7 +53,7 @@ class MetasAddMember(CreateView):
         return context
 
 
-class MetasAddSite(CreateView):
+class MetasAddSite(LoginRequiredMixin, CreateView):
     model = Site
     form_class = AddSiteForm
     success_url = reverse_lazy('metas:add_site')
@@ -58,7 +65,7 @@ class MetasAddSite(CreateView):
         return context
 
 
-class MetasAddRole(CreateView):
+class MetasAddRole(LoginRequiredMixin, CreateView):
     model = Role
     form_class = AddRolForm
     success_url = reverse_lazy('metas:add_role')
