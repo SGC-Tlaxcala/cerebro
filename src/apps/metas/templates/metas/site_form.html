@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+  <div class="container">
+
+    <div class="row">
+      <h1>Add Site</h1>
+    </div>
+
+    <div class="row">
+      <div class="col">
+        <div class="table_responsive">
+          <table class="table table-hover table-bordered table-condensed table-striped table-responsive">
+            <thead class="thead-dark">
+              <tr>
+                <th>Sito</th>
+                <th>Nombre</th>
+                <th>Dirección</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for site in sites %}
+                <tr>
+                  <td>{{ site.site }}</td>
+                  <td>{{ site.name }}</td>
+                  <td>{{ site.address }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col">
+        <h2>Agregar Sitio</h2>
+        <form method="post" class="form">
+          {% crispy form %}
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock content %}

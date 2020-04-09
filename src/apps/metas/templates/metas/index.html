@@ -1,16 +1,21 @@
 {% extends 'base.html' %}
-{% load crispy_forms_tags %}
 
 {% block content %}
   <div class="container">
-    <div class="row">
-      <div class="col"><h2>JMM01</h2></div>
-    </div>
+
     <div class="row">
       <div class="col">
-        <form method="post" class="form">
-          {% crispy form %}
-        </form>
+        <div class="jumbotron">
+          <h1 class="display-4"><i class="fa fa-flag-checkered"></i> Metas del SPEN</h1>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col">
+        {% for member in members %}
+          {{ member }}<br>
+        {% endfor %}
       </div>
     </div>
   </div>

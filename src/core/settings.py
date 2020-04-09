@@ -48,7 +48,8 @@ LOCAL_APPS = [
     'apps.cobertura.config.CoberturaConfig',
     'apps.incidencias.config.IncidenciasConfig',
     'apps.aprobacion.config.AprobacionConfig',
-    'apps.mc.config.MCConfig'
+    'apps.mc.config.MCConfig',
+    'apps.metas.config.MetasConfig'
 ]
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
