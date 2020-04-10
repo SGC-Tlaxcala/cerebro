@@ -106,10 +106,10 @@ class Goal(models.Model):
 class Proof(models.Model):
     """Identificación de la meta"""
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    goal = models.ForeignKey(Goal, verbose_name="Meta", related_name="proof_goal", on_delete=models.CASCADE)
     member = models.ForeignKey(
         Member, verbose_name='Miembro del SPE', related_name='proof_member', on_delete=models.CASCADE
     )
+    goal = models.ForeignKey(Goal, verbose_name="Meta", related_name="proof_goal", on_delete=models.CASCADE)
     date = models.DateField(verbose_name="Fecha")
     fields = JSONField(verbose_name="Campos", blank=True, null=True)
     user = models.ForeignKey(
