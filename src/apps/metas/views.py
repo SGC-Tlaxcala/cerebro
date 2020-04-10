@@ -9,8 +9,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import TemplateView
 from django.views.generic.edit import CreateView
 from django.urls import reverse_lazy
-from .models import Role, Site, Member, Goal
-from .forms import AddRolForm, AddSiteForm, AddMemberForm, AddGoalForm
+from .models import Role, Site, Member, Goal, Proof
+from .forms import AddRolForm, AddSiteForm, AddMemberForm, AddGoalForm, ProofForm
 
 
 class MetasIndex(TemplateView):
@@ -75,3 +75,15 @@ class MetasAddRole(LoginRequiredMixin, CreateView):
         roles = Role.objects.all().order_by('order')
         context.update({'kpi_path': True, 'roles': roles})
         return context
+
+
+class CreateProof(LoginRequiredMixin, CreateView):
+    model = Proof
+    form_class = ProofForm
+    success_url = reverse_lazy('metas:add_proof')
+
+    def form_valid(self, form):
+        obj = form.save(commit=False)
+        obj.user = self.request.user
+        print(self.request.user)
+        return super(CreateProof, self).form_valid(form)
