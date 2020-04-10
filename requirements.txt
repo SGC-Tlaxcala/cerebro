@@ -22,3 +22,4 @@ ipython
 jupyter
 pandas
 django-pandas
+django-autocomplete-light
