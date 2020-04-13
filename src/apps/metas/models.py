@@ -106,14 +106,14 @@ class Goal(models.Model):
 class Proof(models.Model):
     """Identificación de la meta"""
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    goal = models.ForeignKey(Goal, related_name="proof_goal", on_delete=models.CASCADE)
     member = models.ForeignKey(
         Member, verbose_name='Miembro del SPE', related_name='proof_member', on_delete=models.CASCADE
     )
-    date = models.DateField()
-    fields = JSONField(blank=True, null=True)
+    goal = models.ForeignKey(Goal, verbose_name="Meta", related_name="proof_goal", on_delete=models.CASCADE)
+    date = models.DateField(verbose_name="Fecha")
+    fields = JSONField(verbose_name="Campos", blank=True, null=True)
     user = models.ForeignKey(
-        User, related_name='evidencia_user', editable=False, on_delete=models.CASCADE
+        User, related_name='proof_user', editable=False, on_delete=models.CASCADE
     )
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
@@ -122,7 +122,7 @@ class Proof(models.Model):
         return f"{self.member.site}_{self.goal}_{self.date.strftime('%Y%m%d')}"
 
     def __str__(self):
-        return "%s - %s - %s" % (self.meta, self.member.site, self.date)
+        return "%s - %s - %s" % (self.goal, self.member.site, self.date)
 
     class Meta:
         app_label = 'metas'

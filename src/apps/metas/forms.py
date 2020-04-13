@@ -8,15 +8,27 @@
 from crispy_forms.layout import Layout, Submit, Div, Field
 from crispy_forms.helper import FormHelper
 from django import forms
-
 from apps.metas.models import Proof, Goal, Role, Site, Member
 
 
 class ProofForm(forms.ModelForm):
 
+    def __init__(self, *args, **kwargs):
+        super(ProofForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.layout = Layout(
+            Div(
+                Field('member', wrapper_class='col-md-4'),
+                Field('goal', wrapper_class='col-md-2'),
+                Field('date', wrapper_class='col-md-2'),
+                css_class='row'
+            )
+        )
+        self.helper.add_input(Submit('submit', 'Enviar'))
+
     class Meta:
         model = Proof
-        exclude = ['campos', ]
+        exclude = ['fields', ]
 
 
 class AddSiteForm(forms.ModelForm):
