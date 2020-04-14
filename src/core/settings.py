@@ -18,8 +18,6 @@ if env('SSL', default=False) is True:
     SECURE_SSL_REDIRECT = False
 
 DJANGO_APPS = [
-    'dal',
-    'dal_select2',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -36,7 +34,8 @@ THIRD_PARTY_APPS = [
     'django_extensions',
     'watson',
     'debug_toolbar',
-    'simple_history'
+    'simple_history',
+    'guardian'
 ]
 LOCAL_APPS = [
     'core',
@@ -205,8 +204,14 @@ INTERNAL_IPS = '127.0.0.1'
 
 NOTEBOOK_ARGUMENTS = [
     # exposes IP and port
-    '--ip=0.0.0.0',
+    '--ip=localhost',
     '--port=8888',
     # disables the browser
     '--no-browser',
 ]
+
+# CMI-1 Configuración de Guardian
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend', # this is default
+    'guardian.backends.ObjectPermissionBackend',
+)
