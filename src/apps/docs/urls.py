@@ -7,12 +7,13 @@
 
 
 from django.urls import path
-from apps.docs.views import IndexList, DocDetail, ProcesoList, Buscador
+from apps.docs.views import IndexList, DocDetail, ProcesoList, ProcesoDetail, Buscador
 
 app_name = 'docs'
 urlpatterns = [
     path('', IndexList.as_view(), name='index'),
     path('<int:pk>/detalle', DocDetail.as_view(), name='detalle'),
-    path('proceso/<slug:slug>', ProcesoList.as_view(), name='proceso'),
+    path('proceso/', ProcesoList.as_view(), name='proceso_list'),
+    path('proceso/<slug:slug>', ProcesoDetail.as_view(), name='proceso_detail'),
     path('buscador/', Buscador.as_view(), name='buscador')
 ]

@@ -6,13 +6,16 @@
 # pylint: disable=W0613,R0201,R0903
 
 from watson import search as watson
+from django.urls import reverse_lazy
 from django.db.models import Q
 from django.views.generic import (
     ListView,
     TemplateView,
-    DetailView
+    DetailView,
+    CreateView
 )
 from apps.docs.models import Documento, Tipo, Proceso
+from apps.docs.forms import ProcessAddForm
 
 
 class IndexList(ListView):
@@ -62,7 +65,17 @@ class DocDetail(DetailView):
     context_object_name = 'doc'
 
 
-class ProcesoList(DetailView):
+class ProcesoList(CreateView):
+    model = Proceso
+    form_class = ProcessAddForm
+    success_url = reverse_lazy('docs:proceso_list')
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super(ProcesoList, self).get_context_data(**kwargs)
+        return context
+
+
+class ProcesoDetail(DetailView):
     model = Proceso
     context_object_name = 'proceso'
 

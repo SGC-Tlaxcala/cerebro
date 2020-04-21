@@ -1,0 +1,26 @@
+{# docs/index.html #}
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+  <div class="jumbotron rounded">
+    <h1>Procesos con Control de Documentos</h1>
+     <p>
+      <div class="btn-group" role="group" aria-label="Basic example">
+        <button type="button" class="btn btn-secondary">Documento</button>
+        <a href="{% url 'docs:proceso_list' %}" type="button" class="btn btn-secondary">Proceso</a>
+        <button type="button" class="btn btn-secondary">Tipo</button>
+      </div>
+    </p>
+  </div>
+
+  <div class="row">
+    <div class="col">
+      <form method="post" class="form">
+        {% crispy form %}
+      </form>
+    </div>
+  </div>
+
+{% endblock content %}
