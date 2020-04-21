@@ -17,7 +17,7 @@ from apps.docs.models import Documento, Tipo, Proceso
 
 class IndexList(ListView):
     model = Documento
-    template_name = 'docs/portada2.html'
+    template_name = 'docs/index.html'
     context_object_name = 'docs'
 
     def get_queryset(self):
