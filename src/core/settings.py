@@ -34,7 +34,8 @@ THIRD_PARTY_APPS = [
     'django_extensions',
     'watson',
     'debug_toolbar',
-    'simple_history'
+    'simple_history',
+    'guardian'
 ]
 LOCAL_APPS = [
     'core',
@@ -48,7 +49,8 @@ LOCAL_APPS = [
     'apps.cobertura.config.CoberturaConfig',
     'apps.incidencias.config.IncidenciasConfig',
     'apps.aprobacion.config.AprobacionConfig',
-    'apps.mc.config.MCConfig'
+    'apps.mc.config.MCConfig',
+    'apps.metas.config.MetasConfig'
 ]
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
@@ -91,6 +93,7 @@ DATABASES = {
 }
 
 if DEBUG:
+    DJANGO_ALLOW_ASYNC_UNSAFE = env("DJANGO_ALLOW_ASYNC_UNSAFE", default=True)
     AUTH_PASSWORD_VALIDATORS = [
         {
             'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -201,8 +204,21 @@ INTERNAL_IPS = '127.0.0.1'
 
 NOTEBOOK_ARGUMENTS = [
     # exposes IP and port
-    '--ip=0.0.0.0',
+    '--ip=localhost',
     '--port=8888',
     # disables the browser
     '--no-browser',
 ]
+
+# CMI-1 Configuración de Guardian
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',  # this is default
+    'guardian.backends.ObjectPermissionBackend',
+)
+
+# Caso no. 35, Backend para correo
+EMAIL_HOST = env("EMAIL_HOST")
+EMAIL_USE_TLS = env("EMAIL_USE_TLS", default=True)
+EMAIL_PORT = env("EMAIL_PORT")
+EMAIL_HOST_USER = env('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')

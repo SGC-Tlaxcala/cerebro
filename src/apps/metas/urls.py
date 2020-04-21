@@ -7,9 +7,14 @@
 
 
 from django.urls import path
-from apps.metas.views import index
+from apps.metas.views import MetasIndex, MetasAddRole, MetasAddSite, MetasAddMember, MetasAddGoal, CreateProof
 
 app_name = 'metas'
 urlpatterns = [
-    path('', index, name='index')
+    path('', MetasIndex.as_view(), name='index'),
+    path('add_role/', MetasAddRole.as_view(), name='add_role'),
+    path('add_site/', MetasAddSite.as_view(), name='add_site'),
+    path('add_member/', MetasAddMember.as_view(), name='add_member'),
+    path('add_goal/', MetasAddGoal.as_view(), name='add_goal'),
+    path('add_proof/', CreateProof.as_view(), name='add_proof')
 ]

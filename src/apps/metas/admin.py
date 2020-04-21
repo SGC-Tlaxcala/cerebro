@@ -7,26 +7,25 @@
 
 
 from django.contrib import admin
-from apps.metas.models import MetasSPE
-from apps.metas.models import Evidencia
+from apps.metas.models import Goal, Proof
 
 
-class MetasAdmin(admin.ModelAdmin):
-    list_display = ('nom_corto', 'puesto', 'clave')
-    list_filter = ('puesto',)
+class GoalAdmin(admin.ModelAdmin):
+    list_display = ('name', 'role', 'key')
+    list_filter = ('role',)
 
     def save_model(self, request, obj, form, change):
-        obj.usuario = request.user
+        obj.user = request.user
         obj.save()
 
 
-class EvidenciaAdmin(admin.ModelAdmin):
+class ProofAdmin(admin.ModelAdmin):
     pass
 
     def save_model(self, request, obj, form, change):
-        obj.usuario = request.user
+        obj.user = request.user
         obj.save()
 
 
-admin.site.register(MetasSPE, MetasAdmin)
-admin.site.register(Evidencia, EvidenciaAdmin)
+admin.site.register(Goal, GoalAdmin)
+admin.site.register(Proof, ProofAdmin)

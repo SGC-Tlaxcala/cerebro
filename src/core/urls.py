@@ -7,11 +7,13 @@ from django.contrib import admin
 from django.urls import path, include
 from core.views import index, EncuestasIndex
 
+
 urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls')),
+    path('admin/', admin.site.urls),
+    path('metas/', include('apps.metas.urls')),
     path('mesas/', include('apps.mesas.urls')),
     path('paquetes/', include('apps.paquetes.urls')),
-    path('admin/', admin.site.urls),
     path('docs/', include('apps.docs.urls')),
     path('cifras/', include('apps.productividad.urls')),
     path('dpi/', include('apps.dpi.urls')),
@@ -24,7 +26,6 @@ urlpatterns = [
     path('', index, name='index')
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-
 if settings.DEBUG:
     import debug_toolbar
     urlpatterns = [

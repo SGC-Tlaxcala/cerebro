@@ -22,3 +22,5 @@ ipython
 jupyter
 pandas
 django-pandas
+django-guardian
+django-sendgrid-v5
