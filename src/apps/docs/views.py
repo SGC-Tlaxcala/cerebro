@@ -14,6 +14,7 @@ from django.views.generic import (
     DetailView
 )
 from django.views.generic.edit import CreateView
+from django.template.defaultfilters import slugify
 from apps.docs.models import Documento, Proceso, Tipo
 from apps.docs.forms import DocForm, ProcesoForm, TipoForm
 
@@ -52,6 +53,13 @@ class DocAdd(CreateView):
     model = Documento
     form_class = DocForm
     success_url = reverse_lazy('docs:index')
+
+    def form_valid(self, form):
+        self.document = form.save(commit=False)
+        self.document.autor = self.request.user
+        self.document.slug = slugify(self.document.nombre)
+        self.document.save()
+        return super().form_valid(form)
 
 
 class ProcesoList(DetailView):

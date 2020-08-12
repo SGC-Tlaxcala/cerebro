@@ -40,7 +40,7 @@ class DocForm(forms.ModelForm):
 
     class Meta:
         model = Documento
-        fields = '__all__'
+        fields = ['nombre', 'proceso', 'tipo', 'texto_ayuda']
 
 
 class ProcesoForm(forms.ModelForm):
