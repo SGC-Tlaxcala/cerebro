@@ -6,13 +6,16 @@
 # pylint: disable=W0613,R0201,R0903
 
 from watson import search as watson
+from django.urls import reverse_lazy
 from django.db.models import Q
 from django.views.generic import (
     ListView,
     TemplateView,
     DetailView
 )
-from apps.docs.models import Documento, Proceso
+from django.views.generic.edit import CreateView
+from apps.docs.models import Documento, Proceso, Tipo
+from apps.docs.forms import DocForm, ProcesoForm, TipoForm
 
 
 class IndexList(ListView):
@@ -29,9 +32,43 @@ class DocDetail(DetailView):
     context_object_name = 'doc'
 
 
+class SetupDoc(TemplateView):
+    template_name = 'docs/setup.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        process = Proceso.objects.all()
+        types = Tipo.objects.all()
+        context.update({
+            'process_form': ProcesoForm,
+            'process': process,
+            'types_form': TipoForm,
+            'types': types
+        })
+        return context
+
+
+class DocAdd(CreateView):
+    model = Documento
+    form_class = DocForm
+    success_url = reverse_lazy('docs:index')
+
+
 class ProcesoList(DetailView):
     model = Proceso
     context_object_name = 'proceso'
+
+
+class ProcessAdd(CreateView):
+    model = Proceso
+    fields = ['proceso', 'slug']
+    success_url = reverse_lazy('docs:setup')
+
+
+class TipoAdd(CreateView):
+    model = Tipo
+    fields = ['tipo', 'slug']
+    success_url = reverse_lazy('docs:setup')
 
 
 class Buscador(TemplateView):
