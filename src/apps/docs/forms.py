@@ -4,10 +4,9 @@
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Submit, Div, HTML, Field, Button
 from crispy_forms.bootstrap import FormActions
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django import forms
 
-from apps.docs.models import Documento, Proceso, Tipo
+from apps.docs.models import Documento, Proceso, Tipo, Revision
 
 
 class DocForm(forms.ModelForm):
@@ -34,7 +33,8 @@ class DocForm(forms.ModelForm):
                 FormActions(
                     Submit('save', 'Guardar cambios'),
                     Button('cancel', 'Cancelar')
-                )
+                ),
+                css_class='modal-footer'
             )
         )
 
@@ -89,3 +89,34 @@ class TipoForm(forms.ModelForm):
     class Meta:
         model = Tipo
         fields = '__all__'
+
+
+class VersionForm(forms.ModelForm):
+    class Meta:
+        model = Revision
+        fields = ['documento', 'revision', 'f_actualizacion', 'archivo', 'cambios']
+
+    def __init__(self, *args, **kwargs):
+        super(VersionForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.layout = Layout(
+            Div(
+                Field('revision', wrapper_class='col-md-6'),
+                Field('f_actualizacion', wrapper_class='col-md-6'),
+                css_class='row'
+            ),
+            Div(
+                Field('archivo', wrapper_class='col-md-12'),
+                css_class='row'
+            ),
+            Div(
+                Field('cambios', wrapper_class='col', rows=3),
+                css_class='row'
+            ),
+            Div(
+                HTML('<hr>'),
+                FormActions(
+                    Submit('save', 'Guardar cambios')
+                )
+            )
+        )

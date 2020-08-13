@@ -10,7 +10,7 @@ from django.urls import path
 from django.contrib.auth.decorators import login_required
 from apps.docs.views import (
     IndexList, DocDetail, ProcesoList, Buscador, SetupDoc,
-    ProcessAdd, TipoAdd, DocAdd
+    ProcessAdd, TipoAdd, DocAdd, RevisionAdd
 )
 
 app_name = 'docs'
@@ -22,5 +22,6 @@ urlpatterns = [
     path('add/', login_required(DocAdd.as_view()), name='add'),
     path('setup/', login_required(SetupDoc.as_view()), name='setup'),
     path('process_add/', login_required(ProcessAdd.as_view()), name='process_add'),
-    path('tipo_add/', login_required(TipoAdd.as_view()), name='tipo_add')
+    path('tipo_add/', login_required(TipoAdd.as_view()), name='tipo_add'),
+    path('<int:pk>/add', RevisionAdd.as_view(), name='rev_add')
 ]

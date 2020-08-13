@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block footer %}
+  <link rel="stylesheet" href="{% static 'css/datepicker.css' %}" />
+  <script src="{% static 'js/bootstrap-datepicker.js' %}"></script>
+  <script>
+    $('.dateinput').datepicker({
+      format: 'dd/mm/yyyy',
+      locale: 'es'
+    })
+  </script>
+{% endblock footer %}
+
+{% block content %}
+  <div class="container">
+    <div class="row">
+      {% if form.errors %}
+        {% for field in form %}
+          {% for error in field.errors %}
+            <div class="alert alert-danger">
+              <strong>{{field.name }}: </strong> {{ error|escape }}
+            </div>
+          {% endfor %}
+        {% endfor %}
+        {% for error in form.non_field_errors %}
+          <div class="alert alert-danger">
+            <strong>{{ error|escape }}</strong>
+          </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+    <div class="row">
+      <div class="col">
+        <h1 class="display-3"><i class="fa fa-book"></i> Actualización de revisiones {{ doc }}</h1>
+        {% include 'partials/_messages.html' %}
+        <hr>
+        <form method="post" class="form">
+          {% csrf_token %}
+          <input type="hidden" id="docID" name="documento" value="{{ doc.id }}">
+          {% crispy form %}
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock content %}

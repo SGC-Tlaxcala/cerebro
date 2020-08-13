@@ -15,8 +15,9 @@ from django.views.generic import (
 )
 from django.views.generic.edit import CreateView
 from django.template.defaultfilters import slugify
-from apps.docs.models import Documento, Proceso, Tipo
-from apps.docs.forms import DocForm, ProcesoForm, TipoForm
+from django.contrib.auth.mixins import LoginRequiredMixin
+from apps.docs.models import Documento, Proceso, Tipo, Revision
+from apps.docs.forms import DocForm, ProcesoForm, TipoForm, VersionForm
 
 
 class IndexList(ListView):
@@ -25,12 +26,20 @@ class IndexList(ListView):
     context_object_name = 'docs'
 
     def get_queryset(self):
-        return Documento.objects.filter(Q(activo=True)).order_by('proceso', 'nombre')
+        return Documento.objects.filter(Q(activo=True)).\
+            order_by('proceso', 'nombre')
 
 
 class DocDetail(DetailView):
     model = Documento
     context_object_name = 'doc'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'version': VersionForm
+        })
+        return context
 
 
 class SetupDoc(TemplateView):
@@ -52,7 +61,6 @@ class SetupDoc(TemplateView):
 class DocAdd(CreateView):
     model = Documento
     form_class = DocForm
-    success_url = reverse_lazy('docs:index')
 
     def form_valid(self, form):
         self.document = form.save(commit=False)
@@ -60,6 +68,31 @@ class DocAdd(CreateView):
         self.document.slug = slugify(self.document.nombre)
         self.document.save()
         return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy('docs:detalle', args=(self.object.id,))
+
+
+class RevisionAdd(LoginRequiredMixin, CreateView):
+    model = Revision
+    form_class = VersionForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        doc = Documento.objects.get(pk=self.kwargs['pk'])
+        context.update({
+            'doc': doc
+        })
+        return context
+
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
+        self.object.autor = self.request.user
+        self.object.save()
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy('docs:detalle', args=(self.kwargs['pk'],))
 
 
 class ProcesoList(DetailView):
