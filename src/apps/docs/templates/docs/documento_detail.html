@@ -215,6 +215,17 @@
         </div>
       </div><!-- ./cad descargar -->
 
+      <div class="row">
+        <div class="col">
+          <div class="card">
+            <div class="card-header text-white-50 bg-success"><i class="fa fa-certificate"></i> Agregar nueva revisión</div>
+            <div class="card-body">
+              <a href="{% url 'docs:rev_add' pk=doc.id %}" id="btn-descarga" class="btn btn-success">Agregar</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 {% endblock content %}

@@ -77,11 +77,20 @@ class RevisionAdd(LoginRequiredMixin, CreateView):
     model = Revision
     form_class = VersionForm
 
+    def dispatch(self, request, *args, **kwargs):
+        self.doc = Documento.objects.get(pk=kwargs['pk'])
+        return super(RevisionAdd, self).dispatch(request, *args, **kwargs)
+
+    def get_inital(self):
+        super(RevisionAdd, self).get_initial()
+        revision = self.doc.revision_set.order_by('-revision')[0].revision +1
+        self.initial['revision'] = revision + 1
+        return self.initial
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        doc = Documento.objects.get(pk=self.kwargs['pk'])
         context.update({
-            'doc': doc
+            'doc': self.doc
         })
         return context
 
