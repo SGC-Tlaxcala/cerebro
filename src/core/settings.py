@@ -50,7 +50,7 @@ LOCAL_APPS = [
     'apps.incidencias.config.IncidenciasConfig',
     'apps.aprobacion.config.AprobacionConfig',
     'apps.mc.config.MCConfig',
-    'apps.metas.config.MetasConfig'
+    'apps.metas.config.MetasConfig',
     'apps.kpi.config.KpiConfig'
 ]
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -133,7 +133,8 @@ LOGIN_REDIRECT_URL = '/'
 STATIC_ROOT = APPS_DIR.child('assets')
 STATIC_URL = '/assets/'
 STATICFILES_DIRS = [
-    APPS_DIR.child('static')
+    APPS_DIR.child('static'),
+    APPS_DIR.child('kpi', 'static', 'kpi')
 ]
 
 MEDIA_ROOT = APPS_DIR.child('media')

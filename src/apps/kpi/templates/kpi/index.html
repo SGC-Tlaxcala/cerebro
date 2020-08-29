@@ -3,8 +3,55 @@
 
 {% block content %}
   <div class="jumbotron p-3 p-md-5 rounded">
-    <div class="col-md-6 px-0">
+    <div class="col-md px-0">
       <h1 class="display-5"><i class="fa fa-cogs"></i> Indicadores de desempeño de los procesos</h1>
     </div>
   </div>
+
+  <div class="row">
+    <div class="col">
+      <a type="button" class="btn btn-secondary btn-lg btn-block" href="{% url 'kpi:capacitacion' %}">Capacitación</a>
+    </div>
+    <div class="col">
+      <button type="button" class="btn btn-secondary btn-lg btn-block">Cobertura Marzo</button>
+    </div>
+    <div class="col">
+      <button type="button" class="btn btn-secondary btn-lg btn-block">Mantenimiento</button>
+    </div>
+  </div>
+
+  <div class="row" style="margin-top: 15px">
+    <div class="col">
+      <button type="button" class="btn btn-secondary btn-lg btn-block">Contratación</button>
+    </div>
+    <div class="col">
+      <button type="button" class="btn btn-secondary btn-lg btn-block">Ejercicio del Gasto</button>
+    </div>
+    <div class="col">
+      <button type="button" class="btn btn-secondary btn-lg btn-block">Encuestas</button>
+    </div>
+  </div>
+
+  <div class="row" style="margin-top: 15px">
+    <div class="col">
+      <button type="button" class="btn btn-secondary btn-lg btn-block">Lista de verificación</button>
+    </div>
+    <div class="col">
+      <button type="button" class="btn btn-secondary btn-lg btn-block">Cartografía</button>
+    </div>
+    <div class="col">
+      <button type="button" class="btn btn-secondary btn-lg btn-block">Incidencias</button>
+    </div>
+  </div>
+
+  <div class="row" style="margin-top: 15px">
+    <div class="col">
+    </div>
+    <div class="col">
+      <button type="button" class="btn btn-secondary btn-lg btn-block">Productividad</button>
+    </div>
+    <div class="col">
+    </div>
+  </div>
+
 {% endblock content %}

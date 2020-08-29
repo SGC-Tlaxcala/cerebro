@@ -1,3 +1,9 @@
-from django.shortcuts import render
+from django.views.generic import TemplateView
 
 # Create your views here.
+class Index(TemplateView):
+    template_name = "kpi/index.html"
+
+
+class Capacitacion(TemplateView):
+    template_name = "kpi/capacitacion.html"
