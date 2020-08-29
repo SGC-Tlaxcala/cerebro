@@ -6,13 +6,18 @@
 # pylint: disable=W0613,R0201,R0903
 
 from watson import search as watson
+from django.urls import reverse_lazy
 from django.db.models import Q
 from django.views.generic import (
     ListView,
     TemplateView,
     DetailView
 )
-from apps.docs.models import Documento, Tipo, Proceso
+from django.views.generic.edit import CreateView
+from django.template.defaultfilters import slugify
+from django.contrib.auth.mixins import LoginRequiredMixin
+from apps.docs.models import Documento, Proceso, Tipo, Revision
+from apps.docs.forms import DocForm, ProcesoForm, TipoForm, VersionForm
 
 
 class IndexList(ListView):
@@ -21,50 +26,99 @@ class IndexList(ListView):
     context_object_name = 'docs'
 
     def get_queryset(self):
-        return Documento.objects.filter(Q(activo=True)).order_by('proceso', 'nombre')
-
-
-class DocIndex(TemplateView):
-    template_name = 'docs/portada.html'
-    # Consultas
-    tipos = Tipo.objects.exclude(Q(slug='pro') | Q(slug='doc'))
-    docs = (Q(tipo__slug='doc') | Q(tipo__slug='pro'))
-
-    doc = Documento.objects.filter(Q(activo=True)).order_by('proceso', 'nombre').prefetch_related()
-    los_docs = doc.filter(docs).prefetch_related()
-    los_regs = doc.filter(tipo__slug='registros').prefetch_related()
-    las_ints = doc.filter(tipo__slug='int').prefetch_related()
-    los_fmts = doc.filter(tipo__slug='fmt').prefetch_related()
-    los_exts = doc.filter(tipo__slug='externo').prefetch_related()
-    las_stn = doc.filter(tipo__slug='stn').prefetch_related()
-    los_coc = doc.filter(tipo__slug='coc').prefetch_related()
-
-    docs = {
-        'tipos': tipos,
-        'los_docs': los_docs,
-        'los_regs': los_regs,
-        'las_ints': las_ints,
-        'los_fmts': los_fmts,
-        'los_exts': los_exts,
-        'title': 'Control de Documentos',
-        'las_stn': las_stn,
-        'los_coc': los_coc
-    }
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update(self.docs)
-        return context
+        return Documento.objects.filter(Q(activo=True)).\
+            order_by('proceso', 'nombre')
 
 
 class DocDetail(DetailView):
     model = Documento
     context_object_name = 'doc'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'version': VersionForm
+        })
+        return context
+
+
+class SetupDoc(TemplateView):
+    template_name = 'docs/setup.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        process = Proceso.objects.all()
+        types = Tipo.objects.all()
+        context.update({
+            'process_form': ProcesoForm,
+            'process': process,
+            'types_form': TipoForm,
+            'types': types
+        })
+        return context
+
+
+class DocAdd(CreateView):
+    model = Documento
+    form_class = DocForm
+
+    def form_valid(self, form):
+        self.document = form.save(commit=False)
+        self.document.autor = self.request.user
+        self.document.slug = slugify(self.document.nombre)
+        self.document.save()
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy('docs:detalle', args=(self.object.id,))
+
+
+class RevisionAdd(LoginRequiredMixin, CreateView):
+    model = Revision
+    form_class = VersionForm
+
+    def dispatch(self, request, *args, **kwargs):
+        self.doc = Documento.objects.get(pk=kwargs['pk'])
+        return super(RevisionAdd, self).dispatch(request, *args, **kwargs)
+
+    def get_inital(self):
+        super(RevisionAdd, self).get_initial()
+        revision = self.doc.revision_set.order_by('-revision')[0].revision +1
+        self.initial['revision'] = revision + 1
+        return self.initial
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'doc': self.doc
+        })
+        return context
+
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
+        self.object.autor = self.request.user
+        self.object.save()
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy('docs:detalle', args=(self.kwargs['pk'],))
+
 
 class ProcesoList(DetailView):
     model = Proceso
     context_object_name = 'proceso'
+
+
+class ProcessAdd(CreateView):
+    model = Proceso
+    fields = ['proceso', 'slug']
+    success_url = reverse_lazy('docs:setup')
+
+
+class TipoAdd(CreateView):
+    model = Tipo
+    fields = ['tipo', 'slug']
+    success_url = reverse_lazy('docs:setup')
 
 
 class Buscador(TemplateView):
@@ -81,66 +135,3 @@ class Buscador(TemplateView):
             'query': query
         })
         return context
-
-
-# @login_required
-# def agregar_documento (request):
-#     if request.method == 'POST':
-#         autor = Documento(autor = request.user)
-#         form = DocumentoForm (request.POST, instance=autor)
-#         if form.is_valid():
-#             obj = form.save(commit=False)
-#             obj.save()
-#             form.save_m2m()
-#             doc = obj.pk
-#             ruta = '/docs/%s/control' % doc
-#             return HttpResponseRedirect(ruta)
-#     else:
-#         form = DocumentoForm()
-#     return render_to_response ('2014/docs/agregar_documento.html', {
-#         'form':form,
-#         'title': 'Agregar un nuevo documento',},
-#         context_instance=RequestContext(request)
-#     )
-#
-# @login_required
-# def agregar_control(request, doc):
-#     if request.method == 'POST':
-#         form = RevisionForm(request.POST, request.FILES)
-#         if form.is_valid():
-#             instancia = form.save(commit=False)
-#             instancia.autor = request.user
-#             instancia.save()
-#             handle_uploaded_file(request.FILES['archivo'], instancia)
-#             ruta = '/docs/%s/detalles' % doc
-#             return HttpResponseRedirect(ruta)
-#     else:
-#         form = RevisionForm()
-#         form.initial['documento'] = doc
-#     return render_to_response ('2014/docs/agregar_control.html', {
-#         'form':form, 'doc':doc,
-#         'title': 'Agregar un nuevo documento',
-#         },
-#         context_instance=RequestContext(request)
-#     )
-#
-#
-# @render_to('2014/docs/editar_control.html')
-# @login_required
-# def editar_control(request, rev):
-#     edicion = get_object_or_404 (Revision, pk=rev)
-#     form = RevisionForm(request.POST or None, instance=edicion)
-#     if form.is_valid():
-#         edicion = form.save()
-#         edicion.save()
-#         if request.FILES.has_key('archivo'):
-#             archivo = request.FILES['archivo']
-#             handle_uploaded_file(archivo, edicion)
-#         else:
-#             archivo = edicion.archivo
-#             editar_revision(archivo, edicion)
-#         ruta = '/docs/%s/detalles' % edicion.documento.id
-#         return redirect (ruta)
-#     return { 'form': form, 'title':'Editando revisión' }
-
-#

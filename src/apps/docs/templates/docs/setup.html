@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block content %}
+  <div class="container">
+    <div class="row">
+      <div class="col">
+        <h1 class="display-3"><i class="fa fa-book"></i> Configuración de la aplicación</h1>
+        {% include 'partials/_messages.html' %}
+        <hr>
+        <div class="row">
+          <div class="col">
+
+            <div class="card">
+              <div class="card-body">
+                <h3 class="card-title">Procesos</h3>
+                <hr>
+                <table class="table table-sm">
+                  <thead class="thead-dark">
+                    <tr>
+                      <th scope="col">#</th>
+                      <th scope="col">Proceso</th>
+                    </tr>
+                  </thead>
+                  <tbody class="table-striped table-hover">
+                    {% for p in process %}
+                      <tr>
+                        <th scope="row">{{ forloop.counter }}</th>
+                        <td>{{ p.proceso }}</td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+                <hr>
+                <h5>Agregar nuevo proceso</h5>
+                <form method="post" action="{% url 'docs:process_add' %}">
+                    {% csrf_token %}
+                    {% crispy process_form %}
+                </form>
+              </div>
+            </div>
+
+          </div><!-- ./procesos -->
+
+          <div class="col">
+            <div class="card">
+              <div class="card-body">
+                <h3 class="card-title">Tipos de documentos</h3>
+                <hr>
+                <table class="table table-sm">
+                  <thead class="thead-dark">
+                    <tr>
+                      <th scope="col">#</th>
+                      <th scope="col">Tipo</th>
+                    </tr>
+                  </thead>
+                  <tbody class="table-striped table-hover">
+                    {% for t in types %}
+                      <tr>
+                        <th scope="row">{{ forloop.counter }}</th>
+                        <td>{{ t.tipo }}</td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+                <hr>
+                <h5>Agregar nuevo tipo de documento</h5>
+                <form method="post" action="{% url 'docs:tipo_add' %}">
+                    {% csrf_token %}
+                    {% crispy types_form %}
+                </form>
+              </div>
+            </div>
+          </div><!-- ./tipos -->
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}
