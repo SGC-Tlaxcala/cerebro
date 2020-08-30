@@ -1,0 +1,267 @@
+{# kpi/concilia.html #}
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+  <div class="jumbotron p-3 p-md-5 rounded">
+    <div class="col-md px-0">
+      <h1 class="display-5"><i class="fa fa-cogs"></i> Proceso Concilia</h1>
+      <p class="lead">
+        El proceso de Concilia para la CAP-2019 correspondiente al periodo del
+        01 de septiembre al 15 de diciembre de 2019, cumplió con la meta
+        programada, cero incidencias.
+      </p>
+      <p><a href="{% url 'kpi:index' %}" type="button" class="btn btn-primary">Índice de procesos</a></p>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col">
+      <ul class="nav nav-tabs">
+        <li class="nav-item">
+          <a class="nav-link active" data-toggle="tab" role="tab" id="op-tab" href="#op">Atributos de Oportunidad</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-toggle="tab" role="tab" id="cal-tab" href="#cal">Atributos de Calidad</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-toggle="tab" role="tab" id="cri-tab" href="#cri">Criterios de Calidad</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col">
+      <!-- Tab panes -->
+      <div class="tab-content">
+        <div class="tab-pane fade show active" id="op" role="tabpanel" aria-labelledby="op-tab">
+          <div class="row">
+            <div class="col-md-3">
+              <h5>Calificaciones</h5>
+              <table class="table table-striped table-sm">
+                <thead>
+                  <tr>
+                    <th>Distrito</th>
+                    <th>Calif.</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th>01</th>
+                    <th>50%</th>
+                  </tr>
+                  <tr>
+                    <th>02</th>
+                    <th>50%</th>
+                  </tr>
+                  <tr>
+                    <th>03</th>
+                    <th>50%</th>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="col-md-9">
+              <h5>Características</h5>
+                <table class="table table-striped table-sm">
+                  <thead>
+                    <tr>
+                      <th>Nivel</th>
+                      <th>Características</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                  <tr>
+                    <td>Alto 50%</td>
+                    <td>
+                      Entregar al Vocal del Registro Federal de Electores en la Junta Local los
+                      formatos REPCONCILIA I, II, III IV y V del 100% de los distritos electorales
+                      de la entidad, correspondientes a la campaña de actualización, de acuerdo a
+                      lo establecido en el Plan de Trabajo emitido en el "Procedimiento para la
+                      Conciliación de Cifras MAC-CECYRD" de cada campaña.
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Medio 40%</td>
+                    <td>
+                      Entregar al Vocal del Registro Federal de Electores en la Junta Local los
+                      formatos REPCONCILIA I, II, III IV y V del 100% de los distritos electorales
+                      de la entidad, correspondientes a las campañas de actualización, de uno a
+                      cinco días hábiles posteriores a lo establecido en el Plan de Trabajo emitido
+                      en el "Procedimiento para la Conciliación de Cifras MAC-CECYRD" de cada campaña.
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Bajo 30%</td>
+                    <td>
+                      Entregar al Vocal del Registro Federal de Electores en la Junta Local los
+                      formatos REPCONCILIA I, II, III IV y V del 100% de los distritos electorales
+                      de la entidad, correspondientes a las campañas de actualización, después
+                      de cinco días hábiles posteriores a lo establecido en el Plan de Trabajo
+                      emitido en el "Procedimiento para la Conciliación de Cifras MAC-CECYRD"
+                      de cada campaña.
+                    </td>
+                  </tr>
+                  </tbody>
+                </table>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <div class="alert alert-success" role="alert">
+                <h4 class="alert-heading">Observaciones</h4>
+                <p>
+                  Envía formatos a JL  REPCONCILIA I, II, III IV y V envía el 12 de marzo, correcciones 27 al 30 Mar_2020
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-pane fade" id="cal" role="tabpanel" aria-labelledby="cal-tab">
+          <div class="row">
+            <div class="col-md-3">
+              <h5>Calificaciones</h5>
+              <table class="table table-striped table-sm">
+                <thead>
+                  <tr>
+                    <th>Distrito</th>
+                    <th>Calif.</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th>01</th>
+                    <th>50%</th>
+                  </tr>
+                  <tr>
+                    <th>02</th>
+                    <th>50%</th>
+                  </tr>
+                  <tr>
+                    <th>03</th>
+                    <th>50%</th>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="col-md-9">
+              <h5>Características</h5>
+                <table class="table table-striped table-sm">
+                  <thead>
+                    <tr>
+                      <th>Nivel</th>
+                      <th>Características</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                  <tr>
+                    <td>Alto 50%</td>
+                    <td>
+                      La elaboración de los formatos no presentó ninguna inconsistencia de
+                      acuerdo al apartado de observaciones.
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Medio 40%</td>
+                    <td>
+                      La elaboración de los formatos presentó una inconsistencia de acuerdo
+                      al apartado de observaciones.
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Bajo 30%</td>
+                    <td>
+                      La elaboración de los formatos presentó dos o más inconsistencias de
+                      acuerdo al apartado de observaciones.
+                    </td>
+                  </tr>
+                  </tbody>
+                </table>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <div class="alert alert-success" role="alert">
+                <h4 class="alert-heading">Observaciones</h4>
+                <p>
+                  Ninguna
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-pane fade" id="cri" role="tabpanel" aria-labelledby="cri-tab">
+          <div class="row">
+            <div class="col">
+              <table class="table table-striped table-sm">
+                <thead>
+                  <tr>
+                    <th>Criterio de calidad</th>
+                    <th>01</th>
+                    <th>02</th>
+                    <th>03</th>
+                    <th>Observaciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>1. Ejecutó los Scripts administrativos en fecha distinta a la definida en el procedimiento.</td>
+                    <td><i class="fa fa-check"></i></td>
+                    <td><i class="fa fa-check"></i></td>
+                    <td><i class="fa fa-check"></i></td>
+                    <td>Ninguna</td>
+                  </tr>
+                  <tr>
+                    <td>2. Utiliza formatos desactualizados.</td>
+                    <td><i class="fa fa-check"></i></td>
+                    <td><i class="fa fa-check"></i></td>
+                    <td><i class="fa fa-check"></i></td>
+                    <td>Ninguna</td>
+                  </tr>
+                  <tr>
+                    <td>3. No integra las observaciones realizadas en el Repconcilia V, con respecto a las justificaciones para los Formato Repconcilia I,II, III y IV.</td>
+                    <td><i class="fa fa-check"></i></td>
+                    <td><i class="fa fa-check"></i></td>
+                    <td><i class="fa fa-check"></i></td>
+                    <td>Ninguna</td>
+                  </tr>
+                  <tr>
+                    <td>4. En los formatos de conclusión no contienen la fecha de envío con la firma autógrafa del Vocal del RFE de la Distrital, como lo establece el “Procedimiento para la Conciliación de Cifras MAC CECYRD”</td>
+                    <td><i class="fa fa-check"></i></td>
+                    <td><i class="fa fa-check"></i></td>
+                    <td><i class="fa fa-check"></i></td>
+                    <td>Ninguna</td>
+                  </tr>
+                  <tr>
+                    <td>5. El resultado final de la conciliación de cifras a nivel módulo no se integra en los formatos REPCONCILIA I, II, III IV y V</td>
+                    <td><i class="fa fa-check"></i></td>
+                    <td><i class="fa fa-check"></i></td>
+                    <td><i class="fa fa-check"></i></td>
+                    <td>Ninguna</td>
+                  </tr>
+                  <tr>
+                    <td>6. Oficio o correos de envío a la Vocalía del Registro Federal de Electores de la Junta Local Ejecutiva.</td>
+                    <td><i class="fa fa-check"></i></td>
+                    <td><i class="fa fa-check"></i></td>
+                    <td><i class="fa fa-check"></i></td>
+                    <td>Ninguna</td>
+                  </tr>
+                  <tr>
+                    <td>7. Concentrados distritales REPCONCILIA  I, II, III, IV y V, con firma autógrafa por el Vocal del Registro Federal de Electores en la Junta Distrital Ejecutiva.</td>
+                    <td><i class="fa fa-check"></i></td>
+                    <td><i class="fa fa-check"></i></td>
+                    <td><i class="fa fa-check"></i></td>
+                    <td>Pendiente</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}

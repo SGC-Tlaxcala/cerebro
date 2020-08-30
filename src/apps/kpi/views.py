@@ -7,3 +7,7 @@ class Index(TemplateView):
 
 class Capacitacion(TemplateView):
     template_name = "kpi/capacitacion.html"
+
+
+class Concilia(TemplateView):
+    template_name = 'kpi/concilia.html'
