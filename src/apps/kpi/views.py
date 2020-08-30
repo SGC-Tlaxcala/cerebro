@@ -15,3 +15,8 @@ class Concilia(TemplateView):
 
 class Supervisiones(TemplateView):
     template_name = 'kpi/supervisiones.html'
+
+
+class Mantenimiento(TemplateView):
+    template_name = 'kpi/mantenimiento.html'
+
