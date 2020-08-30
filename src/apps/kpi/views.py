@@ -1,6 +1,6 @@
 from django.views.generic import TemplateView
 
-# Create your views here.
+
 class Index(TemplateView):
     template_name = "kpi/index.html"
 
@@ -11,3 +11,7 @@ class Capacitacion(TemplateView):
 
 class Concilia(TemplateView):
     template_name = 'kpi/concilia.html'
+
+
+class Supervisiones(TemplateView):
+    template_name = 'kpi/supervisiones.html'

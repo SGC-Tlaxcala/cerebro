@@ -1,0 +1,107 @@
+{# kpi/concilia.html #}
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+  <div class="jumbotron p-3 p-md-5 rounded">
+    <div class="col-md px-0">
+      <h1 class="display-5"><i class="fa fa-cogs"></i> Proceso Supervisiones</h1>
+      <p class="lead">
+        En este periodo seregistraron 75 incidencias, de las cuales 66 fueron atendidas y
+        9 están pendientes.
+      </p>
+      <p><a href="{% url 'kpi:index' %}" type="button" class="btn btn-primary">Índice de procesos</a></p>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col">
+      <h3>Resumen</h3>
+      <img
+              src="{% static 'kpi/incidencias-grafico2.png' %}"
+              alt="Resumen"
+              class="img-fluid rounded mx-auto d-block">
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col">
+      <h3>Estadísticas Generales</h3>
+      <img
+              src="{% static 'kpi/incidencias-grafico1.png' %}"
+              alt="Estadísticas generales"
+              class="img-fluid rounded mx-auto d-block">
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col">
+      <h3>Incidencias en Octubre de 2019</h3>
+      <img
+              src="{% static 'kpi/incidencias-2019-10.png' %}"
+              alt="Octubre 2019"
+              class="img-fluid rounded mx-auto d-block">
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col">
+      <h3>Incidencias en Noviembre de 2019</h3>
+      <img
+              src="{% static 'kpi/incidencias-2019-11.png' %}"
+              alt="Noviembre 2019"
+              class="img-fluid rounded mx-auto d-block">
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col">
+      <h3>Incidencias en Diciembre de 2019</h3>
+      <img
+              src="{% static 'kpi/incidencias-2019-12.png' %}"
+              alt="Diciembre 2019"
+              class="img-fluid rounded mx-auto d-block">
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col">
+      <h3>Incidencias en Enero de 2020</h3>
+      <img
+              src="{% static 'kpi/incidencias-2020-01.png' %}"
+              alt="Enero 2020"
+              class="img-fluid rounded mx-auto d-block">
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col">
+      <h3>Incidencias en Febrero de 2020</h3>
+      <img
+              src="{% static 'kpi/incidencias-2020-02.png' %}"
+              alt="Febrero 2020"
+              class="img-fluid rounded mx-auto d-block">
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col">
+      <h3>Incidencias en Marzo de 2020</h3>
+      <img
+              src="{% static 'kpi/incidencias-2020-03.png' %}"
+              alt="Marzo 2020"
+              class="img-fluid rounded mx-auto d-block">
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col">
+      <h3>Catálogo de Incidencias</h3>
+      <img
+              src="{% static 'kpi/incidencias-catalogo.png' %}"
+              alt="Catálogo"
+              class="img-fluid rounded mx-auto d-block">
+    </div>
+  </div>
+
+{% endblock content %}
