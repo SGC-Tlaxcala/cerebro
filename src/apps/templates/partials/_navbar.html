@@ -55,27 +55,6 @@
               <i class="fa fa-id-card-o"></i> Entregas
             </a>
 
-
-            {% comment %}<a
-              class="dropdown-item {% current request 'mesas' %}"
-              href="{% url 'mesas:index' %}">
-              <i class="fa fa-user-times"></i> Control recepción
-            </a>
-            <a
-              class="dropdown-item {% current request 'paquetes' %}"
-              href="{% url 'paquetes:index' %}">
-              <i class="fa fa-truck"></i> Distribución de paquetes
-            </a>
-            <a
-              class="dropdown-item {% current request 'dpi' %}"
-              href="{% url 'dpi:index' %}">
-              <i class="fa fa-user-secret"></i> Control de DPI
-            </a>
-            <a
-              class="dropdown-item {% current request 'cecyrd' %}"
-              href="{% url 'cecyrd:index' %}">
-              <i class="fa fa-bolt"></i> Control de Entregas
-            </a>{% endcomment %}
             <div class="dropdown-divider"></div>
             <a
               class="dropdown-item {% current request 'cecyrd' %}"
@@ -83,11 +62,18 @@
               <i class="fa fa-thumbs-o-up"></i> Aprobación ciudadana
             </a>
 
-            <div class="dropdown-divider"></div>
+            <!-- div class="dropdown-divider"></div>
             <a
               class="dropdown-item {% current request 'mc' %}"
               href="{% url 'mc:index' %}">
               <i class="fa fa-building-o"></i> Modelo de Calidad DERFE
+            </a -->
+
+            <div class="dropdown-divider"></div>
+            <a
+              class="dropdown-item {% current request 'kpi' %}"
+              href="{% url 'kpi:index' %}">
+              <i class="fa fa-cogs"></i> Procesos
             </a>
           </div>
         </li>
