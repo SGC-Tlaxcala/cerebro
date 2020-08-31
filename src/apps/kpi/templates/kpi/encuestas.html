@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+  <div class="jumbotron p-3 p-md-5 rounded">
+    <div class="col-md px-0">
+      <h1 class="display-5"><i class="fa fa-cogs"></i> Proceso Encuestas</h1>
+      <p><a href="{% url 'kpi:index' %}" type="button" class="btn btn-primary">Índice de procesos</a></p>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col">
+        <img
+                src="{% static 'kpi/encuestas-01.png' %}"
+                alt="Resumen"
+                class="img-fluid rounded mx-auto d-block">
+      <p></p>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col">
+        <img
+                src="{% static 'kpi/encuestas-02.png' %}"
+                alt="Resumen"
+                class="img-fluid rounded mx-auto d-block">
+    </div>
+  </div>
+{% endblock content %}
