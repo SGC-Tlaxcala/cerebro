@@ -2,7 +2,7 @@ from django.urls import path
 from apps.kpi.views import (Index,
                             Capacitacion, Concilia, Supervisiones,
                             Mantenimiento, Contratacion, Gasto,
-                            Encuestas, Checklist)
+                            Encuestas, Checklist, Cartografia)
 
 
 app_name = 'kpi'
@@ -15,6 +15,6 @@ urlpatterns = [
     path('gasto', Gasto.as_view(), name='gasto'),
     path('encuestas', Encuestas.as_view(), name='encuestas'),
     path('checklist', Checklist.as_view(), name='checklist'),
+    path('cartografia', Cartografia.as_view(), name='cartografia'),
     path('', Index.as_view(), name='index')
 ]
-
