@@ -31,3 +31,7 @@ class Gasto(TemplateView):
 
 class Encuestas(TemplateView):
     template_name = 'kpi/encuestas.html'
+
+
+class Checklist(TemplateView):
+    template_name = 'kpi/checklist.html'
