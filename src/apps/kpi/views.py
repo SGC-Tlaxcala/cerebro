@@ -39,3 +39,7 @@ class Checklist(TemplateView):
 
 class Cartografia(TemplateView):
     template_name = 'kpi/cartografia.html'
+
+
+class Incidencias(TemplateView):
+    template_name = 'kpi/incidencias.html'
