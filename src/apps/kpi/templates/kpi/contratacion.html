@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+  <div class="jumbotron p-3 p-md-5 rounded">
+    <div class="col-md px-0">
+      <h1 class="display-5"><i class="fa fa-cogs"></i> Proceso Contratación</h1>
+      <p class="lead">
+        Resultados del seguimiento de los procesos, durante el periodo de octubre de 2019 a marzo de 2020.
+      </p>
+      <p><a href="{% url 'kpi:index' %}" type="button" class="btn btn-primary">Índice de procesos</a></p>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col">
+        <img
+                src="{% static 'kpi/contratacion-01.png' %}"
+                alt="Resumen"
+                class="img-fluid rounded mx-auto d-block">
+    </div>
+  </div>
+
+{% endblock content %}

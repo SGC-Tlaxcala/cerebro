@@ -20,3 +20,6 @@ class Supervisiones(TemplateView):
 class Mantenimiento(TemplateView):
     template_name = 'kpi/mantenimiento.html'
 
+
+class Contratacion(TemplateView):
+    template_name = 'kpi/contratacion.html'
