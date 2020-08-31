@@ -43,3 +43,7 @@ class Cartografia(TemplateView):
 
 class Incidencias(TemplateView):
     template_name = 'kpi/incidencias.html'
+
+
+class Productividad(TemplateView):
+    template_name = 'kpi/productividad.html'
