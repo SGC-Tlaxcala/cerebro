@@ -26,9 +26,10 @@ from core.utils import Remesa
 scope = F('fecha_corte__year=2020')
 YEAR = 2020
 YEARS = (2019, 2020)
-CAP = '2019-12-16'
-CAI = '2020-08-31'
-
+# CAP = '2019-12-16'
+# CAI = '2020-08-31'
+INICIO = '2020-08-31'
+FINAL = '2021-01-31'
 
 def get_int(celda):
     """Convierte el valor de una celda en entero"""
@@ -106,7 +107,7 @@ class CifrasPortada(ListView):
         return super(CifrasPortada, self).dispatch(request, *args, **kwargs)
 
     def get_queryset(self, **kwargs):
-        return Reporte.objects.filter(fecha_corte__gte=CAP, fecha_corte__lte=CAI).order_by('fecha_corte')
+        return Reporte.objects.filter(fecha_corte__gte=INICIO, fecha_corte__lte=FINAL).order_by('fecha_corte')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
