@@ -20,6 +20,14 @@ from apps.docs.models import Documento, Proceso, Tipo, Revision
 from apps.docs.forms import DocForm, ProcesoForm, TipoForm, VersionForm
 
 
+class IndexLMD(ListView):
+    model = Documento
+    context_object_name = 'docs'
+
+    def get_queryset(self):
+        return Documento.objects.filter(proceso__slug='lmd').order_by('id')
+
+
 class IndexList(ListView):
     model = Documento
     template_name = 'docs/portada2.html'

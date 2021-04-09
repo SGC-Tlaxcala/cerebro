@@ -19,9 +19,10 @@ Vagrant.configure("2") do |config|
   config.ssh.shell = "bash -c 'BASH_ENV=/etc/profile exec bash'"
 
   config.vm.provision "ansible_local" do |ansible|
-    ansible.install_mode = "pip"
+    ansible.install_mode = "pip3"
     ansible.compatibility_mode = '2.0'
     ansible.playbook = 'playbook.yml'
+    ansible.extra_vars = { ansible_python_interpreter:"/usr/bin/python3" }
   end
     
 end

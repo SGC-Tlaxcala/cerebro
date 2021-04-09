@@ -9,13 +9,13 @@
 from django.urls import path
 from django.contrib.auth.decorators import login_required
 from apps.docs.views import (
-    IndexList, DocDetail, ProcesoList, Buscador, SetupDoc,
+    IndexLMD, DocDetail, ProcesoList, Buscador, SetupDoc,
     ProcessAdd, TipoAdd, DocAdd, RevisionAdd
 )
 
 app_name = 'docs'
 urlpatterns = [
-    path('', IndexList.as_view(), name='index'),
+    path('', IndexLMD.as_view(), name='index'),
     path('<int:pk>/detalle', DocDetail.as_view(), name='detalle'),
     path('proceso/<slug:slug>', ProcesoList.as_view(), name='proceso'),
     path('buscador/', Buscador.as_view(), name='buscador'),

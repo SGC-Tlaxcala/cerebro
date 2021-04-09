@@ -30,6 +30,8 @@ class Proceso (models.Model):
             return 'Opiniones Técnicas de la STN'
         elif self.slug == 'coc':
             return 'Oficios de la COC'
+        elif self.slug == 'lmd':
+            return 'Lista Maestra de Documentos'
         else:
             return f'Proceso {self.proceso}'
 
