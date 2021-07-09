@@ -4,9 +4,8 @@ from rest_framework import views, serializers, status
 from rest_framework.response import Response
 
 
-def index(request):
-    template = 'index.html'
-    return render(request, template)
+class Index(TemplateView):
+    template_name = 'index.html'
 
 
 class EncuestasIndex(TemplateView):
