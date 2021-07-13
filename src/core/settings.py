@@ -51,7 +51,8 @@ LOCAL_APPS = [
     'apps.aprobacion.config.AprobacionConfig',
     'apps.mc.config.MCConfig',
     'apps.metas.config.MetasConfig',
-    'apps.kpi.config.KpiConfig'
+    'apps.kpi.config.KpiConfig',
+    'apps.risks.config.RisksConfig'
 ]
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
@@ -92,6 +93,10 @@ WSGI_APPLICATION = 'core.wsgi.application'
 DATABASES = {
     'default': env.db()
 }
+
+import sys
+if 'test' in sys.argv or 'test_coverage' in sys.argv: #Covers regular testing and django-coverage
+    DATABASES['default']['ENGINE'] = 'django.db.backends.sqlite3'
 
 if DEBUG:
     DJANGO_ALLOW_ASYNC_UNSAFE = env("DJANGO_ALLOW_ASYNC_UNSAFE", default=True)

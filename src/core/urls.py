@@ -9,6 +9,7 @@ from core.views import Index, EncuestasIndex
 
 
 urlpatterns = [
+    path('risks/', include('apps.risks.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
     path('admin/', admin.site.urls),
     path('metas/', include('apps.metas.urls')),
