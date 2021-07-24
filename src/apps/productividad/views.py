@@ -23,13 +23,14 @@ from apps.productividad.forms import CargaCifras
 from apps.productividad.models import Cifras, PronosticoTramites, Reporte
 from core.utils import Remesa
 
-scope = F('fecha_corte__year=2020')
-YEAR = 2020
-YEARS = (2019, 2020)
+scope = F('fecha_corte__year=2021')
+YEAR = 2021
+YEARS = (2019, 2020, 2021)
 # CAP = '2019-12-16'
 # CAI = '2020-08-31'
-INICIO = '2020-08-31'
-FINAL = '2021-01-31'
+INICIO = '2021-01-01'
+FINAL = '2021-12-31'
+
 
 def get_int(celda):
     """Convierte el valor de una celda en entero"""
@@ -56,7 +57,7 @@ def get_float(celda):
 def procesar_cifras(archivo_excel):
     """Procesa el archivo de cifras"""
     try:
-        cifras = xlrd.open_workbook(archivo_excel).sheet_by_name("CIFRAS_PRODUCCION DIARIA")
+        cifras = xlrd.open_workbook(archivo_excel).sheet_by_index(0)
     except xlrd.XLRDError:
         cifras = xlrd.open_workbook(archivo_excel).sheet_by_name("CIFRAS_PRODUCCION SEMANAL")
     remesa = list(filter(None, cifras.row_values(6)))[0][8:].replace('_', '-')
