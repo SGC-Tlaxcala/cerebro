@@ -56,6 +56,7 @@ class Documento (models.Model):
     tipo = models.ForeignKey(Tipo, on_delete=models.CASCADE)
 
     # Búsqueda
+    aprobado = models.BooleanField("Documento en aprobación", default=False)
     activo = models.BooleanField(default=True)
     texto_ayuda = models.TextField(blank=True)
 
