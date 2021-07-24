@@ -143,7 +143,7 @@ class CifrasPortada(ListView):
         return super(CifrasPortada, self).dispatch(request, *args, **kwargs)
 
     def get_queryset(self, **kwargs):
-        return Reporte.objects.filter(fecha_corte__gte=INICIO, fecha_corte__lte=FINAL).order_by('fecha_corte')
+        return Reporte.objects.filter(fecha_corte__gte=INICIO, fecha_corte__lte=FINAL).order_by('remesa')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -251,11 +251,11 @@ class Productividad(View):
             .filter(reporte_semanal__fecha_corte__year=self.year)\
             .values('distrito')\
             .order_by('distrito')\
-            .annotate(suma_modulo=Sum('tramites'))
+            .annotate(suma_modulo=Sum('tramites_aplicados'))
         self.entregas = Numbers.objects.values('distrito')\
             .filter(reporte_semanal__fecha_corte__year=self.year)\
             .order_by('distrito')\
-            .annotate(entregas_distrito=Sum('credenciales_entregadas_actualizacion'))
+            .annotate(entregas_distrito=Sum('cards_by_update'))
         self.periodo = {
             'inicio': Reporte.objects.filter(fecha_corte__year=self.year).order_by('fecha_corte').first(),
             'fin': Reporte.objects.filter(fecha_corte__year=self.year).order_by('fecha_corte').last()

@@ -51,11 +51,6 @@
                 <i class="fa fa-plus-circle"></i> Agregar remesa
               </a>
             {% endif %}
-            <a href="{% url 'cifras:tramites' %}?year={{ year }}" class="btn btn-success"><i class="fa fa-edit"></i> Trámites {{ year }}</a>
-            <a href="{% url 'cifras:entregas' %}?year={{ year }}" class="btn btn-info"><i class="fa fa-id-card-o"></i> Entregas {{ year }}</a>
-            {% if not same_year %}
-              <a href="{% url 'cifras:index' %}?year={{ current_year }}" class="btn btn-warning"><i class="fa fa-bar-chart"></i> Productividad <strong>{{ current_year }}</strong></a>
-            {% endif %}
           </p>
         </div>
       </div>
