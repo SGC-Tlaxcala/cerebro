@@ -36,25 +36,10 @@
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdown">
             <a
-              class="dropdown-item {% current request 'cobertura' %}"
-              href="{% url 'cobertura:index' %}">
-              <i class="fa fa-globe"></i> Cobertura</a>
-            <a
               class="dropdown-item {% current request 'cifras' %}"
               href="{% url 'cifras:index' %}">
               <i class="fa fa-bar-chart"></i> Productividad
             </a>
-            <a
-              class="dropdown-item {% current request 'tramites' %}"
-              href="{% url 'cifras:tramites' %}">
-              <i class="fa fa-edit"></i> Trámites
-            </a>
-            <a
-              class="dropdown-item {% current request 'entregas' %}"
-              href="{% url 'cifras:entregas' %}">
-              <i class="fa fa-id-card-o"></i> Entregas
-            </a>
-
             <div class="dropdown-divider"></div>
             <a
               class="dropdown-item {% current request 'cecyrd' %}"
@@ -62,25 +47,8 @@
               <i class="fa fa-thumbs-o-up"></i> Aprobación ciudadana
             </a>
 
-            <!-- div class="dropdown-divider"></div>
-            <a
-              class="dropdown-item {% current request 'mc' %}"
-              href="{% url 'mc:index' %}">
-              <i class="fa fa-building-o"></i> Modelo de Calidad DERFE
-            </a -->
-
             <div class="dropdown-divider"></div>
-            <a
-              class="dropdown-item {% current request 'kpi' %}"
-              href="{% url 'kpi:index' %}">
-              <i class="fa fa-cogs"></i> Procesos
-            </a>
           </div>
-        </li>
-
-              <li class="nav-item">
-          <a href="http://10.29.0.79/media/carto/vnm2020/" class="nav-link {% current request 'metas' %}">
-            <i class="fa fa-map"></i> VNM 2020</a>
         </li>
 
       </ul>
