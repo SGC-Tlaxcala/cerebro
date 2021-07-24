@@ -33,7 +33,7 @@ THIRD_PARTY_APPS = [
     'crispy_forms',
     'django_extensions',
     'watson',
-    'debug_toolbar',
+ #   'debug_toolbar',
     'simple_history',
     'guardian'
 ]
@@ -63,7 +63,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware'
+#    'debug_toolbar.middleware.DebugToolbarMiddleware'
 ]
 
 ROOT_URLCONF = 'core.urls'
