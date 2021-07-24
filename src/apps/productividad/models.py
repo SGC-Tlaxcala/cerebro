@@ -59,7 +59,7 @@ class Reporte(TimeStampedModel):
         get_latest_by = 'fecha_corte'
 
 
-class Cifras(models.Model):
+class Numbers(models.Model):
     """Modelo de productividad."""
     reporte_semanal = models.ForeignKey(
         Reporte,
@@ -67,29 +67,25 @@ class Cifras(models.Model):
         on_delete=models.CASCADE
     )
     distrito = models.CharField('Distrito', max_length=2)
-    modulo = models.CharField('Módulo', max_length=6)
-    tipo = models.CharField('Tipo de módulo', max_length=20)
-    dias_trabajados = models.PositiveSmallIntegerField('Días trabajados')
-    jornada_trabajada = models.FloatField('Jornada trabajada')
-    configuracion = models.CharField('Configuración', max_length=10)
-    tramites = models.SmallIntegerField('Trámites')
-    credenciales_entregadas_actualizacion = models.SmallIntegerField(
-        'Credenciales entregas',
+    mac = models.CharField('Módulo', max_length=6)
+    type = models.CharField('Tipo de módulo', max_length=20)
+    days_worked = models.FloatField('Días trabajados')
+    hours_worked = models.FloatField('Jornada trabajada')
+    setup = models.CharField('Configuración', max_length=10)
+    tramites_aplicados = models.SmallIntegerField('Trámites')
+    cards_by_update = models.SmallIntegerField(
+        'Credenciales entregadas',
         help_text='Credenciales entregadas producto de trámites de actualización'
     )
-    credenciales_reimpresion = models.SmallIntegerField(
-        'Credenciales reimpresión',
-        help_text='Credenciales entregadas productos de solicitudes de reimpresión'
-    )
     total_atenciones = models.SmallIntegerField('Total de atención')
-    productividad_x_dia = models.SmallIntegerField('Productividad por día')
-    productividad_x_dia_x_estacion = models.SmallIntegerField('Productividad por día por estación')
+    numbers_by_day = models.SmallIntegerField('Productividad por día')
+    numbers_by_machine_by_day = models.SmallIntegerField('Productividad por día por estación')
     credenciales_recibidas = models.SmallIntegerField('Credenciales recibidas')
 
     def __str__(self):
-        return f'{self.modulo} - {self.reporte_semanal.remesa}'
+        return f'{self.mac} - {self.reporte_semanal.remesa}'
 
     class Meta:
         verbose_name = 'Cifras por módulo'
         verbose_name_plural = 'Reportes de productividad'
-        ordering = ['distrito', 'modulo']
+        ordering = ['distrito', 'mac']

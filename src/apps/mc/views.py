@@ -4,7 +4,7 @@ from django.views import View
 from django.shortcuts import render
 from django.db.models import Sum
 
-from apps.productividad.models import PronosticoTramites, Cifras
+from apps.productividad.models import PronosticoTramites, Numbers
 from apps.productividad.models import Reporte
 
 
