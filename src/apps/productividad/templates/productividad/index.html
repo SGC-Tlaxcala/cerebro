@@ -9,8 +9,8 @@
     function drawChart() {
 
       let data = google.visualization.arrayToDataTable([
-        ['Remesa', {% for mac in reportes.1.reporte_cifras.all %}'{{ mac.modulo }}'{% if not forloop.last %}, {% endif %}{% endfor %}],
-        {% for r in reportes %}['{{ r.remesa }}', {% for m in r.reporte_cifras.all %}{{ m.productividad_x_dia_x_estacion }}{% if not forloop.last %}, {% endif %}{% endfor %}]{% if not forloop.last %},{% endif %}
+        ['Remesa', {% for mac in reportes.1.reporte_cifras.all %}'{{ mac.mac }}'{% if not forloop.last %}, {% endif %}{% endfor %}],
+        {% for r in reportes %}['{{ r.remesa }}', {% for m in r.reporte_cifras.all %}{{ m.numbers_by_machine_by_day }}{% if not forloop.last %}, {% endif %}{% endfor %}]{% if not forloop.last %},{% endif %}
         {% endfor %}
       ])
 
@@ -77,7 +77,7 @@
             <tr>
               <th>Remesa</th>
               {% for mac in reportes.1.reporte_cifras.all %}
-                <th>{{ mac.modulo }}</th>
+                <th>{{ mac.mac }}</th>
               {% endfor %}
             </tr>
           </thead>
@@ -90,7 +90,7 @@
                   </a>
                 </td>
                 {% for m in r.reporte_cifras.all %}
-                  <td class="text-right">{{ m.productividad_x_dia_x_estacion }}</td>
+                  <td class="text-right">{{ m.numbers_by_machine_by_day }}</td>
                 {% endfor %}
               </tr>
             {% endfor %}

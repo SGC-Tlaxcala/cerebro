@@ -28,8 +28,7 @@
               <th class="text-center">Jornada trabajada</th>
               <th class="text-center">Configuración</th>
               <th class="text-center">Trámites realizados</th>
-              <th class="text-center">Cred. entregadas<sup>1</sup></th>
-              <th class="text-center">Cred. reimpresión<sup>2</sup></th>
+              <th class="text-center">Cred. entregadas</th>
               <th class="text-center">Total de atenciones</th>
               <th class="text-center">Productividad por día</th>
               <th class="text-center">Productividad por estación</th>
@@ -39,27 +38,22 @@
           <tbody>
           {% for mac in reporte.reporte_cifras.all %}
             <tr>
-              <td class="text-center">{{ mac.modulo }}</td>
-              <td class="text-nowrap text-center">{{ mac.tipo }}</td>
-              <td class="text-right">{{ mac.dias_trabajados }}</td>
-              <td class="text-right">{{ mac.jornada_trabajada }}</td>
-              <td class="text-center">{{ mac.configuracion }}</td>
-              <td class="text-right">{{ mac.tramites }}</td>
-              <td class="text-right">{{ mac.credenciales_entregadas_actualizacion }}</td>
-              <td class="text-right">{{ mac.credenciales_reimpresion }}</td>
+              <td class="text-center">{{ mac.mac }}</td>
+              <td class="text-nowrap text-center">{{ mac.type }}</td>
+              <td class="text-right">{{ mac.days_worked }}</td>
+              <td class="text-right">{{ mac.hours_worked }}</td>
+              <td class="text-center">{{ mac.setup }}</td>
+              <td class="text-right">{{ mac.tramites_aplicados }}</td>
+              <td class="text-right">{{ mac.cards_by_update }}</td>
               <td class="text-right">{{ mac.total_atenciones }}</td>
-              <td class="text-right">{{ mac.productividad_x_dia }}</td>
-              <td class="text-right">{{ mac.productividad_x_dia_x_estacion }}</td>
+              <td class="text-right">{{ mac.numbers_by_day }}</td>
+              <td class="text-right">{{ mac.numbers_by_machine_by_day }}</td>
               <td class="text-right">{{ mac.credenciales_recibidas }}</td>
             </tr>
           {% endfor %}
           </tbody>
         </table>
-        <p>
-          <sup>1</sup> Credenciales entregadas producto de solicitudes de actualización en entidades sin proceso local.
-          <br>
-          <sup>2</sup> Credenciales entregadas producto de solicitudes de reimpresión.
-        </p>
+
         <h4>Observaciones</h4>
         <p>
           {{ reporte.notas }}
