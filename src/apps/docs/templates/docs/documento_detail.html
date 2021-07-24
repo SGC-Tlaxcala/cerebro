@@ -7,11 +7,20 @@
 {% endblock header %}
 
 {% block footer %}
+
+
+
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.0/jquery-confirm.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.0/jquery-confirm.min.js"></script>
   <link rel="stylesheet" href="{% static 'css/datepicker.css' %}" />
   <script src="{% static 'js/bootstrap-datepicker.js' %}"></script>
   <script type="application/javascript">
+
+    {% if doc.aprobado %}
+      $(document).ready(function() {
+        $('#docAprobado').modal('show');
+      });
+    {% endif %}
 
     $('#btn-descarga').on('click', function(){
       $.confirm({
@@ -30,6 +39,37 @@
     })
 
   </script>
+
+  {% if doc.aprobado %}
+    <div id="docAprobado" class="modal modal-wide fade"  data-keyboard="false" data-backdrop="static">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Documento en aprobación</h5>
+          </div>
+          <div class="modal-body">
+            <p>
+              Este documento se revisó y aprobó por el Comité de la Calidad
+              en la entidad. Una vez que sea aprobado por Oficinas Centrales
+              la versión final sustituirá a la presente.
+            </p>
+            <p>
+              Podrá ser utilizado en los procesos del sistema, sin embargo, se
+              recomienda estar atento a las notificaciones de actualización.
+            </p>
+            <p>
+              Cualquier diferencia entre la versión aprobada y la actual será
+              consignada en el área de <em>Historial de actualizaciones</em>.
+            </p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+  {% endif %}
+
   {% if not doc.r_actual %}
     <!-- Button trigger modal -->
     <script type="text/javascript">
@@ -72,7 +112,11 @@
     <div class="col"><!-- contenido -->
       <div class="page-header">
         <h1 class="display-4">
-          {{ doc.nombre }} <small>
+          {% if doc.aprobado %}
+            <span class="text-danger"><i class="fa fa-exclamation-triangle"></i></span>
+          {% endif %}
+          {{ doc.nombre }}
+          <small>
             {% if doc.proceso.slug != "stn" %}ver. {{ doc.r_actual }}{% endif %}
             ({{ doc.revision_actual.f_actualizacion }})
           </small>
@@ -120,6 +164,28 @@
         </div>
         <!-- ./Cambios actuales -->
       {% endif %}
+
+    <p></p>
+    <div class="row">
+      <div class="col">
+        <div class="alert alert-danger" role="alert">
+          <h5>Documento en revisión</h5>
+            <p>
+              Este documento se revisó y aprobó por el Comité de la Calidad
+              en la entidad. Una vez que sea aprobado por Oficinas Centrales
+              la versión final sustituirá a la presente.
+            </p>
+            <p>
+              Podrá ser utilizado en los procesos del sistema, sin embargo, se
+              recomienda estar atento a las notificaciones de actualización.
+            </p>
+            <p>
+              Cualquier diferencia entre la versión aprobada y la actual será
+              consignada en el área de <em>Historial de actualizaciones</em>.
+            </p>
+        </div>
+      </div>
+    </div>
 
       <div class="row">
         <div class="col">

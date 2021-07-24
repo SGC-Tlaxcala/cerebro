@@ -46,7 +46,9 @@
               </td>
               {% if doc.r_actual %}
                 <td style="text-align: center;">{{ doc.r_actual }}</td>
-                <td>{{ doc.revision_actual.f_actualizacion|date:"M d, Y" }}</td>
+                <td>{% if not doc.aprobado %}
+                  {{ doc.revision_actual.f_actualizacion|date:"M d, Y" }}
+                {%  endif %}</td>
               {% else %}
                 <td colspan="3">
                   <a href="{% url "docs.views.agregar_control" doc=doc.id %}">
