@@ -7,10 +7,12 @@
 import math
 import xlrd
 from datetime import datetime
+from openpyxl import load_workbook
 
 from django.conf import settings
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
+from django.core.exceptions import BadRequest
 from django.db.models import Sum, F
 from django.shortcuts import render
 from django.urls import reverse
@@ -20,16 +22,15 @@ from django.views.generic.edit import FormView
 from django.views.generic.list import ListView
 
 from apps.productividad.forms import CargaCifras
-from apps.productividad.models import Cifras, PronosticoTramites, Reporte
+from apps.productividad.models import Numbers, PronosticoTramites, Reporte
 from core.utils import Remesa
 
-scope = F('fecha_corte__year=2021')
+
 YEAR = 2021
 YEARS = (2019, 2020, 2021)
-# CAP = '2019-12-16'
-# CAI = '2020-08-31'
-INICIO = '2021-01-01'
+INICIO = '2021-01-18'
 FINAL = '2021-12-31'
+scope = F(f'fecha_corte__year={YEAR}')
 
 
 def get_int(celda):
@@ -93,6 +94,40 @@ def procesar_cifras(archivo_excel):
     return observaciones, remesa, macs
 
 
+def get_data_excel(file):
+    try:
+        wb = load_workbook(filename=file, data_only=True)
+    except Exception:
+        raise BadRequest('Ocurrió un error')
+    ws = wb.active
+    remesa = ws['J7'].value[8:15].replace('_', '-')
+    observaciones = ws['A41'].value
+    macs = {}
+
+    for row in range(9, 22):
+        mac = ws[row]
+        try:
+            _mac = str(mac[0].value)
+            if _mac[:3] == '290':
+                macs[_mac] = {
+                    'distrito': _mac[2:4],
+                    'type': mac[1].value,
+                    'days_worked': mac[2].value,
+                    'hours_worked': mac[3].value,
+                    'setup': mac[4].value,
+                    'tramites_aplicados': mac[5].value,
+                    'cards_by_update': mac[6].value,
+                    'total_atenciones': mac[7].value,
+                    'numbers_by_day': mac[8].value,
+                    'numbers_by_machine_by_day': mac[9].value,
+                    'credenciales_recibidas': mac[11].value
+                }
+        except ValueError:
+            pass
+
+    return remesa, observaciones, macs
+
+
 class CifrasPortada(ListView):
     """Para crear la portada"""
     model = Reporte
@@ -108,7 +143,7 @@ class CifrasPortada(ListView):
         return super(CifrasPortada, self).dispatch(request, *args, **kwargs)
 
     def get_queryset(self, **kwargs):
-        return Reporte.objects.filter(fecha_corte__gte=INICIO, fecha_corte__lte=FINAL).order_by('fecha_corte')
+        return Reporte.objects.filter(fecha_corte__gte=INICIO, fecha_corte__lte=FINAL).order_by('remesa')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -148,41 +183,41 @@ class CifrasUpload(FormView):
     def form_valid(self, form):
         fecha = form.cleaned_data['fecha_corte']
         archivo = self.get_form_kwargs().get('files')['archivo']
-        path = default_storage.save(
-            settings.MEDIA_ROOT.child('productividad', f"remesa-{fecha.strftime('%Y%m%d')}.xls"),
+        file = default_storage.save(
+            settings.MEDIA_ROOT.child('productividad', f"remesa-{fecha.strftime('%Y%m%d')}.xlsx"),
             ContentFile(archivo.read())
         )
-        (observaciones, remesa, macs) = procesar_cifras(path)
+        (remesa, observaciones, macs) = get_data_excel(file)
         self.reporte, created = Reporte.objects.update_or_create(
             remesa=remesa,
             defaults={
                 'fecha_corte': fecha,
                 'remesa': remesa,
                 'notas': observaciones,
-                'archivo': path,
+                'archivo': file,
                 'usuario': self.request.user
             }
         )
         reporte_actividad = 'creó' if {created} else 'actualizó'
         print(f"cerebro:: El reporte {self.reporte} se {reporte_actividad}")
         for mac in macs:
-            cifras, created = Cifras.objects.update_or_create(
-                reporte_semanal=self.reporte, modulo=mac,
+            cifras, created = Numbers.objects.update_or_create(
+                reporte_semanal=self.reporte,
+                mac=mac,
                 defaults={
                     'reporte_semanal': self.reporte,
                     'distrito': macs[mac]['distrito'],
-                    'modulo': mac,
-                    'tipo': macs[mac]['tipo'],
-                    'dias_trabajados': macs[mac]['dias_trabajados'],
-                    'jornada_trabajada': macs[mac]['jornada_trabajada'],
-                    'configuracion': macs[mac]['configuracion'],
-                    'tramites': macs[mac]['tramites'],
-                    'credenciales_entregadas_actualizacion':
-                        macs[mac]['credenciales_entregadas_actualizacion'],
-                    'credenciales_reimpresion': macs[mac]['credenciales_reimpresion'],
+                    'mac': mac,
+                    'type': macs[mac]['type'],
+                    'days_worked': macs[mac]['days_worked'],
+                    'hours_worked': macs[mac]['hours_worked'],
+                    'setup': macs[mac]['setup'],
+                    'tramites_aplicados': macs[mac]['tramites_aplicados'],
+                    'cards_by_update':
+                        macs[mac]['cards_by_update'],
                     'total_atenciones': macs[mac]['total_atenciones'],
-                    'productividad_x_dia': macs[mac]['productividad_x_dia'],
-                    'productividad_x_dia_x_estacion': macs[mac]['productividad_x_dia_x_estacion'],
+                    'numbers_by_day': macs[mac]['numbers_by_day'],
+                    'numbers_by_machine_by_day': macs[mac]['numbers_by_machine_by_day'],
                     'credenciales_recibidas': macs[mac]['credenciales_recibidas']
                 }
             )
@@ -212,15 +247,15 @@ class Productividad(View):
 
     def dispatch(self, request, *args, **kwargs):
         self.year = self.request.GET.get("year", YEAR)
-        self.tramites = Cifras.objects\
+        self.tramites = Numbers.objects\
             .filter(reporte_semanal__fecha_corte__year=self.year)\
             .values('distrito')\
             .order_by('distrito')\
-            .annotate(suma_modulo=Sum('tramites'))
-        self.entregas = Cifras.objects.values('distrito')\
+            .annotate(suma_modulo=Sum('tramites_aplicados'))
+        self.entregas = Numbers.objects.values('distrito')\
             .filter(reporte_semanal__fecha_corte__year=self.year)\
             .order_by('distrito')\
-            .annotate(entregas_distrito=Sum('credenciales_entregadas_actualizacion'))
+            .annotate(entregas_distrito=Sum('cards_by_update'))
         self.periodo = {
             'inicio': Reporte.objects.filter(fecha_corte__year=self.year).order_by('fecha_corte').first(),
             'fin': Reporte.objects.filter(fecha_corte__year=self.year).order_by('fecha_corte').last()

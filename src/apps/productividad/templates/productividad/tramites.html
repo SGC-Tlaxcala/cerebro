@@ -60,7 +60,6 @@
         Contribuye al seguimiento del pronóstico de trámites.
         <br>
         <span class="text-muted"><small>Periodo reportado:  desde {{ periodo.inicio.fecha_corte }} hasta {{ periodo.fin.fecha_corte }}.</small></span>
-        <hr>
           <hr class="my-4">
           <p>
             {% if same_year %}
@@ -73,21 +72,6 @@
             {% if not same_year %}
               <a href="{% url 'cifras:index' %}?year={{ current_year }}" class="btn btn-warning"><i class="fa fa-bar-chart"></i> Productividad <strong>{{ current_year }}</strong></a>
             {% endif %}
-          </p>
-
-          <p>
-            {% for y in years %}
-              <div class="btn-group">
-                <button type="button" class="btn btn-{% cycle 'primary' 'success' 'info' 'warning' 'danger' %} dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  {{ y }}
-                </button>
-                <div class="dropdown-menu">
-                  <a class="dropdown-item" href="{% url 'cifras:index' %}?year={{ y }}"><i class="fa fa-bar-chart"></i> Productividad <strong>{{ y }}</strong></a>
-                  <a class="dropdown-item" href="{% url 'cifras:tramites' %}?year={{ y }}"><i class="fa fa-edit"></i> Trámites <strong>{{ y }}</strong></a>
-                  <a class="dropdown-item" href="{% url 'cifras:entregas' %}?year={{ y }}"><i class="fa fa-id-card-o"></i> Entregas <strong>{{ y }}</strong></a>
-                </div>
-              </div>
-            {% endfor %}
           </p>
     </div>
   </div>
@@ -144,7 +128,7 @@
         <th>Pronóstico {{ year }}</th>
         <td>{{ estatal.pronostico|intcomma }}</td>
       </tr>
-      <tr>{% widthratio estatal.faltantes 1 -1 %}
+      <tr>
         <th>{% if estatal.faltantes < 0 %}Excedente{% else %}Faltantes{% endif %} {{ year }}</th>
         <td>{% if estatal.faltantes < 0 %}{% widthratio estatal.faltantes 1 -1 %}{% else %}{{ estatal.faltantes|intcomma }}{% endif %}</td>
       </tr>
