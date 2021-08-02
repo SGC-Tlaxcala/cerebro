@@ -3,38 +3,6 @@
 
 {% block head_title %}Resultados de la encuesta de aprobación ciudadana{% endblock %}
 
-{% block footer %}
-  {% regroup object_list by fecha as meses %}
-  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-  <script type="text/javascript">
-    google.charts.load('current', {'packages':['corechart']})
-    google.charts.setOnLoadCallback(dibujaGráfico)
-
-    function dibujaGráfico() {
-      let datos = google.visualization.arrayToDataTable([
-        ['Mes', '290151', '290152', '290153', '290154', '290251', '290253', '290254', '290351', '290352', '290353', 'Objetivo'],
-        {% for datos in meses %}['{{ datos.grouper|date:"N Y"  }}', {% for mac in datos.list %}{{ mac.calificacion }}, {% endfor %}9.3]{% if not forloop.last %},{% endif %}
-        {% endfor %}
-      ])
-
-      const opciones = {
-        seriesType: 'bars',
-        series: {10: {type: 'line'}},
-        hAxis: {title: 'Mes'},
-        vAxis: {
-          title: 'Calificación',
-          minValue: 12, maxValue: 10,
-          viewWindow: {min: 8.6,  max: 10}
-        }
-      }
-
-      const gráfico = new google.visualization.ComboChart(document.getElementById('aprobacion'))
-      gráfico.draw(datos, opciones)
-    }
-  </script>
-{% endblock footer %}
-
-
 {% block content %}
   <div class="row">
     <div class="col">
@@ -43,40 +11,126 @@
         <p class="lead">
           Resultados de la aplicación de la encuesta de satisfacción
         </p>
-      </div>
-    </div>
-  </div>
+      </div><!-- ./jumbotron -->
+    </div><!-- ./col jumbotron -->
+  </div><!-- ./row jumbotron -->
 
-  <div class="row">
-    <div class="col">
-      <div id="aprobacion" style="width: 100%; height: 500px;"></div>
-    </div>
-  </div>
+  <div class="row"><!--  >row gráfica -->
+    <div class="col"><!-- >col gráfica -->
+      <div id="aprobacion" style="width: 100%; height: 500px;"><!-- >id grafica -->
+        <img src="{% static "aprobacion/2021-06.jpg" %}" alt="Encuesta 2021-01" />
+      </div><!-- ./id grafica -->
+    </div><!-- ./col gráfica -->
+  </div><!-- ./ row gráfica -->
 
   <div class="row">
     <div class="col">
       <div class="table-responsive-sd">
         <table class="table table-striped table-hover table-sm">
-          <caption>Estadístico de aprobación ciudadana</caption>
-          <thead class="thead-dark">
-            <th scope="col">Mes</th>
-            <th scope="col">290151</th>
-            <th scope="col">290152</th>
-            <th scope="col">290153</th>
-            <th scope="col">290154</th>
-            <th scope="col">290251</th>
-            <th scope="col">290253</th>
-            <th scope="col">290254</th>
-            <th scope="col">290351</th>
-            <th scope="col">290352</th>
-            <th scope="col">290353</th>
-          </thead>
-          <tbody>{% regroup object_list by fecha as meses %}
-            {% for datos in meses %}<tr>
-              <th scope="row">{{ datos.grouper|date:"N Y"  }}</th>
-              {% for mac in datos.list %}<td>{{ mac.calificacion }}</td>{% endfor %}
-            </tr>{% endfor %}
-          </tbody>
+          <caption>Estadístico de aprobación ciudadana 2021</caption>
+  <thead class="thead-dark">
+   <tr>
+    <th scope="col">Módulo</th>
+    <th scope="col">enero</th>
+    <th scope="col">febrero</th>
+    <th scope="col">marzo</th>
+    <th scope="col">abril</th>
+    <th scope="col">mayo</th>
+    <th scope="col">junio</th>
+   </tr>
+  </thead>
+  <tbody>
+   <tr>
+    <th scope="row">290151</th>
+    <td>9.5</td>
+    <td>9.6</td>
+    <td>9.7</td>
+    <td>9.7</td>
+    <td>9.6</td>
+    <td>9.7</td>
+   </tr>
+   <tr>
+    <th scope="row">290152</th>
+    <td>9.6</td>
+    <td>9.6</td>
+    <td>9.8</td>
+    <td>9.9</td>
+    <td>10.0</td>
+    <td>9.9</td>
+   </tr>
+   <tr>
+    <th scope="row">290153</th>
+    <td>9.8</td>
+    <td>10.0</td>
+    <td>10.0</td>
+    <td>10.0</td>
+    <td>N/A</td>
+    <td>10.0</td>
+   </tr>
+   <tr>
+    <th scope="row">290154</th>
+    <td>9.5</td>
+    <td>9.4</td>
+    <td>9.5</td>
+    <td>10.0</td>
+    <td>N/A</td>
+    <td>9.4</td>
+   </tr>
+   <tr>
+    <th scope="row">290251</th>
+    <td>9.8</td>
+    <td>9.9</td>
+    <td>9.8</td>
+    <td>9.9</td>
+    <td>10.0</td>
+    <td>9.9</td>
+   </tr>
+   <tr>
+    <th scope="row">290253</th>
+    <td>9.5</td>
+    <td>9.5</td>
+    <td>9.4</td>
+    <td>9.4</td>
+    <td>9.5</td>
+    <td>9.4</td>
+   </tr>
+   <tr>
+    <th scope="row">290254</th>
+    <td>9.6</td>
+    <td>9.4</td>
+    <td>9.5</td>
+    <td>9.9</td>
+    <td>N/A</td>
+    <td>9.6</td>
+   </tr>
+   <tr>
+    <th scope="row">290351</th>
+    <td>10.0</td>
+    <td>9.9</td>
+    <td>9.9</td>
+    <td>9.9</td>
+    <td>9.5</td>
+    <td>9.4</td>
+   </tr>
+   <tr>
+    <th scope="row">290352</th>
+    <td>10.0</td>
+    <td>10.0</td>
+    <td>10.0</td>
+    <td>10.0</td>
+    <td>9.9</td>
+    <td>9.7</td>
+   </tr>
+   <tr>
+    <th scope="row">290353</th>
+    <td>9.8</td>
+    <td>9.9</td>
+    <td>9.8</td>
+    <td>10.0</td>
+    <td>N/A</td>
+    <td>10.0</td>
+   </tr>
+  </tbody>
         </table>
       </div>
     </div>
