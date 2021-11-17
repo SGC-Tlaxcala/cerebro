@@ -51,6 +51,7 @@ LOCAL_APPS = [
     'apps.mc.config.MCConfig',
     'apps.metas.config.MetasConfig',
     'apps.kpi.config.KpiConfig',
+    'apps.ideas.config.IdeasConfig',
 ]
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
