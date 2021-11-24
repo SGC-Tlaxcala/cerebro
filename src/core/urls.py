@@ -11,6 +11,7 @@ from core.views import Index, EncuestasIndex
 urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls')),
     path('admin/', admin.site.urls),
+    path('tinymce/', include('tinymce.urls')),
     path('metas/', include('apps.metas.urls')),
     path('mesas/', include('apps.mesas.urls')),
     path('paquetes/', include('apps.paquetes.urls')),

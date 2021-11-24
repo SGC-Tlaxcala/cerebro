@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 
+{% block head_title %}Caja de Ideas{% endblock %}
+
 {% block content %}
   <div class="row">
       <div class="col">
@@ -14,36 +16,30 @@
           </p>
         </div>
       </div>
-    </div>
+  </div>
 
   <div class="row">
-    <div class="col">
-      <div class="card">
-        <h5 class="card-header">Ideas</h5>
-        <img src="https://placekitten.com/800/400" class="card-img-top" alt="...">
-        <div class="card-body">
-          <p class="card-text">
-            Si tienes una idea y quieres que alguien la
-            haga realidad, cuéntanos sobre ella. Revisa
-            las ideas de otros y anímate a convertirla
-            en un proyecto.
-          </p>
-          <a href="{% url 'ideas:ideas' %}" class="btn btn-primary">Ver la lista de ideas</a>
-        </div>
-      </div>
+    <div class="col-md-12">
+      <table class="table table-striped" >
+        <caption>Lista de ideas</caption>
+        <thead>
+          <tr>
+            <th>Tipo</th>
+            <th>Alcance</th>
+            <th>Descripción</th>
+          <tr>
+        </thead>
+        <tbody>
+          {% for idea in object_list %}
+            <tr>
+              <td>{{ idea.get_type_display }}</td>
+              <td>{{ idea.get_scope_display }}</td>
+              <td><a href="{% url 'ideas:detalle' pk=idea.id %}">{{ idea.desc|safe }}</a></td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
-      <div class="col">
-        <div class="card">
-          <h5 class="card-header">Proyectos</h5>
-          <img src="https://placekitten.com/g/600/300" class="card-img-top" alt="...">
-          <div class="card-body">
-            <p class="card-text">
-              Mira los proyectos en ejecución. Anota tu proyecto para que sea evaluado.
-              Registra tus avances y resultados.
-            </p>
-            <a href="#" class="btn btn-primary">Ir a proyectos</a>
-          </div>
-        </div>
-      </div>
   </div>
+
 {% endblock content %}

@@ -7,7 +7,6 @@ django-crispy-forms
 coreapi
 djangorestframework
 djangorestframework-jwt
-djoser
 workdays
 django-extensions
 Werkzeug
@@ -20,8 +19,7 @@ xlrd
 django-simple-history
 ipython
 jupyter
-pandas
-django-pandas
 django-guardian
 django-sendgrid-v5
 openpyxl
+django-tinymce

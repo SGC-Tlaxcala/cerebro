@@ -29,12 +29,12 @@ DJANGO_APPS = [
 THIRD_PARTY_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
-    'djoser',
     'crispy_forms',
     'django_extensions',
     'watson',
     'simple_history',
-    'guardian'
+    'guardian',
+    'tinymce',
 ]
 LOCAL_APPS = [
     'core',
