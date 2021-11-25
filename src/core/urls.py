@@ -11,6 +11,7 @@ from core.views import Index, EncuestasIndex
 urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls')),
     path('admin/', admin.site.urls),
+    path('tinymce/', include('tinymce.urls')),
     path('metas/', include('apps.metas.urls')),
     path('mesas/', include('apps.mesas.urls')),
     path('paquetes/', include('apps.paquetes.urls')),
@@ -24,6 +25,7 @@ urlpatterns = [
     path('incidencias/', include('apps.incidencias.urls')),
     path('mc/', include('apps.mc.urls')),
     path('kpi/', include('apps.kpi.urls')),
+    path('mejora/', include('apps.ideas.urls')),
     path('', Index.as_view(), name='index')
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

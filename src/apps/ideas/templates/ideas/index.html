@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block head_title %}Caja de Ideas{% endblock %}
+
+{% block content %}
+  <div class="row">
+      <div class="col">
+        <div class="jumbotron">
+          <h1 class="display-4"><i class="fa fa-lightbulb-o"></i> Caja de Ideas</h1>
+          <p class="lead">
+            <span class="text-muted">
+              <small>
+                ¿Tienes una idea para mejorar el SGC? ¡Compártela con nosotros!
+              </small>
+            </span><br><br>
+            <a href="{% url 'ideas:add' %}" class="btn btn-danger">Agrega tu idea</a>
+          </p>
+        </div>
+      </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <table class="table table-striped" >
+        <caption>Lista de ideas</caption>
+        <thead>
+          <tr>
+            <th>Tipo</th>
+            <th>Alcance</th>
+            <th>Descripción</th>
+          <tr>
+        </thead>
+        <tbody>
+          {% for idea in object_list %}
+            <tr>
+              <td>{{ idea.get_type_display }}</td>
+              <td>{{ idea.get_scope_display }}</td>
+              <td><a href="{% url 'ideas:detalle' pk=idea.id %}">{{ idea.desc|safe }}</a></td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+{% endblock content %}

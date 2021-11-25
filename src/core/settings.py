@@ -29,12 +29,12 @@ DJANGO_APPS = [
 THIRD_PARTY_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
-    'djoser',
     'crispy_forms',
     'django_extensions',
     'watson',
     'simple_history',
-    'guardian'
+    'guardian',
+    'tinymce',
 ]
 LOCAL_APPS = [
     'core',
@@ -51,6 +51,7 @@ LOCAL_APPS = [
     'apps.mc.config.MCConfig',
     'apps.metas.config.MetasConfig',
     'apps.kpi.config.KpiConfig',
+    'apps.ideas.config.IdeasConfig',
 ]
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
@@ -228,3 +229,7 @@ EMAIL_HOST_USER = env('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
 
 DEFAULT_AUTO_FIELD='django.db.models.AutoField'
+
+TINYMCE_DEFAULT_CONFIG = {
+    "height": 300,
+}
