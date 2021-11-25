@@ -13,42 +13,42 @@
         </div>
       </div>
   </div>
-  
+
   <div class="row">
     <div class="col">
         <table class="table table-striped table-hover">
           <tbody>
             <tr>
-               <th scope="row" class="text-right">Propone</th>
-               <td>{{ idea.name }}</td>
+               <th scope="row" class="text-right w-25">Propone</th>
+               <td class="w-75">{{ idea.name }}</td>
             </tr>
             <tr>
-               <th scope="row" class="text-right">Sitio</th>
-               <td>{{ idea.site }}</td>
+               <th scope="row" class="text-right w-25">Sitio</th>
+               <td class="w-75">{{ idea.site }}</td>
             </tr>
             <tr>
-               <th scope="row" class="text-right">Tipo</th>
-               <td>{{ idea.get_type_display }}</td>
+               <th scope="row" class="text-right w-25">Tipo</th>
+               <td class="w-75">{{ idea.get_type_display }}</td>
             </tr>
             <tr>
-               <th scope="row" class="text-right">Alcance</th>
-               <td>{{ idea.get_scope_display }}</td>
+               <th scope="row" class="text-right w-25">Alcance</th>
+               <td class="w-75">{{ idea.get_scope_display }}</td>
             </tr>
             <tr>
-                <th scope="row" class="text-right">Descripción</th>
-                <td>{{ idea.desc | safe }}</td>
+                <th scope="row" class="text-right w-25">Descripción</th>
+                <td class="w-75">{{ idea.desc | safe }}</td>
             </tr>
             <tr>
-                <th scope="row" class="text-right">Resultados (en el caso de Proyectos)</th>
-                <td>{{ idea.docs | safe }}</td>
+                <th scope="row" class="text-right w-25">Resultados (en el caso de Proyectos)</th>
+                <td class="w-75">{{ idea.docs | safe }}</td>
             </tr>
             <tr>
-                <th scope="row" class="text-right">Formatos</th>
-                <td>{{ idea.docs }}</td>
+                <th scope="row" class="text-right w-25">Formatos</th>
+                <td class="w-75">{{ idea.docs }}</td>
             </tr>
             <tr>
-                <th scope="row" class="text-right">Evidencias</th>
-                <td>{{ idea.evidence }}</td>
+                <th scope="row" class="text-right w-25">Evidencias</th>
+                <td class="w-75">{{ idea.evidence }}</td>
             </tr>
           </tbody>
         </table>

@@ -49,7 +49,7 @@ class Idea(models.Model):
         help_text='''Escribe tu idea o proyecto. Un proyecto es algo que quieres
         implementar. Describe qué quieres lograr y cómo quieres lograrlo''')
     results = HTMLField(
-        'Results', blank=True, null=True,
+        'Resultados', blank=True, null=True,
         help_text='Escribe los resultados que has obtenido con tu proyecto')
     docs = models.FileField(
         'Formatos', upload_to='ideas', blank=True, null=True,
