@@ -40,15 +40,15 @@
             </tr>
             <tr>
                 <th scope="row" class="text-right w-25">Resultados (en el caso de Proyectos)</th>
-                <td class="w-75">{{ idea.docs | safe }}</td>
+                <td class="w-75">{{ idea.results | safe }}</td>
             </tr>
             <tr>
                 <th scope="row" class="text-right w-25">Formatos</th>
-                <td class="w-75">{{ idea.docs }}</td>
+                <td class="w-75"><a href="/media/{{ idea.docs }}">{{ idea.docs }}</a></td>
             </tr>
             <tr>
                 <th scope="row" class="text-right w-25">Evidencias</th>
-                <td class="w-75">{{ idea.evidence }}</td>
+                <td class="w-75"><a href="/media/{{ idea.evidence }}">{{ idea.evidence }}</a></td>
             </tr>
           </tbody>
         </table>
