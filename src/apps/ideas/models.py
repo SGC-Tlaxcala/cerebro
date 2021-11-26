@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.text import slugify
 from tinymce.models import HTMLField
 
 
@@ -26,6 +27,8 @@ SCOPE = (
 
 
 class Idea(models.Model):
+    title = models.CharField('Título', max_length=200)
+    slug = models.SlugField('Slug', max_length=200, unique=True, editable=False)
     type = models.PositiveSmallIntegerField(
         'Tipo',
         choices=TYPE,
@@ -57,6 +60,11 @@ class Idea(models.Model):
     evidence = models.FileField(
         'Evidencias', upload_to='ideas', blank=True, null=True,
         help_text='Sube las evidencias que usaste en tu proyecto en un solo zip')
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
+        super(Idea, self).save(*args, **kwargs)
 
     def __str__(self):
         return f'idea-{self.id}'
