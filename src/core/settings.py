@@ -3,7 +3,7 @@ import environ
 from django.contrib.messages import constants as messages
 import datetime
 
-VERSION = '1.7.0'
+VERSION = '2.0.0'
 
 BASE_DIR = Path(__file__).ancestor(2)
 APPS_DIR = BASE_DIR.child('apps')
@@ -27,8 +27,6 @@ DJANGO_APPS = [
     'django.contrib.humanize'
 ]
 THIRD_PARTY_APPS = [
-    'rest_framework',
-    'rest_framework.authtoken',
     'crispy_forms',
     'django_extensions',
     'watson',
@@ -38,19 +36,8 @@ THIRD_PARTY_APPS = [
 ]
 LOCAL_APPS = [
     'core',
-    'apps.mesas.config.MesasConfig',
     'apps.profiles.config.ProfilesConfig',
     'apps.docs.config.DocsConfig',
-    'apps.paquetes.config.PaquetesConfig',
-    'apps.productividad.config.ProductividadConfig',
-    'apps.dpi.config.DpiConfig',
-    'apps.cecyrd.config.CecyrdConfig',
-    'apps.cobertura.config.CoberturaConfig',
-    'apps.incidencias.config.IncidenciasConfig',
-    'apps.aprobacion.config.AprobacionConfig',
-    'apps.mc.config.MCConfig',
-    'apps.metas.config.MetasConfig',
-    'apps.kpi.config.KpiConfig',
     'apps.ideas.config.IdeasConfig',
 ]
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
