@@ -1,8 +1,0 @@
-{% extends 'base.html' %}
-{% load static %}
-
-{% block content %}
-  {% for expediente in expedientes %}
-    {{ expediente }} - {{ expediente.expediente_completo }} - <a href="{% url 'dpi:edit' expediente.folio %}">Editar</a>
-  {% endfor %}
-{% endblock %}
