@@ -3,7 +3,7 @@ import environ
 from django.contrib.messages import constants as messages
 import datetime
 
-VERSION = '1.7.0'
+VERSION = '2.0.0'
 
 BASE_DIR = Path(__file__).ancestor(2)
 APPS_DIR = BASE_DIR.child('apps')
@@ -12,8 +12,8 @@ environ.Env.read_env(BASE_DIR.child('.env'))
 
 SECRET_KEY = env('SECRET_KEY', default='5kho_evo8b7font)yy(^p!1w$skj%)#5yw-097cr@=%w=8#i7z')
 
-DEBUG = env("DEBUG", default=True)
-ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default='*')
+DEBUG = True
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
 if env('SSL', default=False) is True:
     SECURE_SSL_REDIRECT = False
 
@@ -27,8 +27,6 @@ DJANGO_APPS = [
     'django.contrib.humanize'
 ]
 THIRD_PARTY_APPS = [
-    'rest_framework',
-    'rest_framework.authtoken',
     'crispy_forms',
     'django_extensions',
     'watson',
@@ -38,19 +36,8 @@ THIRD_PARTY_APPS = [
 ]
 LOCAL_APPS = [
     'core',
-    'apps.mesas.config.MesasConfig',
     'apps.profiles.config.ProfilesConfig',
     'apps.docs.config.DocsConfig',
-    'apps.paquetes.config.PaquetesConfig',
-    'apps.productividad.config.ProductividadConfig',
-    'apps.dpi.config.DpiConfig',
-    'apps.cecyrd.config.CecyrdConfig',
-    'apps.cobertura.config.CoberturaConfig',
-    'apps.incidencias.config.IncidenciasConfig',
-    'apps.aprobacion.config.AprobacionConfig',
-    'apps.mc.config.MCConfig',
-    'apps.metas.config.MetasConfig',
-    'apps.kpi.config.KpiConfig',
     'apps.ideas.config.IdeasConfig',
 ]
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -134,17 +121,16 @@ SITE_ID = 1
 LOGIN_REDIRECT_URL = '/'
 
 STATIC_ROOT = APPS_DIR.child('assets')
-STATIC_URL = '/assets/'
+STATIC_URL = 'assets/'
 STATICFILES_DIRS = [
     APPS_DIR.child('static'),
-    APPS_DIR.child('kpi', 'static', 'kpi')
 ]
 
 MEDIA_ROOT = APPS_DIR.child('media')
 MEDIA_URL = '/media/'
 FILE_UPLOAD_PERMISSIONS = 0o644
 
-CRISPY_TEMPLATE_PACK = 'bootstrap4'
+CRISPY_TEMPLATE_PACK = 'bootstrap5'
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
@@ -152,16 +138,8 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.TokenAuthentication',
-        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
     ),
-}
-
-JWT_AUTH = {
-    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=30),  # 3 days
-    'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=60),  # 3 days
-    'JWT_AUTH_COOKIE': 'JWT',
-    'JWT_ALLOW_REFRESH': True
 }
 
 MESSAGE_TAGS = {

@@ -1,39 +1,6 @@
 {% load static %}
-<footer class="py-5 bg-secondary text-light container-fluid">
-  <div class="row justify-content-center">
-    <div class="col-md-5">
-      <h3>Sistema de Gestión de la Calidad</h3>
-      <p>
-        El Cuadro de Mando Integral es un desarrollo de la Junta Local de Tlaxcala
-        que contribuye a demostrar el cumplimiento de requisitos.
-      </p>
-    </div>
-    <div class="col-md-2">
-      <h4>Enlaces</h4>
-      <ul>
-        <li><a class="text-light bg-secondary" href="{% url 'docs:index' %}"><i class="fa fa-book"></i> Documentación</a></li>
-        <li><a class="text-light bg-secondary" href="http://10.29.0.79:2014/"><i class="fa fa-flag-checkered"></i> Metas</a></li>
-        <!-- li><a class="text-light bg-secondary" href="http://10.29.0.79:2019/"><i class="fa fa-users"></i> Metas Colectivas</a></li -->
-      </ul>
-    </div>
-    <div class="col-md-2">
-      <h4>Indicadores</h4>
-      <ul>
-        <li><a class="text-light bg-secondary" href="{% url 'cifras:index' %}"><i class="fa fa-bar-chart"></i> Productividad</a></li>
-        <li><a class="text-light bg-secondary" href="{% url 'aprobacion:index' %}"><i class="fa fa-thumbs-o-up"></i> Aprobación Ciudadana</a></li>
-      </ul>
-    </div>
-    <div class="col-md-3">
-      <h4>Enlaces Externos</h4>
-      <ul>
-        <li><a class="text-light bg-secondary" href="https://ine.mx">Instituto Nacional Electoral</a></li>
-        <li><a class="text-light bg-secondary" href="http://www.efinf.com/client/INE/resumen.pdf">Resumen Informativo</a></li>
-        <li><a class="text-light bg-secondary" href="http://www.efinf.com/client/INE/Portadas.pdf">Portadas de los diarios</a></li>
-        <li><a class="text-light bg-secondary" href="http://www.efinf.com/client/INE/ine.pdf">INE Informativo</a></li>
-      </ul>
-    </div>
-  </div>
-  <div class="row justify-content-center">
-      <img class="img-responsive" height="50px" src="{% static 'img/logoINE-01.png' %}" alt="INE logo">
+<footer class="navbar bg-secondary" style="margin-top: 20px;">
+  <div class="container-fluid">
+    <a class="navbar-brand text-primary" href="#">SCG Tlaxcala &copy; 2023</a>
   </div>
 </footer>

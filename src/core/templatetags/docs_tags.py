@@ -9,21 +9,8 @@
 import re
 from django import template
 
-try:
-    from apps.mesas.models import CAUSAS
-except RuntimeError:
-    pass
 
 register = template.Library()
-
-try:
-    dict_causas = {key: value for key, value in CAUSAS}
-except NameError:
-    pass
-
-@register.filter
-def causas(causa):
-    return dict_causas[causa]
 
 
 @register.simple_tag

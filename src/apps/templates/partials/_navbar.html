@@ -1,64 +1,25 @@
 {% load static %}
 {% load docs_tags %}
 
-  <nav class="navbar navbar-expand-md navbar-light bg-light fixed-top">
-    <a class="navbar-brand" href="#">
-      <img src="{% static 'img/credencial.jpg' %}" height="30" class="d-inline-block align-top" alt="">
-      Cuadro de Mando
-    </a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+<nav class="navbar bg-primary navbar-expand-lg" data-bs-theme="dark">
+  <div class="container">
+    <a class="navbar-brand" href="{% url 'index' %}">SGC Tlaxcala</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll" aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
-
-    <div class="collapse navbar-collapse" id="navbarsExampleDefault">
-      <ul class="navbar-nav mr-auto">
+    <div class="collapse navbar-collapse" id="navbarScroll">
+      <ul class="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll" style="--bs-scroll-height: 100px;">
         <li class="nav-item">
-          <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="{% url 'index' %}"><i class="fa fa-home"></i> Portada</a>
+          <a class="nav-link active" aria-current="page" href="{% url 'index' %}">Inicio</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link {% current request 'docs' %}" href="{% url 'docs:index' %}"><i class="fa fa-book"></i> Documentación</a>
+          <a class="nav-link" href="#">Documentación</a>
         </li>
-
-        <!-- li class="nav-item">
-          <a class="nav-link" href="http://10.29.0.79:2019/">
-            <i class="fa fa-users"></i> Metas Colectivas
-          </a>
-        </li -->
-
-        <li class="nav-item">
-          <a href="http://10.29.0.79:2014/" class="nav-link {% current request 'metas' %}">
-            <i class="fa fa-flag-checkered"></i> Metas</a>
-        </li>
-
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle {% if kpi_path %}active{% endif %}" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="fa fa-line-chart"></i> Indicadores
-          </a>
-          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <a
-              class="dropdown-item {% current request 'cifras' %}"
-              href="{% url 'cifras:index' %}">
-              <i class="fa fa-bar-chart"></i> Productividad
-            </a>
-            <div class="dropdown-divider"></div>
-            <a
-              class="dropdown-item {% current request 'cecyrd' %}"
-              href="{% url 'aprobacion:index' %}">
-              <i class="fa fa-thumbs-o-up"></i> Aprobación ciudadana
-            </a>
-
-            <div class="dropdown-divider"></div>
-          </div>
-        </li>
-
-        <li class="nav-item">
-          <a href="{% url 'ideas:index' %}" class="nav-link"><i class="fa fa-lightbulb-o"></i> Caja de ideas</a>
-        </li>
-
       </ul>
-      <form class="form-inline my-2 my-lg-0"  method="get" action="{% url 'docs:buscador' %}">
-        <input class="form-control mr-sm-2" type="text" name="q" id="id_q" placeholder="Buscador" aria-label="Search">
-        <button class="btn btn-outline-primary my-2 my-sm-0" type="submit">Buscar</button>
+      <form class="d-flex" role="search"  method="get" action="{% url 'docs:buscador' %}">
+        <input class="form-control me-2" type="search" placeholder="Escribe aquí" name="q" aria-label="Buscar">
+        <button class="btn btn-secondary" type="submit">Buscar</button>
       </form>
     </div>
-  </nav>
+  </div>
+</nav>
