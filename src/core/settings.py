@@ -12,7 +12,7 @@ environ.Env.read_env(BASE_DIR.child('.env'))
 
 SECRET_KEY = env('SECRET_KEY', default='5kho_evo8b7font)yy(^p!1w$skj%)#5yw-097cr@=%w=8#i7z')
 
-DEBUG = env("DEBUG", default=True)
+DEBUG = True
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
 if env('SSL', default=False) is True:
     SECURE_SSL_REDIRECT = False
@@ -121,7 +121,7 @@ SITE_ID = 1
 LOGIN_REDIRECT_URL = '/'
 
 STATIC_ROOT = APPS_DIR.child('assets')
-STATIC_URL = '/assets/'
+STATIC_URL = 'assets/'
 STATICFILES_DIRS = [
     APPS_DIR.child('static'),
 ]
@@ -130,7 +130,7 @@ MEDIA_ROOT = APPS_DIR.child('media')
 MEDIA_URL = '/media/'
 FILE_UPLOAD_PERMISSIONS = 0o644
 
-CRISPY_TEMPLATE_PACK = 'bootstrap4'
+CRISPY_TEMPLATE_PACK = 'bootstrap5'
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
@@ -140,13 +140,6 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
     ),
-}
-
-JWT_AUTH = {
-    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=30),  # 3 days
-    'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=60),  # 3 days
-    'JWT_AUTH_COOKIE': 'JWT',
-    'JWT_ALLOW_REFRESH': True
 }
 
 MESSAGE_TAGS = {

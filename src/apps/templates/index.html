@@ -3,27 +3,36 @@
 {% block head_title %}Cuadro de Mando Integral{% endblock head_title %}
 
 {% block content %}
-<div class="row position-relative overflow-hidden text-center bg-secondary rounded">
-  <div class="col-md-8 p-lg-8 mx-auto my-8">
-    <h1 class="display-4 font-weight-normal text-primary">Política de la Calidad</h1>
-    <p class="lead text-primary mx-auto display-6">
-      En el Instituto Nacional Electoral INE, estamos comprometidos en proporcionar
-      a la ciudadanía un servicio eficiente y de calidad en el trámite de expedición
-      de su credencial para votar, desde la entrevista hasta la entrega de la
-      credencial para votar, para contribuir al derecho a la identidad ciudadana,
-      con base en el marco normativo, reglamentario y en un entorno de mejora continua
-      con apego a los requisitos de la norma ISO 9001:2015.<br>
-      <span class="text-muted small">Revisión: 00 - 2021</span>
-    </p>
+<div class="row position-relative overflow-hidden text-center mb-5">
+  <div class="col my-5">
+    <form class="form" method="get" action="{% url 'docs:buscador' %}">
+      <div class="input-group mb-3">
+        <input type="text" class="form-control py-3" name="q" placeholder="Escribe el documento a buscar" aria-label="Nombre del documento" aria-describedby="button-addon2">
+        <button class="btn btn-primary" type="button" id="button-addon2"><i class="fa fa-search"></i></button>
+      </div>
+    </form>
   </div>
-  <div class="product-device box-shadow d-none d-md-block"></div>
-  <div class="product-device product-device-2 box-shadow d-none d-md-block"></div>
 </div>
+
+  <div class="row mt-4">
+    <div class="col mx-auto my-8 bg-secondary rounded-5 p-5">
+      <h1 class="display-5 font-weight-normal text-primary">Política de la Calidad</h1>
+      <p class="lead text-primary mx-auto">
+        En el Instituto Nacional Electoral INE, estamos comprometidos en proporcionar
+        a la ciudadanía un servicio eficiente y de calidad en el trámite de expedición
+        de su credencial para votar, desde la entrevista hasta la entrega de la
+        credencial para votar, para contribuir al derecho a la identidad ciudadana,
+        con base en el marco normativo, reglamentario y en un entorno de mejora continua
+        con apego a los requisitos de la norma ISO 9001:2015.<br>
+        <span class="text-muted small">Revisión: 00 - 2021</span>
+      </p>
+    </div>
+  </div>
 
 <div class="row mt-4">
   <div class="col">
     <h1 class="display-5">Alcance del Sistema</h1>
-    <p class="lead p-3 mb-2 bg-primary text-white">
+    <p class="lead p-3 mb-2 bg-primary text-white rounded-3">
       Dar un Servicio de Atención a la Ciudadanía durante el trámite de
       expedición       de su credencial para votar, dese la primera
       entrevista hasta la entrega de la credencial en los MAC en la
