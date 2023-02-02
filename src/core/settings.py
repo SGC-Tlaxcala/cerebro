@@ -12,7 +12,7 @@ environ.Env.read_env(BASE_DIR.child('.env'))
 
 SECRET_KEY = env('SECRET_KEY', default='5kho_evo8b7font)yy(^p!1w$skj%)#5yw-097cr@=%w=8#i7z')
 
-DEBUG = True
+DEBUG = env('DEBUG', default=False)
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
 if env('SSL', default=False) is True:
     SECURE_SSL_REDIRECT = False
