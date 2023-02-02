@@ -2,6 +2,7 @@ from unipath import Path
 import environ
 from django.contrib.messages import constants as messages
 import datetime
+import sys
 
 VERSION = '2.0.0'
 
@@ -79,8 +80,8 @@ DATABASES = {
     'default': env.db()
 }
 
-import sys
-if 'test' in sys.argv or 'test_coverage' in sys.argv: #Covers regular testing and django-coverage
+
+if 'test' in sys.argv or 'test_coverage' in sys.argv:
     DATABASES['default']['ENGINE'] = 'django.db.backends.sqlite3'
 
 if DEBUG:
@@ -206,7 +207,7 @@ EMAIL_PORT = env("EMAIL_PORT")
 EMAIL_HOST_USER = env('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
 
-DEFAULT_AUTO_FIELD='django.db.models.AutoField'
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 TINYMCE_DEFAULT_CONFIG = {
     "height": 300,
