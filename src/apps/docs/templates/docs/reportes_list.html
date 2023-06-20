@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+{% extends 'base.html' %}
+{% load static %}
+
+{% block header %}
+  <link rel="stylesheet" href="{% static 'docs/estilos.css' %}">
+{% endblock header %}
+
+{% block content %}
+  <div class="row">
+    <div class="col-md-12">
+      <div class="jumbotron">
+        <h1>Reportes de Mantenimiento</h1>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="table-responsive">
+        <table class="table table-striped table-bordered table-sm table-hover">
+          <thead>
+            <tr>
+              <th>Documento</th>
+              <th>Código</th>
+              <th>Revisión</th>
+              <th>Aprobación</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for doc in docs %}
+            <tr>
+              <td>
+              {% if doc.aprobado %}
+                <span class="text-danger"><i class="fa fa-exclamation-triangle"></i></span>
+              {% endif %}
+                <a href="{% url 'docs:detalle' doc.id %}"
+                  {% if doc.aprobado %}
+                   class="text-danger"
+                   data-toggle="tooltip" data-placement="top" title="Documento en aprobación"
+                  {% endif %}
+                >{{ doc.nombre }}</a>
+              </td>
+              <td>
+                {{ doc.clave|upper }}
+              </td>
+              {% if doc.r_actual %}
+                <td style="text-align: center;">{{ doc.r_actual }}</td>
+                <td>{% if not doc.aprobado %}
+                  {{ doc.revision_actual.f_actualizacion|date:"M d, Y" }}
+                {%  endif %}</td>
+              {% else %}
+                <td colspan="3">
+                  <a href="{% url "docs.views.agregar_control" doc=doc.id %}">
+                    <i class="icon-plus-2"></i> Agregar una nueva revisión
+                  </a>
+                </td>
+              {% endif %}
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+{% endblock content %}
+
+{% block  head_title %}Lista Maestra de Documentos{% endblock %}

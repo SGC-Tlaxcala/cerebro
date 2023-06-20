@@ -20,6 +20,14 @@ from apps.docs.models import Documento, Proceso, Tipo, Revision
 from apps.docs.forms import DocForm, ProcesoForm, TipoForm, VersionForm
 
 
+class Reportes(ListView):
+    model = Documento
+    context_object_name = 'docs'
+
+    def get_queryset(self):
+        return Documento.objects.filter(tipo__slug='reportes-de-mantenimiento').order_by('id')
+
+
 class IndexLMD(ListView):
     model = Documento
     context_object_name = 'docs'
