@@ -18,6 +18,9 @@
         <li class="nav-item">
           <a class="nav-link" href="{% url 'docs:reportes' %}"><i class="fa fa-bar-chart" aria-hidden="true"></i> Reportes</a>
         </li>
+        <li class="nav-item">
+          <a href="{% url 'carto:index' %}" class="nav-link"><i class="fa fa-map" aria-hidden="true"></i> Cartografía</a>
+        </li>
       </ul>
       <form class="d-flex" role="search"  method="get" action="{% url 'docs:buscador' %}">
         <input class="form-control me-2" type="search" placeholder="Escribe aquí" name="q" aria-label="Buscar">
