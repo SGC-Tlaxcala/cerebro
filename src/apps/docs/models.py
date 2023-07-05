@@ -89,6 +89,13 @@ class Documento (models.Model):
             return self.revision_set.latest('revision')
         except IndexError:
             return ""
+        
+    def f_actual(self):
+        """Devuelve la fecha de la revisión actual del documento"""
+        try:
+            return self.revision_set.latest('revision').f_actualizacion
+        except IndexError:
+            return ""
 
     def r_actual(self):
         """Devuelve la revisión de un documento con ceros a la izquierda"""

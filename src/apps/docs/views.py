@@ -99,7 +99,7 @@ class RevisionAdd(LoginRequiredMixin, CreateView):
 
     def get_inital(self):
         super(RevisionAdd, self).get_initial()
-        revision = self.doc.revision_set.order_by('-revision')[0].revision +1
+        revision = self.doc.revision_set.order_by('-revision')[0].revision + 1
         self.initial['revision'] = revision + 1
         return self.initial
 
