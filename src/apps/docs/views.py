@@ -25,7 +25,7 @@ class Reportes(ListView):
     context_object_name = 'docs'
 
     def get_queryset(self):
-        return Documento.objects.filter(tipo__slug='reportes-de-mantenimiento').order_by('id')
+        return Documento.objects.filter(tipo__slug='RPT').order_by('id')
 
 
 class IndexLMD(ListView):
