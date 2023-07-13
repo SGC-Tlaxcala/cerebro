@@ -7,9 +7,6 @@
 {% endblock header %}
 
 {% block footer %}
-
-
-
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.0/jquery-confirm.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.0/jquery-confirm.min.js"></script>
   <link rel="stylesheet" href="{% static 'css/datepicker.css' %}" />
@@ -204,6 +201,12 @@
                 <div id="collapse{{ forloop.counter }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" aria-labelledby="heading{{ forloop.counter }}" data-bs-parent="#accordionChanges">
                   <div class="card-body p-3">
                     {{ r.cambios | safe }}
+                    {% if request.user.is_staff %}
+                    <br />
+                    <a href="/media/{{ r.archivo }}" type="button" class="btn btn-success">
+                      Descargar documento histórico
+                    </a>
+                    {% endif %}
                   </div>
                 </div>
               </div>
