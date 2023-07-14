@@ -40,6 +40,9 @@ class Reportes(ListView):
         """La consulta que devuelve los documentos con slug 'RPT'."""
         return Documento.objects.filter(tipo__slug='RPT').order_by('id')
 
+    def __str__(self):
+        return self.__class__.__name__
+
 
 class IndexLMD(ListView):
     """
@@ -55,6 +58,9 @@ class IndexLMD(ListView):
     def get_queryset(self):
         """Genera la consulta de la LMD."""
         return Documento.objects.filter(proceso__slug='lmd').order_by('id')
+
+    def __str__(self):
+        return self.__class__.__name__
 
 
 class IndexList(ListView):
@@ -143,14 +149,17 @@ class DocAdd(CreateView):
 
 
 class RevisionAdd(LoginRequiredMixin, CreateView):
+    """Formulario para crear una nueva revisión de un documento."""
+
     model = Revision
     form_class = VersionForm
 
     def dispatch(self, request, *args, **kwargs):
+        """Crea un nuevo documento en el formulario."""
         self.doc = Documento.objects.get(pk=kwargs['pk'])
         return super(RevisionAdd, self).dispatch(request, *args, **kwargs)
 
-    def get_inital(self):
+    def get_initial(self):
         super(RevisionAdd, self).get_initial()
         revision = self.doc.revision_set.order_by('-revision')[0].revision + 1
         self.initial['revision'] = revision + 1
@@ -172,23 +181,27 @@ class RevisionAdd(LoginRequiredMixin, CreateView):
 
 
 class ProcesoList(DetailView):
+    """Lista de documentos por proceso."""
     model = Proceso
     context_object_name = 'proceso'
 
 
 class ProcessAdd(CreateView):
+    """Formulario para agregar un nuevo proceso."""
     model = Proceso
     fields = ['proceso', 'slug']
     success_url = reverse_lazy('docs:setup')
 
 
 class TipoAdd(CreateView):
+    """Formulario para agregar un nuevo tipo de documento."""
     model = Tipo
     fields = ['tipo', 'slug']
     success_url = reverse_lazy('docs:setup')
 
 
 class Buscador(TemplateView):
+    """Vista para el buscador de documentos."""
     template_name = 'docs/busqueda.html'
 
     def get_context_data(self, **kwargs):
