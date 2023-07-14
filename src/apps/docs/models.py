@@ -16,18 +16,38 @@ from django.template.defaultfilters import slugify
 
 
 class Tipo (models.Model):
+    """
+    Clase Tipo.
+
+    Modelo para manejar los diferentes tipos de documentos.
+    Campos:
+    - tipo -> CharField
+    - slug -> CharField
+    """
+
     tipo = models.CharField(max_length=50)
     slug = models.CharField(max_length=50)
 
     def __str__(self):
+        """Cadenificación de la salida del modelo."""
         return f'Tipo: {self.tipo}'
 
 
 class Proceso (models.Model):
+    """
+    Clase Proceso.
+
+    Modelo simple para el registro de procesos.
+    Campos:
+    - proceso -> CharField
+    - tipo -> CharField
+    """
+
     proceso = models.CharField(max_length=80)
     slug = models.CharField(max_length=80)
 
     def __str__(self):
+        """Textificación de la salida del modelo."""
         if self.slug == 'sgc':
             return 'Documentos del Sistema'
         elif self.slug == 'stn':
@@ -85,13 +105,13 @@ class Documento (models.Model):
         return self.revision_actual().archivo.name.split('.')[-1]
 
     def save(self, *args, **kwargs):
-        """Actividades antes de ejecutar save()."""
+        """Actividades antes de ejecutar save."""
         self.slug = slugify(self.nombre)
         super(Documento, self).save(*args, **kwargs)
 
     def clave(self):
         """
-        Función clave().
+        Función clave.
 
         Devuelve la clave del documento, que es única y se forma por
         el tipo de documento (tres letras) y la identificación del
@@ -135,20 +155,32 @@ class Documento (models.Model):
             self.revision_set.latest('revision').archivo.url.split('.')[0]
 
 
-# Función para subir archivos
 def subir_documento(instancia, archivo):
+    """Función auxiliar para renombrar y colocar archivos en su ruta."""
     import os.path
     ext = archivo.split('.')[-1]
     orig = 'docs'
     tipo = instancia.documento.tipo.slug
     doc = instancia.documento.slug
     rev = instancia.revision
-    nombre = "%s_%s-%02d_rev%02d.%s" % (doc, tipo, instancia.documento.id, rev, ext)
+    nombre = "%s_%s-%02d_rev%02d.%s" % (
+        doc, tipo, instancia.documento.id, rev, ext)
     ruta = os.path.join(orig, tipo, nombre)
     return ruta
 
 
 class Revision (models.Model):
+    """
+    Modelo Revision.
+
+    Campos:
+    - documento: referencia al modelo Documento
+    - revision: entero. número de revisión
+    - f_actualización: fecha de actualización
+    - archivo: archivo del documento
+    - cambios: registro de cambios
+    """
+
     # Documento
     documento = models.ForeignKey(Documento, on_delete=models.CASCADE)
 
@@ -157,20 +189,35 @@ class Revision (models.Model):
     f_actualizacion = models.DateField()
 
     # Archivos de la revisión
-    archivo = models.FileField(upload_to=subir_documento, blank=True, null=True)
+    archivo = models.FileField(
+        upload_to=subir_documento,
+        blank=True,
+        null=True
+    )
 
     # Identificación de cambios
     cambios = models.TextField()
 
     # Trazabilidad
-    autor = models.ForeignKey(User, related_name='revisions_user', editable=False, on_delete=models.CASCADE)
+    autor = models.ForeignKey(
+        User,
+        related_name='revisions_user',
+        editable=False,
+        on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
-    def __str__(self):
-        return u"%s rev %02d (%s)" % (self.documento, self.revision, self.f_actualizacion)
-
     class Meta:
+        """Metadatos del modelo Revision."""
+
         unique_together = (("documento", "revision"),)
         verbose_name = "Revisión"
         verbose_name_plural = "Control Revisiones"
+
+    def __str__(self):
+        """Cadenificación del modelo."""
+        return u"%s rev %02d (%s)" % (
+            self.documento,
+            self.revision,
+            self.f_actualizacion
+        )
