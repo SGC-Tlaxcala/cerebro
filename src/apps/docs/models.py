@@ -1,7 +1,7 @@
 """
 Modelos para la app docs.
 
-Esta aplicación controla los documentos y registrosl del SGC.
+Esta aplicación controla los documentos y registros del SGC.
 
 Modelos:
 - Tipo
@@ -29,7 +29,7 @@ class Tipo (models.Model):
     slug = models.CharField(max_length=50)
 
     def __str__(self):
-        """Cadenificación de la salida del modelo."""
+        """Formato en texto de la salida del modelo."""
         return f'Tipo: {self.tipo}'
 
 
@@ -47,7 +47,7 @@ class Proceso (models.Model):
     slug = models.CharField(max_length=80)
 
     def __str__(self):
-        """Textificación de la salida del modelo."""
+        """Formato en texto de la salida del modelo."""
         if self.slug == 'sgc':
             return 'Documentos del Sistema'
         elif self.slug == 'stn':
@@ -96,7 +96,7 @@ class Documento (models.Model):
     updated = models.DateTimeField(auto_now=True)
 
     class Meta:
-        """Metadatos del modelo Dpcumento."""
+        """Metadatos del modelo Documento."""
 
         ordering = ['tipo', 'id']
 
@@ -120,7 +120,7 @@ class Documento (models.Model):
         return "%s-%02d" % (self.tipo.slug, self.id)
 
     def __str__(self):
-        """La textificación del modelo."""
+        """Formato en texto del modelo."""
         return "%s (%s-%02d)" % (self.nombre, self.tipo.slug.upper(), self.id)
 
     def revision_actual(self):
@@ -215,7 +215,7 @@ class Revision (models.Model):
         verbose_name_plural = "Control Revisiones"
 
     def __str__(self):
-        """Cadenificación del modelo."""
+        """Formato en texto del modelo."""
         return u"%s rev %02d (%s)" % (
             self.documento,
             self.revision,
