@@ -1,10 +1,14 @@
-# coding: utf-8
-#         app: docs
-#      module: models
-#        date: miércoles, 06 de junio de 2018 - 09:08
-# description: control de documentos y registros
-# pylint: disable=W0613,R0201,R0903
+"""
+Modelos para la app docs.
 
+Esta aplicación controla los documentos y registrosl del SGC.
+
+Modelos:
+- Tipo
+- Proceso
+- Documento
+- Revision
+"""
 
 from django.db import models
 from django.contrib.auth.models import User
@@ -37,13 +41,18 @@ class Proceso (models.Model):
 
 
 class Documento (models.Model):
-    """Definición del Documento:
+    """
+    Definición del Documento.
+
+    Campos:
     - nombre: El nombre del documento
     - slug: Un nombre corto para identificar el documento
     - ruta: Un campo URL, útil para documentos externos (opcional)
     - activo: Campo lógico, True por default
     - proceso: Contenedor para indicar el proceso al que pertenece
-    - tipo: Contenedor para indicar el tipo de documento"""
+    - tipo: Contenedor para indicar el tipo de documento.
+    """
+
     # Identificación
     nombre = models.CharField(max_length=120)
     slug = models.SlugField(max_length=120)
@@ -61,44 +70,55 @@ class Documento (models.Model):
     texto_ayuda = models.TextField(blank=True)
 
     # Trazabilidad
-    autor = models.ForeignKey(User, related_name='docs', editable=False, on_delete=models.CASCADE)
+    autor = models.ForeignKey(
+        User, related_name='docs', editable=False, on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
     class Meta:
+        """Metadatos del modelo Dpcumento."""
+
         ordering = ['tipo', 'id']
 
     def ext(self):
+        """Obtiene la extensión del archivo."""
         return self.revision_actual().archivo.name.split('.')[-1]
 
     def save(self, *args, **kwargs):
+        """Actividades antes de ejecutar save()."""
         self.slug = slugify(self.nombre)
         super(Documento, self).save(*args, **kwargs)
 
     def clave(self):
-        """Devuelve la clave del documento, que es única y se forma por
-        el tipo de documento (tres letras) y la identificación del documento"""
+        """
+        Función clave().
+
+        Devuelve la clave del documento, que es única y se forma por
+        el tipo de documento (tres letras) y la identificación del
+        documento.
+        """
         return "%s-%02d" % (self.tipo.slug, self.id)
 
     def __str__(self):
+        """La textificación del modelo."""
         return "%s (%s-%02d)" % (self.nombre, self.tipo.slug.upper(), self.id)
 
     def revision_actual(self):
-        """Devuelve la revisión del documento como un entero"""
+        """Devuelve la revisión del documento como un entero."""
         try:
             return self.revision_set.latest('revision')
         except IndexError:
             return ""
-        
+
     def f_actual(self):
-        """Devuelve la fecha de la revisión actual del documento"""
+        """Devuelve la fecha de la revisión actual del documento."""
         try:
             return self.revision_set.latest('revision').f_actualizacion
         except IndexError:
             return ""
 
     def r_actual(self):
-        """Devuelve la revisión de un documento con ceros a la izquierda"""
+        """Devuelve la revisión de un documento con ceros a la izquierda."""
         try:
             x = "%02d" % self.revision_set.order_by('-revision')[0].revision
             return x
@@ -106,10 +126,13 @@ class Documento (models.Model):
             return ""
 
     def historial(self):
+        """Devuelve el historial del documento."""
         return self.revision_set.order_by('-revision')[1:]
 
     def swf(self):
-        return "%s.swf" % self.revision_set.latest('revision').archivo.url.split('.')[0]
+        """Devuelve el archivo sin extensión."""
+        return "%s.swf" %\
+            self.revision_set.latest('revision').archivo.url.split('.')[0]
 
 
 # Función para subir archivos
