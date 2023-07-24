@@ -23,6 +23,7 @@ from django.template.defaultfilters import slugify
 from django.contrib.auth.mixins import LoginRequiredMixin
 from apps.docs.models import Documento, Proceso, Tipo, Revision
 from apps.docs.forms import DocForm, ProcesoForm, TipoForm, VersionForm
+from datetime import datetime
 
 
 class Reportes(ListView):
@@ -162,7 +163,9 @@ class RevisionAdd(LoginRequiredMixin, CreateView):
     def get_initial(self):
         super(RevisionAdd, self).get_initial()
         revision = self.doc.revision_set.order_by('-revision')[0].revision + 1
-        self.initial['revision'] = revision + 1
+        fecha = datetime.today()
+        self.initial['revision'] = revision
+        self.initial['f_actualizacion'] = fecha
         return self.initial
 
     def get_context_data(self, **kwargs):
@@ -172,6 +175,7 @@ class RevisionAdd(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         self.object = form.save(commit=False)
+        self.object.documento = self.doc
         self.object.autor = self.request.user
         self.object.save()
         return super().form_valid(form)

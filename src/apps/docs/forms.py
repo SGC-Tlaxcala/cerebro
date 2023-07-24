@@ -140,7 +140,6 @@ class VersionForm(forms.ModelForm):
 
         model = Revision
         fields = [
-            'documento',
             'revision',
             'f_actualizacion',
             'archivo',
@@ -151,13 +150,13 @@ class VersionForm(forms.ModelForm):
         """Inicializador de la clase VersionForm."""
         super(VersionForm, self).__init__(*args, **kwargs)
         self.fields['f_actualizacion'].label = "Fecha de Actualización"
-        # Prefill the revision field with the next revision number
-        self.fields['revision'].text = self.instance
 
         self.helper = FormHelper()
         self.helper.layout = Layout(
             Div(
-                Field('revision', wrapper_class='col-md-6'),
+                Field('revision', wrapper_class='col-md-6', attrs={
+                    "label": self.instance.revision
+                }),
                 Field('f_actualizacion', wrapper_class='col-md-6', attrs={
                     "label": "Fecha de Actualización"
                 }),
