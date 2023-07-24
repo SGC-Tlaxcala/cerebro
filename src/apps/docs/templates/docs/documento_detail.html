@@ -283,6 +283,7 @@
         </div>
       </div><!-- ./cad descargar -->
 
+      {% if request.user.is_staff %}
       <div class="row">
         <div class="col">
           <div class="card">
@@ -293,6 +294,7 @@
           </div>
         </div>
       </div>
+      {% endif %}
 
     </div>
   </div>

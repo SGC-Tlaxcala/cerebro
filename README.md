@@ -2,23 +2,17 @@
 
 ## Configuración
 
-Para poder usar esta aplicación hay que crear un archivo `.env.json` con las opciones de configuración pertinentes:
+Para poder usar esta aplicación hay que crear un archivo `src/.env`
+con las opciones de configuración pertinentes:
 
-```json
-{
-  "SECRET_KEY": "kminvupn=7dbw70e!#njo8qas2bx$tmw$nv1pt$g30&+f4(8c)",
-  "DEBUG": true,
-  "SSL": false,
-  "ALLOWED_HOSTS": [
-    "*"
-  ],
-  "DATABASE": {
-    "ENGINE": "postgresql",
-    "NAME": "dbname",
-    "USER": "dbuser",
-    "PASSWORD": "dbsecret"
-  }
-}
+```
+DEBUG=True
+SSL=False
+DATABASE_URL=postgresql://usuario:contraseña@servidor:puerto/database
+EMAIL_HOST=email_host
+EMAIL_PORT=puerto
+EMAIL_HOST_USER=usuario
+EMAIL_HOST_PASSWORD=
 ```
 
 Y para usar estas variables en el proyecto se hace así:
