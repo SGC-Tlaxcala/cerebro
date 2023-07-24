@@ -20,7 +20,7 @@ class DocForm(forms.ModelForm):
     """Formulario para crear un documento nuevo."""
 
     def __init__(self, *args, **kwargs):
-        """Inicialización del formulario de documentos."""
+        """Inicializador del formulario de documentos."""
         super(DocForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.layout = Layout(

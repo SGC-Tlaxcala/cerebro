@@ -14,6 +14,7 @@ Incluye las siguientes vistas:
 - Buscador, el buscador de documentos
 """
 
+from datetime import datetime
 from watson import search as watson
 from django.urls import reverse_lazy
 from django.db.models import Q
@@ -23,7 +24,6 @@ from django.template.defaultfilters import slugify
 from django.contrib.auth.mixins import LoginRequiredMixin
 from apps.docs.models import Documento, Proceso, Tipo, Revision
 from apps.docs.forms import DocForm, ProcesoForm, TipoForm, VersionForm
-from datetime import datetime
 
 
 class Reportes(ListView):

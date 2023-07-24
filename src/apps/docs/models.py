@@ -10,9 +10,13 @@ Modelos:
 - Revision
 """
 
+import os.path
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.template.defaultfilters import slugify
+
+
+User = get_user_model()
 
 
 class Tipo (models.Model):
@@ -85,7 +89,11 @@ class Documento (models.Model):
     tipo = models.ForeignKey(Tipo, on_delete=models.CASCADE)
 
     # Búsqueda
-    lmd = models.BooleanField("LMD", help_text="Pertenece a la Lista Maestra de Documentos", default=False)
+    lmd = models.BooleanField(
+        "LMD",
+        help_text="Pertenece a la Lista Maestra de Documentos",
+        default=False
+    )
     aprobado = models.BooleanField("Documento en aprobación", default=False)
     activo = models.BooleanField(default=True)
     texto_ayuda = models.TextField(blank=True)
@@ -158,7 +166,6 @@ class Documento (models.Model):
 
 def subir_documento(instancia, archivo):
     """Función auxiliar para renombrar y colocar archivos en su ruta."""
-    import os.path
     ext = archivo.split('.')[-1]
     orig = 'docs'
     tipo = instancia.documento.tipo.slug
@@ -212,13 +219,12 @@ class Revision (models.Model):
         """Metadatos del modelo Revision."""
 
         unique_together = (("documento", "revision"),)
-        verbose_name = "Revisión"
-        verbose_name_plural = "Control Revisiones"
+        verbose_name: str = "Revisión"
+        verbose_name_plural: str = "Control Revisiones"
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Formato en texto del modelo."""
-        return u"%s rev %02d (%s)" % (
-            self.documento,
-            self.revision,
-            self.f_actualizacion
-        )
+        respuesta: str = f"""
+{self.documento} rev {self.revision:02d} ({self.f_actualizacion}))
+"""
+        return respuesta
