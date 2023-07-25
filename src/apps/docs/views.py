@@ -58,7 +58,7 @@ class IndexLMD(ListView):
 
     def get_queryset(self):
         """Genera la consulta de la LMD."""
-        return Documento.objects.filter(proceso__slug='lmd').order_by('id')
+        return Documento.objects.filter(lmd=True).order_by('id')
 
     def __str__(self):
         return self.__class__.__name__
