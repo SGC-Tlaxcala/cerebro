@@ -13,6 +13,7 @@ venv/
 cerebro.db
 competencia/
 .vs/
+*#*#
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

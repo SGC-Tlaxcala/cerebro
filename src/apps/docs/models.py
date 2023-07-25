@@ -124,11 +124,10 @@ class Documento (models.Model):
         """Obtiene la extensión del archivo."""
         return self.revision_actual().archivo.name.split('.')[-1]
 
-    def save(self):
+    def save(self, *args, **kwargs):
         """Actividades antes de ejecutar save."""
         self.slug = slugify(self.nombre)
-        super(Documento, self).save()
-
+        super(Documento, self).save(*args, **kwargs)
 
     def clave(self):
         """
