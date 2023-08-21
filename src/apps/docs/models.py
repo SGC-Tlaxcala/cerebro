@@ -32,7 +32,7 @@ class Tipo (models.Model):
     tipo = models.CharField(max_length=50)
     slug = models.CharField(max_length=50)
 
-    def __str__(self):
+    def __str__(self)->str:
         """Formato en texto de la salida del modelo."""
         return f'Tipo: {self.tipo}'
 
@@ -50,7 +50,7 @@ class Proceso (models.Model):
     proceso = models.CharField(max_length=80)
     slug = models.CharField(max_length=80)
 
-    def __str__(self):
+    def __str__(self)->str:
         """Formato en texto de la salida del modelo."""
         nombre_proceso: str = ""
 
@@ -116,20 +116,7 @@ class Documento (models.Model):
         def __str__(self):
             return "Metadatos del modelo Documento"
 
-        def get_metadata(self):
-            """Devuelve un diccionario vacío."""
-            return {}
-
-    def ext(self):
-        """Obtiene la extensión del archivo."""
-        return self.revision_actual().archivo.name.split('.')[-1]
-
-    def save(self, *args, **kwargs):
-        """Actividades antes de ejecutar save."""
-        self.slug = slugify(self.nombre)
-        super(Documento, self).save(*args, **kwargs)
-
-    def clave(self):
+    def ext(self)->str:
         """
         Función clave.
 
@@ -139,18 +126,18 @@ class Documento (models.Model):
         """
         return "%s-%02d" % (self.tipo.slug, self.id)
 
-    def __str__(self):
+    def __str__(self)->str:
         """Formato en texto del modelo."""
         return "%s (%s-%02d)" % (self.nombre, self.tipo.slug.upper(), self.id)
 
-    def revision_actual(self):
+    def revision_actual(self)->str:
         """Devuelve la revisión del documento como un entero."""
         try:
             return self.revision_set.latest('revision')
         except IndexError:
             return ""
 
-    def f_actual(self):
+    def f_actual(self) -> str:
         """Devuelve la fecha de la revisión actual del documento."""
         try:
             return self.revision_set.latest('revision').f_actualizacion
@@ -174,7 +161,7 @@ class Documento (models.Model):
         return f"{self.revision_set.latest('revision').archivo.url.split('.')[0]}.swf"
 
 
-def subir_documento(instancia, archivo):
+def subir_documento(instancia, archivo) -> str:
     """Función auxiliar para renombrar y colocar archivos en su ruta."""
     ext = archivo.split('.')[-1]
     orig = 'docs'
