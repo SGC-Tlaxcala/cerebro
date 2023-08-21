@@ -32,7 +32,7 @@ class Tipo (models.Model):
     tipo = models.CharField(max_length=50)
     slug = models.CharField(max_length=50)
 
-    def __str__(self)->str:
+    def __str__(self) -> str:
         """Formato en texto de la salida del modelo."""
         return f'Tipo: {self.tipo}'
 
@@ -50,10 +50,9 @@ class Proceso (models.Model):
     proceso = models.CharField(max_length=80)
     slug = models.CharField(max_length=80)
 
-    def __str__(self)->str:
+    def __str__(self) -> str:
         """Formato en texto de la salida del modelo."""
         nombre_proceso: str = ""
-
         if self.slug == 'sgc':
             nombre_proceso = 'Documentos del Sistema'
         elif self.slug == 'stn':
@@ -64,7 +63,6 @@ class Proceso (models.Model):
             nombre_proceso = 'Lista Maestra de Documentos'
         else:
             nombre_proceso = self.proceso
-
         return f'Proceso {nombre_proceso}'
 
 
@@ -116,7 +114,7 @@ class Documento (models.Model):
         def __str__(self):
             return "Metadatos del modelo Documento"
 
-    def ext(self)->str:
+    def ext(self) -> str:
         """
         Función clave.
 
@@ -126,11 +124,26 @@ class Documento (models.Model):
         """
         return "%s-%02d" % (self.tipo.slug, self.id)
 
-    def __str__(self)->str:
+    def save(self, *args, **kwargs) -> None:
+        """Actividades antes de ejecutar save."""
+        self.slug = slugify(self.nombre)
+        super(Documento, self).save(*args, **kwargs)
+
+    def clave(self) -> str:
+        """
+        Función clave.
+
+        Devuelve la clave del documento, que es única y se forma por
+        el tipo de documento (tres letras) y la identificación del
+        documento.
+        """
+        return "%s-%02d" % (self.tipo.slug, self.id)
+
+    def __str__(self) -> str:
         """Formato en texto del modelo."""
         return "%s (%s-%02d)" % (self.nombre, self.tipo.slug.upper(), self.id)
 
-    def revision_actual(self)->str:
+    def revision_actual(self) -> str:
         """Devuelve la revisión del documento como un entero."""
         try:
             return self.revision_set.latest('revision')

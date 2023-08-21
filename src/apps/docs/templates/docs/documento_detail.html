@@ -15,7 +15,7 @@
 
     {% if doc.aprobado %}
       $(document).ready(function() {
-        $('#docAprobado').modal('show');
+        $('#modal').modal('show');
       });
     {% endif %}
 
@@ -38,7 +38,7 @@
   </script>
 
   {% if doc.aprobado %}
-    <div id="docAprobado" class="modal modal-wide fade"  data-keyboard="false" data-backdrop="static">
+    <div id="modal" class="modal modal-wide fade"  data-keyboard="false" data-backdrop="static">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
@@ -60,7 +60,7 @@
             </p>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+            <button type="button" class="btn btn-default" data-bs-dismiss="modal" aria-hidden="true">Cerrar</button>
           </div>
         </div><!-- /.modal-content -->
       </div><!-- /.modal-dialog -->
@@ -216,6 +216,7 @@
       </div>
     </div>
 
+    <!-- [[ SIDEBAR ]] -->
     <div class="col-md-3" id="sidebar">
       <div class="row">
         <div class="col">
