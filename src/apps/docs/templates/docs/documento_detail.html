@@ -4,6 +4,7 @@
 
 {% block header %}
   <link rel="stylesheet" href="{% static 'docs/estilos.css' %}">
+  <link rel="stylesheet" href="{% static 'docs/colorbox.css' %}" />
 {% endblock header %}
 
 {% block footer %}
@@ -11,7 +12,25 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.0/jquery-confirm.min.js"></script>
   <link rel="stylesheet" href="{% static 'css/datepicker.css' %}" />
   <script src="{% static 'js/bootstrap-datepicker.js' %}"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.colorbox/1.6.4/jquery.colorbox-min.js" integrity="sha512-DAVSi/Ovew9ZRpBgHs6hJ+EMdj1fVKE+csL7mdf9v7tMbzM1i4c/jAvHE8AhcKYazlFl7M8guWuO3lDNzIA48A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
   <script type="application/javascript">
+    $(document).ready(function(){
+      $(".iframe").colorbox({iframe:true, width:"80%", height:"80%"});
+      $(".callbacks").colorbox({
+					onOpen:function(){ alert('onOpen: colorbox is about to open'); },
+					onLoad:function(){ alert('onLoad: colorbox has started to load the targeted content'); },
+					onComplete:function(){ alert('onComplete: colorbox has displayed the loaded content'); },
+					onCleanup:function(){ alert('onCleanup: colorbox has begun the close process'); },
+					onClosed:function(){ alert('onClosed: colorbox has completely closed'); }
+				});
+
+        //Example of preserving a JavaScript event for inline calls.
+        $("#click").click(function(){
+          $('#click').css({"background-color":"#f00", "color":"#fff", "cursor":"inherit"}).text("Open this window again and this message will still be here.");
+          return false;
+        });
+    });
 
     {% if doc.aprobado %}
       $(document).ready(function() {
@@ -251,13 +270,17 @@
               <i class="fa fa-exclamation-triangle"></i> Documento obsoleto
             </div>
             <div class="card-body">
-              <button type="button" class="btn btn-success btn-lg" data-bs-toggle="modal" data-bs-target="#obsoletoModal">
+              <a 
+                type="button" 
+                class="btn btn-success btn-lg iframe"  
+                href="https://wikipedia.com">
                 Notificar documento obsoleto
+              </a>
             </div>
           </div>
         </div>
       </div>
-      <!-- ./Documento Obsoleto -->
+      <!-- [[ /Documento Obsoleto ]] -->
 
       {% if doc.proceso.slug == "stn" %}
       <div class="row">
