@@ -18,12 +18,12 @@ from datetime import datetime
 from watson import search as watson
 from django.urls import reverse_lazy
 from django.db.models import Q
-from django.views.generic import (ListView, TemplateView, DetailView)
+from django.views.generic import (ListView, TemplateView, DetailView, FormView)
 from django.views.generic.edit import CreateView
 from django.template.defaultfilters import slugify
 from django.contrib.auth.mixins import LoginRequiredMixin
 from apps.docs.models import Documento, Proceso, Tipo, Revision
-from apps.docs.forms import DocForm, ProcesoForm, TipoForm, VersionForm
+from apps.docs.forms import DocForm, ProcesoForm, ReporteForm, TipoForm, VersionForm
 
 
 class Reportes(ListView):
@@ -216,3 +216,40 @@ class Buscador(TemplateView):
             resultados = watson.search(query)
         context.update({'resultados': resultados, 'query': query})
         return context
+
+
+class PanicButtonView(FormView):
+    """Vista para el botón de pánico."""
+
+    template_name = 'docs/panic.html'
+    form_class = ReporteForm
+    success_url = reverse_lazy('docs:portada')
+
+    # Agregamos el documento_id obtenido mediante el parámetro
+    # pk de la URL al contexto de la vista.
+    def get_context_data(self, **kwargs):
+        context = super(PanicButtonView, self).get_context_data(**kwargs)
+        context['documento'] = Documento.objects.get(pk=self.kwargs['pk'])
+        return context
+
+    # Inicializamos el formulario con el documento actual
+    # para usarlo en el template y el registro que se guarda
+    # en la base de datos.
+    def get_initial(self):
+        initial = super(PanicButtonView, self).get_initial()
+        initial['documento'] = self.kwargs['pk']
+        return initial
+    
+    # Guardamos el reporte en la base de datos  
+    def form_valid(self, form):
+        # El Documento en el contexto se agrega al campo documento
+        # del formulario.
+        form.instance.documento = Documento.objects.get(pk=self.kwargs['pk'])
+        # Si el correo no termina en '@ine.mx' se rechaza el formulario
+        if not form.instance.correo.endswith('@ine.mx'):
+            return self.form_invalid(form)
+        # Si el formulario es válido, se guarda en la base de datos
+        else:
+            form.save()
+        return super(PanicButtonView, self).form_valid(form)
+    

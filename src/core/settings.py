@@ -215,3 +215,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 TINYMCE_DEFAULT_CONFIG = {
     "height": 300,
 }
+
+X_FRAME_OPTIONS = "SAMEORIGIN"

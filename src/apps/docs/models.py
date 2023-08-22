@@ -238,3 +238,41 @@ class Revision (models.Model):
 {self.documento} rev {self.revision:02d} ({self.f_actualizacion}))
 """
         return respuesta
+
+
+class Reporte(models.Model):
+    """
+    Modelo Reporte.
+
+    Almacena los reportes hecho con el botón de pánico. Permite hacer
+    seguimiento de las acciones tomadas para resolver el problema.
+
+    Campos
+    - documento: referencia al modelo Documento
+    - causa: la causa por la que se reporta el documento
+    - descripcion: descripción del problema (es opcional)
+    - correo: correo electrónico del usuario que reporta el problema
+    """
+
+    CAUSAS = (
+        ('1', 'No se puede descargar el documento'),
+        ('2', 'El documento no es el correcto'),
+        ('3', 'Hay una nueva versión del documento'),
+        ('4', 'Otro problema')
+    )
+
+    documento = models.ForeignKey(Documento, on_delete=models.CASCADE)
+    causa = models.CharField(max_length=1, choices=CAUSAS)
+    descripcion = models.TextField(blank=True)
+    correo = models.EmailField()
+    created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        """Metadatos del modelo Reporte."""
+
+        verbose_name = "Reporte"
+        verbose_name_plural = "Reportes"
+
+    def __str__(self) -> str:
+        """Formato en texto del modelo."""
+        return f"{self.documento} - {self.get_causa_display()}"

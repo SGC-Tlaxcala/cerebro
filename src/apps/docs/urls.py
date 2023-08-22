@@ -10,12 +10,14 @@ from django.urls import path
 from django.contrib.auth.decorators import login_required
 from apps.docs.views import (
     IndexLMD, DocDetail, ProcesoList, Buscador, SetupDoc,
-    ProcessAdd, TipoAdd, DocAdd, RevisionAdd, Reportes
+    ProcessAdd, TipoAdd, DocAdd, RevisionAdd, Reportes,
+    PanicButtonView
 )
 
 app_name = 'docs'
 urlpatterns = [
     path('', IndexLMD.as_view(), name='index'),
+    path('panic/<int:pk>', PanicButtonView.as_view(), name='panic'),
     path('<int:pk>/detalle', DocDetail.as_view(), name='detalle'),
     path('proceso/<slug:slug>', ProcesoList.as_view(), name='proceso'),
     path('buscador/', Buscador.as_view(), name='buscador'),

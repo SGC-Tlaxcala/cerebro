@@ -11,7 +11,7 @@ from crispy_forms.layout import Layout, Submit, Div, HTML, Field, Button
 from crispy_forms.bootstrap import FormActions
 from django import forms
 
-from apps.docs.models import Documento, Proceso, Tipo, Revision
+from .models import Documento, Proceso, Tipo, Revision, Reporte
 
 GUARDAR_CAMBIOS = 'Guardar cambios'
 
@@ -121,6 +121,38 @@ class TipoForm(forms.ModelForm):
 
         model = Tipo
         fields = ['tipo', 'slug']
+
+
+class ReporteForm(forms.ModelForm):
+    """
+    Formulario de Reporte.
+
+    Se muestra en un modal para recopilar información de
+    documentos obsoletos.
+    """
+
+    class Meta:
+        """Metadatos de la clase ReporteForm."""
+
+        model = Reporte
+        fields = ['causa', 'descripcion', 'correo']
+
+    def __init__(self, *args, **kwargs):
+        """Inicializador de la clase ReporteForm."""
+        super(ReporteForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.layout = Layout(
+            Div(Field('causa', wrapper_class='col-md-12'), css_class='row'),
+            Div(Field('descripcion', rows=2, wrapper_class='col-md-12'), css_class='row'),
+            Div(Field('correo', wrapper_class='col-md-12'), css_class='row'),
+            Div(
+                HTML('<hr>'),
+                FormActions(
+                    Submit('cancel', 'Cancelar'),
+                    Submit('save', GUARDAR_CAMBIOS)
+                )
+            ),
+        )
 
 
 class VersionForm(forms.ModelForm):
