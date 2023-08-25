@@ -32,7 +32,7 @@ class Tipo (models.Model):
     tipo = models.CharField(max_length=50)
     slug = models.CharField(max_length=50)
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Formato en texto de la salida del modelo."""
         return f'Tipo: {self.tipo}'
 
@@ -50,10 +50,9 @@ class Proceso (models.Model):
     proceso = models.CharField(max_length=80)
     slug = models.CharField(max_length=80)
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Formato en texto de la salida del modelo."""
         nombre_proceso: str = ""
-
         if self.slug == 'sgc':
             nombre_proceso = 'Documentos del Sistema'
         elif self.slug == 'stn':
@@ -64,7 +63,6 @@ class Proceso (models.Model):
             nombre_proceso = 'Lista Maestra de Documentos'
         else:
             nombre_proceso = self.proceso
-
         return f'Proceso {nombre_proceso}'
 
 
@@ -116,20 +114,7 @@ class Documento (models.Model):
         def __str__(self):
             return "Metadatos del modelo Documento"
 
-        def get_metadata(self):
-            """Devuelve un diccionario vacío."""
-            return {}
-
-    def ext(self):
-        """Obtiene la extensión del archivo."""
-        return self.revision_actual().archivo.name.split('.')[-1]
-
-    def save(self, *args, **kwargs):
-        """Actividades antes de ejecutar save."""
-        self.slug = slugify(self.nombre)
-        super(Documento, self).save(*args, **kwargs)
-
-    def clave(self):
+    def ext(self) -> str:
         """
         Función clave.
 
@@ -139,18 +124,33 @@ class Documento (models.Model):
         """
         return "%s-%02d" % (self.tipo.slug, self.id)
 
-    def __str__(self):
+    def save(self, *args, **kwargs) -> None:
+        """Actividades antes de ejecutar save."""
+        self.slug = slugify(self.nombre)
+        super(Documento, self).save(*args, **kwargs)
+
+    def clave(self) -> str:
+        """
+        Función clave.
+
+        Devuelve la clave del documento, que es única y se forma por
+        el tipo de documento (tres letras) y la identificación del
+        documento.
+        """
+        return "%s-%02d" % (self.tipo.slug, self.id)
+
+    def __str__(self) -> str:
         """Formato en texto del modelo."""
         return "%s (%s-%02d)" % (self.nombre, self.tipo.slug.upper(), self.id)
 
-    def revision_actual(self):
+    def revision_actual(self) -> str:
         """Devuelve la revisión del documento como un entero."""
         try:
             return self.revision_set.latest('revision')
         except IndexError:
             return ""
 
-    def f_actual(self):
+    def f_actual(self) -> str:
         """Devuelve la fecha de la revisión actual del documento."""
         try:
             return self.revision_set.latest('revision').f_actualizacion
@@ -174,7 +174,7 @@ class Documento (models.Model):
         return f"{self.revision_set.latest('revision').archivo.url.split('.')[0]}.swf"
 
 
-def subir_documento(instancia, archivo):
+def subir_documento(instancia, archivo) -> str:
     """Función auxiliar para renombrar y colocar archivos en su ruta."""
     ext = archivo.split('.')[-1]
     orig = 'docs'
@@ -238,3 +238,55 @@ class Revision (models.Model):
 {self.documento} rev {self.revision:02d} ({self.f_actualizacion}))
 """
         return respuesta
+
+
+class Reporte(models.Model):
+    """
+    Modelo Reporte.
+
+    Almacena los reportes hecho con el botón de pánico. Permite hacer
+    seguimiento de las acciones tomadas para resolver el problema.
+
+    Campos
+    - documento: referencia al modelo Documento
+    - causa: la causa por la que se reporta el documento
+    - descripcion: descripción del problema (es opcional)
+    - correo: correo electrónico del usuario que reporta el problema
+    """
+
+    CAUSAS = (
+        ('1', 'No se puede descargar el documento '),
+        ('2', 'El proceso asignado no es correcto'),
+        ('3', 'Hay una nueva versión del documento'),
+        ('4', 'Otro problema')
+    )
+
+    documento = models.ForeignKey(Documento, on_delete=models.CASCADE)
+    causa = models.CharField(max_length=1, choices=CAUSAS)
+    descripcion = models.TextField(blank=True)
+    correo = models.EmailField()
+    created = models.DateTimeField(auto_now_add=True)
+
+    # Resolución del reporte
+    resuelto = models.BooleanField(default=False)
+    resolucion = models.TextField('Resolución', blank=True)
+    resuelto_por = models.ForeignKey(
+        User,
+        editable=False,
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True
+    )
+    resuelto_en = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        """Metadatos del modelo Reporte."""
+
+        verbose_name = "Reporte"
+        verbose_name_plural = "Reportes"
+
+    def __str__(self) -> str:
+        """Formato en texto del modelo."""
+        return f"{self.documento} - {self.get_causa_display()}"
+
+

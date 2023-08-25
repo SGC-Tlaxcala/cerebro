@@ -35,6 +35,7 @@ THIRD_PARTY_APPS = [
     'simple_history',
     'guardian',
     'tinymce',
+    'captcha'
 ]
 LOCAL_APPS = [
     'core',
@@ -71,6 +72,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'apps.docs.views.reportes_context'
             ],
         },
     },
@@ -215,3 +217,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 TINYMCE_DEFAULT_CONFIG = {
     "height": 300,
 }
+
+X_FRAME_OPTIONS = "SAMEORIGIN"
+SILENCED_SYSTEM_CHECKS = ['captcha.recaptcha_test_key_error']

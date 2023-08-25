@@ -5,13 +5,13 @@ Gestiona las clases y funciones de los formularios de la documentación.
 """
 
 # Formularios para la app de documentos
-
+from captcha.fields import ReCaptchaField
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Submit, Div, HTML, Field, Button
 from crispy_forms.bootstrap import FormActions
 from django import forms
 
-from apps.docs.models import Documento, Proceso, Tipo, Revision
+from .models import Documento, Proceso, Tipo, Revision, Reporte
 
 GUARDAR_CAMBIOS = 'Guardar cambios'
 
@@ -123,6 +123,40 @@ class TipoForm(forms.ModelForm):
         fields = ['tipo', 'slug']
 
 
+class ReporteForm(forms.ModelForm):
+    """
+    Formulario de Reporte.
+
+    Se muestra en un modal para recopilar información de
+    documentos obsoletos.
+    """
+    captcha = ReCaptchaField()
+
+    class Meta:
+        """Metadatos de la clase ReporteForm."""
+
+        model = Reporte
+        fields = ['causa', 'descripcion', 'correo']
+
+    def __init__(self, *args, **kwargs):
+        """Inicializador de la clase ReporteForm."""
+        super(ReporteForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.layout = Layout(
+            Div(Field('causa', wrapper_class='col-md-12'), css_class='row'),
+            Div(Field('descripcion', rows=2, wrapper_class='col-md-12'), css_class='row'),
+            Div(Field('correo', wrapper_class='col-md-12'), css_class='row'),
+            Div('captcha', css_class='row'),
+            Div(
+                HTML('<hr>'),
+                FormActions(
+                    Submit('cancel', 'Cancelar', css_class='btn btn-secondary'),
+                    Submit('save', GUARDAR_CAMBIOS)
+                )
+            ),
+        )
+
+
 class VersionForm(forms.ModelForm):
     """
     Clase VersionForm.
@@ -176,4 +210,32 @@ class VersionForm(forms.ModelForm):
                     Submit('save', GUARDAR_CAMBIOS)
                 )
             )
+        )
+
+
+class PanicResolveForm(forms.ModelForm):
+    """
+    Clase PanicResolveForm.
+
+    Formulario para resolver un documento en estado de pánico.
+    """
+    
+    class Meta:
+        model = Reporte
+        fields = ['resuelto', 'resolucion']
+
+    def __init__(self, *args, **kwargs):
+        """Inicializa el formulario."""
+        super(PanicResolveForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.layout = Layout(
+            Div(Field('resolucion', rows=3), css_class='row'),
+            Div(Field('resuelto', css_class='form-check-input'), css_class='sform-check form-switch'),
+            Div(
+                HTML('<hr>'),
+                FormActions(
+                    Submit('cancel', 'Cancelar', css_class='btn btn-secondary'),
+                    Submit('save', GUARDAR_CAMBIOS)
+                )
+            ),
         )

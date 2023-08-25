@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block  head_title %}Reportes de documentos con observaciones{% endblock %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col">
+        <div class="well">
+        <h2>Reportes con resolución pendiente</h2>
+        </div>
+        <hr>
+    </div>
+
+<div class="row">
+    <div class="col">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Documento</th>
+                    <th>Observación</th>
+                    <th>Usuario</th>
+                    <th>Fecha de observación</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for reporte in pendientes %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ reporte.documento }}</td>
+                    <td>{{ reporte.get_causa_display }}{%if reporte.causa == '4' %}: {{ reporte.descripcion }}{% endif %}</td>
+                    <td>{{ reporte.correo }}</td>
+                    <td>{{ reporte.created|date:'Y-m-d'}}</td>
+                    <td><a href="{% url 'docs:panic_resolve' pk=reporte.id %}" class="btn btn-primary">Resolver</a></td>
+                </tr>
+                {% endfor %}
+                </tbody>
+        </table>
+    </div>
+</div>
+</div>
+
+<div class="row">
+    <div class="col">
+        <div class="well">
+        <h2>Reportes resueltos</h2>
+        </div>
+        <hr>
+    </div>
+
+<div class="row">
+    <div class="col">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Documento</th>
+                    <th>Observación</th>
+                    <th>Resolución</th>
+                    <th>Fecha</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for reporte in resueltos %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ reporte.documento }}</td>
+                    <td>{{ reporte.get_causa_display }}{%if reporte.causa == '4' %}: {{ reporte.descripcion }}{% endif %}</td>
+                    <td>{{ reporte.resolucion }}</td>
+                    <td>{{ reporte.resuelto_en|date:'Y-m-d' }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

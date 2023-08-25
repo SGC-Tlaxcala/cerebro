@@ -1,0 +1,31 @@
+{% load crispy_forms_tags %}
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Reporte de Documento Obsoleto</title>
+    {% include 'partials/_meta.html' %}
+    {% include 'partials/_styles.html' %}
+  </head>
+  <body style="padding: 40px; border: 2px;">
+
+    <h1>Reporte de Documento Obsoleto</h1>
+    <h3>{{ documento }}</h3>
+    <hr />
+
+    <form method="post" class="form">
+
+    {% if form.non_field_errors %}
+      <p class="alert alert-error">{{ form.non_field_errors }}</p>
+    {% endif %}
+    {% csrf_token %}
+    {% crispy form %}
+    </form>
+
+    {% include 'partials/_scripts.html' %}
+    {% block footer %}{% endblock footer%}
+
+  </body>
+</html>
