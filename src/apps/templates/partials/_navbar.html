@@ -30,7 +30,11 @@
   </div>
 </nav>
 
-
-<div style="margin: 25px 0">
-hola
+{% if panic_reports > 0 %}
+<div style="margin: 10px 50px 10px">
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <strong>¡Alerta!</strong> Hay {{ panic_reports }} reportes de documentos sin atender. <a href="{% url 'docs:panic_reportes' %}" class="alert-link">Ver reportes</a>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
 </div>
+{% endif %}

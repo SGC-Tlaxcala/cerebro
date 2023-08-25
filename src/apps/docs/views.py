@@ -15,7 +15,6 @@ Incluye las siguientes vistas:
 """
 
 from datetime import datetime
-from multiprocessing import context
 from django.forms.models import BaseModelForm
 from django.http import HttpResponse
 from watson import search as watson
@@ -26,7 +25,7 @@ from django.views.generic.edit import CreateView, UpdateView
 from django.template.defaultfilters import slugify
 from django.contrib.auth.mixins import LoginRequiredMixin
 from apps.docs.models import Documento, Proceso, Tipo, Revision, Reporte
-from apps.docs.forms import DocForm, ProcesoForm, ReporteForm, TipoForm, VersionForm, PanicResolveForm
+from apps.docs.forms import (DocForm, ProcesoForm, ReporteForm, TipoForm, VersionForm, PanicResolveForm)
 
 
 class Reportes(ListView):
@@ -295,3 +294,13 @@ class PanicResolve(LoginRequiredMixin, UpdateView):
         self.object.resuelto = form.cleaned_data['resuelto']
         self.object.save()
         return super().form_valid(form)
+
+
+# reportes_context - un custom context processor para agregar el conteo de reportes
+# a todas las vistas
+def reportes_context(request):
+    if request.user.is_authenticated:
+        reportes = Reporte.objects.filter(resuelto=False).count()
+        return {'panic_reports': reportes}
+    else:
+        return {}

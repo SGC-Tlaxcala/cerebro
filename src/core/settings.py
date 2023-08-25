@@ -72,6 +72,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'apps.docs.views.reportes_context'
             ],
         },
     },
@@ -218,8 +219,4 @@ TINYMCE_DEFAULT_CONFIG = {
 }
 
 X_FRAME_OPTIONS = "SAMEORIGIN"
-
-# RECAPTCHA_PUBLIC_KEY = '6LdSj8wnAAAAACXUdurJPcQOVO-yt83q5XyHC4J8'
-# RECAPTCHA_PRIVATE_KEY = '6LdSj8wnAAAAAAtV-wj55D6-zJZX6JqSCubugxW6'
-
 SILENCED_SYSTEM_CHECKS = ['captcha.recaptcha_test_key_error']
