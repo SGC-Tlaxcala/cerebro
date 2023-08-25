@@ -35,6 +35,7 @@ THIRD_PARTY_APPS = [
     'simple_history',
     'guardian',
     'tinymce',
+    'captcha'
 ]
 LOCAL_APPS = [
     'core',
@@ -217,3 +218,8 @@ TINYMCE_DEFAULT_CONFIG = {
 }
 
 X_FRAME_OPTIONS = "SAMEORIGIN"
+
+# RECAPTCHA_PUBLIC_KEY = '6LdSj8wnAAAAACXUdurJPcQOVO-yt83q5XyHC4J8'
+# RECAPTCHA_PRIVATE_KEY = '6LdSj8wnAAAAAAtV-wj55D6-zJZX6JqSCubugxW6'
+
+SILENCED_SYSTEM_CHECKS = ['captcha.recaptcha_test_key_error']

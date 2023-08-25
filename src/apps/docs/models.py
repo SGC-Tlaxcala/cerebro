@@ -255,8 +255,8 @@ class Reporte(models.Model):
     """
 
     CAUSAS = (
-        ('1', 'No se puede descargar el documento'),
-        ('2', 'El documento no es el correcto'),
+        ('1', 'No se puede descargar el documento '),
+        ('2', 'El proceso asignado no es correcto'),
         ('3', 'Hay una nueva versión del documento'),
         ('4', 'Otro problema')
     )
@@ -267,6 +267,18 @@ class Reporte(models.Model):
     correo = models.EmailField()
     created = models.DateTimeField(auto_now_add=True)
 
+    # Resolución del reporte
+    resuelto = models.BooleanField(default=False)
+    resolucion = models.TextField('Resolución', blank=True)
+    resuelto_por = models.ForeignKey(
+        User,
+        editable=False,
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True
+    )
+    resuelto_en = models.DateTimeField(blank=True, null=True)
+
     class Meta:
         """Metadatos del modelo Reporte."""
 
@@ -276,3 +288,5 @@ class Reporte(models.Model):
     def __str__(self) -> str:
         """Formato en texto del modelo."""
         return f"{self.documento} - {self.get_causa_display()}"
+
+

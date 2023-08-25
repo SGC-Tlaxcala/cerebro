@@ -15,15 +15,18 @@ Incluye las siguientes vistas:
 """
 
 from datetime import datetime
+from multiprocessing import context
+from django.forms.models import BaseModelForm
+from django.http import HttpResponse
 from watson import search as watson
 from django.urls import reverse_lazy
 from django.db.models import Q
 from django.views.generic import (ListView, TemplateView, DetailView, FormView)
-from django.views.generic.edit import CreateView
+from django.views.generic.edit import CreateView, UpdateView
 from django.template.defaultfilters import slugify
 from django.contrib.auth.mixins import LoginRequiredMixin
-from apps.docs.models import Documento, Proceso, Tipo, Revision
-from apps.docs.forms import DocForm, ProcesoForm, ReporteForm, TipoForm, VersionForm
+from apps.docs.models import Documento, Proceso, Tipo, Revision, Reporte
+from apps.docs.forms import DocForm, ProcesoForm, ReporteForm, TipoForm, VersionForm, PanicResolveForm
 
 
 class Reportes(ListView):
@@ -95,6 +98,8 @@ class DocDetail(DetailView):
     def get_context_data(self, **kwargs):
         """Agrega la variable `version` al contexto de la vista."""
         context = super().get_context_data(**kwargs)
+        # Buscamos los reportes que existan en el documento actual y los agregamos al contexto
+        context['reportes'] = Reporte.objects.filter(documento=self.kwargs['pk'])
         context.update({'version': VersionForm})
         return context
 
@@ -220,10 +225,8 @@ class Buscador(TemplateView):
 
 class PanicButtonView(FormView):
     """Vista para el botón de pánico."""
-
     template_name = 'docs/panic.html'
     form_class = ReporteForm
-    success_url = reverse_lazy('docs:portada')
 
     # Agregamos el documento_id obtenido mediante el parámetro
     # pk de la URL al contexto de la vista.
@@ -253,3 +256,42 @@ class PanicButtonView(FormView):
             form.save()
         return super(PanicButtonView, self).form_valid(form)
     
+    # Redirigimos a la página de éxito
+    def get_success_url(self):
+        return reverse_lazy('docs:panic_success')
+
+
+class ReportesList(ListView):
+    """Lista de reportes."""
+    model = Reporte
+    template_name = 'docs/panic_reportes.html'
+
+    # Agregamos los reportes al contexto de la vista
+    def get_context_data(self, **kwargs):
+        context = super(ReportesList, self).get_context_data(**kwargs)
+        context['pendientes'] = Reporte.objects.filter(resuelto=False).order_by('-created')
+        context['resueltos'] = Reporte.objects.filter(resuelto=True).order_by('-resuelto_en')
+        return context
+
+
+class PanicResolve(LoginRequiredMixin, UpdateView):
+    model = Reporte
+    template_name = 'docs/panic_resolve.html'
+    success_url = reverse_lazy('docs:panic_reportes')
+    form_class = PanicResolveForm
+    
+    # Agregamos el reporte al contexto de la vista
+    def get_context_data(self, **kwargs):
+        context = super(PanicResolve, self).get_context_data(**kwargs)
+        context['reporte'] = Reporte.objects.get(pk=self.kwargs['pk'])
+        return context
+
+    def form_valid(self, form: BaseModelForm) -> HttpResponse:
+        self.object = form.save(commit=False)
+        self.object.documento = Reporte.objects.get(pk=self.kwargs['pk']).documento
+        self.object.resuelto_por = self.request.user
+        self.object.resuelto_en = datetime.now()
+        self.object.resolucion = form.cleaned_data['resolucion']
+        self.object.resuelto = form.cleaned_data['resuelto']
+        self.object.save()
+        return super().form_valid(form)

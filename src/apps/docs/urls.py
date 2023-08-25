@@ -8,16 +8,20 @@
 
 from django.urls import path
 from django.contrib.auth.decorators import login_required
+from django.views.generic import TemplateView
 from apps.docs.views import (
     IndexLMD, DocDetail, ProcesoList, Buscador, SetupDoc,
     ProcessAdd, TipoAdd, DocAdd, RevisionAdd, Reportes,
-    PanicButtonView
+    PanicButtonView, ReportesList, PanicResolve,
 )
 
 app_name = 'docs'
 urlpatterns = [
     path('', IndexLMD.as_view(), name='index'),
     path('panic/<int:pk>', PanicButtonView.as_view(), name='panic'),
+    path('panic_success/', TemplateView.as_view(template_name='docs/panic_success.html'), name='panic_success'),
+    path('panic_reports', ReportesList.as_view(), name='panic_reportes'),
+    path('panic_resolve/<int:pk>', PanicResolve.as_view(), name='panic_resolve'),
     path('<int:pk>/detalle', DocDetail.as_view(), name='detalle'),
     path('proceso/<slug:slug>', ProcesoList.as_view(), name='proceso'),
     path('buscador/', Buscador.as_view(), name='buscador'),

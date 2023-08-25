@@ -12,18 +12,11 @@
   <body style="padding: 40px; border: 2px;">
 
     <h1>Reporte de Documento Obsoleto</h1>
-    <h3>{{ documento }}</h3>
+    <h2>Su reporte ha sido enviado</h2>
     <hr />
 
-    <form method="post" class="form">
-
-    {% if form.non_field_errors %}
-      <p class="alert alert-error">{{ form.non_field_errors }}</p>
-    {% endif %}
-    {% csrf_token %}
-    {% crispy form %}
-    </form>
-
+    <h3>Puede cerrar esta ventana</h3>
+    
     {% include 'partials/_scripts.html' %}
     {% block footer %}{% endblock footer%}
 
