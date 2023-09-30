@@ -15,6 +15,9 @@ SECRET_KEY = env('SECRET_KEY', default='5kho_evo8b7font)yy(^p!1w$skj%)#5yw-097cr
 
 DEBUG = env('DEBUG', default=False)
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
+CSRF_TRUSTED_ORIGINS = ['https://sgctlaxcala.com.mx', 'https://www.sgctlaxcala.com.mx'] 
+CORS_ORIGIN_WHITELIST = ['https://sgctlaxcala.com.mx', 'https://www.sgctlaxcala.com.mx']
+
 if env('SSL', default=False) is True:
     SECURE_SSL_REDIRECT = False
 
@@ -219,4 +222,5 @@ TINYMCE_DEFAULT_CONFIG = {
 }
 
 X_FRAME_OPTIONS = "SAMEORIGIN"
-SILENCED_SYSTEM_CHECKS = ['captcha.recaptcha_test_key_error']
+RECAPTCHA_PUBLIC_KEY = env('RECAPTCHA_PUBLIC_KEY')
+RECAPTCHA_PRIVATE_KEY = env('RECAPTCHA_PRIVATE_KEY')

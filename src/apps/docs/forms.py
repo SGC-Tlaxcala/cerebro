@@ -6,6 +6,7 @@ Gestiona las clases y funciones de los formularios de la documentación.
 
 # Formularios para la app de documentos
 from captcha.fields import ReCaptchaField
+from captcha.widgets import  ReCaptchaV2Checkbox
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Submit, Div, HTML, Field, Button
 from crispy_forms.bootstrap import FormActions
@@ -130,7 +131,7 @@ class ReporteForm(forms.ModelForm):
     Se muestra en un modal para recopilar información de
     documentos obsoletos.
     """
-    captcha = ReCaptchaField()
+    captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox())
 
     class Meta:
         """Metadatos de la clase ReporteForm."""

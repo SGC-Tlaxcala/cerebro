@@ -6,15 +6,15 @@ After=network.target
 [Service]
 User=javier
 Group=javier
-WorkingDirectory=/home/javier/proyectos/cerebro/src
-ExecStart=/home/javier/.pyenv/versions/cerebro/bin/gunicorn \
+WorkingDirectory=/home/javier/Projects/cerebro/src
+ExecStart=/home/javier/.virtualenvs/cerebro/bin/gunicorn  \
   core.wsgi:application \
   --name cerebro \
   --workers 3 \
   --user=javier --group=javier \
   --access-logfile - \
   --log-level=debug \
-  --bind=unix:/home/javier/proyectos/goals/run/cerebro.sock
+  --bind unix:/home/javier/Projects/cerebro/run/cerebro.sock
 
 [Install]
 WantedBy=multi-user.target
