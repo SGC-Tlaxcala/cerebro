@@ -258,11 +258,12 @@ class Reporte(models.Model):
         ('1', 'No se puede descargar el documento '),
         ('2', 'El proceso asignado no es correcto'),
         ('3', 'Hay una nueva versión del documento'),
-        ('4', 'Otro problema')
+        ('4', 'Documento faltante'),
+        ('99', 'Otro problema')
     )
 
     documento = models.ForeignKey(Documento, on_delete=models.CASCADE)
-    causa = models.CharField(max_length=1, choices=CAUSAS)
+    causa = models.CharField(max_length=2, choices=CAUSAS)
     descripcion = models.TextField(blank=True)
     correo = models.EmailField()
     created = models.DateTimeField(auto_now_add=True)
