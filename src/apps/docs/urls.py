@@ -12,7 +12,7 @@ from django.views.generic import TemplateView
 from apps.docs.views import (
     IndexLMD, DocDetail, ProcesoList, Buscador, SetupDoc,
     ProcessAdd, TipoAdd, DocAdd, RevisionAdd, Reportes,
-    PanicButtonView, ReportesList, PanicResolve,
+    PanicButtonView, ReportesList, PanicResolve, IndexLDP
 )
 
 app_name = 'docs'
@@ -30,5 +30,6 @@ urlpatterns = [
     path('setup/', login_required(SetupDoc.as_view()), name='setup'),
     path('process_add/', login_required(ProcessAdd.as_view()), name='process_add'),
     path('tipo_add/', login_required(TipoAdd.as_view()), name='tipo_add'),
+    path('ldp/', IndexLDP.as_view(), name='ldp'),
     path('<int:pk>/add', RevisionAdd.as_view(), name='rev_add')
 ]

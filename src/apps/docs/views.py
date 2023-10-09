@@ -64,6 +64,32 @@ class IndexLMD(ListView):
 
     def __str__(self):
         return self.__class__.__name__
+    
+    def get_context_data(self, **kwargs):
+        """Agrega la variable `active` al contexto de la vista."""
+        context = super().get_context_data(**kwargs)
+        # Buscamos los reportes que existan en el documento actual y los agregamos al contexto
+        context['activeLMD'] = True
+        return context
+    
+
+class IndexLDP(ListView):
+    """Lista de documentos por proceso."""
+    
+    model = Documento
+    template_name = 'docs/ldp.html'
+    context_object_name = 'docs'
+
+    def get_queryset(self):
+        """Genera la consulta de la LMD."""
+        return Documento.objects.filter(lmd=False, activo=True).order_by('proceso')
+    
+    def get_context_data(self, **kwargs):
+        """Agrega la variable `active` al contexto de la vista."""
+        context = super().get_context_data(**kwargs)
+        # Buscamos los reportes que existan en el documento actual y los agregamos al contexto
+        context['activeLDP'] = True
+        return context
 
 
 class IndexList(ListView):
