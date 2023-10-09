@@ -3,7 +3,7 @@
 {% load static %}
 
 
-{% block  head_title %}Lista de Documentos por Proceso{% endblock %}
+{% block  head_title %}Lista de Documentos por Tipo{% endblock %}
 
 {% block header %}
   <link rel="stylesheet" href="{% static 'docs/estilos.css' %}">
@@ -21,12 +21,12 @@
             href="{% url 'docs:index' %}">Lista maestra de documentos</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link{% if activeLDP %} active{% endif %}" 
+          <a class="nav-link" 
             aria-current="page"
             href="{% url 'docs:ldp' %}">Lista por procesos</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="{% url 'docs:ldt' %}">Lista por tipo</a>
+          <a class="nav-link active" href="{% url 'docs:ldt' %}">Lista por tipo</a>
         </li>
         <li class="nav-item">
           <a 
@@ -42,16 +42,16 @@
   <div class="row">
     <div class="col-md-12">
       <div class="jumbotron">
-        <h1>Lista de Documentos por Proceso</h1>
+        <h1>Lista de tipo de Documento</h1>
       </div>
     </div>
   </div>
 
-  {% regroup docs by proceso as proceso_list %}
+  {% regroup docs by tipo as tipo_list %}
   <div class="row">
     <div class="col-md-12">
       <div class="accordion" id="acordeonLDP">
-        {% for proceso, docs in proceso_list %}
+        {% for proceso, docs in tipo_list %}
         <div class="accordion-item">
           <h2 class="accordion-header">
             <button 
@@ -74,10 +74,10 @@
                       <thead>
                         <tr>
                           <th>Documento</th>
+                          <th>Proceso</th>
                           <th>Código</th>
                           <th>Revisión</th>
                           <th>Aprobación</th>
-                          <th>Tipo</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -94,6 +94,7 @@
                               {% endif %}
                             >{{ doc.nombre }}</a>
                           </td>
+                          <td>{{ doc.proceso }}</td>
                           <td>
                             {{ doc.clave|upper }}
                           </td>
@@ -104,7 +105,6 @@
                             {%  endif %}</td>
                           {% else %}
                           {% endif %}
-                          <td>{{ doc.tipo }}</td>
                         </tr>
                         {% endfor %}
                       </tbody>

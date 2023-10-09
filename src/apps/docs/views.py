@@ -82,7 +82,7 @@ class IndexLDP(ListView):
 
     def get_queryset(self):
         """Genera la consulta de la LMD."""
-        return Documento.objects.filter(lmd=False, activo=True).order_by('proceso')
+        return Documento.objects.filter(lmd=False, activo=True).order_by('proceso', 'tipo')
     
     def get_context_data(self, **kwargs):
         """Agrega la variable `active` al contexto de la vista."""
@@ -91,6 +91,18 @@ class IndexLDP(ListView):
         context['activeLDP'] = True
         return context
 
+
+class IndexLDT(ListView):
+    """Lista de documentos por tipo."""
+    
+    model = Documento
+    template_name = 'docs/ldt.html'
+    context_object_name = 'docs'
+
+    def get_queryset(self):
+        """Genera la consulta de la LMD."""
+        return Documento.objects.filter(lmd=False, activo=True).order_by('tipo', 'proceso', 'id')
+    
 
 class IndexList(ListView):
     """
