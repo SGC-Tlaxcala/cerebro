@@ -25,7 +25,14 @@ from django.views.generic.edit import CreateView, UpdateView
 from django.template.defaultfilters import slugify
 from django.contrib.auth.mixins import LoginRequiredMixin
 from apps.docs.models import Documento, Proceso, Tipo, Revision, Reporte
-from apps.docs.forms import (DocForm, ProcesoForm, ReporteForm, TipoForm, VersionForm, PanicResolveForm)
+from apps.docs.forms import (
+    DocForm,
+    ProcesoForm,
+    ReporteForm,
+    TipoForm,
+    VersionForm,
+    PanicResolveForm
+)
 
 
 class Reportes(ListView):
@@ -68,7 +75,8 @@ class IndexLMD(ListView):
     def get_context_data(self, **kwargs):
         """Agrega la variable `active` al contexto de la vista."""
         context = super().get_context_data(**kwargs)
-        # Buscamos los reportes que existan en el documento actual y los agregamos al contexto
+        # Buscamos los reportes que existan en el documento actual 
+        # y los agregamos al contexto
         context['activeLMD'] = True
         return context
     
@@ -82,12 +90,15 @@ class IndexLDP(ListView):
 
     def get_queryset(self):
         """Genera la consulta de la LMD."""
-        return Documento.objects.filter(lmd=False, activo=True).order_by('proceso', 'tipo')
+        return Documento.objects\
+            .filter(lmd=False, activo=True)\
+            .order_by('proceso', 'tipo')
     
     def get_context_data(self, **kwargs):
         """Agrega la variable `active` al contexto de la vista."""
         context = super().get_context_data(**kwargs)
-        # Buscamos los reportes que existan en el documento actual y los agregamos al contexto
+        # Buscamos los reportes que existan en el documento actual 
+        # y los agregamos al contexto
         context['activeLDP'] = True
         return context
 
@@ -101,7 +112,8 @@ class IndexLDT(ListView):
 
     def get_queryset(self):
         """Genera la consulta de la LMD."""
-        return Documento.objects.filter(lmd=False, activo=True).order_by('tipo', 'proceso', 'id')
+        return Documento.objects\
+            .filter(lmd=False, activo=True).order_by('tipo', 'proceso', 'id')
     
 
 class IndexList(ListView):
@@ -112,7 +124,7 @@ class IndexList(ListView):
     """
 
     model = Documento
-    template_name = 'docs/portada2.html'
+    template_name = 'docs/portada.html'
     context_object_name = 'docs'
 
     def get_queryset(self):
@@ -135,7 +147,8 @@ class DocDetail(DetailView):
     def get_context_data(self, **kwargs):
         """Agrega la variable `version` al contexto de la vista."""
         context = super().get_context_data(**kwargs)
-        # Buscamos los reportes que existan en el documento actual y los agregamos al contexto
+        # Buscamos los reportes que existan en el documento actual 
+        # y los agregamos al contexto
         context['reportes'] = Reporte.objects.filter(documento=self.kwargs['pk'])
         context.update({'version': VersionForm})
         return context
@@ -279,7 +292,7 @@ class PanicButtonView(FormView):
         initial = super(PanicButtonView, self).get_initial()
         initial['documento'] = self.kwargs['pk']
         return initial
-    
+
     # Guardamos el reporte en la base de datos  
     def form_valid(self, form):
         # El Documento en el contexto se agrega al campo documento
@@ -292,7 +305,7 @@ class PanicButtonView(FormView):
         else:
             form.save()
         return super(PanicButtonView, self).form_valid(form)
-    
+
     # Redirigimos a la página de éxito
     def get_success_url(self):
         return reverse_lazy('docs:panic_success')
@@ -316,7 +329,7 @@ class PanicResolve(LoginRequiredMixin, UpdateView):
     template_name = 'docs/panic_resolve.html'
     success_url = reverse_lazy('docs:panic_reportes')
     form_class = PanicResolveForm
-    
+
     # Agregamos el reporte al contexto de la vista
     def get_context_data(self, **kwargs):
         context = super(PanicResolve, self).get_context_data(**kwargs)
