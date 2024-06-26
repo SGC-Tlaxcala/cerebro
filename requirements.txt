@@ -24,4 +24,4 @@ django-sendgrid-v5
 openpyxl
 django-tinymce
 crispy-bootstrap5
-django-recaptcha
+django-recaptcha==3.0.0
