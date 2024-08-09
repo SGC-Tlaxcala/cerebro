@@ -44,7 +44,8 @@ THIRD_PARTY_APPS = [
     'simple_history',
     'guardian',
     'tinymce',
-    'captcha'
+    'captcha',
+    'anymail'
 ]
 LOCAL_APPS = [
     'core',
@@ -250,6 +251,11 @@ EMAIL_USE_TLS = env("EMAIL_USE_TLS", default=True)
 EMAIL_PORT = env("EMAIL_PORT")
 EMAIL_HOST_USER = env('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
+
+ANYMAIL = {
+    "MAILGUN_API_KEY": env('EMAIL_HOST_USER'),
+    "MAILGUN_SENDER_DOMAIN": env('EMAIL_HOST_PASSWORD')
+}
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 

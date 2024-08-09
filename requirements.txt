@@ -25,3 +25,4 @@ openpyxl
 django-tinymce
 crispy-bootstrap5
 django-recaptcha==3.0.0
+django-anymail[mailgun]
