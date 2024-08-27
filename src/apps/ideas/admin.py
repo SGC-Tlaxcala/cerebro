@@ -24,13 +24,12 @@ class IdeaAdmin(admin.ModelAdmin):
     search_fields = ('desc', 'results', 'title')
     inlines = [ResolveAdminInline]
 
-
     def viable(self, obj):
         viable = '<strong>Sí</strong>' if obj.resolve_set.last().viable else '<i>No</i>'
-        return mark_safe(f'{viable}')
+        return mark_safe(viable)
 
     def state(self, obj):
-        return mark_safe(f'{obj.resolve_set.last().resolve}')
+        return mark_safe(obj.resolve_set.last().resolve)
 
     def save_formset(self, request, form, formset, change):
         instances = formset.save(commit=False)
