@@ -27,13 +27,13 @@ class IdeaForm(forms.ModelForm):
         self.helper.layout = Layout(
             Div(
                 HTML('<h3>Déjanos tus datos</h3>'),
+                Div(Field('title', wrapper_class='col-sm-12'), css_class='row'),
                 Div(
                     Field('name', wrapper_class='col-sm-12'),
-                    Field('contacto', wrapper_class='col-sm-3', autocomplete='off'),
                     css_class='row'
                 ),
                 Div(
-                    Field('contact', wrapper_class='col'),
+                    Field('contact', wrapper_class='col',  autocomplete='off'),
                     Field('site', wrapper_class='col'),
                     css_class='row'
                 ),
@@ -88,6 +88,16 @@ class IdeaForm(forms.ModelForm):
                 )
             ),
         )
+
+    def clean(self):
+        """Valida que el campo de contacto tenga un correo o teléfono."""
+        # Verifica que el correo sea institucional
+        contact = self.cleaned_data.get('contact')
+        if '@ine.mx' not in contact:
+            raise forms.ValidationError(
+                'El contacto debe ser un correo institucional válido')
+        return self.cleaned_data
+
 
 
 
