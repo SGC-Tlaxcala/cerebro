@@ -14,7 +14,7 @@ urlpatterns = [
     path('tinymce/', include('tinymce.urls')),
     path('docs/', include('apps.docs.urls')),
     path('carto/', include('apps.carto.urls')),
-    path('mejora/', include('apps.ideas.urls')),
+    path('ideas/', include('apps.ideas.urls')),
     path('', Index.as_view(), name='index')
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
