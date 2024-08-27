@@ -16,13 +16,15 @@ SYSTEM = 2
 FORMAT = 3
 KPI = 4
 GOAL = 5
+CMI = 6
 SCOPE = (
     (PROCESS, 'Proceso'),
     (ACTIVITY, 'Actividad'),
     (SYSTEM, 'Sistema'),
     (FORMAT, 'Formato'),
     (KPI, 'Indicador'),
-    (GOAL, 'Objetivo')
+    (GOAL, 'Objetivo'),
+    (CMI, 'Cuadro de Mando')
 )
 
 
@@ -43,7 +45,7 @@ class Idea(models.Model):
         help_text='Escribe tu nombre')
     contact = models.CharField(
         'Contacto', max_length=100,
-        help_text='Escribe tu correo electrónico o número telefónico')
+        help_text='Escribe tu correo electrónico institucional')
     site = models.CharField(
         'Sitio', max_length=30,
         help_text='Escribe tu módulo o Junta')
