@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='resolve',
             name='viable',
-            field=models.PositiveSmallIntegerField(choices=[(0, 'En espera'), (1, 'No viable'), (2, 'Viable')], default=0, help_text='Selecciona si la idea es viable o no', verbose_name='Viable'),
+            field=models.IntegerField(choices=[(0, 'En espera'), (1, 'No viable'), (2, 'Viable')], default=0, help_text='Selecciona si la idea es viable o no', verbose_name='Viable'),
         ),
     ]

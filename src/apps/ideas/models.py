@@ -91,7 +91,7 @@ class Resolve(models.Model):
     resolve = HTMLField('Resolución', help_text='Describe la resolución de la idea')
     created = models.DateTimeField(auto_now_add=True)
 
-    viable = models.PositiveSmallIntegerField(
+    viable = models.IntegerField(
         'Viable',
         choices=((ESPERA, 'En espera'), (NO_VIABLE, 'No viable'), (VIABLE, 'Viable')),
         default=ESPERA,
