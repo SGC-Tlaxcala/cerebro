@@ -37,7 +37,7 @@
               <td>{{ idea.get_type_display }}</td>
               <td>{{ idea.get_scope_display }}</td>
               <td><a href="{% url 'ideas:detalle' pk=idea.id %}">{{ idea.desc|safe }}</a></td>
-              <td>{% if idea.resolve_set.last.viable %}<strong>Viable</strong>{% elif idea.resolve_set.last.viable == False %}No viable{% else %}En análisis{% endif %}</td>
+              <td>{% if idea.resolve_set.last.viable == 2 %}<strong>Viable</strong>{% elif idea.resolve_set.last.viable == 1 %}No viable{% else %}En análisis{% endif %}</td>
             </tr>
           {% endfor %}
         </tbody>

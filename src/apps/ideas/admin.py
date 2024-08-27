@@ -26,8 +26,12 @@ class IdeaAdmin(admin.ModelAdmin):
 
     def viable(self, obj):
         try:
-            if obj.resolve_set.last().viable:
+            if obj.resolve_set.last().viable == 2:
                 estatus = '<strong>Sí</strong>'
+            elif obj.resolve_set.last().viable == 1:
+                estatus = '<strong>No</strong>'
+            else:
+                estatus = '<strong>En espera</strong>'
         except AttributeError:
             estatus = '<i>No</i>'
         return mark_safe(estatus)
@@ -42,7 +46,7 @@ class IdeaAdmin(admin.ModelAdmin):
     def save_formset(self, request, form, formset, change):
         instances = formset.save(commit=False)
         for instance in instances:
-            instance.autor = request.user
+            instance.user = request.user
             instance.save()
         formset.save_m2m()
 
