@@ -1,6 +1,9 @@
 from django.db import models
 from django.utils.text import slugify
 from tinymce.models import HTMLField
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 
 IDEA = 0
@@ -71,13 +74,16 @@ class Idea(models.Model):
     def __str__(self):
         return f'idea-{self.id}'
 
+    def final(self):
+        # Regresa el estado final de la idea o proyecto Resolve_last()
+        return self.resolve_set.last()
+
 
 # TODO: Crear un modelo para comentarios de cada idea. Y calificarla como viable o no viable.
-class Comment(models.Model):
+class Resolve(models.Model):
     idea = models.ForeignKey(Idea, on_delete=models.CASCADE)
-    name = models.CharField('Nombre', max_length=120)
-    email = models.EmailField('Correo')
-    comment = models.TextField('Comentario')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, editable=False)
+    resolve = HTMLField('Resolución', help_text='Describe la resolución de la idea')
     viable = models.BooleanField('Viable', default=False)
 
     def __str__(self):
