@@ -1,6 +1,6 @@
 # Docker para cerebro
 
-FROM python:3.10-alpine
+FROM python:alpine
 
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
