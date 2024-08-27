@@ -65,6 +65,7 @@ class Idea(models.Model):
     evidence = models.FileField(
         'Evidencias', upload_to='ideas', blank=True, null=True,
         help_text='Sube las evidencias que usaste en tu proyecto en un solo zip')
+    created = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -88,6 +89,8 @@ class Resolve(models.Model):
     idea = models.ForeignKey(Idea, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE, editable=False)
     resolve = HTMLField('Resolución', help_text='Describe la resolución de la idea')
+    created = models.DateTimeField(auto_now_add=True)
+
     viable = models.PositiveSmallIntegerField(
         'Viable',
         choices=((ESPERA, 'En espera'), (NO_VIABLE, 'No viable'), (VIABLE, 'Viable')),
