@@ -79,12 +79,20 @@ class Idea(models.Model):
         return self.resolve_set.last()
 
 
-# TODO: Crear un modelo para comentarios de cada idea. Y calificarla como viable o no viable.
+ESPERA = 0
+NO_VIABLE = 1
+VIABLE = 2
+
+
 class Resolve(models.Model):
     idea = models.ForeignKey(Idea, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE, editable=False)
     resolve = HTMLField('Resolución', help_text='Describe la resolución de la idea')
-    viable = models.BooleanField('Viable', default=False)
+    viable = models.PositiveSmallIntegerField(
+        'Viable',
+        choices=((ESPERA, 'En espera'), (NO_VIABLE, 'No viable'), (VIABLE, 'Viable')),
+        default=ESPERA,
+        help_text='Selecciona si la idea es viable o no')
 
     def __str__(self):
         return f'comment-{self.id}'

@@ -25,11 +25,19 @@ class IdeaAdmin(admin.ModelAdmin):
     inlines = [ResolveAdminInline]
 
     def viable(self, obj):
-        viable = '<strong>Sí</strong>' if obj.resolve_set.last().viable else '<i>No</i>'
-        return mark_safe(viable)
+        try:
+            if obj.resolve_set.last().viable:
+                estatus = '<strong>Sí</strong>'
+        except AttributeError:
+            estatus = '<i>No</i>'
+        return mark_safe(estatus)
 
     def state(self, obj):
-        return mark_safe(obj.resolve_set.last().resolve)
+        try:
+            status = obj.resolve_set.last().resolve
+        except AttributeError:
+            status = '<i>En espera</i>'
+        return mark_safe(status)
 
     def save_formset(self, request, form, formset, change):
         instances = formset.save(commit=False)
