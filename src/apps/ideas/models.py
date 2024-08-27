@@ -1,6 +1,9 @@
 from django.db import models
 from django.utils.text import slugify
 from tinymce.models import HTMLField
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 
 IDEA = 0
@@ -29,7 +32,7 @@ SCOPE = (
 
 
 class Idea(models.Model):
-    title = models.CharField('Título', max_length=200)
+    title = models.CharField('Título', max_length=200, help_text='Ponle un nombre a tu idea o proyecto')
     slug = models.SlugField('Slug', max_length=200, unique=True, editable=False)
     type = models.PositiveSmallIntegerField(
         'Tipo',
@@ -62,6 +65,7 @@ class Idea(models.Model):
     evidence = models.FileField(
         'Evidencias', upload_to='ideas', blank=True, null=True,
         help_text='Sube las evidencias que usaste en tu proyecto en un solo zip')
+    created = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -70,3 +74,28 @@ class Idea(models.Model):
 
     def __str__(self):
         return f'idea-{self.id}'
+
+    def final(self):
+        # Regresa el estado final de la idea o proyecto Resolve_last()
+        return self.resolve_set.last()
+
+
+ESPERA = 0
+NO_VIABLE = 1
+VIABLE = 2
+
+
+class Resolve(models.Model):
+    idea = models.ForeignKey(Idea, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, editable=False)
+    resolve = HTMLField('Resolución', help_text='Describe la resolución de la idea')
+    created = models.DateTimeField(auto_now_add=True)
+
+    viable = models.PositiveSmallIntegerField(
+        'Viable',
+        choices=((ESPERA, 'En espera'), (NO_VIABLE, 'No viable'), (VIABLE, 'Viable')),
+        default=ESPERA,
+        help_text='Selecciona si la idea es viable o no')
+
+    def __str__(self):
+        return f'comment-{self.id}'

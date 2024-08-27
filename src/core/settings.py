@@ -18,7 +18,8 @@ DEBUG = env('DEBUG', default=False)
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
 CSRF_TRUSTED_ORIGINS = [
     'https://sgctlaxcala.com.mx',
-    'https://www.sgctlaxcala.com.mx']
+    'https://www.sgctlaxcala.com.mx'
+]
 CORS_ORIGIN_WHITELIST = [
     'https://sgctlaxcala.com.mx',
     'https://www.sgctlaxcala.com.mx'
@@ -102,56 +103,26 @@ if DEBUG:
     DJANGO_ALLOW_ASYNC_UNSAFE = env("DJANGO_ALLOW_ASYNC_UNSAFE", default=True)
     AUTH_PASSWORD_VALIDATORS = [
         {
-            'NAME':
-            'django\
-                .contrib\
-                .auth\
-                .password_validation\
-                .UserAttributeSimilarityValidator',
+            'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
         },
         {
-            'NAME':
-                'django\
-                .contrib\
-                .auth\
-                .password_validation\
-                .NumericPasswordValidator',
+            'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
         }
     ]
     SITE_URL = "http://127.0.0.1:8000"
 else:
     AUTH_PASSWORD_VALIDATORS = [
         {
-            'NAME':
-                'django\
-                .contrib\
-                .auth\
-                .password_validation\
-                .UserAttributeSimilarityValidator',
+            'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
         },
         {
-            'NAME':
-                'django\
-                .contrib\
-                .auth\
-                .password_validation\
-                .MinimumLengthValidator',
+            'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
         },
         {
-            'NAME':
-                'django\
-                .contrib\
-                .auth\
-                .password_validation\
-                .CommonPasswordValidator',
+            'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
         },
         {
-            'NAME':
-                'django\
-                .contrib\
-                .auth\
-                .password_validation\
-                .NumericPasswordValidator',
+            'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
         },
     ]
 

@@ -27,7 +27,6 @@ class IdeaForm(forms.ModelForm):
         self.helper.layout = Layout(
             Div(
                 HTML('<h3>Déjanos tus datos</h3>'),
-                Div(Field('title', wrapper_class='col-sm-12'), css_class='row'),
                 Div(
                     Field('name', wrapper_class='col-sm-12'),
                     css_class='row'
@@ -39,6 +38,7 @@ class IdeaForm(forms.ModelForm):
                 ),
                 HTML('<hr>'),
                 HTML('<h3>Cuéntanos tu idea</h3>'),
+                Div(Field('title', wrapper_class='col-sm-12'), css_class='row'),
                 Div(
                     Field('type', wrapper_class='col-md-3'),
                     Field('scope', wrapper_class='col-md-3'),
