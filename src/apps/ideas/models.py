@@ -29,7 +29,7 @@ SCOPE = (
 
 
 class Idea(models.Model):
-    title = models.CharField('Título', max_length=200)
+    title = models.CharField('Título', max_length=200, help_text='Ponle un nombre a tu idea o proyecto')
     slug = models.SlugField('Slug', max_length=200, unique=True, editable=False)
     type = models.PositiveSmallIntegerField(
         'Tipo',
@@ -70,3 +70,15 @@ class Idea(models.Model):
 
     def __str__(self):
         return f'idea-{self.id}'
+
+
+# TODO: Crear un modelo para comentarios de cada idea. Y calificarla como viable o no viable.
+class Comment(models.Model):
+    idea = models.ForeignKey(Idea, on_delete=models.CASCADE)
+    name = models.CharField('Nombre', max_length=120)
+    email = models.EmailField('Correo')
+    comment = models.TextField('Comentario')
+    viable = models.BooleanField('Viable', default=False)
+
+    def __str__(self):
+        return f'comment-{self.id}'
