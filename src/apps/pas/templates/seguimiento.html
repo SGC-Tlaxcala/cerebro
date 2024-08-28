@@ -1,0 +1,39 @@
+<div class="modal-content">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+    <h4 class="modal-title">{{ accion }} <small>Actividades de Seguimiento</small></h4
+  </div>
+  <div class="modal-body">
+    <p>
+      <a class="btn btn-primary" href="/admin/pas/accion/{{ accion.id }}">Editar</a>
+    </p>
+    <table class="table table-bordered table-hover">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Descripción</th>
+          <th>Fecha</th>
+          <th>Estado</th>
+          <th>Responsable</th>
+          <th>Evidencia</th>
+        </tr>
+      </thead>
+      <tbody>
+    {% for s in accion.seguimiento_set.all %}
+    <tr>
+      <td>{{ s.id }}</td>
+      <td>{{ s.descripcion|safe }}</td>
+      <td>{{ s.fecha }}</td>
+      <td>{{ s.get_estado_display }}</td>
+      <td>{{ s.responsable }}</td>
+      <td><a href="/media/{{ s.evidencia }}">Descargar</a></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+    </table>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+  </div>
+</div><!-- /.modal-content -->
+

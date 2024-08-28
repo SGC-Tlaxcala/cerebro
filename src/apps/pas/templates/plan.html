@@ -1,0 +1,254 @@
+{% extends 'base_pas.html' %}
+
+{% block post_footer %}
+<script type="text/javascript">
+  function abrir(pagina) {
+    var strWindowFeatures = "menubar=no,resizable=no,scrollbars=yes,status=no,width=600,height=400";
+    window.open(pagina, 'window', strWindowFeatures).focus();
+  }
+
+  $('#myModal').on('hide.bs.modal', function(e) {
+      $(this).removeData('bs.modal');
+  });
+</script>
+{% endblock post_footer %}
+
+{% block pre_contenido %}
+<div class="row">
+  <div class="col-md-12">
+    <div class="jumbotron">
+      <h1>
+        <i class="fa fa-bug"></i>
+        {{ plan.nombre }} <small><span class="label label-primary">{{ plan.get_tipo_display }}</span></small>
+      </h1>
+      {{ plan.redaccion|safe }}
+    </div>
+  </div>
+
+  <div class="col-md-12">
+    <nav class="navbar navbar-default" role="navigation" id="control-pas">
+      <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#control-pas-menu">
+            <span class="sr-only">Menú</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">Proceso</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="control-pas-menu">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="#identificacion">identificación</a></li>
+            <li><a href="#decl">declaración</a></li>
+            <li><a href="#corr">corrección</a></li>
+            <li><a href="#causa">causa</a></li>
+            <li><a href="#acciones">acciones</a></li>
+          </ul>
+        </div><!-- /.navbar-collapse -->
+      </div><!-- /.container-fluid -->
+    </nav>
+  </div>
+
+</div>
+{% endblock pre_contenido %}
+
+{% block contenido %}
+
+<div class="expediente" data-spy="scroll" data-target="#control-pas" data-offset="0">
+  <div class="row" id="identificacion">
+    <div class="col-md-12">
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          <h3 class="panel-title"><i class="fa fa-info-circle"></i> Identificación</h3>
+        </div>
+        <div class="panel-body">
+          <table class="table">
+            <tr>
+              <td>Nombre: <strong>{{ plan.nombre }}</strong></td>
+              <td>Detectado en: <strong>{{ plan.get_deteccion_display }}</strong></td>
+              <td>Tipo: <strong>{{ plan.get_tipo_display }}</strong></td>
+              <td>Mejora de: <strong>{{ plan.get_mejora_display }}</strong></td>
+            </tr>
+            <tr>
+              <td>Folio: <strong>{{ plan.id }}</strong></td>
+              <td>Proceso: <strong>{{ plan.get_proceso_display }}</strong></td>
+              <td>Fecha de Llenado: <strong>{{ plan.fecha_llenado }}</strong></td>
+              <td>Fecha de Detección: <strong>{{ plan.fecha_deteccion }}</strong></td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row" id="decl">
+    <div class="col-md-12">
+      <div class="panel panel-info">
+        <div class="panel-heading">
+          <h3 class="panel-title"><i class="fa fa-legal"></i> Declaración</h3>
+        </div>
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="thumbnail">
+                <div class="caption">
+                  <h3>Redacción</h3>
+                  {{ plan.redaccion|safe }}
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="thumbnail">
+                <div class="caption">
+                  <h3>Declaración</h3>
+                  {{ plan.declaracion|safe }}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-4">
+              <div class="thumbnail">
+                <div class="caption">
+                  <h3>Evidencias</h3>
+                  {{ plan.evidencia|safe }}
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="thumbnail">
+                <div class="caption">
+                  <h3>Requisitos al que hace referencia</h3>
+                  {{ plan.requisitos|safe }}
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="thumbnail">
+                <div class="caption">
+                  <h3>No conformidades o NCP relacionadas</h3>
+                  {{ plan.relacionadas|safe }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- ./declaracion -->
+  <div class="row" id="corr">
+    <div class="col-md-12">
+      <div class="panel panel-danger">
+        <div class="panel-heading">
+          <h3 class="panel-title"><i class="fa fa-fire-extinguisher"></i> Corrección</h3>
+        </div>
+        <div class="panel-body">
+          {{ plan.correccion|safe }}
+        </div>
+        <div class="panel-footer">
+          <div class="row">
+            <div class="col-md-4">
+              Responsable: <strong>{{ plan.reaccion_responsable }}</strong>
+            </div>
+            <div class="col-md-4">
+              {% if plan.reaccion_evidencia %}Evidencia: <a target="_blank" href="{{ plan.reaccion_evidencia.url }}" onClick="abrir(this.href);return false" class="btn btn-primary btn-xs">Revisar</a>{% endif %}
+            </div>
+            <div class="col-md-4">
+              Consecuencias: <strong>{{ plan.consecuencias }}</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- ./correccion -->
+  <div class="row" id="causa">
+    <div class="col-md-12">
+      <div class="panel panel-warning">
+        <div class="panel-heading">
+          <h3 class="panel-title"><i class="fa fa-paw"></i> Determinación de la causa</h3>
+        </div>
+        <div class="panel-body">
+                  <div class="row">
+            <div class="col-md-6">
+              <div class="thumbnail">
+                <div class="caption">
+                  <h3>Diagrama de Causa Raíz</h3>
+                  <p>Una descripción del pescadito</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="thumbnail">
+                <div class="caption">
+                  <h3>5 Por Qué's</h3>
+                  <p>Técnica socrática</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="panel-footer">
+          <h4>Causa Raíz</h4>
+          {{ plan.causa_raiz|safe }}
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row" id="acciones">
+    <div class="col-md-12">
+      <div class="panel panel-danger">
+        <div class="panel-heading">
+          <h3 class="panel-title"><i class="fa fa-ambulance"></i> Acciones Correctivas</h3>
+        </div>
+        <div class="panel-body">
+          <table class="table table-bordered table-hover">
+            <thead>
+              <tr>
+                <th class="col-md-5">Acción</th>
+                <th class="col-md-1">Fecha</th>
+                <th class="col-md-2">Responsable</th>
+                <th class="col-md-1">Seguimiento</th>
+                <th class="col-md-2">Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for a in plan.accion_set.all %}
+                <tr>
+                  <td>{{ a.accion|safe }}</td>
+                  <td>{{ a.fecha|date:"d/b/Y" }}</td>
+                  <td>{{ a.responsable }}</td>
+                  <td>
+                    <a type="button" class="btn btn-danger" data-toggle="modal" data-target="#myModal" href="{%  url 'seguimiento' id=a.id %}">
+                      {{ a.seguimiento_set.count }}
+                    </a>
+                  </td>
+                  <td>{{ a.estado }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <div class="panel-footer">Panel footer</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <div class="modal-body">
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+{% endblock contenido %}
