@@ -54,6 +54,7 @@ LOCAL_APPS = [
     'apps.docs.config.DocsConfig',
     'apps.ideas.config.IdeasConfig',
     'apps.carto.config.CartoConfig',
+    'apps.pas.config.PasConfig',
 ]
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
