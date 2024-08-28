@@ -1,5 +1,6 @@
 import datetime
 
+import django.utils.timezone
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext as _
@@ -86,7 +87,7 @@ class Plan(TrackingFields):
     folio = models.CharField(max_length=20)
     fecha_llenado = models.DateField(
         'Fecha de Llenado',
-        default=datetime.date.today()
+        default=django.utils.timezone.now
     )
     fecha_deteccion = models.DateField('Fecha de Detección', blank=True, null=True)
 
@@ -102,7 +103,7 @@ class Plan(TrackingFields):
     requisito = models.TextField(
         blank=True, null=True,
         help_text='Requisito(s) de ISO 9001:2015 afectado(s) y/o beneficiados')
-    proceso = models.PositiveSmallIntegerField(choices=PROCESO)
+    proceso = models.IntegerField(choices=PROCESO)
     desc_pcm = HTMLField(default='', blank=True, null=True, help_text='Descripción del cambio o mejora al SGC')
     consecuencias = HTMLField(
         default='', blank=True, null=True,
@@ -157,8 +158,8 @@ class Seguimiento(TrackingFields, models.Model):
     descripcion = HTMLField()
     fecha = models.DateField()
     evidencia = models.FileField(upload_to='pas', blank=True, null=True)
-    estado = models.PositiveSmallIntegerField(choices=A_ESTADO)
-    responsable = models.ForeignKey(User, on_delete=models.CASCADE)
+    estado = models.IntegerField(choices=A_ESTADO)
+    responsable = models.ForeignKey(User, related_name='pas_seguimiento_responsable', on_delete=models.CASCADE)
 
     class Meta:
         verbose_name = _(u'Seguimiento de Acciones')

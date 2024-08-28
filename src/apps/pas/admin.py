@@ -19,7 +19,7 @@ class AccionAdmin(admin.ModelAdmin):
     inlines = [SeguimientoInline,]
     date_hierarchy = 'fecha_fin'
     ordering = ('fecha_fin', 'id')
-    list_display = ('plan', 'fecha_inicio', 'fecha_fin', 'responsable', 'estado')
+    list_display = ('plan', 'fecha_inicio', 'fecha_fin', 'responsable', 'get_estado')
     list_filter = ('plan', 'seguimiento__estado', 'plan__tipo')
 
 
