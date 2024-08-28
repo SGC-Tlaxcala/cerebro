@@ -1,11 +1,11 @@
-{% extends 'base_pas.html' %}
+{% extends 'pas/base_pas.html' %}
 
 {% block pre_contenido %}
   <div class="row">
     <div class="col-md-12">
       <div class="jumbotron">
         <h1>
-          <i class="icon icon-material-bug-report"></i> 
+          <i class="icon icon-material-bug-report"></i>
           Control de Planes de Acción
         </h1>
         <p>
@@ -27,13 +27,13 @@
     <div class="col-md-4">
       <div class="panel panel-default">
         <div class="panel-heading">
-          <h4><a href="{% url 'pas_plan' p.id %}">{{ p.nombre }}</a></h4>
+          <h4><a href="#">{{ p.nombre }}</a></h4>
         </div>
         <div class="panel-body">
           {{ p.redaccion|safe }}
         </div>
         <div class="panel-footer">
-          Accciones: <span class="badge">{{ p.accion_set.count }}</span> | 
+          Accciones: <span class="badge">{{ p.accion_set.count }}</span> |
           <span class="label label-primary">{{ p.get_proceso_display }}</span> |
           <span class="label label-success">{{ p.get_tipo_display }}</span> |
           <span class="label label-info">{{ p.get_mejora_display }}</span>
