@@ -1,28 +1,12 @@
-# -*- coding: UTF-8 -*-
-
-#         app: Control de Planes de Acción
-#      modulo: pas.models
-# descripcion: Modelos para Control de Planes de Acción
-#       autor: Javier Sanchez Toledano
-#       fecha: jueves, 2 de octubre de 2014
-
+import datetime
 
 from django.db import models
+from django.contrib.auth import get_user_model
+from django.utils.translation import gettext as _
 from tinymce.models import HTMLField
-import datetime
-# import magic
-from django.utils.translation import ugettext as _
 
 
-class Pipol (models.Model):
-    class Meta:
-        verbose_name = _('Pipol')
-        verbose_name_plural = _('Personas')
-
-    nombre = models.CharField(max_length=60)
-
-    def __unicode__(self):
-        return '%s' % self.nombre
+User = get_user_model()
 
 
 class TrackingFields(models.Model):
@@ -31,6 +15,7 @@ class TrackingFields(models.Model):
 
     class Meta:
         abstract = True
+
 
 PROCESO = (
     (1, 'Planeación'),
@@ -62,7 +47,7 @@ MEJORA = (
     (3, 'Sistema')
 )
 
-CERRADA = 6
+CERRADA = 99
 
 A_ESTADO = (
     (1, u'Seguimiento'),
@@ -79,9 +64,11 @@ PNG = 'image/png'
 
 
 class Plan(models.Model):
+
     class Meta:
         verbose_name = _(u'Plan de Acción')
         verbose_name_plural = _(u'Planes de Acción')
+
     # #################################### #
     # I. Identificación del plan
     fecha_llenado = models.DateField(
@@ -114,7 +101,7 @@ class Plan(models.Model):
     correccion = HTMLField(default="", blank=True, null=True)
     consecuencias = models.FileField(upload_to='pas', blank=True, null=True)
     reaccion_responsable = models.ForeignKey(
-        Pipol, blank=True, null=True)
+        User, blank=True, null=True)
     reaccion_evidencia = models.FileField(upload_to='pas', blank=True, null=True)
 
     # #################################### #
