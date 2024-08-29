@@ -12,7 +12,7 @@ var lyr_SECCION_0 = new ol.layer.Vector({
                 source:jsonSource_SECCION_0,
                 style: style_SECCION_0,
                 interactive: true,
-                title: '<img src="/assets/maps/styles/legend/SECCION_0.png" /> SECCION'
+                title: '<img src="/static/maps/styles/legend/SECCION_0.png" /> SECCION'
             });
 var format_LIMITE_LOCALIDAD_1 = new ol.format.GeoJSON();
 var features_LIMITE_LOCALIDAD_1 = format_LIMITE_LOCALIDAD_1.readFeatures(json_LIMITE_LOCALIDAD_1,
@@ -26,7 +26,7 @@ var lyr_LIMITE_LOCALIDAD_1 = new ol.layer.Vector({
                 source:jsonSource_LIMITE_LOCALIDAD_1,
                 style: style_LIMITE_LOCALIDAD_1,
                 interactive: true,
-                title: '<img src="/assets/maps/styles/legend/LIMITE_LOCALIDAD_1.png" /> LIMITE_LOCALIDAD'
+                title: '<img src="/static/maps/styles/legend/LIMITE_LOCALIDAD_1.png" /> LIMITE_LOCALIDAD'
             });
 var format_MUNICIPIO_2 = new ol.format.GeoJSON();
 var features_MUNICIPIO_2 = format_MUNICIPIO_2.readFeatures(json_MUNICIPIO_2,
@@ -40,7 +40,7 @@ var lyr_MUNICIPIO_2 = new ol.layer.Vector({
                 source:jsonSource_MUNICIPIO_2,
                 style: style_MUNICIPIO_2,
                 interactive: true,
-                title: '<img src="/assets/maps/styles/legend/MUNICIPIO_2.png" /> MUNICIPIO'
+                title: '<img src="/static/maps/styles/legend/MUNICIPIO_2.png" /> MUNICIPIO'
             });
 var format_DISTRITO_LOCAL_3 = new ol.format.GeoJSON();
 var features_DISTRITO_LOCAL_3 = format_DISTRITO_LOCAL_3.readFeatures(json_DISTRITO_LOCAL_3,
@@ -54,7 +54,7 @@ var lyr_DISTRITO_LOCAL_3 = new ol.layer.Vector({
                 source:jsonSource_DISTRITO_LOCAL_3,
                 style: style_DISTRITO_LOCAL_3,
                 interactive: true,
-                title: '<img src="/assets/maps/styles/legend/DISTRITO_LOCAL_3.png" /> DISTRITO_LOCAL'
+                title: '<img src="/static/maps/styles/legend/DISTRITO_LOCAL_3.png" /> DISTRITO_LOCAL'
             });
 var format_DISTRITO_FEDERAL_4 = new ol.format.GeoJSON();
 var features_DISTRITO_FEDERAL_4 = format_DISTRITO_FEDERAL_4.readFeatures(json_DISTRITO_FEDERAL_4,
@@ -68,7 +68,7 @@ var lyr_DISTRITO_FEDERAL_4 = new ol.layer.Vector({
                 source:jsonSource_DISTRITO_FEDERAL_4,
                 style: style_DISTRITO_FEDERAL_4,
                 interactive: true,
-                title: '<img src="/assets/maps/styles/legend/DISTRITO_FEDERAL_4.png" /> DISTRITO_FEDERAL'
+                title: '<img src="/static/maps/styles/legend/DISTRITO_FEDERAL_4.png" /> DISTRITO_FEDERAL'
             });
 var format_ENTIDAD_5 = new ol.format.GeoJSON();
 var features_ENTIDAD_5 = format_ENTIDAD_5.readFeatures(json_ENTIDAD_5,
@@ -82,7 +82,7 @@ var lyr_ENTIDAD_5 = new ol.layer.Vector({
                 source:jsonSource_ENTIDAD_5,
                 style: style_ENTIDAD_5,
                 interactive: true,
-                title: '<img src="/assets/maps/styles/legend/ENTIDAD_5.png" /> ENTIDAD'
+                title: '<img src="/static/maps/styles/legend/ENTIDAD_5.png" /> ENTIDAD'
             });
 
 lyr_SECCION_0.setVisible(true);lyr_LIMITE_LOCALIDAD_1.setVisible(true);lyr_MUNICIPIO_2.setVisible(true);lyr_DISTRITO_LOCAL_3.setVisible(true);lyr_DISTRITO_FEDERAL_4.setVisible(true);lyr_ENTIDAD_5.setVisible(true);

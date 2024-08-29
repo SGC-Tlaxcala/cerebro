@@ -1,12 +1,3 @@
-# coding: utf-8
-"""Formularios para agregar una idea o proyecto."""
-
-#         app: ideas
-#      módulo: forms
-# descripción: Formularios para agregar una idea o proyecto.
-#       autor: Javier Sanchez Toledano
-#       fecha: lunes, 25 de noviembre de 2021
-
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Submit, Div, HTML, Field, Button
 from crispy_forms.bootstrap import InlineRadios, Tab, TabHolder, FormActions

@@ -2,7 +2,7 @@ from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.http import HttpResponseRedirect
 from .models import Plan, Accion
-# from .forms import PlanForm
+from .forms import PlanForm
 # from annoying.decorators import render_to
 
 
@@ -13,7 +13,7 @@ class PASIndex(ListView):
 
 class PASAdd(CreateView):
     model = Plan
-    fields = '__all__'
+    form_class = PlanForm
     template_name = 'pas/add.html'
     success_url = reverse_lazy('pas:pas_index')
 

@@ -83,29 +83,41 @@ class Plan(TrackingFields):
     # #################################### #
     # I. Campos de identificación comunes CNC y PCM
     nombre = models.CharField(max_length=255, help_text='Nombre del Plan de Acción')
-    documento = models.IntegerField(choices=DOCUMENTO)
+    documento = models.IntegerField("Tipo de plan", choices=DOCUMENTO, help_text="Selecciona el tipo de plan")
     folio = models.CharField(max_length=20)
     fecha_llenado = models.DateField(
         'Fecha de Llenado',
         default=django.utils.timezone.now
     )
-    fecha_deteccion = models.DateField('Fecha de Detección', blank=True, null=True)
 
     # I.1 Identificación de la CNC
     tipo = models.IntegerField(choices=TIPO, help_text='Tipo de acción requerida', blank=True, null=True)
-    desc_cnc = HTMLField(default='', blank=True, null=True)
+    desc_cnc = HTMLField("Descripción de la No Conformidad / Riesgo", default='', blank=True, null=True)
     fuente = models.IntegerField(choices=FUENTE, blank=True, null=True)
-    otra_fuente = models.TextField(blank=True, null=True)
+    otra_fuente = models.TextField(
+        "Otra (especifique)", blank=True, null=True,
+        help_text='Especifique la fuente si seleccionó Otros'
+    )
 
     # I.2 Identificación del PCM
-    fecha_termino = models.DateField('Fecha de Término', blank=True, null=True)
-    proposito = models.TextField(blank=True, null=True, help_text='Propósito del cambio o mejora al SGC')
-    requisito = models.TextField(
+    fecha_inicio = models.DateField(
+        'Fecha de Inicio', blank=True, null=True,
+        help_text='Fecha en la que se inició el Plan de Cambios y Mejoras'
+    )
+    fecha_termino = models.DateField(
+        'Fecha de Término', blank=True, null=True,
+        help_text='Fecha en la que se terminará el Plan de Cambios y Mejoras')
+    proposito = HTMLField("Propósito", blank=True, null=True, help_text='Propósito del cambio o mejora al SGC')
+    requisito = models.CharField(
         blank=True, null=True,
+        max_length=255,
         help_text='Requisito(s) de ISO 9001:2015 afectado(s) y/o beneficiados')
-    proceso = models.IntegerField(choices=PROCESO, blank=True, null=True)
-    desc_pcm = HTMLField(default='', blank=True, null=True, help_text='Descripción del cambio o mejora al SGC')
+    proceso = models.IntegerField(
+        choices=PROCESO, blank=True, null=True,
+        help_text='Proceso(s) del SGC afectado(s) y/o beneficiados')
+    desc_pcm = HTMLField("Descripción", default='', blank=True, null=True, help_text='Descripción del cambio o mejora al SGC')
     consecuencias = HTMLField(
+        "Consecuencias",
         default='', blank=True, null=True,
         help_text='Consecuencias potenciales de que el cambio o mejora no se realice')
 
