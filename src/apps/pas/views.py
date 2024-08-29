@@ -1,5 +1,5 @@
 from django.urls import reverse_lazy
-from django.views.generic import ListView
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.http import HttpResponseRedirect
 from .models import Plan, Accion
 # from .forms import PlanForm
@@ -9,6 +9,13 @@ from .models import Plan, Accion
 class PASIndex(ListView):
     model = Plan
     template_name = 'pas/index.html'
+
+
+class PASAdd(CreateView):
+    model = Plan
+    fields = '__all__'
+    template_name = 'pas/add.html'
+    success_url = reverse_lazy('pas:pas_index')
 
 
 # @render_to('plan.html')

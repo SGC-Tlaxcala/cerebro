@@ -1,27 +1,23 @@
-{% extends 'pas/base_pas.html' %}
+{% extends 'base.html' %}
 
-{% block pre_contenido %}
-  <div class="row">
-    <div class="col-md-12">
-      <div class="jumbotron">
-        <h1>
-          <i class="icon icon-material-bug-report"></i>
-          Control de Planes de Acción
-        </h1>
-        <p>
-          La organización debe determinar y seleccionar las oportunidades de mejora e implementar las acciones necesarias para cumplir los requisitos del cliente y aumentar la satisfacción del cliente.
-        </p>
-        <p>
-          <a href="javascript:void(0)" class="btn btn-danger">Seguimiento</a>
-          <a href="javascript:void(0)" class="btn btn-success">Acción Compromiso</a>
-          <a href="javascript:void(0)" class="btn btn-info">Agregar un PAS</a>
-        </p>
-      </div>
+{% block before_content %}
+  <div class="container py-4">
+     <div class="p-5 mb-4 bg-body-tertiary rounded-3">
+          <h1 class="display-5 fw-bold"><i class="fa fa-bug" aria-hidden="true"></i> Control de Planes de Acción</h1>
+          <p class="col fs-4">
+            La organización debe determinar y seleccionar las oportunidades de mejora e implementar las acciones necesarias para cumplir los requisitos del
+            cliente y aumentar la satisfacción del cliente.
+          </p>
+          <p>
+            <a href="javascript:void(0)" class="btn btn-lg btn-danger"><i class="fa fa-check-square-o" aria-hidden="true"></i> Seguimiento</a>
+            <a href="javascript:void(0)" class="btn btn-lg btn-success"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Acción Compromiso</a>
+            <a href="javascript:void(0)" class="btn btn-lg btn-info"><i class="fa fa-plus-square-o" aria-hidden="true"></i> Agregar un PAS</a>
+          </p>
+        </div>
     </div>
-  </div>
-{% endblock pre_contenido %}
+{% endblock before_content %}
 
-{% block contenido %}
+{% block content %}
 <div class="row">
   {% for p in planes %}
     <div class="col-md-4">
@@ -42,4 +38,4 @@
     </div>
   {% endfor %}
 </div>
-{% endblock contenido %}
+{% endblock content %}

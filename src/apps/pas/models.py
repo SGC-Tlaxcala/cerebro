@@ -92,9 +92,9 @@ class Plan(TrackingFields):
     fecha_deteccion = models.DateField('Fecha de Detección', blank=True, null=True)
 
     # I.1 Identificación de la CNC
-    tipo = models.IntegerField(choices=TIPO, help_text='Tipo de acción requerida')
+    tipo = models.IntegerField(choices=TIPO, help_text='Tipo de acción requerida', blank=True, null=True)
     desc_cnc = HTMLField(default='', blank=True, null=True)
-    fuente = models.IntegerField(choices=FUENTE)
+    fuente = models.IntegerField(choices=FUENTE, blank=True, null=True)
     otra_fuente = models.TextField(blank=True, null=True)
 
     # I.2 Identificación del PCM
@@ -103,7 +103,7 @@ class Plan(TrackingFields):
     requisito = models.TextField(
         blank=True, null=True,
         help_text='Requisito(s) de ISO 9001:2015 afectado(s) y/o beneficiados')
-    proceso = models.IntegerField(choices=PROCESO)
+    proceso = models.IntegerField(choices=PROCESO, blank=True, null=True)
     desc_pcm = HTMLField(default='', blank=True, null=True, help_text='Descripción del cambio o mejora al SGC')
     consecuencias = HTMLField(
         default='', blank=True, null=True,
