@@ -93,6 +93,7 @@ class Plan(TrackingFields):
     # I.1 Identificación de la CNC
     tipo = models.IntegerField(choices=TIPO, help_text='Tipo de acción requerida', blank=True, null=True)
     desc_cnc = HTMLField("Descripción de la No Conformidad / Riesgo", default='', blank=True, null=True)
+    correccion = HTMLField(default='', blank=True, null=True, help_text='Corrección (si aplica)')
     fuente = models.IntegerField(choices=FUENTE, blank=True, null=True)
     otra_fuente = models.TextField(
         "Otra (especifique)", blank=True, null=True,
@@ -107,7 +108,7 @@ class Plan(TrackingFields):
     fecha_termino = models.DateField(
         'Fecha de Término', blank=True, null=True,
         help_text='Fecha en la que se terminará el Plan de Cambios y Mejoras')
-    proposito = HTMLField("Propósito", blank=True, null=True, help_text='Propósito del cambio o mejora al SGC')
+    proposito = models.CharField("Propósito", blank=True, null=True, help_text='Propósito del cambio o mejora al SGC', max_length=255)
     requisito = models.CharField(
         blank=True, null=True,
         max_length=255,
@@ -124,7 +125,6 @@ class Plan(TrackingFields):
     # #################################### #
     # II. Análisis de la CNC o PCM
     analisis = HTMLField(default='', blank=True, null=True, help_text='Análisis de la causa raíz')
-    correccion = HTMLField(default='', blank=True, null=True, help_text='Corrección (si aplica)')
     evidencia_analisis = models.FileField(upload_to='pas', blank=True, null=True)
 
     # #################################### #

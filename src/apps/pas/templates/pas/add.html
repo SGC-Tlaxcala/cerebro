@@ -88,29 +88,15 @@
 
       <div  class="row row" >
         <div class="col-md " >
-          <div id="div_id_documento" class="mb-3 col">
-            <label for="id_documento" class="form-label requiredField">Tipo de plan<span class="asteriskField">*</span></label>
-            <select name="documento" class="select form-select" required aria-describedby="id_documento_helptext" id="id_documento">
-              <option value="" selected>---------</option>
-              <option value="1">Cédula de No Conformidad</option>
-              <option value="2">Plan de Cambios y Mejoras al SGC</option>
-            </select>
-            <div id="id_documento_helptext" class="form-text">Selecciona el tipo de plan</div>
-          </div>
+          {{ form.documento|as_crispy_field }}
         </div>
 
         <div class="col-md " >
-          <div id="div_id_fecha_llenado" class="mb-3 col">
-            <label for="id_fecha_llenado" class="form-label requiredField">Fecha de Llenado<span class="asteriskField">*</span></label>
-            <input type="text" name="fecha_llenado" value="" class="dateinput form-control" required id="id_fecha_llenado"><input type="hidden" name="initial-fecha_llenado" value="" id="initial-id_fecha_llenado">
-          </div>
+          {{ form.fecha_llenado|as_crispy_field }}
         </div>
 
         <div class="col-md">
-          <div id="div_id_folio" class="mb-3 col">
-            <label for="id_folio" class="form-label requiredField">Folio<span class="asteriskField">*</span></label>
-            <input type="text" name="folio" maxlength="20" class="textinput form-control" required id="id_folio">
-          </div>
+          {{ form.folio|as_crispy_field }}
         </div>
       </div>
 
@@ -132,6 +118,7 @@
           </div>
           <div class="row">
             <div class="col">{{ form.desc_cnc|as_crispy_field }}</div>
+            <div class="col">{{ form.correccion | as_crispy_field }}</div>
           </div>
         </div>
 
@@ -152,20 +139,21 @@
               <div class="col">
                 {{ form.requisito | as_crispy_field }}
               </div>
+            </div>
+
+            <div class="row">
+              <div class="col">
+                {{ form.proposito|as_crispy_field }}
+              </div>
               <div class="col">
                 {{ form.proceso | as_crispy_field }}
               </div>
             </div>
             <div class="row">
-              <div class="col-sm-12">
-                {{ form.proposito|as_crispy_field }}
-              </div>
-              <div class="col-sm-12>
-                {{ form.desc_pcm | as_crispy_field }}
-              </div>
-              <div class="col-sm-12">
-                {{ form.consecuencias | as_crispy_field }}
+              <div class="col">{{ form.desc_pcm | as_crispy_field }}</div>
+              <div class="col">{{ form.consecuencias | as_crispy_field }}</div>
             </div>
+        </div>
     </div>
 
 
