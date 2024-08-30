@@ -64,103 +64,19 @@
 {% endblock footer %}
 
 {% block content %}
+
+
 <div class="row">
   <div class="col-md-12">
     <div class="page-header">
       <h1><i class="fa fa-bug"></i> Agregar un nuevo plan</h1>
     </div>
   </div>
+  <div class="row">
+    {% crispy form %}
+  </div>
 </div>
 
-<div class="row">
-  <form class="form-horizontal" role="form">
-    {% csrf_token %}
-      <div class="row">
-        <h3>Identificación del plan</h3>
-          <div class="row" >
-            <div id="div_id_nombre" class="mb-3 col-sm-12">
-              <label for="id_nombre" class="form-label requiredField">Nombre<span class="asteriskField">*</span> </label>
-              <input type="text" name="nombre" maxlength="255" class="textinput form-control" required aria-describedby="id_nombre_helptext" id="id_nombre">
-              <div id="id_nombre_helptext" class="form-text">Nombre del Plan de Acción</div>
-            </div>
-          </div>
-      </div>
 
-      <div  class="row row" >
-        <div class="col-md " >
-          {{ form.documento|as_crispy_field }}
-        </div>
-
-        <div class="col-md " >
-          {{ form.fecha_llenado|as_crispy_field }}
-        </div>
-
-        <div class="col-md">
-          {{ form.folio|as_crispy_field }}
-        </div>
-      </div>
-
-    <div class="row" id="descripcion_cnc">
-      <div class="h-100 p-5 bg-body-tertiary border rounded-3">
-        <h2>Descripción de la no conformidad</h2>
-
-        <div class="col">
-          <div class="row">
-            <div class="col">
-              {{ form.tipo|as_crispy_field }}
-            </div>
-            <div class="col">
-              {{  form.fuente|as_crispy_field }}
-            </div>
-          </div>
-          <div class="row">
-            <div class="col">{{ form.otra_fuente|as_crispy_field }}</div>
-          </div>
-          <div class="row">
-            <div class="col">{{ form.desc_cnc|as_crispy_field }}</div>
-            <div class="col">{{ form.correccion | as_crispy_field }}</div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-    <div class="row" id="descripcion_pcm">
-        <div class="h-100 p-5 bg-body-tertiary border rounded-3">
-          <h2>Descripción del Plan de Cambios y Mejoras al SGC</h2>
-          <div class="col">
-            <div class="row">
-              <div class="col">
-                {{ form.fecha_inicio|as_crispy_field }}
-              </div>
-              <div class="col">
-                {{ form.fecha_termino|as_crispy_field }}
-              </div>
-              <div class="col">
-                {{ form.requisito | as_crispy_field }}
-              </div>
-            </div>
-
-            <div class="row">
-              <div class="col">
-                {{ form.proposito|as_crispy_field }}
-              </div>
-              <div class="col">
-                {{ form.proceso | as_crispy_field }}
-              </div>
-            </div>
-            <div class="row">
-              <div class="col">{{ form.desc_pcm | as_crispy_field }}</div>
-              <div class="col">{{ form.consecuencias | as_crispy_field }}</div>
-            </div>
-        </div>
-    </div>
-
-
-
-
-
-  </form>
-</div>
 
 {% endblock content %}
