@@ -1,7 +1,7 @@
 from django import forms
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Fieldset, ButtonHolder, Submit, Column, Row, Div, HTML
-from crispy_forms.bootstrap import Tab, TabHolder, FormActions, InlineRadios, Field
+from crispy_forms.layout import Layout, Submit, Column, Row, Div, HTML, Button
+from crispy_forms.bootstrap import Tab, TabHolder, FormActions
 from .models import Plan
 
 
@@ -19,6 +19,14 @@ class PlanForm(forms.ModelForm):
     class Meta:
         model = Plan
         exclude = ['user']
+
+    def clean(self):
+        cleaned_data = super(PlanForm, self).clean()
+        fuente = cleaned_data.get('fuente')
+        otra_fuente = cleaned_data.get('otra_fuente')
+        if fuente == 4 and not otra_fuente:
+            self.add_error('otra_fuente', 'Este campo es obligatorio si seleccionó Otros')
+        return cleaned_data
 
     def __init__(self, *args, **kwargs):
         super(PlanForm, self).__init__(*args, **kwargs)
@@ -54,8 +62,20 @@ class PlanForm(forms.ModelForm):
                     ),
                     css_class='mb-3'
                 ),
+                Row(
+                    TabHolder(
+                        Tab('Análisis de la Causa Raíz'),
+                        Tab('Actividades'),
+                        Tab('Seguimiento'),
+                        Tab('Cierre'),
+                        css_class='mt-3 mb-3'
+                    ),
+                    css_class='mb-4',
+                    css_id='tabs'
+                )
             ),
-            ButtonHolder(
-                Submit('submit', 'Guardar')
+            FormActions(
+                Submit('submit', 'Guardar'),
+                Button('cancel', 'Cancelar', css_class='btn btn-danger', onclick='window.history.back()')
             )
         )

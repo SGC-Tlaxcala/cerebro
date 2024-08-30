@@ -15,7 +15,14 @@ class PASAdd(CreateView):
     model = Plan
     form_class = PlanForm
     template_name = 'pas/add.html'
-    success_url = reverse_lazy('pas:pas_index')
+    success_url = reverse_lazy('pas:index')
+
+    def form_valid(self, form):
+        obj = form.save(commit=False)
+        obj.user = self.request.user  # Asignar el usuario actual
+        print(f'-- Este es el usuario: {obj.user}')
+        obj.save()
+        return super().form_valid(form)
 
 
 # @render_to('plan.html')

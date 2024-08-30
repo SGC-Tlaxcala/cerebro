@@ -44,19 +44,19 @@
     });
 
     $(document).ready(function(){
-      $('#descripcion_cnc, #descripcion_pcm').hide();
+      $('#descripcion_cnc, #descripcion_pcm', '#tabs').hide();
       $('#id_documento').change(function(){
         let selectedValue = $(this).val();
         if (selectedValue == '1') {
           // Mostrar descripcion_cnc
           $('#descripcion_pcm').hide()
-          $('#descripcion_cnc').show();
+          $('#descripcion_cnc, #tabs').show();
         } else if (selectedValue == '2') {
           // Mostrar descripcion_pcm
           $('#descripcion_cnc').hide()
-          $('#descripcion_pcm').show();
+          $('#descripcion_pcm, #tabs').show();
         } else {
-          $('#descripcion_cnc, #descripcion_pcm').hide();
+          $('#descripcion_cnc, #descripcion_pcm, #tabs').hide();
         }
       });
     });
@@ -69,7 +69,7 @@
 <div class="row">
   <div class="col-md-12">
     <div class="page-header">
-      <h1><i class="fa fa-bug"></i> Agregar un nuevo plan</h1>
+      <h1><i class="fa fa-bug"></i> Agregar un nuevo plan - {{ request.user.id }}</h1>
     </div>
   </div>
   <div class="row">
