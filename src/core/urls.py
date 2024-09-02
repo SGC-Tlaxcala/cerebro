@@ -9,7 +9,7 @@ from core.views import Index
 
 
 urlpatterns = [
-    path('accounts/', include('django.contrib.auth.urls')),
+    path('cuentas/', include('django.contrib.auth.urls')),
     path('admin/', admin.site.urls),
     path('tinymce/', include('tinymce.urls')),
     path('docs/', include('apps.docs.urls')),
