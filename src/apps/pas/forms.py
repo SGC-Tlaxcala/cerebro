@@ -73,6 +73,7 @@ class PlanForm(forms.ModelForm):
             ),
             FormActions(
                 Submit('submit', 'Guardar'),
-                Button('cancel', 'Cancelar', css_class='btn btn-danger', onclick='window.history.back()')
+                Button('cancel', 'Cancelar', css_class='btn btn-danger', onclick='window.history.back()'),
+                css_class='mt-3'
             )
         )
