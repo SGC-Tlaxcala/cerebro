@@ -137,9 +137,11 @@ SITE_ID = 1
 
 LOGIN_REDIRECT_URL = '/'
 
-STATIC_ROOT = APPS_DIR.child('static')
+# STATIC_ROOT = APPS_DIR.child('static')
 STATIC_URL = 'assets/'
-
+STATICFILES_DIRS = [
+    APPS_DIR.child('static'),
+]
 
 MEDIA_ROOT = APPS_DIR.child('media')
 MEDIA_URL = 'media/'
