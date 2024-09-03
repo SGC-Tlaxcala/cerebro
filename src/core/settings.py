@@ -135,7 +135,7 @@ USE_L10N = True
 USE_TZ = True
 SITE_ID = 1
 
-LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = 'index'
 
 # STATIC_ROOT = APPS_DIR.child('static')
 STATIC_URL = 'assets/'

@@ -53,7 +53,7 @@
     Ya estás autenticado como <strong>{{ request.user.first_name }} {{ request.user.last_name }}</strong>.
   </h3>
   <p class="well text-center">
-    Regresar al <a href="/">inicio</a>.
+    Regresar al <a href="{% url 'index' %}">inicio</a>.
   </p>
   {% else %}
   
