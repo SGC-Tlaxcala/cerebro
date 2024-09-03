@@ -31,18 +31,23 @@
         {% if user.is_authenticated %}
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="fa fa-user"></i>&nbsp; {{ request.user.first_name }}
+            <i class="fa fa-user"></i>&nbsp; {{ request.user.first_name }} {{ request.user.last_name }}
           </a>
           <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-            <li><a class="dropdown-item" href="{% url 'password_change' %}">Cambiar contraseña</a></li>
-            <li><a class="dropdown-item" href="{% url 'logout' %}">Cerrar sesión</a></li>
+            <li><a class="dropdown-item" href="#">Cambiar contraseña</a></li>
+            <li>
+              <form id="logout-form" method="post" action="{% url 'logout' %}" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="dropdown-item pr-2" style="background: none; border: none; padding-left: 2; cursor: pointer;">Cerrar sesión</button>
+              </form>
+            </li>
           </ul>
         </li>
         {% else %}
         <li class="nav-item">
-          <a class="nav-link" href="{% url 'auth_login' %}">Iniciar sesión</a></li>
+          <a class="nav-link" href="{% url 'login' %}">Iniciar sesión</a></li>
         <li class="nav-item">
-          <a class="nav-link" href="{% url 'auth_register' %}">Registrarse</a></li>
+          <a class="nav-link" href="#">Registrarse</a></li>
         {% endif %}
       </ul>
 
