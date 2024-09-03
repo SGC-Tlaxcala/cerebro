@@ -42,26 +42,32 @@
 
 
 {% block content %}
-  <form class="form-signin" method="post" action="{% url 'login' %}">
-    {% csrf_token %}
-
-    <img
+      <img
       class="mx-auto d-block mb-4"
       src="{% static 'img/logoINE-01.png' %}"
       alt="logo INE"
       width="150" height="53">
-
+  
+  {% if user.is_authenticated %}
+  <h3 class="display-3 text-center">
+    Ya estás autenticado como <strong>{{ request.user.first_name }} {{ request.user.last_name }}</strong>.
+  </h3>
+  <p class="well text-center">
+    Regresar al <a href="{% url 'index' %}">inicio</a>.
+  </p>
+  {% else %}
+  
+  <form class="form-signin" method="post" action="{% url 'login' %}">
+    {% csrf_token %}
     <h1 class="h3 mb-3 font-weight-normal">Formulario de Ingreso</h1>
-
-
       <label for="id_username" class="sr-only">Usuario</label>
       <input type="text" name="username" id="id_username" class="form-control mb-3" placeholder="Usuario" required autofocus>
-
-    <label for="id_password" class="sr-only">Contraseña</label>
-    <input type="password" name="password" id="id_password" class="form-control mb-5" placeholder="Contraseña" required>
-
-    <button class="btn btn-lg btn-primary btn-block" type="submit">Ingresar</button>
-
-    <input type="hidden" name="next" value="{{ next }}">
+      
+      <label for="id_password" class="sr-only">Contraseña</label>
+      <input type="password" name="password" id="id_password" class="form-control mb-5" placeholder="Contraseña" required>
+      
+      <button class="btn btn-lg btn-primary btn-block" type="submit">Ingresar</button>
+      <input type="hidden" name="next" value="{{ next }}">
   </form>
+  {% endif %}
 {% endblock content %}

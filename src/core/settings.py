@@ -138,7 +138,6 @@ SITE_ID = 1
 LOGIN_REDIRECT_URL = 'index'
 LOGOUT_REDIRECT_URL = 'index'
 
-# STATIC_ROOT = APPS_DIR.child('static')
 STATIC_URL = 'assets/'
 STATICFILES_DIRS = [
     APPS_DIR.child('static'),
