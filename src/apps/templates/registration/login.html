@@ -42,14 +42,25 @@
 
 
 {% block content %}
-  <form class="form-signin" method="post" action="{% url 'login' %}">
-    {% csrf_token %}
-
-    <img
+      <img
       class="mx-auto d-block mb-4"
       src="{% static 'img/logoINE-01.png' %}"
       alt="logo INE"
       width="150" height="53">
+  
+  {% if user.is_authenticated %}
+  <h3 class="display-3 text-center">
+    Ya estás autenticado como <strong>{{ request.user.first_name }} {{ request.user.last_name }}</strong>.
+  </h3>
+  <p class="well text-center">
+    Regresar al <a href="/">inicio</a>.
+  </p>
+  {% else %}
+  
+  <form class="form-signin" method="post" action="{% url 'login' %}">
+    {% csrf_token %}
+
+
 
     <h1 class="h3 mb-3 font-weight-normal">Formulario de Ingreso</h1>
 
@@ -64,4 +75,5 @@
 
     <input type="hidden" name="next" value="{{ next }}">
   </form>
+  {% endif %}
 {% endblock content %}
