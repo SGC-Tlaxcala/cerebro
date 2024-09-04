@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
 
-{% block post_footer %}
+{% block footer %}
 <script type="text/javascript">
   function abrir(pagina) {
-    var strWindowFeatures = "menubar=no,resizable=no,scrollbars=yes,status=no,width=600,height=400";
+    const strWindowFeatures = "menubar=no,resizable=no,scrollbars=yes,status=no,width=600,height=400";
     window.open(pagina, 'window', strWindowFeatures).focus();
   }
 
@@ -11,17 +11,25 @@
       $(this).removeData('bs.modal');
   });
 </script>
-{% endblock post_footer %}
+{% endblock footer %}
 
-{% block pre_contenido %}
-<div class="row">
-  <div class="col-md-12">
-    <div class="jumbotron">
-      <h1>
-        <i class="fa fa-bug"></i>
-        {{ plan.nombre }} <small><span class="label label-primary">{{ plan.get_tipo_display }}</span></small>
-      </h1>
-      {{ plan.redaccion|safe }}
+{% block before_content %}
+  <div class="container py-4">
+    <div class="row p-5 mb-4 bg-body-tertiary rounded-3">
+      <div class="col">
+        <div class="jumbotron">
+          <h1>
+            <i class="fa fa-bug"></i>
+            {{ plan.nombre }} <small>
+            {% if plan.documento == 1 %}<span class="label label-primary">{{ plan.get_tipo_display }}</span></small>{% endif %}
+          </h1>
+          {% if plan.documento == 1 %}
+            {{ plan.desc_cnc|safe }}
+          {% else %}
+            <p class="well-lg display-3">{{ plan.desc_pcm|safe }}</p>
+          {% endif %}
+        </div>
+      </div>
     </div>
   </div>
 
@@ -54,9 +62,9 @@
   </div>
 
 </div>
-{% endblock pre_contenido %}
+{% endblock before_content %}
 
-{% block contenido %}
+{% block content %}
 
 <div class="expediente" data-spy="scroll" data-target="#control-pas" data-offset="0">
   <div class="row" id="identificacion">
@@ -251,4 +259,4 @@
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
-{% endblock contenido %}
+{% endblock content %}
