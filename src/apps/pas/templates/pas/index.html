@@ -24,6 +24,7 @@
 
     <div class="row">
       {% for plan in plan_list %}
+
         <div class="col-md-4">
           <div class="card mb-4 shadow-sm border-{% pas_color plan.documento %}">
             <div class="card-header bg-{% pas_color plan.documento %}">
@@ -36,15 +37,20 @@
                 <p>{{ plan.desc_pcm|safe }}</p>
               {% endif %}
               <ul class="list-unstyled mt-3 mb-4">
+                {% if plan.documento == 1 %}
+                  <li>Tipo: <span class="badge bg-primary">{{ plan.get_tipo_display }}</span></li>
+                {% else %}
+                  <li>Propósito: <span>{{ plan.proposito }}</span> </li>
+                  <li>Proceso: <span class="bg-secundary">{{ plan.get_proceso_display  }}</span> </li>
+                  <li>Requisito: <span class="badge bg-success">{{ plan.requisito }}</span></li>
+                {% endif %}
                 <li>Acciones: <span class="badge bg-primary">{{ plan.accion_set.count }}</span></li>
-                <li>Proceso: <span class="badge bg-secondary">{{ plan.get_proceso_display }}</span></li>
-                <li>Tipo: <span class="badge bg-success">{{ plan.get_tipo_display }}</span></li>
-                <li>Mejora: <span class="badge bg-info">{{ plan.get_mejora_display }}</span></li>
               </ul>
               <a href="#" class="btn btn-lg btn-block btn-primary">Ver detalles</a>
             </div>
           </div>
         </div>
+        <pre>{{ plan.get_proceso_display }}</pre>
       {% endfor %}
     </div>
   </div>
