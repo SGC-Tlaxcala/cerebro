@@ -2,6 +2,7 @@
 <footer class="navbar bg-secondary" style="margin-top: 20px;">
   <div class="container-fluid">
     <a class="navbar-brand text-primary" href="#">SCG Tlaxcala &copy; 2023</a>
+    {% if panicButton %}
     <div class="d-flex justify-content-end">
       <a 
         type="button" 
@@ -10,5 +11,6 @@
         Notificar documento faltante
       </a>
     </div>
+    {% endif %}
   </div>
 </footer>

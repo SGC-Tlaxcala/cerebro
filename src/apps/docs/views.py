@@ -71,19 +71,19 @@ class IndexLMD(ListView):
 
     def __str__(self):
         return self.__class__.__name__
-    
+
     def get_context_data(self, **kwargs):
         """Agrega la variable `active` al contexto de la vista."""
         context = super().get_context_data(**kwargs)
-        # Buscamos los reportes que existan en el documento actual 
+        # Buscamos los reportes que existan en el documento actual
         # y los agregamos al contexto
         context['activeLMD'] = True
         return context
-    
+
 
 class IndexLDP(ListView):
     """Lista de documentos por proceso."""
-    
+
     model = Documento
     template_name = 'docs/ldp.html'
     context_object_name = 'docs'
@@ -93,11 +93,11 @@ class IndexLDP(ListView):
         return Documento.objects\
             .filter(lmd=False, activo=True)\
             .order_by('proceso', 'tipo')
-    
+
     def get_context_data(self, **kwargs):
         """Agrega la variable `active` al contexto de la vista."""
         context = super().get_context_data(**kwargs)
-        # Buscamos los reportes que existan en el documento actual 
+        # Buscamos los reportes que existan en el documento actual
         # y los agregamos al contexto
         context['activeLDP'] = True
         return context
@@ -105,7 +105,7 @@ class IndexLDP(ListView):
 
 class IndexLDT(ListView):
     """Lista de documentos por tipo."""
-    
+
     model = Documento
     template_name = 'docs/ldt.html'
     context_object_name = 'docs'
@@ -114,7 +114,7 @@ class IndexLDT(ListView):
         """Genera la consulta de la LMD."""
         return Documento.objects\
             .filter(lmd=False, activo=True).order_by('tipo', 'proceso', 'id')
-    
+
 
 class IndexList(ListView):
     """
@@ -147,9 +147,10 @@ class DocDetail(DetailView):
     def get_context_data(self, **kwargs):
         """Agrega la variable `version` al contexto de la vista."""
         context = super().get_context_data(**kwargs)
-        # Buscamos los reportes que existan en el documento actual 
+        # Buscamos los reportes que existan en el documento actual
         # y los agregamos al contexto
         context['reportes'] = Reporte.objects.filter(documento=self.kwargs['pk'])
+        context['panicButton'] = True
         context.update({'version': VersionForm})
         return context
 
@@ -278,25 +279,25 @@ class PanicButtonView(FormView):
     template_name = 'docs/panic.html'
     form_class = ReporteForm
 
-    # Agregamos el documento_id obtenido mediante el parámetro
-    # pk de la URL al contexto de la vista.
     def get_context_data(self, **kwargs):
+        """Agregamos el documento_id obtenido mediante el parámetro
+        pk de la URL al contexto de la vista."""
         context = super(PanicButtonView, self).get_context_data(**kwargs)
         context['documento'] = Documento.objects.get(pk=self.kwargs['pk'])
         return context
 
-    # Inicializamos el formulario con el documento actual
-    # para usarlo en el template y el registro que se guarda
-    # en la base de datos.
     def get_initial(self):
+        """Inicializamos el formulario con el documento actual
+            para usarlo en el template y el registro que se guarda
+            en la base de datos."""
         initial = super(PanicButtonView, self).get_initial()
         initial['documento'] = self.kwargs['pk']
         return initial
 
-    # Guardamos el reporte en la base de datos  
+    # Guardamos el reporte en la base de datos
     def form_valid(self, form):
-        # El Documento en el contexto se agrega al campo documento
-        # del formulario.
+        """El Documento en el contexto se agrega al campo documento
+        del formulario."""
         form.instance.documento = Documento.objects.get(pk=self.kwargs['pk'])
         # Si el correo no termina en '@ine.mx' se rechaza el formulario
         if not form.instance.correo.endswith('@ine.mx'):
