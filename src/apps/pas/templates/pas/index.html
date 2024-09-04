@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load pas_tags %}
 
 {% block before_content %}
   <div class="container py-4">
@@ -18,24 +19,33 @@
 {% endblock before_content %}
 
 {% block content %}
-<div class="row">
-  {% for p in planes %}
-    <div class="col-md-4">
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          <h4><a href="#">{{ p.nombre }}</a></h4>
+  <div class="row">
+    <h3 class="display-2">Planes de acción abiertos</h3>
+
+    <div class="row">
+      {% for plan in plan_list %}
+        <div class="col-md-4">
+          <div class="card mb-4 shadow-sm border-{% pas_color plan.documento %}">
+            <div class="card-header bg-{% pas_color plan.documento %}">
+              <h4 class="my-0 fw-normal text-bg-{% pas_color plan.documento %}">{{ plan.nombre }}</h4>
+            </div>
+            <div class="card-body">
+              {% if plan.documento == 1 %}
+                <p>{{ plan.desc_cnc|safe }}</p>
+              {% else %}
+                <p>{{ plan.desc_pcm|safe }}</p>
+              {% endif %}
+              <ul class="list-unstyled mt-3 mb-4">
+                <li>Acciones: <span class="badge bg-primary">{{ plan.accion_set.count }}</span></li>
+                <li>Proceso: <span class="badge bg-secondary">{{ plan.get_proceso_display }}</span></li>
+                <li>Tipo: <span class="badge bg-success">{{ plan.get_tipo_display }}</span></li>
+                <li>Mejora: <span class="badge bg-info">{{ plan.get_mejora_display }}</span></li>
+              </ul>
+              <a href="#" class="btn btn-lg btn-block btn-primary">Ver detalles</a>
+            </div>
+          </div>
         </div>
-        <div class="panel-body">
-          {{ p.redaccion|safe }}
-        </div>
-        <div class="panel-footer">
-          Accciones: <span class="badge">{{ p.accion_set.count }}</span> |
-          <span class="label label-primary">{{ p.get_proceso_display }}</span> |
-          <span class="label label-success">{{ p.get_tipo_display }}</span> |
-          <span class="label label-info">{{ p.get_mejora_display }}</span>
-        </div>
-      </div>
+      {% endfor %}
     </div>
-  {% endfor %}
-</div>
+  </div>
 {% endblock content %}
