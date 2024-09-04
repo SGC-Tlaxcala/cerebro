@@ -46,11 +46,10 @@
                 {% endif %}
                 <li>Acciones: <span class="badge bg-primary">{{ plan.accion_set.count }}</span></li>
               </ul>
-              <a href="#" class="btn btn-lg btn-block btn-primary">Ver detalles</a>
+              <a href="{% url 'pas:detalle' plan.id %}" class="btn btn-lg btn-block btn-primary">Ver detalles</a>
             </div>
           </div>
         </div>
-        <pre>{{ plan.get_proceso_display }}</pre>
       {% endfor %}
     </div>
   </div>
