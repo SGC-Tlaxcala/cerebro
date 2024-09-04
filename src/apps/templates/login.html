@@ -42,11 +42,11 @@
 
 
 {% block content %}
-      <img
+  <img
       class="mx-auto d-block mb-4"
       src="{% static 'img/logoINE-01.png' %}"
       alt="logo INE"
-      width="150" height="53">
+      width="150" height="53" />
   
   {% if user.is_authenticated %}
   <h3 class="display-3 text-center">
@@ -56,6 +56,13 @@
     Regresar al <a href="{% url 'index' %}">inicio</a>.
   </p>
   {% else %}
+    
+  <div class="alert alert-primary alert-dismissible fade show" role="alert">
+    <h4 class="alert-heading">Acceso restringido</h4>
+    Si necesitas acceso, solicita una cuenta al responsable del SGC.
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+
   
   <form class="form-signin" method="post" action="{% url 'login' %}">
     {% csrf_token %}

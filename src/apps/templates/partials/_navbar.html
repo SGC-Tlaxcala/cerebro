@@ -34,7 +34,6 @@
             <i class="fa fa-user"></i>&nbsp; {{ request.user.first_name }} {{ request.user.last_name }}
           </a>
           <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-            <li><a class="dropdown-item" href="{% url 'password_change' %}">Cambiar contraseña</a></li>
             <li>
               <form id="logout-form" method="post" action="{% url 'logout' %}" style="display: inline;">
                 {% csrf_token %}
@@ -45,9 +44,8 @@
         </li>
         {% else %}
         <li class="nav-item">
-          <a class="nav-link" href="{% url 'login' %}">Iniciar sesión</a></li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Registrarse</a></li>
+          <a class="nav-link" href="{% url 'login' %}">Iniciar sesión</a>
+        </li>
         {% endif %}
       </ul>
 
