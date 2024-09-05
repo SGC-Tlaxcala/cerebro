@@ -136,6 +136,7 @@ USE_TZ = True
 SITE_ID = 1
 
 LOGIN_REDIRECT_URL = 'index'
+LOGIN_URL = '/login/'
 LOGOUT_REDIRECT_URL = 'index'
 
 STATIC_URL = 'assets/'
