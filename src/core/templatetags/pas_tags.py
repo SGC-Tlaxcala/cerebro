@@ -1,8 +1,7 @@
 """Librería de etiquetas personalizadas para el sistema PAS."""
 
 from django import template
-from django.urls import reverse
-from django.utils.safestring import mark_safe
+
 
 register = template.Library()
 
@@ -14,3 +13,12 @@ def pas_color(documento):
         return 'danger'
     else:
         return 'primary'
+
+
+@register.filter(name='pas_icon')
+def pas_icon(documento):
+    """Devuelve el tipo de un plan de acción."""
+    if documento == 1:
+        return 'bug'
+    elif documento == 2:
+        return 'thumbs-o-up'

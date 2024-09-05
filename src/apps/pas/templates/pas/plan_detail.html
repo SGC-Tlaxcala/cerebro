@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load pas_tags %}
 
 {% block footer %}
 <script type="text/javascript">
@@ -19,15 +20,9 @@
       <div class="col">
         <div class="jumbotron">
           <h1>
-            <i class="fa fa-bug"></i>
-            {{ plan.nombre }} <small>
-            {% if plan.documento == 1 %}<span class="label label-primary">{{ plan.get_tipo_display }}</span></small>{% endif %}
+            <i class="fa fa-{{ plan.documento | pas_icon }}" aria-hidden="true"></i>
+            {{ plan.nombre }}
           </h1>
-          {% if plan.documento == 1 %}
-            {{ plan.desc_cnc|striptags }}
-          {% else %}
-            <p class="well-lg display-5">{{ plan.desc_pcm|striptags }}</p>
-          {% endif %}
         </div>
       </div>
     </div>
@@ -56,29 +51,55 @@
 
 <div class="expediente" data-spy="scroll" data-target="#control-pas" data-offset="0">
   <div class="row" id="identificacion">
-    <div class="col-md-12">
-      <div class="panel panel-primary">
-        <div class="panel-heading">
-          <h3 class="panel-title"><i class="fa fa-info-circle"></i> Identificación</h3>
-        </div>
-        <div class="panel-body">
-          <table class="table">
-            <tr>
-              <td>Nombre: <strong>{{ plan.nombre }}</strong></td>
-              <td>Detectado en: <strong>{{ plan.get_deteccion_display }}</strong></td>
-              <td>Tipo: <strong>{{ plan.get_tipo_display }}</strong></td>
-              <td>Mejora de: <strong>{{ plan.get_mejora_display }}</strong></td>
-            </tr>
-            <tr>
-              <td>Folio: <strong>{{ plan.id }}</strong></td>
-              <td>Proceso: <strong>{{ plan.get_proceso_display }}</strong></td>
-              <td>Fecha de Llenado: <strong>{{ plan.fecha_llenado }}</strong></td>
-              <td>Fecha de Detección: <strong>{{ plan.fecha_deteccion }}</strong></td>
-            </tr>
-          </table>
-        </div>
+    <div class="row">
+      <div class="col">
+        <div class="panel panel primary">
+          <div class="panel-heading">
+            <h3 class="panel-title"><i class="fa fa-info-circle"></i> Identificación</h3>
+          </div>
+
+          <div class="panel-body"><!-- identificación del plan -->
+            <div class="row"><!-- nombre y folio -->
+              <div class="col-md-1"><strong>Nombre</strong></div><div class="col-md-5">{{ plan.nombre }}</div>
+              <div class="col-md-1"><strong>Folio</strong></div><div class="col-md-5">{{ plan.folio }}</div>
+                <hr class="">
+              </div><!-- ./nombre y folio -->
+
+            {% if plan.documento == 1 %}
+              <h2>Aquí va un PAS CNC</h2>
+            {% else %}<!-- PCM identificación -->
+              <div class="row"><!-- Fechas -->
+                <div class="col-md-1"><strong>Fecha llenado</strong></div>
+                <div class="col-md-3"><em>{{ plan.fecha_llenado }}</em></div>
+
+                <div class="col-md-1"><strong>Fecha de inicio</strong></div>
+                <div class="col-md-3">{{ plan.fecha_inicio }}</div>
+
+                <div class="col-md-1"><strong>Fecha de término</strong></div>
+                <div class="col-md-3">{{ plan.fecha_termino }}</div>
+                <hr>
+              </div> <!-- ./Fechas -->
+              <div class="row"><!-- Propósito y Requisito -->
+                <div class="col-md-1"><strong>Propósito: </strong></div><div class="col-md-5">{{ plan.proposito }}</div>
+                <div class="col"><strong>Requisito: </strong></div><div class="col-md-5"><em>{{ plan.requisito }}</em></div>
+                <hr />
+              </div><!-- ./Propósito y Requisito -->
+              <div class="row"><!-- Descripción PCM -->
+                <div class="col-md-1"><strong>Descripción: </strong></div>
+                <div class="col-md-11">{{ plan.desc_pcm|safe }}</div>
+                <hr />
+              </div><!-- ./Descripción PCM -->
+              <div class="row"><!-- Consecuencias -->
+                <div class="col-md-1"><strong>Consecuencias: </strong></div>
+                <div class="col-md-11">{{ plan.consecuencias|safe }}</div>
+                <hr />
+              </div><!-- ./Consecuencias -->
+            {% endif %}<!-- ./PCM identificación -->
+
+        </div><!-- ./panel-body ./identificación del plan -->
       </div>
     </div>
+
   </div>
   <div class="row" id="decl">
     <div class="col-md-12">
@@ -214,7 +235,7 @@
               {% for a in plan.accion_set.all %}
                 <tr>
                   <td>{{ a.accion|safe }}</td>
-                  <td>{{ a.fecha|date:"d/b/Y" }}</td>
+                  <td>{{ a.fecha }}</td>
                   <td>{{ a.responsable }}</td>
                   <td>
                     <a type="button" class="btn btn-danger" data-toggle="modal" data-target="#myModal" href="{%  url 'seguimiento' id=a.id %}">
