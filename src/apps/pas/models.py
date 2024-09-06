@@ -135,7 +135,7 @@ class Plan(TrackingFields):
     txt_recurrencia = HTMLField(blank=True, null=True)
 
     def __str__(self):
-        return u'%s - %s' % (self.id, self.nombre)
+        return u'%s - %s' % (self.folio, self.nombre)
 
 
 class Accion(TrackingFields):

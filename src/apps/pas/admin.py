@@ -21,36 +21,21 @@ class AccionAdmin(admin.ModelAdmin):
 class AccionInline(admin.TabularInline):
     model = Accion
     extra = 1
+    exclude = ('user',)  # Excluir el campo 'user'
+    classes = ['collapse']  # Hacer colapsable el inline
 
 
 class PlanAdmin(admin.ModelAdmin):
     fieldsets = (
-        ('Identificación', {'fields': [
-            'fecha_llenado',
-            'fecha_deteccion',
-            'proceso', 'tipo',
-            'deteccion', 'mejora',
-            'nombre'
-        ]}),
-        ('Reacción', {'fields': [
-            'correccion',
-            'consecuencias',
-            'reaccion_responsable',
-            'reaccion_evidencia'], 'classes': ['collapse']}),
-        ('Revisión', {'fields': [
-            'redaccion',
-            'declaracion',
-            'evidencia',
-            'requisitos',
-            'relacionadas'], 'classes': ['collapse']}),
-        ('Responsabilidades', {'fields': [
-            'informacion', 'aplicacion',
-            'responsable'], 'classes': ['collapse']}),
-        ('Determinación de las Causas', {'fields': [
-            'pescadito', 'cincopq', 'causa_raiz'],
-            'classes': ['collapse']}),
-        ('Acciones', {'fields': [], 'classes': ['collapse']}),
-        ('Seguimiento', {'fields': [], 'classes': ['collapse']}),
+        ('Identificación', {'fields': ['fecha_llenado', 'folio', 'documento', 'nombre']}),  # Identificación común
+        ('Plan de Cambios y Mejoras',
+         {'fields': [
+             'fecha_inicio', 'fecha_termino', 'proposito', 'requisito', 'proceso', 'desc_pcm', 'consecuencias'],
+          'classes': ['collapse']}),
+        ('Cédula de No Conformidad',
+         {'fields': ['tipo', 'desc_cnc', 'correccion', 'fuente', 'otra_fuente'],
+          'classes': ['collapse']}),
+        ('Análisis de la CNC o PCM', {'fields': ['analisis', 'evidencia_analisis'], 'classes': ['collapse']}),
         ('Cierre', {'fields': [
             'eliminacion',
             'txt_eliminacion',
@@ -58,6 +43,34 @@ class PlanAdmin(admin.ModelAdmin):
             'txt_recurrencia'], 'classes': ['collapse']}),
     )
     inlines = [AccionInline]
+
+    def get_fieldsets(self, request, obj=None):
+        fieldsets = super().get_fieldsets(request, obj)
+
+        if obj:  # Si estamos editando un objeto existente
+            if obj.documento == 1:
+                # Oculta "Plan de Cambios y Mejoras" si documento == 1
+                fieldsets = (
+                    ('Identificación', {'fields': ['fecha_llenado', 'documento', 'nombre']}),  # Identificación común
+                    ('Cédula de No Conformidad',
+                     {'fields': ['tipo', 'desc_cnc', 'correccion', 'fuente', 'otra_fuente'], 'classes': ['collapse']}),
+                    ('Análisis de la CNC o PCM', {'fields': ['analisis', 'evidencia_analisis'], 'classes': ['collapse']}),
+                    ('Cierre', {'fields': ['eliminacion', 'txt_eliminacion', 'recurrencia', 'txt_recurrencia'], 'classes': ['collapse']}),
+                )
+            elif obj.documento == 2:
+                # Oculta "Cédula de No Conformidad" si documento == 2
+                fieldsets = (
+                    ('Identificación', {'fields': ['fecha_llenado', 'documento', 'nombre']}),  # Identificación común
+                    ('Plan de Cambios y Mejoras',
+                     {'fields': [
+                         'fecha_inicio', 'fecha_termino', 'proposito',
+                         'requisito', 'proceso', 'desc_pcm', 'consecuencias'],
+                      'classes': ['collapse']}),
+                    ('Análisis de la CNC o PCM', {'fields': ['analisis', 'evidencia_analisis'], 'classes': ['collapse']}),
+                    ('Cierre', {'fields': ['eliminacion', 'txt_eliminacion', 'recurrencia', 'txt_recurrencia'], 'classes': ['collapse']}),
+                )
+
+        return fieldsets
 
 
 admin.site.register(Plan, PlanAdmin)
