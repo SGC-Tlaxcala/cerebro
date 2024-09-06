@@ -1,8 +1,3 @@
-# -*- coding: utf-8 -*-
-#    nombre: admin
-#       app: pas
-#      desc: interface de administración
-
 from django.contrib import admin
 from .models import Plan, Accion, Seguimiento
 

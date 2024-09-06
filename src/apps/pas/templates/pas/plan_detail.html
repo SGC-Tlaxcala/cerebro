@@ -50,21 +50,17 @@
 {% block content %}
 
 <div class="expediente" data-spy="scroll" data-target="#control-pas" data-offset="0">
-  <div class="row" id="identificacion">
+  <div class="row" id="ident">
     <div class="row">
       <div class="col">
         <div class="panel panel primary">
-          <div class="panel-heading">
-            <h3 class="panel-title"><i class="fa fa-info-circle"></i> Identificación</h3>
-          </div>
-
+          <div class="panel-heading"><h3 class="panel-title"><i class="fa fa-info-circle"></i> Identificación</h3></div>
           <div class="panel-body"><!-- identificación del plan -->
-            <div class="row"><!-- nombre y folio -->
+            <div class="row"><!-- \-> nombre y folio -->
               <div class="col-md-1"><strong>Nombre</strong></div><div class="col-md-5">{{ plan.nombre }}</div>
               <div class="col-md-1"><strong>Folio</strong></div><div class="col-md-5">{{ plan.folio }}</div>
-                <hr class="">
-              </div><!-- ./nombre y folio -->
-
+              <hr class="">
+            </div><!-- ./nombre y folio <-/ -->
             {% if plan.documento == 1 %}
               <h2>Aquí va un PAS CNC</h2>
             {% else %}<!-- PCM identificación -->
@@ -95,10 +91,9 @@
                 <hr />
               </div><!-- ./Consecuencias -->
             {% endif %}<!-- ./PCM identificación -->
-
-        </div><!-- ./panel-body ./identificación del plan -->
-      </div>
-    </div>
+          </div><!-- ./panel-body./identificación del plan -->
+        </div><!-- ./panel./panel-primary./identificación -->
+      </div><!-- ./col./identificación -->
 
   </div>
   <div class="row" id="decl">
