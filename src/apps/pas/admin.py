@@ -5,6 +5,7 @@ from .models import Plan, Accion, Seguimiento
 class SeguimientoInline(admin.TabularInline):
     model = Seguimiento
     extra = 1
+    exclude = ('user',)  # Excluir el campo 'user'
 
 
 class AccionAdmin(admin.ModelAdmin):
@@ -37,10 +38,8 @@ class PlanAdmin(admin.ModelAdmin):
           'classes': ['collapse']}),
         ('Análisis de la CNC o PCM', {'fields': ['analisis', 'evidencia_analisis'], 'classes': ['collapse']}),
         ('Cierre', {'fields': [
-            'eliminacion',
-            'txt_eliminacion',
-            'recurrencia',
-            'txt_recurrencia'], 'classes': ['collapse']}),
+            'eliminacion', 'txt_eliminacion',
+            'recurrencia', 'txt_recurrencia'], 'classes': ['collapse']}),
     )
     inlines = [AccionInline]
 
@@ -54,8 +53,11 @@ class PlanAdmin(admin.ModelAdmin):
                     ('Identificación', {'fields': ['fecha_llenado', 'documento', 'nombre']}),  # Identificación común
                     ('Cédula de No Conformidad',
                      {'fields': ['tipo', 'desc_cnc', 'correccion', 'fuente', 'otra_fuente'], 'classes': ['collapse']}),
-                    ('Análisis de la CNC o PCM', {'fields': ['analisis', 'evidencia_analisis'], 'classes': ['collapse']}),
-                    ('Cierre', {'fields': ['eliminacion', 'txt_eliminacion', 'recurrencia', 'txt_recurrencia'], 'classes': ['collapse']}),
+                    ('Análisis de la CNC o PCM',
+                     {'fields': ['analisis', 'evidencia_analisis'], 'classes': ['collapse']}),
+                    ('Cierre',
+                     {'fields': ['eliminacion', 'txt_eliminacion', 'recurrencia', 'txt_recurrencia'],
+                      'classes': ['collapse']}),
                 )
             elif obj.documento == 2:
                 # Oculta "Cédula de No Conformidad" si documento == 2
@@ -66,8 +68,11 @@ class PlanAdmin(admin.ModelAdmin):
                          'fecha_inicio', 'fecha_termino', 'proposito',
                          'requisito', 'proceso', 'desc_pcm', 'consecuencias'],
                       'classes': ['collapse']}),
-                    ('Análisis de la CNC o PCM', {'fields': ['analisis', 'evidencia_analisis'], 'classes': ['collapse']}),
-                    ('Cierre', {'fields': ['eliminacion', 'txt_eliminacion', 'recurrencia', 'txt_recurrencia'], 'classes': ['collapse']}),
+                    ('Análisis de la CNC o PCM',
+                     {'fields': ['analisis', 'evidencia_analisis'], 'classes': ['collapse']}),
+                    ('Cierre',
+                     {'fields': ['eliminacion', 'txt_eliminacion', 'recurrencia', 'txt_recurrencia'],
+                      'classes': ['collapse']}),
                 )
 
         return fieldsets

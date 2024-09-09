@@ -12,6 +12,12 @@
       $(this).removeData('bs.modal');
   });
 </script>
+
+  <style>
+    main {
+      margin-top: 0;
+    }
+  </style>
 {% endblock footer %}
 
 {% block before_content %}
@@ -28,19 +34,29 @@
     </div>
     <div class="row">
       <div class="col-md-12">
-        <ul class="nav nav-tabs justify-content-center">
-          <li class="nav-item">
-            <a href="#identificacion" class="nav-link active" aria-current="page">Identificación</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Link</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Link</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link disabled" aria-disabled="true">Disabled</a>
-          </li>
+        <ul class="nav nav-tabs justify-content-center" role="tablist">
+          <li class="nav-item" role="presentation">
+            <a id="identificacion-tab"
+               data-bs-toggle="tab"
+               href="#identificacion-panel"
+               role="tab"
+               aria-controls="identificacion-panel"
+               aria-selected="true"
+               class="nav-link active" aria-current="page"><i class="fa fa-info-circle"></i>  Identificación</a>
+          </li><!-- ./identificacion-tab -->
+          <li class="nav-item" role="presentation">
+            <a class="nav-link"
+              id="causa-tab" data-bs-toggle="tab" href="#causa-panel" role="tab" aria-controls="causa-panel" aria-selected="false"><i class="fa fa-paw"></i> Causa raíz</a>
+          </li><!-- ./causa-tab -->
+          <li class="nav-item" role="presentation">
+            <a class="nav-link{% if plan.documento == 2 %} disabled{% endif %}"
+              {% if plan.documento == 2 %} aria-disabled="true"{% endif %}
+              id="correccion-tab" data-bs-toggle="tabl" href="#correccion-panel" role="tab" aria-controls="correccion-panel" aria-selected="false"><i class="fa fa-fire-extinguisher"></i> Corrección</a>
+          </li><!-- ./correccion-tab -->
+          <li class="nav-item" role="presentation">
+            <a class="nav-link"
+              id="acciones-tab" data-bs-toggle="tab" href="#acciones-panel" role="tab" aria-controls="acciones-panel" aria-selected="false"><i class="fa fa-ambulance"></i> Acciones</a>
+          </li><!-- ./acciones-tab -->
         </ul>
       </div>
     </div>
@@ -48,168 +64,117 @@
 {% endblock before_content %}
 
 {% block content %}
+  <div class="tab-content" id="tab-content">
+    <div class="tab-pane active" id="identificacion-panel" role="tabpanel" aria-labelledby="identificacion-tab">
+      <div class="row tab-pane active" id="identificacion-panel">
+        <div class="col">
+          <div class="panel panel primary">
+            <div class="panel-heading"><h3 class="panel-title"><i class="fa fa-info-circle"></i> Identificación</h3></div>
+            <div class="panel-body"><!-- identificación del plan -->
+              <div class="row"><!-- \-> nombre y folio -->
+                <div class="col-md-1"><strong>Nombre</strong></div><div class="col-md-5">{{ plan.nombre }}</div>
+                <div class="col-md-1"><strong>Folio</strong></div><div class="col-md-5">{{ plan.folio }}</div>
+                <hr class="">
+              </div><!-- ./nombre y folio <-/ -->
+              {% if plan.documento == 1 %}
+                <h2>Aquí va un PAS CNC</h2>
+              {% else %}<!-- PCM identificación -->
+                <div class="row"><!-- Fechas -->
+                  <div class="col-md-1"><strong>Fecha llenado</strong></div>
+                  <div class="col-md-3"><em>{{ plan.fecha_llenado }}</em></div>
 
-<div class="expediente" data-spy="scroll" data-target="#control-pas" data-offset="0">
-  <div class="row" id="ident">
-    <div class="row">
-      <div class="col">
-        <div class="panel panel primary">
-          <div class="panel-heading"><h3 class="panel-title"><i class="fa fa-info-circle"></i> Identificación</h3></div>
-          <div class="panel-body"><!-- identificación del plan -->
-            <div class="row"><!-- \-> nombre y folio -->
-              <div class="col-md-1"><strong>Nombre</strong></div><div class="col-md-5">{{ plan.nombre }}</div>
-              <div class="col-md-1"><strong>Folio</strong></div><div class="col-md-5">{{ plan.folio }}</div>
-              <hr class="">
-            </div><!-- ./nombre y folio <-/ -->
-            {% if plan.documento == 1 %}
-              <h2>Aquí va un PAS CNC</h2>
-            {% else %}<!-- PCM identificación -->
-              <div class="row"><!-- Fechas -->
-                <div class="col-md-1"><strong>Fecha llenado</strong></div>
-                <div class="col-md-3"><em>{{ plan.fecha_llenado }}</em></div>
+                  <div class="col-md-1"><strong>Fecha de inicio</strong></div>
+                  <div class="col-md-3">{{ plan.fecha_inicio }}</div>
 
-                <div class="col-md-1"><strong>Fecha de inicio</strong></div>
-                <div class="col-md-3">{{ plan.fecha_inicio }}</div>
-
-                <div class="col-md-1"><strong>Fecha de término</strong></div>
-                <div class="col-md-3">{{ plan.fecha_termino }}</div>
-                <hr>
-              </div> <!-- ./Fechas -->
-              <div class="row"><!-- Propósito y Requisito -->
-                <div class="col-md-1"><strong>Propósito: </strong></div><div class="col-md-5">{{ plan.proposito }}</div>
-                <div class="col"><strong>Requisito: </strong></div><div class="col-md-5"><em>{{ plan.requisito }}</em></div>
-                <hr />
-              </div><!-- ./Propósito y Requisito -->
-              <div class="row"><!-- Descripción PCM -->
-                <div class="col-md-1"><strong>Descripción: </strong></div>
-                <div class="col-md-11">{{ plan.desc_pcm|safe }}</div>
-                <hr />
-              </div><!-- ./Descripción PCM -->
-              <div class="row"><!-- Consecuencias -->
-                <div class="col-md-1"><strong>Consecuencias: </strong></div>
-                <div class="col-md-11">{{ plan.consecuencias|safe }}</div>
-                <hr />
-              </div><!-- ./Consecuencias -->
-            {% endif %}<!-- ./PCM identificación -->
-          </div><!-- ./panel-body./identificación del plan -->
-        </div><!-- ./panel./panel-primary./identificación -->
-      </div><!-- ./col./identificación -->
-
-  </div>
-  <div class="row" id="decl">
-    <div class="col-md-12">
-      <div class="panel panel-info">
-        <div class="panel-heading">
-          <h3 class="panel-title"><i class="fa fa-legal"></i> Declaración</h3>
-        </div>
-        <div class="panel-body">
-          <div class="row">
-            <div class="col-md-6">
-              <div class="thumbnail">
-                <div class="caption">
-                  <h3>Redacción</h3>
-                  {{ plan.redaccion|safe }}
+                  <div class="col-md-1"><strong>Fecha de término</strong></div>
+                  <div class="col-md-3">{{ plan.fecha_termino }}</div>
+                  <hr>
+                </div> <!-- ./Fechas -->
+                <div class="row"><!-- Propósito y Requisito -->
+                  <div class="col-md-1"><strong>Propósito: </strong></div><div class="col-md-5">{{ plan.proposito }}</div>
+                  <div class="col"><strong>Requisito: </strong></div><div class="col-md-5"><em>{{ plan.requisito }}</em></div>
+                  <hr />
+                </div><!-- ./Propósito y Requisito -->
+                <div class="row"><!-- Descripción PCM -->
+                  <div class="col-md-1"><strong>Descripción: </strong></div>
+                  <div class="col-md-11">{{ plan.desc_pcm|safe }}</div>
+                  <hr />
+                </div><!-- ./Descripción PCM -->
+                <div class="row"><!-- Consecuencias -->
+                  <div class="col-md-1"><strong>Consecuencias: </strong></div>
+                  <div class="col-md-11">{{ plan.consecuencias|safe }}</div>
+                  <hr />
+                </div><!-- ./Consecuencias -->
+              {% endif %}<!-- ./PCM identificación -->
+            </div><!-- ./panel-body./identificación del plan -->
+          </div><!-- ./panel./panel-primary./identificación -->
+        </div><!-- ./col./identificación -->
+      </div>
+    </div><!-- ./identificación-panel -->
+      <div class="tab-pane" id="causa-panel" role="tabpanel" aria-labelledby="causa-tab">
+      <div class="row" id="causa">
+        <div class="col-md-12">
+          <div class="panel panel-warning">
+            <div class="panel-heading">
+              <h3 class="panel-title"><i class="fa fa-paw"></i> Determinación de la causa raíz {% if plan.documento == 1 %}de la No Conformidad/Riesgo{% else %}del cambio o mejora al SGC{% endif %}</h3>
+            </div>
+            <div class="panel-body">
+                      <div class="row">
+                <div class="col-md-6">
+                  <div class="thumbnail">
+                    <div class="caption">
+                      <h3>Diagrama de Causa Raíz</h3>
+                      <p>Una descripción del pescadito</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="thumbnail">
+                    <div class="caption">
+                      <h3>5 Por Qué's</h3>
+                      <p>Técnica socrática</p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-            <div class="col-md-6">
-              <div class="thumbnail">
-                <div class="caption">
-                  <h3>Declaración</h3>
-                  {{ plan.declaracion|safe }}
-                </div>
-              </div>
+            <div class="panel-footer">
+              <h4>Causa Raíz</h4>
+              {{ plan.causa_raiz|safe }}
             </div>
           </div>
-          <div class="row">
-            <div class="col-md-4">
-              <div class="thumbnail">
-                <div class="caption">
-                  <h3>Evidencias</h3>
-                  {{ plan.evidencia|safe }}
-                </div>
-              </div>
+        </div>
+      </div>
+    </div><!-- ./causa-tab -->
+    <div class="tab-pane" id="correccion-panel" role="tabpanel" aria-labelledby="correccion-tab">
+      <div class="row" id="corr">
+        <div class="col-md-12">
+          <div class="panel panel-danger">
+            <div class="panel-heading">
+              <h3 class="panel-title"><i class="fa fa-fire-extinguisher"></i> Corrección</h3>
             </div>
-            <div class="col-md-4">
-              <div class="thumbnail">
-                <div class="caption">
-                  <h3>Requisitos al que hace referencia</h3>
-                  {{ plan.requisitos|safe }}
-                </div>
-              </div>
+            <div class="panel-body">
+              {{ plan.correccion|safe }}
             </div>
-            <div class="col-md-4">
-              <div class="thumbnail">
-                <div class="caption">
-                  <h3>No conformidades o NCP relacionadas</h3>
-                  {{ plan.relacionadas|safe }}
+            <div class="panel-footer">
+              <div class="row">
+                <div class="col-md-4">
+                  Responsable: <strong>{{ plan.reaccion_responsable }}</strong>
+                </div>
+                <div class="col-md-4">
+                  {% if plan.reaccion_evidencia %}Evidencia: <a target="_blank" href="{{ plan.reaccion_evidencia.url }}" onClick="abrir(this.href);return false" class="btn btn-primary btn-xs">Revisar</a>{% endif %}
+                </div>
+                <div class="col-md-4">
+                  Consecuencias: <strong>{{ plan.consecuencias }}</strong>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-  </div><!-- ./declaracion -->
-  <div class="row" id="corr">
-    <div class="col-md-12">
-      <div class="panel panel-danger">
-        <div class="panel-heading">
-          <h3 class="panel-title"><i class="fa fa-fire-extinguisher"></i> Corrección</h3>
-        </div>
-        <div class="panel-body">
-          {{ plan.correccion|safe }}
-        </div>
-        <div class="panel-footer">
-          <div class="row">
-            <div class="col-md-4">
-              Responsable: <strong>{{ plan.reaccion_responsable }}</strong>
-            </div>
-            <div class="col-md-4">
-              {% if plan.reaccion_evidencia %}Evidencia: <a target="_blank" href="{{ plan.reaccion_evidencia.url }}" onClick="abrir(this.href);return false" class="btn btn-primary btn-xs">Revisar</a>{% endif %}
-            </div>
-            <div class="col-md-4">
-              Consecuencias: <strong>{{ plan.consecuencias }}</strong>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div><!-- ./correccion -->
-  <div class="row" id="causa">
-    <div class="col-md-12">
-      <div class="panel panel-warning">
-        <div class="panel-heading">
-          <h3 class="panel-title"><i class="fa fa-paw"></i> Determinación de la causa</h3>
-        </div>
-        <div class="panel-body">
-                  <div class="row">
-            <div class="col-md-6">
-              <div class="thumbnail">
-                <div class="caption">
-                  <h3>Diagrama de Causa Raíz</h3>
-                  <p>Una descripción del pescadito</p>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-6">
-              <div class="thumbnail">
-                <div class="caption">
-                  <h3>5 Por Qué's</h3>
-                  <p>Técnica socrática</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="panel-footer">
-          <h4>Causa Raíz</h4>
-          {{ plan.causa_raiz|safe }}
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="row" id="acciones">
+    </div><!-- ./correccion-tab -->
+    <div class="tab-pane" id="acciones-panel" role="tabpanel" aria-labelledby="acciones-tab">
+      <div class="row" id="acciones">
     <div class="col-md-12">
       <div class="panel panel-danger">
         <div class="panel-heading">
@@ -233,7 +198,8 @@
                   <td>{{ a.fecha }}</td>
                   <td>{{ a.responsable }}</td>
                   <td>
-                    <a type="button" class="btn btn-danger" data-toggle="modal" data-target="#myModal" href="{%  url 'seguimiento' id=a.id %}">
+                    <a type="button" class="btn btn-danger" data-toggle="modal" data-target="#myModal"
+                       href="#">
                       {{ a.seguimiento_set.count }}
                     </a>
                   </td>
@@ -247,20 +213,6 @@
       </div>
     </div>
   </div>
-</div>
-
-<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-
-      <div class="modal-body">
-
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-      </div>
-    </div><!-- /.modal-content -->
-  </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
-
+    </div><!-- ./acciones-tab -->
+  </div>
 {% endblock content %}

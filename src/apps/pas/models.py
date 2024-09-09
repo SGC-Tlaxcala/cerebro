@@ -144,7 +144,7 @@ class Accion(TrackingFields):
     recursos = HTMLField(blank=True, null=True)
     fecha_inicio = models.DateField(blank=True, null=True)
     fecha_fin = models.DateField(blank=True, null=True)
-    responsable = models.ForeignKey(User, related_name='pas_responsable', on_delete=models.CASCADE)
+    responsable = models.CharField(blank=True, null=True, max_length=5, help_text='Iniciales del Responsable')
 
     class Meta:
         verbose_name = _(u'Actividad')
@@ -171,7 +171,7 @@ class Seguimiento(TrackingFields, models.Model):
     fecha = models.DateField()
     evidencia = models.FileField(upload_to='pas', blank=True, null=True)
     estado = models.IntegerField(choices=A_ESTADO)
-    responsable = models.ForeignKey(User, related_name='pas_seguimiento_responsable', on_delete=models.CASCADE)
+    responsable = models.CharField(max_length=5, help_text='Iniciales del Responsable', blank=True, null=True)
 
     class Meta:
         verbose_name = _(u'Seguimiento de Acciones')
