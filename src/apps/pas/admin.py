@@ -7,6 +7,11 @@ class SeguimientoInline(admin.TabularInline):
     extra = 1
     exclude = ('user',)  # Excluir el campo 'user'
 
+    def save_model(self, request, obj, form, change):
+        if not obj.user_id:
+            obj.user = request.user
+        super().save_model(request, obj, form, change)
+
 
 class AccionAdmin(admin.ModelAdmin):
     fields = (
@@ -18,12 +23,37 @@ class AccionAdmin(admin.ModelAdmin):
     list_display = ('plan', 'fecha_inicio', 'fecha_fin', 'responsable', 'get_estado')
     list_filter = ('plan', 'seguimiento__estado', 'plan__tipo')
 
+    def save_model(self, request, obj, form, change):
+        if not obj.user_id:
+            obj.user = request.user
+        super().save_model(request, obj, form, change)
+
+    def save_formset(self, request, form, formset, change):
+        instances = formset.save(commit=False)
+        for instance in instances:
+            instance.user = request.user
+            instance.save()
+        formset.save_m2m()
+
+    def save_related(self, request, form, formsets, change):
+        super().save_related(request, form, formsets, change)
+        for formset in formsets:
+            for obj in formset.save(commit=False):
+                if isinstance(obj, Accion) and not obj.user_id:
+                    obj.user = request.user
+                    obj.save()
+
 
 class AccionInline(admin.TabularInline):
     model = Accion
     extra = 1
     exclude = ('user',)  # Excluir el campo 'user'
-    classes = ['collapse']  # Hacer colapsable el inline
+    classes = ['collapse']
+
+    def save_model(self, request, obj, form, change):
+        if not obj.user_id:
+            obj.user = request.user
+        super().save_model(request, obj, form, change)
 
 
 class PlanAdmin(admin.ModelAdmin):
@@ -42,6 +72,21 @@ class PlanAdmin(admin.ModelAdmin):
             'recurrencia', 'txt_recurrencia'], 'classes': ['collapse']}),
     )
     inlines = [AccionInline]
+
+    def save_formset(self, request, form, formset, change):
+        instances = formset.save(commit=False)
+        for instance in instances:
+            instance.user = request.user
+            instance.save()
+        formset.save_m2m()
+
+    def save_related(self, request, form, formsets, change):
+        super().save_related(request, form, formsets, change)
+        for formset in formsets:
+            for obj in formset.save(commit=False):
+                if isinstance(obj, Accion) and not obj.user_id:
+                    obj.user = request.user
+                    obj.save()
 
     def get_fieldsets(self, request, obj=None):
         fieldsets = super().get_fieldsets(request, obj)

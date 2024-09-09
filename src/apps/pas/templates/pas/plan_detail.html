@@ -2,33 +2,42 @@
 {% load pas_tags %}
 
 {% block footer %}
-<script type="text/javascript">
-  function abrir(pagina) {
-    const strWindowFeatures = "menubar=no,resizable=no,scrollbars=yes,status=no,width=600,height=400";
-    window.open(pagina, 'window', strWindowFeatures).focus();
+<!-- Script para cargar el PDF en el iframe -->
+<script>
+  function loadPDF(url) {
+    document.getElementById('pdfFrame').src = url;
   }
-
-  $('#myModal').on('hide.bs.modal', function(e) {
-      $(this).removeData('bs.modal');
-  });
 </script>
-
-  <style>
-    main {
-      margin-top: 0;
-    }
-  </style>
 {% endblock footer %}
+
+{% block after_content %}
+<!-- Modal -->
+<div class="modal fade" id="pdfModal" tabindex="-1" role="dialog" aria-labelledby="pdfModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="pdfModalLabel">Ver PDF</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <iframe id="pdfFrame" style="width:100%;height:500px;" src=""></iframe>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock after_content %}
 
 {% block before_content %}
   <div class="container py-4">
     <div class="row p-5 mb-4 bg-body-tertiary rounded-3">
       <div class="col">
         <div class="jumbotron">
-          <h1>
+          <h1 class="display-2">
             <i class="fa fa-{{ plan.documento | pas_icon }}" aria-hidden="true"></i>
             {{ plan.nombre }}
+
           </h1>
+          <p class="well text-muted display-6">{{ plan.get_documento_display }}</p>
         </div>
       </div>
     </div>
@@ -55,7 +64,7 @@
           </li><!-- ./correccion-tab -->
           <li class="nav-item" role="presentation">
             <a class="nav-link"
-              id="acciones-tab" data-bs-toggle="tab" href="#acciones-panel" role="tab" aria-controls="acciones-panel" aria-selected="false"><i class="fa fa-ambulance"></i> Acciones</a>
+              id="acciones-tab" data-bs-toggle="tab" href="#acciones-panel" role="tab" aria-controls="acciones-panel" aria-selected="false"><i class="fa fa-ambulance"></i> Actividades</a>
           </li><!-- ./acciones-tab -->
         </ul>
       </div>
@@ -111,36 +120,25 @@
         </div><!-- ./col./identificación -->
       </div>
     </div><!-- ./identificación-panel -->
-      <div class="tab-pane" id="causa-panel" role="tabpanel" aria-labelledby="causa-tab">
+    <div class="tab-pane" id="causa-panel" role="tabpanel" aria-labelledby="causa-tab">
       <div class="row" id="causa">
         <div class="col-md-12">
           <div class="panel panel-warning">
             <div class="panel-heading">
-              <h3 class="panel-title"><i class="fa fa-paw"></i> Determinación de la causa raíz {% if plan.documento == 1 %}de la No Conformidad/Riesgo{% else %}del cambio o mejora al SGC{% endif %}</h3>
+              <h3 class="panel-title"><i class="fa fa-paw"></i> Análisis de la causa raíz {% if plan.documento == 1 %}de la No Conformidad/Riesgo{% else %}del cambio o mejora al SGC{% endif %}</h3>
             </div>
             <div class="panel-body">
-                      <div class="row">
-                <div class="col-md-6">
-                  <div class="thumbnail">
-                    <div class="caption">
-                      <h3>Diagrama de Causa Raíz</h3>
-                      <p>Una descripción del pescadito</p>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="thumbnail">
-                    <div class="caption">
-                      <h3>5 Por Qué's</h3>
-                      <p>Técnica socrática</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="panel-footer">
-              <h4>Causa Raíz</h4>
-              {{ plan.causa_raiz|safe }}
+              {{ plan.analisis|safe }}
+              <!-- Botón que activa el modal -->
+              {% if plan.evidencia_analisis %}
+                {% if plan.evidencia_analisis.url|slice:"-4:" == ".pdf" %}
+                  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#pdfModal" onclick="loadPDF('{{ plan.evidencia_analisis.url }}')">
+                    Ver PDF
+                  </button>
+                {% else %}
+                  <a href="{{ plan.evidencia_analisis.url }}" class="btn btn-primary" download>Descargar Evidencia</a>
+                {% endif %}
+              {% endif %}
             </div>
           </div>
         </div>
@@ -178,7 +176,7 @@
     <div class="col-md-12">
       <div class="panel panel-danger">
         <div class="panel-heading">
-          <h3 class="panel-title"><i class="fa fa-ambulance"></i> Acciones Correctivas</h3>
+          <h3 class="panel-title"><i class="fa fa-ambulance"></i> Descripción de las Actividades</h3>
         </div>
         <div class="panel-body">
           <table class="table table-bordered table-hover">
@@ -195,7 +193,7 @@
               {% for a in plan.accion_set.all %}
                 <tr>
                   <td>{{ a.accion|safe }}</td>
-                  <td>{{ a.fecha }}</td>
+                  <td>{{ a.fecha_fin|date:"d/m/Y" }}</td>
                   <td>{{ a.responsable }}</td>
                   <td>
                     <a type="button" class="btn btn-danger" data-toggle="modal" data-target="#myModal"
@@ -203,7 +201,7 @@
                       {{ a.seguimiento_set.count }}
                     </a>
                   </td>
-                  <td>{{ a.estado }}</td>
+                  <td>{{ a.get_estado }}</td>
                 </tr>
               {% endfor %}
             </tbody>

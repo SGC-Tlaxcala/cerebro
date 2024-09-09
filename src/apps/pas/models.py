@@ -168,7 +168,7 @@ class Accion(TrackingFields):
 class Seguimiento(TrackingFields, models.Model):
     accion = models.ForeignKey(Accion, on_delete=models.CASCADE)
     descripcion = HTMLField()
-    fecha = models.DateField()
+    fecha = models.DateField(help_text="Fecha de la actualización")
     evidencia = models.FileField(upload_to='pas', blank=True, null=True)
     estado = models.IntegerField(choices=A_ESTADO)
     responsable = models.CharField(max_length=5, help_text='Iniciales del Responsable', blank=True, null=True)
