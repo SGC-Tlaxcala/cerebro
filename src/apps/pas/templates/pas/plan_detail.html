@@ -2,10 +2,11 @@
 {% load pas_tags %}
 
 {% block footer %}
-<!-- Script para cargar el PDF en el iframe -->
+<!-- Script para cargar el PDF en el iframe con zoom de ancho de página -->
 <script>
   function loadPDF(url) {
-    document.getElementById('pdfFrame').src = url;
+    const pdfUrl = url + '#view=FitH';
+    document.getElementById('pdfFrame').src = pdfUrl;
   }
 </script>
 {% endblock footer %}
@@ -13,14 +14,14 @@
 {% block after_content %}
 <!-- Modal -->
 <div class="modal fade" id="pdfModal" tabindex="-1" role="dialog" aria-labelledby="pdfModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
+  <div class="modal-dialog modal-lg" role="document" style="max-width: 90%; height: 90%;">
+    <div class="modal-content" style="height: 100%;">
       <div class="modal-header">
         <h5 class="modal-title" id="pdfModalLabel">Ver PDF</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body">
-        <iframe id="pdfFrame" style="width:100%;height:500px;" src=""></iframe>
+      <div class="modal-body" style="height: calc(100% - 56px);">
+        <iframe id="pdfFrame" style="width: 100%; height: 100%;" src=""></iframe>
       </div>
     </div>
   </div>
@@ -35,7 +36,6 @@
           <h1 class="display-2">
             <i class="fa fa-{{ plan.documento | pas_icon }}" aria-hidden="true"></i>
             {{ plan.nombre }}
-
           </h1>
           <p class="well text-muted display-6">{{ plan.get_documento_display }}</p>
         </div>
@@ -133,7 +133,7 @@
               {% if plan.evidencia_analisis %}
                 {% if plan.evidencia_analisis.url|slice:"-4:" == ".pdf" %}
                   <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#pdfModal" onclick="loadPDF('{{ plan.evidencia_analisis.url }}')">
-                    Ver PDF
+                    Ver evidencia del análisis
                   </button>
                 {% else %}
                   <a href="{{ plan.evidencia_analisis.url }}" class="btn btn-primary" download>Descargar Evidencia</a>
