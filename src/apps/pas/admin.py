@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.utils.html import format_html
 from .models import Plan, Accion, Seguimiento
 
 
@@ -14,9 +15,7 @@ class SeguimientoInline(admin.TabularInline):
 
 
 class AccionAdmin(admin.ModelAdmin):
-    fields = (
-        'plan', 'accion', 'fecha_inicio', 'fecha_fin', 'responsable',
-    )
+    fields = ('plan', 'accion', 'fecha_inicio', 'fecha_fin', 'responsable')
     inlines = [SeguimientoInline,]
     date_hierarchy = 'fecha_fin'
     ordering = ('fecha_fin', 'id')
@@ -47,8 +46,17 @@ class AccionAdmin(admin.ModelAdmin):
 class AccionInline(admin.TabularInline):
     model = Accion
     extra = 1
-    exclude = ('user',)  # Excluir el campo 'user'
+    exclude = ('user',)
+    fields = ('accion', 'responsable', 'recursos', 'evidencia', 'fecha_inicio', 'fecha_fin', 'edit_link')
+    readonly_fields = ('edit_link',)
     classes = ['collapse']
+
+    def edit_link(self, obj):
+        if obj.id:  # Asegúrate de que el objeto tiene un ID antes de generar el enlace
+            return format_html('<a class="changelink" href="/admin/pas/accion/{}/change/">&nbsp;</a>', obj.id)
+        return "-"
+    edit_link.short_description = 'Seg'
+    edit_link.allow_tags = True
 
     def save_model(self, request, obj, form, change):
         if not obj.user_id:
@@ -95,10 +103,10 @@ class PlanAdmin(admin.ModelAdmin):
             if obj.documento == 1:
                 # Oculta "Plan de Cambios y Mejoras" si documento == 1
                 fieldsets = (
-                    ('Identificación', {'fields': ['fecha_llenado', 'documento', 'nombre']}),  # Identificación común
+                    ('Identificación', {'fields': ['fecha_llenado', 'folio', 'documento', 'nombre']}),  # Identificación común
                     ('Cédula de No Conformidad',
                      {'fields': ['tipo', 'desc_cnc', 'correccion', 'fuente', 'otra_fuente'], 'classes': ['collapse']}),
-                    ('Análisis de la CNC o PCM',
+                    ('Análisis de la Cédula de No Conformidad',
                      {'fields': ['analisis', 'evidencia_analisis'], 'classes': ['collapse']}),
                     ('Cierre',
                      {'fields': ['eliminacion', 'txt_eliminacion', 'recurrencia', 'txt_recurrencia'],
@@ -107,13 +115,13 @@ class PlanAdmin(admin.ModelAdmin):
             elif obj.documento == 2:
                 # Oculta "Cédula de No Conformidad" si documento == 2
                 fieldsets = (
-                    ('Identificación', {'fields': ['fecha_llenado', 'documento', 'nombre']}),  # Identificación común
+                    ('Identificación', {'fields': ['fecha_llenado', 'folio', 'documento', 'nombre']}),  # Identificación común
                     ('Plan de Cambios y Mejoras',
                      {'fields': [
                          'fecha_inicio', 'fecha_termino', 'proposito',
                          'requisito', 'proceso', 'desc_pcm', 'consecuencias'],
                       'classes': ['collapse']}),
-                    ('Análisis de la CNC o PCM',
+                    ('Análisis del Plan de Cambios y Mejoras',
                      {'fields': ['analisis', 'evidencia_analisis'], 'classes': ['collapse']}),
                     ('Cierre',
                      {'fields': ['eliminacion', 'txt_eliminacion', 'recurrencia', 'txt_recurrencia'],

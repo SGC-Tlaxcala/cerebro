@@ -44,8 +44,30 @@
                   <li>Proceso: <span class="bg-secundary">{{ plan.get_proceso_display  }}</span> </li>
                   <li>Requisito: <span class="badge bg-success">{{ plan.requisito }}</span></li>
                 {% endif %}
-                <li>Acciones: <span class="badge bg-primary">{{ plan.accion_set.count }}</span></li>
               </ul>
+              <div class="mt-3 mb-4">
+                <h5>Actividades en el plan</h5>
+                <table class="table">
+                  <tbody>
+                    <tr>
+                      <td>Cerradas</td>
+                      <td><span class="badge bg-success">{{ plan.cerradas }}</span></td>
+                    </tr>
+                    <tr>
+                      <td>Abiertas en Tiempo</td>
+                      <td><span class="badge bg-warning">{{ plan.abiertas_en_tiempo }}</span></td>
+                    </tr>
+                    <tr>
+                      <td>Abiertas Fuera de Tiempo</td>
+                      <td><span class="badge bg-danger">{{ plan.abiertas_fuera_de_tiempo }}</span></td>
+                    </tr>
+                  <tr>
+                    <td><strong>Total de acciones</strong></td>
+                    <td><strong><span class="badge bg-primary">{{ plan.accion_set.count }}</span></strong></td>
+                  </tr>
+                  </tbody>
+                </table>
+              </div>
               <a href="{% url 'pas:detalle' plan.id %}" class="btn btn-lg btn-block btn-primary">Ver detalles</a>
             </div>
           </div>

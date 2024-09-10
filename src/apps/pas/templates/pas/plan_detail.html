@@ -1,6 +1,8 @@
 {% extends 'base.html' %}
 {% load pas_tags %}
 
+{% block head_title %} {% if plan.documento == 1 %} CNC: {{ plan.nombre }}{% else %} PCM: {{ plan.nombre }}{% endif %}{% endblock head_title %}
+
 {% block footer %}
 <!-- Script para cargar el PDF en el iframe con zoom de ancho de página -->
 <script>
@@ -8,11 +10,20 @@
     const pdfUrl = url + '#view=FitH';
     document.getElementById('pdfFrame').src = pdfUrl;
   }
+
+  function loadActionContent(url) {
+    fetch(url)
+      .then(response => response.text())
+      .then(html => {
+        document.getElementById('actionModalContent').innerHTML = html;
+      })
+      .catch(error => console.error('Error loading action content:', error));
+  }
 </script>
 {% endblock footer %}
 
 {% block after_content %}
-<!-- Modal -->
+<!-- Modal for PDF -->
 <div class="modal fade" id="pdfModal" tabindex="-1" role="dialog" aria-labelledby="pdfModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document" style="max-width: 90%; height: 90%;">
     <div class="modal-content" style="height: 100%;">
@@ -26,10 +37,27 @@
     </div>
   </div>
 </div>
+
+<!-- Modal for Action Content -->
+<div class="modal fade" id="actionModal" tabindex="-1" role="dialog" aria-labelledby="actionModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="actionModalLabel">Detalles de la Acción</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="actionModalContent">
+        <!-- Content will be loaded here -->
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock after_content %}
 
-{% block before_content %}
-  <div class="container py-4">
+{% block before_content %}{% endblock before_content %}
+
+{% block content %}
+    <div class="container py-4">
     <div class="row p-5 mb-4 bg-body-tertiary rounded-3">
       <div class="col">
         <div class="jumbotron">
@@ -58,9 +86,8 @@
               id="causa-tab" data-bs-toggle="tab" href="#causa-panel" role="tab" aria-controls="causa-panel" aria-selected="false"><i class="fa fa-paw"></i> Causa raíz</a>
           </li><!-- ./causa-tab -->
           <li class="nav-item" role="presentation">
-            <a class="nav-link{% if plan.documento == 2 %} disabled{% endif %}"
-              {% if plan.documento == 2 %} aria-disabled="true"{% endif %}
-              id="correccion-tab" data-bs-toggle="tabl" href="#correccion-panel" role="tab" aria-controls="correccion-panel" aria-selected="false"><i class="fa fa-fire-extinguisher"></i> Corrección</a>
+            <a class="nav-link{% if plan.documento == 2 %} disabled{% endif %}" {% if plan.documento == 2 %} aria-disabled="true"{% endif %}
+              id="correccion-tab" data-bs-toggle="tab" href="#correccion-panel" role="tab" aria-controls="correccion-panel" aria-selected="false"><i class="fa fa-fire-extinguisher"></i> Corrección</a>
           </li><!-- ./correccion-tab -->
           <li class="nav-item" role="presentation">
             <a class="nav-link"
@@ -70,9 +97,7 @@
       </div>
     </div>
   </div>
-{% endblock before_content %}
 
-{% block content %}
   <div class="tab-content" id="tab-content">
     <div class="tab-pane active" id="identificacion-panel" role="tabpanel" aria-labelledby="identificacion-tab">
       <div class="row tab-pane active" id="identificacion-panel">
@@ -86,7 +111,22 @@
                 <hr class="">
               </div><!-- ./nombre y folio <-/ -->
               {% if plan.documento == 1 %}
-                <h2>Aquí va un PAS CNC</h2>
+                <div class="row"><!-- Fechas y tipo -->
+                  <div class="col-md-1"><strong>Fecha</strong></div>
+                  <div class="col-md-5">{{ plan.fecha_llenado }}</div>
+
+                  <div class="col-md-2"><strong>Tipo de acción correctiva</strong></div>
+                  <div class="col-md-4">{{ plan.get_tipo_display }}</div>
+                  <hr>
+                </div><!-- ./Fechas y tipo -->
+                <div class="row"><!-- Descripción CNC -->
+                  <div class="col-md-1"><strong>Fuente</strong></div>
+                  <div class="col-md-11">{{ plan.get_fuente_display }}</div>
+
+                  <div class="col-md-1"><strong>Descripción</strong></div>
+                  <div class="col-md-11">{{ plan.desc_cnc|safe }}</div>
+                  <hr>
+                </div><!-- ./Descripción CNC -->
               {% else %}<!-- PCM identificación -->
                 <div class="row"><!-- Fechas -->
                   <div class="col-md-1"><strong>Fecha llenado</strong></div>
@@ -133,7 +173,7 @@
               {% if plan.evidencia_analisis %}
                 {% if plan.evidencia_analisis.url|slice:"-4:" == ".pdf" %}
                   <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#pdfModal" onclick="loadPDF('{{ plan.evidencia_analisis.url }}')">
-                    Ver evidencia del análisis
+                    Ver evidencia
                   </button>
                 {% else %}
                   <a href="{{ plan.evidencia_analisis.url }}" class="btn btn-primary" download>Descargar Evidencia</a>
@@ -182,32 +222,39 @@
           <table class="table table-bordered table-hover">
             <thead>
               <tr>
-                <th class="col-md-5">Acción</th>
-                <th class="col-md-1">Fecha</th>
-                <th class="col-md-2">Responsable</th>
-                <th class="col-md-1">Seguimiento</th>
-                <th class="col-md-2">Estado</th>
+                <th class="text-center col-md-1">Núm</th>
+                <th class="col-md-4 text-center">Actividades</th>
+                <th class="col-md-1 text-center">Fecha</th>
+                <th class="col-md-1 text-center">Responsable</th>
+                <th class="col-md-1 text-center">Recursos</th>
+                <th class="col-md-2 text-center">Evidencia</th>
+                <th class="col-md-1 text-center">Seguimiento</th>
+                <th class="col-md-2 text-center">Estado</th>
               </tr>
             </thead>
             <tbody>
-              {% for a in plan.accion_set.all %}
+              {% for action in plan.accion_set.all %}
                 <tr>
-                  <td>{{ a.accion|safe }}</td>
-                  <td>{{ a.fecha_fin|date:"d/m/Y" }}</td>
-                  <td>{{ a.responsable }}</td>
-                  <td>
-                    <a type="button" class="btn btn-danger" data-toggle="modal" data-target="#myModal"
-                       href="#">
-                      {{ a.seguimiento_set.count }}
-                    </a>
-                  </td>
-                  <td>{{ a.get_estado }}</td>
+                  <td class="text-center align-middle">{{ forloop.counter }}</td>
+                  <td class="align-middle">{{ action.accion|safe }}</td>
+                  <td class="text-center align-middle">{{ action.fecha_fin|date:"d/m/Y" }}</td>
+                  <td class="text-center align-middle">{{ action.responsable }}</td>
+                  <td class="text-center align-middle">{{ action.recursos }}</td>
+                  <td class="text-center align-middle">{{ action.evidencia }}</td>
+                  <td class="text-center align-middle">
+                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#actionModal" onclick="loadActionContent('{% url 'pas:action' action.id %}')">
+                      {{ action.seguimiento_set.count }}
+                    </button>
+                  </td><!-- ./Seguimiento -->
+                  <td class="align-middle">{{ action.get_estado }}</td>
                 </tr>
               {% endfor %}
             </tbody>
           </table>
         </div>
-        <div class="panel-footer">Panel footer</div>
+        <div class="panel-footer">
+          <strong>Total de acciones: </strong> {{ plan.accion_set.count }}
+        </div>
       </div>
     </div>
   </div>

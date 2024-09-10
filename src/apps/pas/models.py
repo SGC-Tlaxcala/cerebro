@@ -141,10 +141,11 @@ class Plan(TrackingFields):
 class Accion(TrackingFields):
     plan = models.ForeignKey(Plan, on_delete=models.CASCADE)
     accion = HTMLField()
-    recursos = HTMLField(blank=True, null=True)
+    responsable = models.CharField(blank=True, null=True, max_length=255, help_text='Iniciales del Responsable')
+    recursos = models.CharField(blank=True, null=True, max_length=255, help_text='Recursos necesarios para realizar la actividad')
+    evidencia = models.CharField(max_length=255, blank=True, null=True, help_text='Evidencia documental esperada')
     fecha_inicio = models.DateField(blank=True, null=True)
     fecha_fin = models.DateField(blank=True, null=True)
-    responsable = models.CharField(blank=True, null=True, max_length=5, help_text='Iniciales del Responsable')
 
     class Meta:
         verbose_name = _(u'Actividad')

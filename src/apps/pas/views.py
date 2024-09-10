@@ -8,6 +8,30 @@ class PASIndex(ListView):
     model = Plan
     template_name = 'pas/index.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        plan_list = Plan.objects.all()
+
+        for plan in plan_list:
+            cerradas = 0
+            abiertas_en_tiempo = 0
+            abiertas_fuera_de_tiempo = 0
+
+            for accion in plan.accion_set.all():
+                estado = accion.get_estado
+                if estado == 'Cerrada':
+                    cerradas += 1
+                elif estado == 'Abierta en Tiempo':
+                    abiertas_en_tiempo += 1
+                elif estado == 'Abierta Fuera de Tiempo':
+                    abiertas_fuera_de_tiempo += 1
+
+            plan.cerradas = cerradas
+            plan.abiertas_en_tiempo = abiertas_en_tiempo
+            plan.abiertas_fuera_de_tiempo = abiertas_fuera_de_tiempo
+
+        context['plan_list'] = plan_list
+        return context
 
 class PASAdd(CreateView):
     model = Plan
@@ -27,10 +51,5 @@ class PASDetail(DetailView):
     model = Plan
 
 
-# @render_to('seguimiento.html')
-# def seguimiento(request, id):
-#     accion = Accion.objects.get(pk=id)
-#     return {
-#         'title': 'Lista de actividades de seguimiento',
-#         'accion': accion
-#     }
+class PASAction(DetailView):
+    model = Accion
