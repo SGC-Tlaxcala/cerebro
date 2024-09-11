@@ -22,3 +22,8 @@ def pas_icon(documento):
         return 'bug'
     elif documento == 2:
         return 'thumbs-o-up'
+
+
+@register.filter
+def endswith(value, arg):
+    return value.endswith(arg)

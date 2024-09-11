@@ -152,6 +152,10 @@ class Accion(TrackingFields):
         verbose_name_plural = _('Actividades')
 
     @property
+    def estado(self):
+        return self.seguimiento_set.latest().estado
+
+    @property
     def get_estado(self):
         """Regresa el estado de una acción correctiva, de acuerdo al último seguimiento capturado."""
         if self.seguimiento_set.count() == 0:

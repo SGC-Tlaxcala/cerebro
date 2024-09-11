@@ -1,6 +1,31 @@
 {% extends 'base.html' %}
 {% load pas_tags %}
 
+{% block footer %}
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+      var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+      })
+    });
+
+    function loadPDF(url) {
+      const pdfUrl = url + '#view=FitH';
+      document.getElementById('pdfFrame').src = pdfUrl;
+    }
+
+    function loadActionContent(url) {
+      fetch(url)
+        .then(response => response.text())
+        .then(html => {
+          document.getElementById('actionModalContent').innerHTML = html;
+        })
+        .catch(error => console.error('Error loading action content:', error));
+    }
+  </script>
+  {% endblock footer %}
+
 {% block before_content %}
   <div class="container py-4">
      <div class="p-5 mb-4 bg-body-tertiary rounded-3">
@@ -18,10 +43,109 @@
     </div>
 {% endblock before_content %}
 
+{% block after_content %}
+<!-- Modal for PDF -->
+<div class="modal fade" id="pdfModal" tabindex="-1" role="dialog" aria-labelledby="pdfModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document" style="max-width: 90%; height: 90%;">
+    <div class="modal-content" style="height: 100%;">
+      <div class="modal-header">
+        <h5 class="modal-title" id="pdfModalLabel">Ver PDF</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" style="height: calc(100% - 56px);">
+        <iframe id="pdfFrame" style="width: 100%; height: 100%;" src=""></iframe>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal for Action Content -->
+<div class="modal fade" id="actionModal" tabindex="-1" role="dialog" aria-labelledby="actionModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="actionModalLabel">Detalles de la Acción</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="actionModalContent">
+        <!-- Content will be loaded here -->
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock after_content %}
+
 {% block content %}
   <div class="row">
-    <h3 class="display-2">Planes de acción abiertos</h3>
+    <div class="col">
+      <ul class="nav nav-tabs nav-fill" role="tablist">
+        <li class="nav-item" role="presentation">
+          <a class="nav-link active" id="actions-tab" data-bs-toggle="tab" href="#actions" role="tab" aria-controls="cnc" aria-selected="true"><i class="fa fa-list" aria-hidden="true"></i> Lista de Actividades</a>
+        </li>
+        <li class="nav-item" role="presentation">
+          <a class="nav-link" id="plans-tab" data-bs-toggle="tab" href="#plans" role="tab" aria-controls="pcm" aria-selected="false"><i class="fa fa-tasks" aria-hidden="true"></i>  Planes</a>
+        </li>
+      </ul>
+    </div>
+  </div>
 
+  <div class="tab-content">
+    <div class="tab-pane fade show active" id="actions" role="tabpanel" aria-labelledby="actions-tab">
+      <h3 class="display-2"><i class="fa fa-list" aria-hidden="true"></i> Lista de Actividades</h3>
+      <table class="table table-bordered table-hover">
+        <thead>
+          <tr>
+            <th class="text-center col-md-1">Núm</th>
+            <th class="col-md-1 text-center">Plan</th>
+            <th class="col-md-7 text-center">Actividades</th>
+            <th class="col-md-1 text-center">Fecha</th>
+            <th class="col-md-1 text-center">Responsable</th>
+            <th class="col-md-1 text-center">Seguimiento</th>
+            <th class="col-md-1 text-center">Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for action in action_list %}
+            <tr>
+              <td class="text-center align-middle">{{ forloop.counter }}</td>
+              <td class="text-center align-middle">{{ action.plan.folio }}</td>
+              <td class="align-middle">{{ action.accion|safe }}</td>
+              <td class="text-center align-middle">{{ action.fecha_fin | date:"d/m/Y" }}</td>
+              <td class="text-center align-middle">{{ action.responsable }}</td>
+              <td class="text-center align-middle">
+                    <button type="button" class="btn
+                      {% if action.get_estado == 'Cerrada' %}btn-success
+                      {% elif action.get_estado == 'Abierta en Tiempo' %}btn-warning
+                      {% elif action.get_estado == 'Abierta Fuera de Tiempo' %}btn-danger
+                      {% endif %}"
+                      data-bs-toggle="modal" data-bs-target="#actionModal" onclick="loadActionContent('{% url 'pas:action' action.id %}')">
+                      {{ action.seguimiento_set.count }}
+                    </button>
+                  </td><!-- ./Seguimiento -->
+              <td class="text-center align-middle">
+                {% if action.get_estado == 'Cerrada' %}
+                  <i class="fa fa-check-circle text-success" aria-hidden="true" data-bs-toggle="tooltip" title="Cerrada"></i>
+                {% elif action.get_estado == 'Abierta en Tiempo' %}
+                  <i class="fa fa-exclamation-circle text-warning" aria-hidden="true" data-bs-toggle="tooltip" title="Abierta en Tiempo"></i>
+                {% elif action.get_estado == 'Abierta Fuera de Tiempo' %}
+                  <i class="fa fa-times-circle text-danger" aria-hidden="true" data-bs-toggle="tooltip" title="Abierta Fuera de Tiempo"></i>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div><!-- ./actions-tab ./tab-pane ./#actions -->
+    <div class="tab-pane fade" id="plans" role="tabpanel" aria-labelledby="plans-tab">
+      Lista de planes
+    </div><!-- ./plans-tab ./tab-pane ./#plans -->
+  </div>
+
+
+
+
+  <div class="row">
+    <h3 class="display-2">Planes de acción abiertos</h3>
     <div class="row">
       {% for plan in plan_list %}
 
