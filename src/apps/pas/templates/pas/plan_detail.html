@@ -241,7 +241,7 @@
                   <td class="text-center align-middle">{{ action.fecha_fin | date:"d/m/Y" }}</td>
                   <td class="text-center align-middle">{{ action.responsable }}</td>
                   <td class="text-center align-middle">{{ action.recursos }}</td>
-                  <td class="text-center align-middle">{{ action.evidencia }}</td>
+                  <td class="text-center align-middle">{% if action.evidencia %}{{ action.evidencia }}{% endif %}</td>
                   <td class="text-center align-middle">
                     <button type="button" class="btn
                       {% if action.get_estado == 'Cerrada' %}btn-success

@@ -104,7 +104,10 @@
             <tr>
               <td class="text-center align-middle">{{ forloop.counter }}</td>
               <td class="text-center align-middle"><a href="{% url 'pas:detalle' action.plan.id %}">{{ action.plan.folio }}</a></td>
-              <td class="align-middle">{{ action.accion|safe }}</td>
+              <td class="align-middle">
+                {{ action.accion|safe }}
+                {% if action.evidencia %}<p class="small text-muted"><strong>Evidencia solicitada: </strong>{{ action.evidencia }}</p>{% endif %}
+              </td>
               <td class="text-center align-middle">{{ action.fecha_fin | date:"d/m/Y" }}</td>
               <td class="text-center align-middle">{{ action.responsable }}</td>
               <td class="text-center align-middle">

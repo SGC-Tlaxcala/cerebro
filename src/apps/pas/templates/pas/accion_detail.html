@@ -12,8 +12,13 @@
   <div class="col-6"><strong>Fecha de Finalización</strong> {{ accion.fecha_fin|date:"d/m/Y" }}</div>
   <div class="col-6"><strong>Responsable</strong> {{ accion.responsable }}</div>
   <div class="col-6"><strong>Estado</strong> {{ accion.get_estado }}</div>
+  <div class="col-3"><strong>Evidencia solicitada</strong></div>
+  <div class="col-9">{% if accion.evidencia %}{{ accion.evidencia }}{% endif %}</div>
 </div>
 
+{% if accion.seguimiento_set.count == 0 %}
+    <h4 class="text-center text-danger">No hay seguimientos registrados</h4>
+{% else %}
   <table class="table table-bordered table-hover">
     <thead>
       <tr>
@@ -50,4 +55,5 @@
       {% endfor %}
     </tbody>
   </table>
+{% endif %}
 </div>
