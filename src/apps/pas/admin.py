@@ -58,6 +58,21 @@ class AccionInline(admin.TabularInline):
     edit_link.short_description = 'Seg'
     edit_link.allow_tags = True
 
+    def save_formset(self, request, form, formset, change):
+        instances = formset.save(commit=False)
+        for instance in instances:
+            instance.user = request.user
+            instance.save()
+        formset.save_m2m()
+
+    def save_related(self, request, form, formsets, change):
+        super().save_related(request, form, formsets, change)
+        for formset in formsets:
+            for obj in formset.save(commit=False):
+                if isinstance(obj, Accion) and not obj.user_id:
+                    obj.user = request.user
+                    obj.save()
+
     def save_model(self, request, obj, form, change):
         if not obj.user_id:
             obj.user = request.user
@@ -95,6 +110,11 @@ class PlanAdmin(admin.ModelAdmin):
                 if isinstance(obj, Accion) and not obj.user_id:
                     obj.user = request.user
                     obj.save()
+
+    def save_model(self, request, obj, form, change):
+        if not obj.user_id:
+            obj.user = request.user
+        super().save_model(request, obj, form, change)
 
     def get_fieldsets(self, request, obj=None):
         fieldsets = super().get_fieldsets(request, obj)
