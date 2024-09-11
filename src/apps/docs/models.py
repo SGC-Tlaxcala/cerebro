@@ -116,13 +116,14 @@ class Documento (models.Model):
 
     def ext(self) -> str:
         """
-        Función clave.
+        Función ext.
 
-        Devuelve la clave del documento, que es única y se forma por
-        el tipo de documento (tres letras) y la identificación del
-        documento.
+        Devuelve la extensión del documento.
         """
-        return "%s-%02d" % (self.tipo.slug, self.id)
+        try:
+            return self.revision_set.latest('revision').archivo.url.split('.')[-1]
+        except IndexError:
+            return ""
 
     def save(self, *args, **kwargs) -> None:
         """Actividades antes de ejecutar save."""
