@@ -1,0 +1,40 @@
+<div class="modal-header">
+  <h4 class="modal-title">{{ accion.plan.folio }} <small>Actividad de Seguimiento: {{ accion.id }}</small></h4>
+</div>
+<div class="modal-body">
+<div class="row">
+  <div class="col-12">{{ accion.accion|safe }}</div>
+</div>
+
+<div class="row mb-3">
+  <div class="col-6"><strong>Fecha de Inicio</strong> {{ accion.fecha_inicio|date:"d/m/Y" }}</div>
+  <div class="col-6"><strong>Fecha de Finalización</strong> {{ accion.fecha_fin|date:"d/m/Y" }}</div>
+  <div class="col-6"><strong>Responsable</strong> {{ accion.responsable }}</div>
+  <div class="col-6"><strong>Estado</strong> {{ accion.get_estado }}</div>
+</div>
+
+  <table class="table table-bordered table-hover">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Descripción</th>
+        <th>Fecha</th>
+        <th>Estado</th>
+        <th>Responsable</th>
+        <th>Evidencia</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for s in accion.seguimiento_set.all %}
+      <tr>
+        <td>{{ s.id }}</td>
+        <td>{{ s.descripcion|safe }}</td>
+        <td>{{ s.fecha|date:"d/m/Y" }}</td>
+        <td>{{ s.get_estado_display }}</td>
+        <td>{{ s.responsable }}</td>
+        <td><a href="/media/{{ s.evidencia }}">Descargar</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>

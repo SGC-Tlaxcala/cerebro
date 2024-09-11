@@ -135,16 +135,17 @@ class Plan(TrackingFields):
     txt_recurrencia = HTMLField(blank=True, null=True)
 
     def __str__(self):
-        return u'%s - %s' % (self.id, self.nombre)
+        return u'%s - %s' % (self.folio, self.nombre)
 
 
 class Accion(TrackingFields):
     plan = models.ForeignKey(Plan, on_delete=models.CASCADE)
     accion = HTMLField()
-    recursos = HTMLField(blank=True, null=True)
+    responsable = models.CharField(blank=True, null=True, max_length=255, help_text='Iniciales del Responsable')
+    recursos = models.CharField(blank=True, null=True, max_length=255, help_text='Recursos necesarios para realizar la actividad')
+    evidencia = models.CharField(max_length=255, blank=True, null=True, help_text='Evidencia documental esperada')
     fecha_inicio = models.DateField(blank=True, null=True)
     fecha_fin = models.DateField(blank=True, null=True)
-    responsable = models.ForeignKey(User, related_name='pas_responsable', on_delete=models.CASCADE)
 
     class Meta:
         verbose_name = _(u'Actividad')
@@ -168,10 +169,10 @@ class Accion(TrackingFields):
 class Seguimiento(TrackingFields, models.Model):
     accion = models.ForeignKey(Accion, on_delete=models.CASCADE)
     descripcion = HTMLField()
-    fecha = models.DateField()
+    fecha = models.DateField(help_text="Fecha de la actualización")
     evidencia = models.FileField(upload_to='pas', blank=True, null=True)
     estado = models.IntegerField(choices=A_ESTADO)
-    responsable = models.ForeignKey(User, related_name='pas_seguimiento_responsable', on_delete=models.CASCADE)
+    responsable = models.CharField(max_length=5, help_text='Iniciales del Responsable', blank=True, null=True)
 
     class Meta:
         verbose_name = _(u'Seguimiento de Acciones')
