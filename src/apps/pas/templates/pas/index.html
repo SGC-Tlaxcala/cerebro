@@ -26,22 +26,7 @@
   </script>
   {% endblock footer %}
 
-{% block before_content %}
-  <div class="container py-4">
-     <div class="p-5 mb-4 bg-body-tertiary rounded-3">
-          <h1 class="display-5 fw-bold"><i class="fa fa-bug" aria-hidden="true"></i> Control de Planes de Acción</h1>
-          <p class="col fs-4">
-            La organización debe determinar y seleccionar las oportunidades de mejora e implementar las acciones necesarias para cumplir los requisitos del
-            cliente y aumentar la satisfacción del cliente.
-          </p>
-          <p>
-            <a href="javascript:void(0)" class="btn btn-lg btn-danger"><i class="fa fa-check-square-o" aria-hidden="true"></i> Seguimiento</a>
-            <a href="javascript:void(0)" class="btn btn-lg btn-success"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Acción Compromiso</a>
-            <a href="{% url 'pas:add' %}" class="btn btn-lg btn-info"><i class="fa fa-plus-square-o" aria-hidden="true"></i> Agregar un PAS</a>
-          </p>
-        </div>
-    </div>
-{% endblock before_content %}
+{% block before_content %}{% endblock before_content %}
 
 {% block after_content %}
 <!-- Modal for PDF -->
@@ -76,11 +61,21 @@
 {% endblock after_content %}
 
 {% block content %}
+  <div class="container py-4">
+     <div class="p-5 mb-4 bg-body-tertiary rounded-3">
+          <h1 class="display-5 fw-bold"><i class="fa fa-bug" aria-hidden="true"></i> Control de Planes de Acción</h1>
+          <p class="col fs-4">
+            La organización debe determinar y seleccionar las oportunidades de mejora e implementar las acciones necesarias para cumplir los requisitos del
+            cliente y aumentar la satisfacción del cliente.
+          </p>
+        </div>
+    </div>
+
   <div class="row">
     <div class="col">
       <ul class="nav nav-tabs nav-fill" role="tablist">
         <li class="nav-item" role="presentation">
-          <a class="nav-link active" id="actions-tab" data-bs-toggle="tab" href="#actions" role="tab" aria-controls="cnc" aria-selected="true"><i class="fa fa-list" aria-hidden="true"></i> Lista de Actividades</a>
+          <a class="nav-link active" id="actions-tab" data-bs-toggle="tab" href="#actions" role="tab" aria-controls="cnc" aria-selected="true"><i class="fa fa-list" aria-hidden="true"></i> Actividades</a>
         </li>
         <li class="nav-item" role="presentation">
           <a class="nav-link" id="plans-tab" data-bs-toggle="tab" href="#plans" role="tab" aria-controls="pcm" aria-selected="false"><i class="fa fa-tasks" aria-hidden="true"></i>  Planes</a>
@@ -108,7 +103,7 @@
           {% for action in action_list %}
             <tr>
               <td class="text-center align-middle">{{ forloop.counter }}</td>
-              <td class="text-center align-middle">{{ action.plan.folio }}</td>
+              <td class="text-center align-middle"><a href="{% url 'pas:detalle' action.plan.id %}">{{ action.plan.folio }}</a></td>
               <td class="align-middle">{{ action.accion|safe }}</td>
               <td class="text-center align-middle">{{ action.fecha_fin | date:"d/m/Y" }}</td>
               <td class="text-center align-middle">{{ action.responsable }}</td>
@@ -137,66 +132,49 @@
       </table>
     </div><!-- ./actions-tab ./tab-pane ./#actions -->
     <div class="tab-pane fade" id="plans" role="tabpanel" aria-labelledby="plans-tab">
-      Lista de planes
+      <h3 class="display-2"><i class="fa fa-tasks" aria-hidden="true"></i> Lista de Planes</h3>
+      <table class="table table-bordered table-hover">
+        <thead>
+          <tr>
+            <th class="col-md-1 text-center">Núm</th>
+            <th class="col-md-2 text-center">Folio</th>
+            <th class="col-md-1 text-center">Tipo</th>
+            <th class="col-md-5 text-center">Nombre</th>
+            <th class="col-md-2 text-center">Actividades</th>
+            <th class="col-md-1 text-center">Fecha</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for plan in plan_list %}
+            <tr>
+              <td class="text-center align-middle">{{ forloop.counter }}</td>
+              <td class="text-center align-middle"><a href="{% url 'pas:detalle' plan.id %}">{{ plan.folio }}</a></td>
+              <td class="text-center align-middle">
+                <i class="fa fa-{{ plan.documento | pas_icon }}" aria-hidden="true" data-bs-toggle="tooltip" title="{{ plan.get_documento_display }}"></i>
+              </td>
+              <td class="align-middle">
+                <strong class="text-primary">{{ plan.nombre }}</strong><hr />
+                {% if plan.documento == 1 %}
+                  {{ plan.desc_cnc|truncatewords_html:30|safe }}
+                {% else %}
+                  {{ plan.desc_pcm|truncatewords_html:30|safe }}
+                {% endif %}
+              </td>
+              <td class="text-center align-middle">
+                <span class="badge bg-success" data-bs-toggle="tooltip" title="{{ plan.cerradas }} actividades cerradas">{{ plan.cerradas }}</span>
+                &nbsp;
+                <span class="badge bg-warning" data-bs-toggle="tooltip" title="{{ plan.abiertas_en_tiempo }} actividades abiertas en tiempo">{{ plan.abiertas_en_tiempo }}</span>
+                &nbsp;
+                <span class="badge bg-danger" data-bs-toggle="tooltip" title="{{ plan.abiertas_fuera_de_tiempo }} actividades abiertas fuera de tiempo">{{ plan.abiertas_fuera_de_tiempo }}</span>
+                =
+                <span class="badge bg-primary" data-bs-toggle="tooltip" title="{{ plan.accion_set.count }} acciones en total"><strong>{{ plan.accion_set.count }}</strong></span>
+              </td>
+              <td class="text-center align-middle">{{ plan.fecha_llenado | date:"d/m/Y" }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div><!-- ./plans-tab ./tab-pane ./#plans -->
   </div>
 
-
-
-
-  <div class="row">
-    <h3 class="display-2">Planes de acción abiertos</h3>
-    <div class="row">
-      {% for plan in plan_list %}
-
-        <div class="col-md-4">
-          <div class="card mb-4 shadow-sm border-{% pas_color plan.documento %}">
-            <div class="card-header bg-{% pas_color plan.documento %}">
-              <h4 class="my-0 fw-normal text-bg-{% pas_color plan.documento %}">{{ plan.nombre }}</h4>
-            </div>
-            <div class="card-body">
-              {% if plan.documento == 1 %}
-                <p>{{ plan.desc_cnc|safe }}</p>
-              {% else %}
-                <p>{{ plan.desc_pcm|safe }}</p>
-              {% endif %}
-              <ul class="list-unstyled mt-3 mb-4">
-                {% if plan.documento == 1 %}
-                  <li>Tipo: <span class="badge bg-primary">{{ plan.get_tipo_display }}</span></li>
-                {% else %}
-                  <li>Propósito: <span>{{ plan.proposito }}</span> </li>
-                  <li>Proceso: <span class="bg-secundary">{{ plan.get_proceso_display  }}</span> </li>
-                  <li>Requisito: <span class="badge bg-success">{{ plan.requisito }}</span></li>
-                {% endif %}
-              </ul>
-              <div class="mt-3 mb-4">
-                <h5>Actividades en el plan</h5>
-                <table class="table">
-                  <tbody>
-                    <tr>
-                      <td>Cerradas</td>
-                      <td><span class="badge bg-success">{{ plan.cerradas }}</span></td>
-                    </tr>
-                    <tr>
-                      <td>Abiertas en Tiempo</td>
-                      <td><span class="badge bg-warning">{{ plan.abiertas_en_tiempo }}</span></td>
-                    </tr>
-                    <tr>
-                      <td>Abiertas Fuera de Tiempo</td>
-                      <td><span class="badge bg-danger">{{ plan.abiertas_fuera_de_tiempo }}</span></td>
-                    </tr>
-                  <tr>
-                    <td><strong>Total de acciones</strong></td>
-                    <td><strong><span class="badge bg-primary">{{ plan.accion_set.count }}</span></strong></td>
-                  </tr>
-                  </tbody>
-                </table>
-              </div>
-              <a href="{% url 'pas:detalle' plan.id %}" class="btn btn-lg btn-block btn-primary">Ver detalles</a>
-            </div>
-          </div>
-        </div>
-      {% endfor %}
-    </div>
-  </div>
 {% endblock content %}
