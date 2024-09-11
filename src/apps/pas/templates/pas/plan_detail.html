@@ -57,7 +57,7 @@
 {% block before_content %}{% endblock before_content %}
 
 {% block content %}
-    <div class="container py-4">
+  <div class="container py-4">
     <div class="row p-5 mb-4 bg-body-tertiary rounded-3">
       <div class="col">
         <div class="jumbotron">
@@ -66,6 +66,7 @@
             {{ plan.nombre }}
           </h1>
           <p class="well text-muted display-6">{{ plan.get_documento_display }}</p>
+          <p><a class="btn btn-outline-primary btn-lg">Regresar al control de Planes</a></p>
         </div>
       </div>
     </div>
@@ -237,12 +238,17 @@
                 <tr>
                   <td class="text-center align-middle">{{ forloop.counter }}</td>
                   <td class="align-middle">{{ action.accion|safe }}</td>
-                  <td class="text-center align-middle">{{ action.fecha_fin|date:"d/m/Y" }}</td>
+                  <td class="text-center align-middle">{{ action.fecha_fin | date:"d/m/Y" }}</td>
                   <td class="text-center align-middle">{{ action.responsable }}</td>
                   <td class="text-center align-middle">{{ action.recursos }}</td>
                   <td class="text-center align-middle">{{ action.evidencia }}</td>
                   <td class="text-center align-middle">
-                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#actionModal" onclick="loadActionContent('{% url 'pas:action' action.id %}')">
+                    <button type="button" class="btn
+                      {% if action.get_estado == 'Cerrada' %}btn-success
+                      {% elif action.get_estado == 'Abierta en Tiempo' %}btn-warning
+                      {% elif action.get_estado == 'Abierta Fuera de Tiempo' %}btn-danger
+                      {% endif %}"
+                      data-bs-toggle="modal" data-bs-target="#actionModal" onclick="loadActionContent('{% url 'pas:action' action.id %}')">
                       {{ action.seguimiento_set.count }}
                     </button>
                   </td><!-- ./Seguimiento -->
