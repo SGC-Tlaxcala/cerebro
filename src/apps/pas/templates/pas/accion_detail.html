@@ -1,3 +1,4 @@
+{% load pas_tags %}
 <div class="modal-header">
   <h4 class="modal-title">{{ accion.plan.folio }} <small>Actividad de Seguimiento: {{ accion.id }}</small></h4>
 </div>
@@ -27,12 +28,24 @@
     <tbody>
       {% for s in accion.seguimiento_set.all %}
       <tr>
-        <td>{{ s.id }}</td>
-        <td>{{ s.descripcion|safe }}</td>
-        <td>{{ s.fecha|date:"d/m/Y" }}</td>
-        <td>{{ s.get_estado_display }}</td>
-        <td>{{ s.responsable }}</td>
-        <td><a href="/media/{{ s.evidencia }}">Descargar</a></td>
+        <td class="text-center align-middle">{{ s.id }}</td>
+        <td class="align-middle">{{ s.descripcion|safe }}</td>
+        <td class="text-center align-middle">{{ s.fecha|date:"d/m/Y" }}</td>
+        <td class="text-center align-middle">{{ s.get_estado_display }}</td>
+        <td class="text-center align-middle">{{ s.responsable }}</td>
+        <td class="text-center align-middle">
+          {% if s.evidencia %}
+            {% if s.evidencia.url|endswith:".pdf" %}
+              <a href="{{ s.evidencia.url }}" target="_blank">
+                <i class="fa fa-download" aria-hidden="true" data-bs-toggle="tooltip" title="Ver Evidencia"></i>
+              </a>
+            {% else %}
+              <a href="https://docs.google.com/viewer?url=https://sgctlaxcala.com{{ s.evidencia.url }}" target="_blank">
+                <i class="fa fa-download" aria-hidden="true" data-bs-toggle="tooltip" title="Ver Evidencia"></i>
+              </a>
+            {% endif %}
+          {% endif %}
+        </td>
       </tr>
       {% endfor %}
     </tbody>
