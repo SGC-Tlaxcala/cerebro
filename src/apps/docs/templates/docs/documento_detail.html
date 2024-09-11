@@ -167,7 +167,7 @@
         <div class="col">
           {% if doc.ext == 'pdf' %}
             <div class="col">
-              <embed src="/media/{{ doc.revision_actual.archivo.url }}#toolbar=0" type="application/pdf" width="100%" height="600px" />
+              <embed src="{{ doc.revision_actual.archivo.url }}#toolbar=0" type="application/pdf" width="100%" height="600px" />
             </div>
           {% elif doc.ext == 'doc' or doc.ext == 'docx' or doc.ext == 'xls' or doc.ext == 'xlsx' or doc.ext == 'ppt' or doc.ext == 'pptx' %}
             <div class="col">
