@@ -78,6 +78,7 @@ class IndexLMD(ListView):
         # Buscamos los reportes que existan en el documento actual
         # y los agregamos al contexto
         context['activeLMD'] = True
+        context['panicButton'] = True
         return context
 
 
@@ -100,6 +101,7 @@ class IndexLDP(ListView):
         # Buscamos los reportes que existan en el documento actual
         # y los agregamos al contexto
         context['activeLDP'] = True
+        context['panicButton'] = True
         return context
 
 
@@ -109,6 +111,12 @@ class IndexLDT(ListView):
     model = Documento
     template_name = 'docs/ldt.html'
     context_object_name = 'docs'
+
+    def get_context_data(self, **kwargs):
+        """Agregamos la variable panicButton al contexto de la vista."""
+        context = super().get_context_data(**kwargs)
+        context['panicButton'] = True
+        return context
 
     def get_queryset(self):
         """Genera la consulta de la LMD."""
@@ -126,6 +134,12 @@ class IndexList(ListView):
     model = Documento
     template_name = 'docs/portada.html'
     context_object_name = 'docs'
+
+    def get_context_data(self, **kwargs):
+        """Agregamos la variable panicButton al contexto de la vista."""
+        context = super().get_context_data(**kwargs)
+        context['panicButton'] = True
+        return context
 
     def get_queryset(self):
         """Consulta para la portada. Todos los documentos."""
@@ -288,7 +302,7 @@ class PanicButtonView(FormView):
 
     def get_initial(self):
         """Inicializamos el formulario con el documento actual
-            para usarlo en el template y el registro que se guarda
+            para usarlo en el templates y el registro que se guarda
             en la base de datos."""
         initial = super(PanicButtonView, self).get_initial()
         initial['documento'] = self.kwargs['pk']
