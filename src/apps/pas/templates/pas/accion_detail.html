@@ -5,6 +5,7 @@
 <div class="modal-body">
 <div class="row">
   <div class="col-12">{{ accion.accion|safe }}</div>
+    <pre>{{ accion.seguimiento_set.latest.estado }}</pre>
 </div>
 
 <div class="row mb-3">

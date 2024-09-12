@@ -1,7 +1,7 @@
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, DetailView
-from django.db.models import Case, When, IntegerField
-from .models import Plan, Accion, CERRADA
+from django.db.models import OuterRef, Subquery
+from .models import Plan, Accion, Seguimiento
 from .forms import PlanForm
 
 
@@ -12,8 +12,14 @@ class PASIndex(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         plan_list = Plan.objects.all()
-        # Ordenar las acciones: cerradas al final y luego por fecha_fin
-        action_list = Accion.objects.all().order_by('fecha_fin')
+        # Subquery to get the latest estado for each Accion
+        latest_estado = Seguimiento.objects.filter(
+            accion=OuterRef('pk')
+        ).order_by('-fecha').values('estado')[:1]
+        # Annotate each Accion with the latest estado
+        action_list = Accion.objects.annotate(
+            latest_estado=Subquery(latest_estado)
+        ).order_by('latest_estado', 'fecha_fin')
 
         for plan in plan_list:
             cerradas = 0
