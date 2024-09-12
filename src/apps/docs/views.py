@@ -288,7 +288,7 @@ class PanicButtonView(FormView):
 
     def get_initial(self):
         """Inicializamos el formulario con el documento actual
-            para usarlo en el template y el registro que se guarda
+            para usarlo en el templates y el registro que se guarda
             en la base de datos."""
         initial = super(PanicButtonView, self).get_initial()
         initial['documento'] = self.kwargs['pk']
