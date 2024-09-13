@@ -7,7 +7,7 @@
     {% include 'partials/_styles.html' %}
     {% block header %}{% endblock header %}
   </head>
-  <body>
+  <body hx-boost="true">
     {% include 'partials/_navbar.html' %}
 
     {% block before_content %}{% endblock before_content %}
