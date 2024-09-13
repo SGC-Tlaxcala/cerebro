@@ -1,5 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.utils import timezone
+from apps.pas.models import TrackingFields
 
 User = get_user_model()
 
@@ -27,7 +29,7 @@ PERIODS = (
 )
 
 
-class KPI(models.Model):
+class KPI(TrackingFields):
     """Model to store Key Performance Objectives (KPOs) & Indicators (KPIs).
 
     Attributes:
@@ -66,11 +68,6 @@ class KPI(models.Model):
 
     active = models.BooleanField('Activo', default=True)
 
-    # Traceability
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, editable=False)
-
     class Meta:
         verbose_name = 'Indicador'
         verbose_name_plural = 'Indicadores'
@@ -84,16 +81,11 @@ class KPI(models.Model):
         return f'{self.get_type_display()}: {self.name} - {self.lapse}'
 
 
-class Record(models.Model):
+class Record(TrackingFields):
     """Model to store the records of the KPIs."""
     kpi = models.ForeignKey(KPI, on_delete=models.CASCADE)
     date = models.DateField('Fecha')
     value = models.FloatField('Valor')
-
-    # Traceability
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, editable=False)
 
     class Meta:
         verbose_name = 'Registro'

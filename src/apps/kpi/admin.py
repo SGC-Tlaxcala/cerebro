@@ -14,7 +14,7 @@ class RecordInline(TabularInline):
 
 @admin.register(KPI)
 class KPIAdmin(admin.ModelAdmin):
-    list_display = ('name', 'type', 'period', 'target', 'active', 'created_at', 'updated_at')
+    list_display = ('name', 'type', 'period', 'target', 'active')
     search_fields = ('name', 'description')
     list_filter = ('type', 'period', 'active')
     ordering = ('pos',)
