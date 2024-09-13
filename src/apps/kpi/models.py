@@ -6,8 +6,8 @@ User = get_user_model()
 KPO = 1
 KPI = 2
 TYPE = (
-    (KPO, 'KPO'),
-    (KPI, 'KPI')
+    (KPO, 'Objetivo'),
+    (KPI, 'Indicador')
 )
 
 # Definition of constant of PERIODS of time
@@ -20,7 +20,10 @@ PERIODS = (
     ('6', 'Cuatrimestral'),
     ('7', 'Semestral'),
     ('8', 'Anual'),
-    ('99', 'Por campaña')
+    ('C', 'Por campaña'),
+    ('R', 'Por campaña/remesa'),
+    ('M', 'Por campaña/mensual'),
+    ('S', 'Por campaña/semanal'),
 )
 
 
@@ -45,13 +48,13 @@ class KPI(models.Model):
     """
 
     # Identification
-    pos = models.IntegerField('Posición', help_text='Posición u orden del KPI')
-    type = models.IntegerField('Tipo', choices=TYPE, help_text='Indica si es una KPO o un KPI')
-    name = models.CharField('Nombre', max_length=255, help_text='Nombre del KPI o KPO')
-    description = models.TextField('Descripción', help_text='Descripción detallada del KPI o KPO')
+    pos = models.IntegerField('Posición', help_text='Posición u orden del Indicador')
+    type = models.IntegerField('Tipo', choices=TYPE, help_text='Indica si es una Objetivo o un KPI')
+    name = models.CharField('Nombre', max_length=255, help_text='Nombre del Objetivo o Indicador')
+    description = models.TextField('Descripción', help_text='Descripción detallada del Objetivo o Indicador')
 
     # Period of time
-    period = models.IntegerField('Periodo', choices=PERIODS)
+    period = models.CharField('Periodo', max_length=1, choices=PERIODS, help_text='Periodo de medición del Indicador')
     period_begin = models.DateField('Inicio')
     period_end = models.DateField('Fin')
     lapse = models.CharField('Lapso', max_length=255, blank=True, null=True, editable=False)
@@ -66,7 +69,7 @@ class KPI(models.Model):
     # Traceability
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, editable=False)
 
     class Meta:
         verbose_name = 'Indicador'
@@ -78,4 +81,24 @@ class KPI(models.Model):
         super(KPI, self).save(*args, **kwargs)
 
     def __str__(self) -> str:
-        return f'{self.name} - {self.lapse}'
+        return f'{self.get_type_display()}: {self.name} - {self.lapse}'
+
+
+class Record(models.Model):
+    """Model to store the records of the KPIs."""
+    kpi = models.ForeignKey(KPI, on_delete=models.CASCADE)
+    date = models.DateField('Fecha')
+    value = models.FloatField('Valor')
+
+    # Traceability
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, editable=False)
+
+    class Meta:
+        verbose_name = 'Registro'
+        verbose_name_plural = 'Registros'
+        ordering = ('kpi', 'date',)
+
+    def __str__(self) -> str:
+        return f'{self.kpi.name} - {self.date}: {self.value}'
