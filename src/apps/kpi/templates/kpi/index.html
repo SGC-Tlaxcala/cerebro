@@ -12,3 +12,22 @@
         </p>
       </div>
   </div>
+
+<pre>
+  {% for kpi in kpis %}
+    {{ kpi.get_type_display }}: {{ kpi.name }}
+    {{ kpi.description }}
+    {{ kpi.formula }} - {{ kpi.lapse }}
+    {{ kpi.period_set.all }}
+    ---
+    {% for period in kpi.period_set.all %}
+      {{ period.period }}
+      {{ period.start }} - {{ period.end }}
+      {{ period.target }}: {{ period.nominal }}
+      ---
+      {% for record in period.record_set.all %}
+        {{ record.date }}: {{ record.value }}
+      {% endfor %}
+    {% endfor %}
+  {% endfor %}
+</pre>
