@@ -1,9 +1,10 @@
 from django.contrib import admin
 from django.contrib.admin import TabularInline
 
-from .models import KPI, Record
+from .models import KPI, Record, Period
 
 class RecordInline(TabularInline):
+    exclude = ('user',)
     model = Record
     extra = 1
 
@@ -12,18 +13,36 @@ class RecordInline(TabularInline):
             obj.user = request.user
         super().save_model(request, obj, form, change)
 
+
+class PeriodInline(TabularInline):
+    exclude = ('user',)
+    model = Period
+    extra = 1
+
+    def save_model(self, request, obj, form, change):
+        if not obj.pk:
+            obj.user = request.user
+        super().save_model(request, obj, form, change)
+
+
 @admin.register(KPI)
 class KPIAdmin(admin.ModelAdmin):
-    list_display = ('name', 'type', 'period', 'target', 'active')
+    exclude = ('user',)
+    list_display = ('name', 'type', 'active')
     search_fields = ('name', 'description')
-    list_filter = ('type', 'period', 'active')
+    list_filter = ('type', 'active')
     ordering = ('pos',)
-    inlines = [RecordInline]
+    inlines = [PeriodInline]
+
+    def save_model(self, request, obj, form, change):
+        if not obj.user_id:
+            obj.user = request.user
+        super().save_model(request, obj, form, change)
 
     def save_related(self, request, form, formsets, change):
         super().save_related(request, form, formsets, change)
         for formset in formsets:
-            if isinstance(formset, RecordInline):
+            if isinstance(formset, PeriodInline):
                 for obj in formset.save(commit=False):
                     if not obj.pk:
                         obj.user = request.user
@@ -32,10 +51,8 @@ class KPIAdmin(admin.ModelAdmin):
 
 @admin.register(Record)
 class RecordAdmin(admin.ModelAdmin):
-    list_display = ('kpi', 'date', 'value')
-    search_fields = ('kpi__name',)
-    list_filter = ('kpi', 'date')
-    ordering = ('kpi', 'date')
+    exclude = ('user',)
+    list_display = ('period', 'date', 'value')
 
     def save_model(self, request, obj, form, change):
         if not obj.pk:
