@@ -13,18 +13,18 @@ TYPE = (
 
 # Definition of constant of PERIODS of time
 PERIODS = (
-    ('1', 'Semanal'),
-    ('2', 'Remesa'),
-    ('3', 'Mensual'),
-    ('4', 'Bimestral'),
-    ('5', 'Trimestral'),
-    ('6', 'Cuatrimestral'),
-    ('7', 'Semestral'),
-    ('8', 'Anual'),
-    ('C', 'Por campaña'),
-    ('R', 'Por campaña/remesa'),
-    ('M', 'Por campaña/mensual'),
-    ('S', 'Por campaña/semanal'),
+    (1, 'Semanal'),
+    (1, 'Remesa'),
+    (3, 'Mensual'),
+    (4, 'Bimestral'),
+    (5, 'Trimestral'),
+    (6, 'Cuatrimestral'),
+    (7, 'Semestral'),
+    (8, 'Anual'),
+    (9, 'Por campaña'),
+    (10, 'Por campaña/remesa'),
+    (11, 'Por campaña/mensual'),
+    (12, 'Por campaña/semanal'),
 )
 
 
@@ -34,6 +34,7 @@ class KPI(TrackingFields):
     name = models.CharField('Nombre', max_length=255, help_text='Nombre del Objetivo o Indicador')
     description = models.TextField('Descripción', help_text='Descripción detallada del Objetivo o Indicador')
     formula = models.TextField('Fórmula')
+    lapse = models.IntegerField('Medición', choices=PERIODS, help_text='Periodo de medición', default=3)
     active = models.BooleanField('Activo', default=True)
 
     class Meta:
