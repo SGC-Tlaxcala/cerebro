@@ -1,0 +1,33 @@
+{% load static %}
+
+<div class="container py-4">
+   <div class="p-5 mb-4 bg-body-tertiary rounded-3">
+        <h1 class="display-5 fw-bold"><i class="fa fa-line-chart" aria-hidden="true"></i> Objetivos e Indicadores</h1>
+        <p class="col fs-4">
+          Los Indicadores permiten al Instituto medir el desempeño de sus procesos clave,
+          asegurando que cumplan con los estándares de calidad de ISO 9001. Ayudan a
+          identificar áreas de mejora continua y a mantener la eficiencia operativa.
+          Además, permiten al Instituto tomar decisiones basadas en datos para cumplir
+          con los objetivos de calidad establecidos.
+        </p>
+      </div>
+  </div>
+
+<pre>
+  {% for kpi in kpis %}
+    {{ kpi.get_type_display }}: {{ kpi.name }}
+    {{ kpi.description }}
+    {{ kpi.formula }} - {{ kpi.lapse }}
+    {{ kpi.period_set.all }}
+    ---
+    {% for period in kpi.period_set.all %}
+      {{ period.period }}
+      {{ period.start }} - {{ period.end }}
+      {{ period.target }}: {{ period.nominal }}
+      ---
+      {% for record in period.record_set.all %}
+        {{ record.date }}: {{ record.value }}
+      {% endfor %}
+    {% endfor %}
+  {% endfor %}
+</pre>
