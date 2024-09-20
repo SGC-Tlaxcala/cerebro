@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.db.models import Sum
 from apps.pas.models import TrackingFields
 
 User = get_user_model()
@@ -77,6 +78,7 @@ class Record(TrackingFields):
     period = models.ForeignKey(Period, on_delete=models.CASCADE)
     date = models.DateField('Fecha')
     value = models.FloatField('Valor')
+    cumulative_value = models.FloatField('Valor Acumulado', default=0)
 
     class Meta:
         verbose_name = 'Registro'
@@ -85,3 +87,10 @@ class Record(TrackingFields):
 
     def __str__(self) -> str:
         return f'{self.period.kpi.name} - {self.date}: {self.value}'
+
+    def save(self, *args, **kwargs):
+        # Calculate the cumulative value
+        previous_records = Record.objects.filter(period=self.period, date__lte=self.date).exclude(pk=self.pk)
+        self.cumulative_value = previous_records.aggregate(total=Sum('value'))['total'] or 0
+        self.cumulative_value += self.value
+        super().save(*args, **kwargs)

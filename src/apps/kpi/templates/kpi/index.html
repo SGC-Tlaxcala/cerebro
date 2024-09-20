@@ -1,11 +1,13 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load compress %}
 
 {% block header %}
   <script src="https://fastly.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
 {% endblock header %}
 
 {% block footer %}
+  {% compress js %}
   <script type="text/javascript">
     var dom = document.getElementById('chart-container');
     var myChart = echarts.init(dom, null, {
@@ -127,6 +129,7 @@
 
     window.addEventListener('resize', myChart.resize);
   </script>
+  {% endcompress %}
 {% endblock footer %}
 
 {% block content %}
@@ -161,7 +164,7 @@
       {{ period.total }} -- {{ period.percent }}
       ---
       {% for record in period.record_set.all %}
-        {{ record.date|date:"M/Y" }}: {{ record.value }}
+        {{ record.date|date:"M/Y" }}: {{ record.value }} -- {{ record.cumulative_value }}
       {% endfor %}
     {% endfor %}
   {% endfor %}
