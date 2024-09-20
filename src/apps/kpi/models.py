@@ -69,7 +69,7 @@ class Period(models.Model):
 
     @property
     def percent(self):
-        return self.total / self.target * 100 if self.target else 0
+        return self.total / self.nominal * 100 if self.target else 0
 
 
 class Record(TrackingFields):
