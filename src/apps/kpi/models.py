@@ -79,6 +79,9 @@ class Record(TrackingFields):
     date = models.DateField('Fecha')
     value = models.FloatField('Valor')
     cumulative_value = models.FloatField('Valor Acumulado', default=0)
+    percentage_of_nominal = models.FloatField('Porcentaje del Nominal', default=0)
+    cumulative_value = models.FloatField('Valor Acumulado', default=0)
+    cumulative_percentage = models.FloatField('Porcentaje Acumulado', default=0)
 
     class Meta:
         verbose_name = 'Registro'
@@ -93,4 +96,17 @@ class Record(TrackingFields):
         previous_records = Record.objects.filter(period=self.period, date__lte=self.date).exclude(pk=self.pk)
         self.cumulative_value = previous_records.aggregate(total=Sum('value'))['total'] or 0
         self.cumulative_value += self.value
+
+        # Calculate the percentage of nominal
+        if self.period.nominal:
+            self.percentage_of_nominal = (self.value / self.period.nominal) * 100
+        else:
+            self.percentage_of_nominal = 0
+
+        # Calculate the cumulative percentage
+        if self.period.nominal:
+            self.cumulative_percentage = (self.cumulative_value / self.period.nominal) * 100
+        else:
+            self.cumulative_percentage = 0
+
         super().save(*args, **kwargs)
