@@ -9,4 +9,5 @@ class KpiIndex(TemplateView):
         context = super().get_context_data(**kwargs)
         context['title'] = 'KPI'
         context['kpis'] = KPI.objects.filter(active=True)
+        context['is_htmx'] = self.request.headers.get('HX-Request') is not None
         return context

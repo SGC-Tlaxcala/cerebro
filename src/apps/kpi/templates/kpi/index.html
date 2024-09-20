@@ -1,5 +1,6 @@
 {% load static %}
 
+{% block content %}
 <div class="container py-4">
    <div class="p-5 mb-4 bg-body-tertiary rounded-3">
         <h1 class="display-5 fw-bold"><i class="fa fa-line-chart" aria-hidden="true"></i> Objetivos e Indicadores</h1>
@@ -24,10 +25,12 @@
       {{ period.period }}
       {{ period.start }} - {{ period.end }}
       {{ period.target }}: {{ period.nominal }}
+      {{ period.total }} -- {{ period.percent }}
       ---
       {% for record in period.record_set.all %}
-        {{ record.date }}: {{ record.value }}
+        {{ record.date|date:"M/Y" }}: {{ record.value }}
       {% endfor %}
     {% endfor %}
   {% endfor %}
 </pre>
+{% endblock %}

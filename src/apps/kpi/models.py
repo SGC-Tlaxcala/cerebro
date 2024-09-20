@@ -63,6 +63,14 @@ class Period(models.Model):
     def __str__(self) -> str:
         return f'{self.kpi.name} - {self.period}: {self.target}'
 
+    @property
+    def total(self):
+        return self.record_set.aggregate(total=models.Sum('value'))['total'] or 0
+
+    @property
+    def percent(self):
+        return self.total / self.target * 100 if self.target else 0
+
 
 class Record(TrackingFields):
     """Model to store the records of the KPIs."""
