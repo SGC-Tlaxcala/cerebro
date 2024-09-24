@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load humanize %}
 {% load compress %}
 
 {% block header %}
@@ -161,10 +162,11 @@
       {{ period.period }}
       {{ period.start }} - {{ period.end }}
       {{ period.target }}: {{ period.nominal }}
-      {{ period.total }} -- {{ period.percent }}
+      {{ period.total }} -- {{ period.percent|floatformat:2 }}
       ---
       {% for record in period.record_set.all %}
-        {{ record.date|date:"M/Y" }}: {{ record.value }} -- {{ record.cumulative_value }}
+        {{ record.date|date:"M/Y" }}: {{ record.value|floatformat:0|intcomma }} -- {{ record.cumulative_value|floatformat:0|intcomma }}
+                  {{ record.percentage_of_nominal|floatformat:2 }}% -- {{ record.cumulative_percentage|floatformat:2 }}%
       {% endfor %}
     {% endfor %}
   {% endfor %}
