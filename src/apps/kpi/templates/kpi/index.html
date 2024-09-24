@@ -5,6 +5,15 @@
 
 {% block header %}
   <script src="https://fastly.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
+    <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+      // Simulate a click on the first KPI link on page load
+      const firstLink = document.querySelector('.nav-link.active');
+      if (firstLink) {
+        firstLink.click();  // Trigger the click event to load the content
+      }
+    });
+    </script>
 {% endblock header %}
 
 {% block content %}
