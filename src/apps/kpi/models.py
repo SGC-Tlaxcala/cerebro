@@ -36,6 +36,11 @@ class KPI(TrackingFields):
     description = models.TextField('Descripción', help_text='Descripción detallada del Objetivo o Indicador')
     formula = models.TextField('Fórmula')
     lapse = models.IntegerField('Medición', choices=PERIODS, help_text='Periodo de medición', default=3)
+    chart_type = models.CharField('Gráfica', max_length=50, help_text='Tipo de gráfica', blank=True, null=True)
+    xaxis_name = models.CharField('Eje X', max_length=50, help_text='Unidad de medida del eje X', blank=True, null=True)
+    yaxis_name = models.CharField('Eje Y', max_length=50, help_text='Unidad de medida del eje Y', blank=True, null=True)
+    xaxis_label = models.CharField('Etiqueta X', max_length=50, help_text='Etiqueta para el eje de las X', blank=True, null=True)
+    yaxis_label = models.CharField('Etiqueta Y', max_length=50, help_text='Etiqueta para el eje de las Y', blank=True, null=True)
     active = models.BooleanField('Activo', default=True)
 
     class Meta:
