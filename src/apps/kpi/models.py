@@ -77,6 +77,115 @@ class Period(models.Model):
     def percent(self):
         return self.total / self.nominal * 100 if self.target else 0
 
+    @property
+    def chart(self):
+        dates = self.record_set.values_list('date', flat=True)
+        serie_1 = self.record_set.values_list('value', flat=True)
+        serie_2 = self.record_set.values_list('cumulative_percentage', flat=True)
+        min = self.record_set.aggregate(min=models.Min('value'))['min'] or 0
+        if self.kpi.chart_type:
+            chart_script = f"""
+  var dom = document.getElementById('chart-container');
+  var myChart = echarts.init(dom, null, {{
+    renderer: 'canvas',
+    useDirtyRect: false
+  }});
+  var app = {{}};
+
+  var option;
+
+  const colors = ['#5470C6', '#91CC75', '#EE6666'];
+  option = {{
+    color: colors,
+    tooltip: {{
+      trigger: 'axis',
+      axisPointer: {{
+        type: 'cross'
+      }}
+    }},
+    grid: {{
+      right: '20%'
+    }},
+    toolbox: {{
+      feature: {{
+        dataView: {{ show: true, readOnly: false }},
+        restore: {{ show: true }},
+        saveAsImage: {{ show: true }}
+      }}
+    }},
+    legend: {{
+      data: ['{self.kpi.xaxis_name}', '{self.kpi.yaxis_name}']
+    }},
+    xAxis: [
+      {{
+        type: 'category',
+        axisTick: {{
+          alignWithLabel: true
+        }},
+        // prettier-ignore ***************
+        data: [{', '.join([f"'{date}'" for date in dates])}]
+      }}
+    ],
+    yAxis: [
+      {{
+        // Serie 1
+        type: 'value',
+        name: '{self.kpi.xaxis_name}',
+        position: 'right',
+        alignTicks: true,
+        axisLine: {{
+          show: true,
+          lineStyle: {{
+            color: colors[0]
+          }}
+        }},
+        axisLabel: {{
+          formatter: '{{value}} {self.kpi.xaxis_label}'
+        }}
+      }},
+      {{
+        // Serie 2
+        type: 'value',
+        name: '{self.kpi.yaxis_name}',
+        position: 'left',
+        alignTicks: true,
+        axisLine: {{
+          show: true,
+          lineStyle: {{
+            color: colors[2]
+          }}
+        }},
+        axisLabel: {{
+          formatter: '{{value}} {self.kpi.yaxis_label}'
+        }}
+      }}
+    ],
+    series: [
+      {{
+        name: 'Trámites',
+        type: 'bar',
+        data: [{', '.join([str(value) for value in serie_1])}]
+      }},
+      {{
+        name: '% Avance',
+        type: 'line',
+        yAxisIndex: 1,
+        data: [{', '.join([str(value) for value in serie_2])}]
+      }}
+    ]
+  }};
+
+  if (option && typeof option === 'object') {{
+    myChart.setOption(option);
+  }}
+
+  window.addEventListener('resize', myChart.resize);
+"""
+
+            return chart_script
+        else:
+            return ''
+
 
 class Record(TrackingFields):
     """Model to store the records of the KPIs."""

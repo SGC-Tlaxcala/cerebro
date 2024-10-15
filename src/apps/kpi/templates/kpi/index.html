@@ -5,15 +5,6 @@
 
 {% block header %}
   <script src="https://fastly.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
-    <script type="text/javascript">
-    document.addEventListener("DOMContentLoaded", function() {
-      // Simulate a click on the first KPI link on page load
-      const firstLink = document.querySelector('.nav-link.active');
-      if (firstLink) {
-        firstLink.click();  // Trigger the click event to load the content
-      }
-    });
-    </script>
 {% endblock header %}
 
 {% block content %}
@@ -47,25 +38,7 @@
 
   <div class="row pt-1" id="kpi_periods"></div><!-- Aqu van los periodos de cada KPI -->
 
-<pre>
-
-  {% for kpi in kpis %}
-    {% for period in kpi.period_set.all %}
-      {{ period.period }}
-      {{ period.start }} - {{ period.end }}
-      {{ period.target }}: {{ period.nominal }}
-      {{ period.total }} -- {{ period.percent|floatformat:2 }}
-      ---
-      {% for record in period.record_set.all %}
-        {{ record.date|date:"M/Y" }}: {{ record.value|floatformat:0|intcomma }} -- {{ record.cumulative_value|floatformat:0|intcomma }}
-                  {{ record.percentage_of_nominal|floatformat:2 }}% -- {{ record.cumulative_percentage|floatformat:2 }}%
-      {% endfor %}
-    {% endfor %}
-  {% endfor %}
-</pre>
-
   <div class="row">
-    <div id="chart-container" style="height:400px;"></div>
-  </div>
-
+  <div id="chart-container" style="height:400px;"></div>
+</div>
 {% endblock %}
