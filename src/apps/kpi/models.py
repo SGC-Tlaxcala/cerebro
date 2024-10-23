@@ -194,7 +194,6 @@ class Record(TrackingFields):
     value = models.FloatField('Valor')
     cumulative_value = models.FloatField('Valor Acumulado', default=0)
     percentage_of_nominal = models.FloatField('Porcentaje del Nominal', default=0)
-    cumulative_value = models.FloatField('Valor Acumulado', default=0)
     cumulative_percentage = models.FloatField('Porcentaje Acumulado', default=0)
 
     class Meta:
