@@ -1,0 +1,18 @@
+{% load static %}
+{% load humanize %}
+{% load compress %}
+<script src="https://fastly.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
+
+<h3 class="display-5">{{ period.period }}</h3>
+<p class="small">
+  <small class="cite">del {{ period.start }} al {{ period.end }}</small>
+</p>
+
+<div class="row">
+  <div id="chart-container" style="height:600px;width:100%"></div>
+</div>
+
+<!-- Inyección del script generado por Period.chart -->
+<script type="text/javascript">
+  {{ period.chart|safe }}
+</script>

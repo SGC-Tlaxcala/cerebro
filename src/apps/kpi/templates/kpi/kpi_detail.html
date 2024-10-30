@@ -1,0 +1,24 @@
+{% load static %}
+
+<div class="col-12 mb-1">
+  <h2 class="display-3"><i class="fa fa-bullseye" aria-hidden="true"></i> {{ kpi.name }}</h2>
+  <p class="lead">
+    {{ kpi.description }} <em>Medición: </em> {{ kpi.get_lapse_display }}.
+  </p>
+  <p class="text-center">
+    <strong>Fórmula: </strong>{{ kpi.formula }}
+  </p>
+</div>
+
+<div class="col-2 bg-body-secondary rounded-start-2">
+  <nav class="nav flex-column" >
+    {% for p in kpi.period_set.all %}
+      <a class="nav-link"
+         hx-target="#period"
+         hx-get="{% url 'kpi:period' p.id 'doble' %}">{{ p.period }}</a>
+    {% endfor %}
+  </nav>
+</div>
+<div class="col-9 border border-1 rounded-end-2" id="period"></div>
+
+

@@ -46,7 +46,8 @@ THIRD_PARTY_APPS = [
     'guardian',
     'tinymce',
     'captcha',
-    'anymail'
+    'anymail',
+    "compressor",
 ]
 LOCAL_APPS = [
     'core',
@@ -240,3 +241,11 @@ TINYMCE_DEFAULT_CONFIG = {
 X_FRAME_OPTIONS = "SAMEORIGIN"
 RECAPTCHA_PUBLIC_KEY = env('RECAPTCHA_PUBLIC_KEY')
 RECAPTCHA_PRIVATE_KEY = env('RECAPTCHA_PRIVATE_KEY')
+
+COMPRESS_ROOT = APPS_DIR.child('static')
+
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'compressor.finders.CompressorFinder',
+)

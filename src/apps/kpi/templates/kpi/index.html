@@ -1,5 +1,13 @@
+{% extends 'base.html' %}
 {% load static %}
+{% load humanize %}
+{% load compress %}
 
+{% block header %}
+  <script src="https://fastly.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
+{% endblock header %}
+
+{% block content %}
 <div class="container py-4">
    <div class="p-5 mb-4 bg-body-tertiary rounded-3">
         <h1 class="display-5 fw-bold"><i class="fa fa-line-chart" aria-hidden="true"></i> Objetivos e Indicadores</h1>
@@ -13,21 +21,24 @@
       </div>
   </div>
 
-<pre>
-  {% for kpi in kpis %}
-    {{ kpi.get_type_display }}: {{ kpi.name }}
-    {{ kpi.description }}
-    {{ kpi.formula }} - {{ kpi.lapse }}
-    {{ kpi.period_set.all }}
-    ---
-    {% for period in kpi.period_set.all %}
-      {{ period.period }}
-      {{ period.start }} - {{ period.end }}
-      {{ period.target }}: {{ period.nominal }}
-      ---
-      {% for record in period.record_set.all %}
-        {{ record.date }}: {{ record.value }}
-      {% endfor %}
-    {% endfor %}
-  {% endfor %}
-</pre>
+  <div class="row">
+    <div class="col-12">
+      <ul class="nav nav-tabs">
+        {% for kpi in kpis %}
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              hx-target="#kpi_periods"
+              hx-get="{% url 'kpi:detail' kpi.id %}">{{ kpi.name }}</a>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div><!-- Presentación de los KPIs -->
+
+  <div class="row pt-1" id="kpi_periods"></div><!-- Aqu van los periodos de cada KPI -->
+
+  <div class="row">
+  <div id="chart-container" style="height:400px;"></div>
+</div>
+{% endblock %}
