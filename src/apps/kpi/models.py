@@ -6,7 +6,7 @@ from apps.pas.models import TrackingFields
 User = get_user_model()
 
 KPO = 1
-KPI = 2
+KPI: int = 2
 TYPE = (
     (KPO, 'Objetivo'),
     (KPI, 'Indicador')
@@ -192,9 +192,12 @@ class Record(TrackingFields):
     period = models.ForeignKey(Period, on_delete=models.CASCADE)
     date = models.DateField('Fecha')
     value = models.FloatField('Valor')
-    cumulative_value = models.FloatField('Valor Acumulado', default=0)
-    percentage_of_nominal = models.FloatField('Porcentaje del Nominal', default=0)
-    cumulative_percentage = models.FloatField('Porcentaje Acumulado', default=0)
+    cumulative_value = models.FloatField(
+        'Valor Acumulado', default=0, editable=False)
+    percentage_of_nominal = models.FloatField(
+        'Porcentaje del Nominal', default=0, editable=False)
+    cumulative_percentage = models.FloatField(
+        'Porcentaje Acumulado', default=0, editable=False)
 
     class Meta:
         verbose_name = 'Registro'
@@ -212,13 +215,19 @@ class Record(TrackingFields):
 
         # Calculate the percentage of nominal
         if self.period.nominal:
-            self.percentage_of_nominal = (self.value / self.period.nominal) * 100
+            try:
+                self.percentage_of_nominal = (self.value / self.period.nominal) * 100
+            except ZeroDivisionError:
+                self.percentage_of_nominal = 0
         else:
             self.percentage_of_nominal = 0
 
         # Calculate the cumulative percentage
         if self.period.nominal:
-            self.cumulative_percentage = (self.cumulative_value / self.period.nominal) * 100
+            try:
+                self.cumulative_percentage = (self.cumulative_value / self.period.nominal) * 100
+            except ZeroDivisionError:
+                self.cumulative_percentage = 0
         else:
             self.cumulative_percentage = 0
 
