@@ -1,7 +1,7 @@
 environ
 Django
 django_environ
-psycopg2-binary
+# psycopg2-binary
 Unipath
 django-crispy-forms
 coreapi
