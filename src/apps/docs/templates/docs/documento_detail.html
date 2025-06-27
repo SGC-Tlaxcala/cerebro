@@ -158,7 +158,6 @@ function descargarArchivo(url, nombre) {
         {{ doc.nombre }}
         <small>
           {% if doc.proceso.slug != "stn" %}ver. {{ doc.r_actual }}{% endif %}
-          ({{ doc.revision_actual.f_actualizacion }})
         </small>
       </h1>
     </div><!-- ./page-header -->
@@ -348,7 +347,7 @@ function descargarArchivo(url, nombre) {
             <i class="fa fa-calendar"></i> Revisión
           </div>
           <div class="card-body">
-            <span>{{ doc.r_actual }} ({{ doc.revision_actual.f_actualizacion }})</span>
+            <span>{{ doc.r_actual }}</span>
           </div>
         </div>
       </div>
