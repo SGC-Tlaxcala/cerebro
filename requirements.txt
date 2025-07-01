@@ -6,7 +6,7 @@ Unipath
 django-crispy-forms
 coreapi
 djangorestframework
-djangorestframework-jwt
+djangorestframework-simplejwt
 workdays
 django-extensions
 Werkzeug
