@@ -11,7 +11,6 @@ Modelos:
 """
 
 import os.path
-from urllib.parse import urlparse
 from os.path import basename
 from django.db import models
 from django.contrib.auth import get_user_model
@@ -146,14 +145,14 @@ class Documento (models.Model):
         """Formato en texto del modelo."""
         return "%s (%s-%02d)" % (self.nombre, self.tipo.slug.upper(), self.id)
 
-    def revision_actual(self) -> str:
+    def revision_actual(self):
         """Devuelve la revisión del documento como un entero."""
         try:
             return self.revision_set.latest('revision')
         except IndexError:
             return ""
 
-    def f_actual(self) -> str:
+    def f_actual(self):
         """Devuelve la fecha de la revisión actual del documento."""
         try:
             return self.revision_set.latest('revision').f_actualizacion
@@ -175,7 +174,7 @@ class Documento (models.Model):
     def swf(self):
         """Devuelve el archivo sin extensión."""
         return f"{self.revision_set.latest('revision').archivo.url.split('.')[0]}.swf"
-        
+
     def name(self) -> str:
         """
         Devuelve el nombre del archivo al que apunta el campo `ruta`.
@@ -247,7 +246,7 @@ class Revision (models.Model):
 {self.documento} rev {self.revision:02d} ({self.f_actualizacion}))
 """
         return respuesta
-        
+
     def nombre(self) -> str:
         return basename(self.archivo.name)
 
