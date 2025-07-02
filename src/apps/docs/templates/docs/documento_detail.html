@@ -141,6 +141,22 @@ function descargarArchivo(url, nombre) {
     })
     .catch(error => console.error('Error al descargar:', error));
 }
+
+$(document).on('click', '.btn-descarga-historico', function () {
+  const url = $(this).data('url');
+  const nombre = $(this).data('nombre');
+  $.confirm({
+    title: 'Control de documentos',
+    content: 'ADVERTENCIA: Estás descargando una versión anterior del documento. ¿Estás seguro de que deseas continuar?',
+    closeIcon: true,
+    buttons: {
+      confirmar: function () {
+        descargarArchivo(url, nombre);
+      },
+      cerrar: function () { }
+    }
+  });
+});
 </script>
 {% endblock footer%}
 
@@ -265,12 +281,11 @@ function descargarArchivo(url, nombre) {
   {{ r.cambios | safe }}
   {% if request.user.is_staff %}
   <br />
-  <a href="/media/{{ r.archivo }}" 
-     class="btn btn-success" 
-     download="{{ r.nombre }}"
-     target="_self">
-    Descargar documento histórico
-  </a>
+<button class="btn btn-success btn-descarga-historico"
+        data-url="/media/{{ r.archivo }}"
+        data-nombre="{{ r.nombre }}">
+  Descargar documento histórico
+</button>
   {% endif %}
 </div>
 
@@ -374,7 +389,7 @@ function descargarArchivo(url, nombre) {
           <div class="card-header text-white-50 bg-success"><i class="fa fa-certificate"></i> Agregar nueva revisión
           </div>
           <div class="card-body">
-            <a href="{% url 'docs:rev_add' pk=doc.id %}" id="btn-descarga" class="btn btn-success">Agregar</a>
+            <a href="{% url 'docs:rev_add' pk=doc.id %}" id="btn-agregar" class="btn btn-success">Agregar</a>
           </div>
         </div>
       </div>
