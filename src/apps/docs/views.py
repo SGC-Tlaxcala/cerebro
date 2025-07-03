@@ -261,15 +261,23 @@ class RevisionAdd(LoginRequiredMixin, CreateView):
             # Enviar notificación urgente
             destinatarios = Profile.objects.filter(recibe_notificaciones=True, user__email__isnull=False)
             asunto = f"Notificación Urgente: Nueva Revisión de {self.doc.nombre}"
-            mensaje = render_to_string('docs/notificacion_urgente.html', {
+            mensaje_html = render_to_string('docs/notificacion_urgente.html', {
                 'documento': self.doc,
                 'revision': self.object,
                 'autor': self.request.user,
             })
-            from_email = 'no-reply@example.com' # Reemplazar con su correo electrónico real
-            for destinatario_perfil in destinatarios:
-                if destinatario_perfil.user.email:
-                    send_mail(asunto, mensaje, from_email, [destinatario_perfil.user.email])
+            from_email = 'cerebro@sgctlaxcala.com.mx'
+            lista_correos_destinatarios = [p.user.email for p in destinatarios if p.user.email]
+            
+            if lista_correos_destinatarios:
+                send_mail(
+                    asunto,
+                    '', # Mensaje de texto plano vacío, ya que enviamos HTML
+                    from_email,
+                    lista_correos_destinatarios,
+                    html_message=mensaje_html,
+                    fail_silently=False
+                )
             messages.success(self.request, "Revisión guardada y notificación urgente enviada.")
         else:
             messages.success(self.request, "Revisión guardada correctamente.")
