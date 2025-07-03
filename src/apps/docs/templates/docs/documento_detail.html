@@ -48,14 +48,14 @@
       $(document).off('click', '.btn-descarga-confirm').on('click', '.btn-descarga-confirm', function (e) {
         e.preventDefault(); // Prevenir la acción por defecto del botón
         console.log("Botón de descarga clickeado."); // Log para depuración
-        
+
         var button = $(this);
         var url = button.data('url');
         var nombre = button.data('nombre');
         var esHistorico = button.hasClass('btn-descarga-historico');
 
         var titulo = 'Control de documentos';
-        var contenido = esHistorico 
+        var contenido = esHistorico
           ? 'ADVERTENCIA: Estás descargando una versión anterior del documento. ¿Estás seguro de que deseas continuar?'
           : 'La descarga y/o impresión de este documento se considera una copia no controlada.';
 
@@ -160,7 +160,7 @@
 {% block head_title %}{{ doc.nombre }}{% endblock %}
 
 {% block content %}
-<div class="row" style="padding-top: 65px;">
+<div class="row">
   <div class="col"><!-- contenido -->
     <div class="page-header">
       <h1 class="display-4">
@@ -373,8 +373,8 @@
             <i class="fa fa-cloud-download"></i> Descargar archivo
           </div>
           <div class="card-body">
-            <button class="btn btn-outline-danger btn-descarga-confirm" 
-                    data-url="/media/{{doc.revision_actual.archivo}}" 
+            <button class="btn btn-outline-danger btn-descarga-confirm"
+                    data-url="/media/{{doc.revision_actual.archivo}}"
                     data-nombre="{{doc.revision_actual.nombre}}">
               Descargar
             </button>
