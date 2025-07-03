@@ -16,7 +16,7 @@ Incluye las siguientes vistas:
 
 from datetime import datetime
 from django.forms.models import BaseModelForm
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from watson import search as watson
 from django.urls import reverse_lazy
 from django.db.models import Q
@@ -267,18 +267,44 @@ class RevisionAdd(LoginRequiredMixin, CreateView):
                 'autor': self.request.user,
             })
             from_email = 'cerebro@sgctlaxcala.com.mx'
-            lista_correos_destinatarios = [p.user.email for p in destinatarios if p.user.email]
-            
-            if lista_correos_destinatarios:
-                send_mail(
-                    asunto,
-                    '', # Mensaje de texto plano vacío, ya que enviamos HTML
-                    from_email,
-                    lista_correos_destinatarios,
-                    html_message=mensaje_html,
-                    fail_silently=False
-                )
-            messages.success(self.request, "Revisión guardada y notificación urgente enviada.")
+            if destinatarios.exists():
+                for destinatario_profile in destinatarios:
+                    nombre_usuario = destinatario_profile.user.first_name
+                    if destinatario_profile.user.last_name:
+                        nombre_usuario += f" {destinatario_profile.user.last_name}"
+                    
+                    # Si el nombre está vacío, usar el username o email
+                    if not nombre_usuario:
+                        nombre_usuario = destinatario_profile.user.username or destinatario_profile.user.email.split('@')[0]
+
+                    mensaje_html = render_to_string('docs/notificacion_urgente.html', {
+                        'documento': self.doc,
+                        'revision': self.object,
+                        'autor': self.request.user,
+                        'nombre_usuario': nombre_usuario,
+                    })
+                    try:
+                        send_mail(
+                            asunto,
+                            '',  # Mensaje de texto plano vacío, ya que enviamos HTML
+                            from_email,
+                            [destinatario_profile.user.email],  # Enviar a un solo destinatario
+                            html_message=mensaje_html,
+                            fail_silently=False
+                        )
+                        Notificacion.objects.create(
+                            documento=self.doc,
+                            revision_obj=self.object,
+                            destinatario=destinatario_profile.user,
+                            tipo='U',  # Urgente
+                            asunto=asunto,
+                            cuerpo_html=mensaje_html,
+                        )
+                    except Exception as e:
+                        messages.error(self.request, f"Error al enviar notificación a {destinatario_profile.user.email}: {e}")
+                messages.success(self.request, "Revisión guardada y notificación urgente enviada.")
+            else:
+                messages.warning(self.request, "Revisión guardada, pero no se encontraron destinatarios para la notificación urgente.")
         else:
             messages.success(self.request, "Revisión guardada correctamente.")
         return HttpResponseRedirect(self.get_success_url())
@@ -287,7 +313,6 @@ class RevisionAdd(LoginRequiredMixin, CreateView):
         return reverse_lazy('docs:detalle', args=(self.doc.id, ))
 
 
-from django.http import JsonResponse
 
 def get_notification_recipients_count(request):
     if request.method == 'GET':
@@ -381,6 +406,19 @@ class ReportesList(ListView):
         context['pendientes'] = Reporte.objects.filter(resuelto=False).order_by('-created')
         context['resueltos'] = Reporte.objects.filter(resuelto=True).order_by('-resuelto_en')
         return context
+
+
+class NotificacionListView(LoginRequiredMixin, ListView):
+    model = Notificacion
+    template_name = 'docs/notificacion_list.html'
+    context_object_name = 'notificaciones'
+    ordering = ['-fecha_envio']
+
+
+class NotificacionDetailView(LoginRequiredMixin, DetailView):
+    model = Notificacion
+    template_name = 'docs/notificacion_detail.html'
+    context_object_name = 'notificacion'
 
 
 class PanicResolve(LoginRequiredMixin, UpdateView):

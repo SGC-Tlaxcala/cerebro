@@ -330,8 +330,9 @@ class Notificacion(models.Model):
     tipo = models.CharField(max_length=1, choices=TIPOS)
     asunto = models.CharField(max_length=255)
     cuerpo_html = models.TextField()
-    destinatarios = models.TextField()
-    revisiones = models.ManyToManyField(Revision)
+    documento = models.ForeignKey(Documento, on_delete=models.CASCADE, related_name='notificaciones', null=True, blank=True)
+    revision_obj = models.ForeignKey(Revision, on_delete=models.CASCADE, related_name='notificaciones', null=True, blank=True)
+    destinatario = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notificaciones_recibidas', null=True, blank=True)
 
     class Meta:
         verbose_name = "Notificación"

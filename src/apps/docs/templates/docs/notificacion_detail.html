@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalle de Notificación{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mt-4">Detalle de Notificación</h1>
+    <div class="card">
+        <div class="card-header">
+            Notificación #{{ notificacion.pk }}
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">Asunto: {{ notificacion.asunto }}</h5>
+            <p class="card-text"><strong>Tipo:</strong> {{ notificacion.get_tipo_display }}</p>
+            <p class="card-text"><strong>Fecha de Envío:</strong> {{ notificacion.fecha_envio|date:"d M Y H:i" }}</p>
+            <p class="card-text"><strong>Documento:</strong> {% if notificacion.documento %}<a href="{% url 'docs:detalle' pk=notificacion.documento.pk %}">{{ notificacion.documento.nombre }}</a>{% else %}N/A{% endif %}</p>
+            <p class="card-text"><strong>Revisión:</strong> {{ notificacion.revision_obj.revision }}</p>
+            <p class="card-text"><strong>Destinatario:</strong> {% if notificacion.destinatario %}{{ notificacion.destinatario.get_full_name|default:notificacion.destinatario.username }}{% else %}N/A{% endif %}</p>
+            <hr>
+            <h6>Contenido del Mensaje:</h6>
+            <div class="card-text border p-3" style="max-height: 400px; overflow-y: auto;">
+                {{ notificacion.cuerpo_html|safe }}
+            </div>
+        </div>
+        <div class="card-footer">
+            <a href="{% url 'docs:notificaciones_list' %}" class="btn btn-secondary">Volver a la lista</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Notificaciones Enviadas{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mt-4">Notificaciones Enviadas</h1>
+    {% if notificaciones %}
+    <div class="list-group">
+        {% for notificacion in notificaciones %}
+        <a href="{% url 'docs:notificaciones_detail' pk=notificacion.pk %}" class="list-group-item list-group-item-action">
+            <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1">{{ notificacion.asunto }}</h5>
+                <small>{{ notificacion.fecha_envio|date:"d M Y H:i" }}</small>
+            </div>
+            <p class="mb-1">Tipo: {{ notificacion.get_tipo_display }}</p>
+            
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p>No hay notificaciones enviadas.</p>
+    {% endif %}
+</div>
+{% endblock %}

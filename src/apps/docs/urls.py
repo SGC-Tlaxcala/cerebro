@@ -10,7 +10,7 @@ from apps.docs.views import (
     IndexLMD, DocDetail, ProcesoList, Buscador, SetupDoc,
     ProcessAdd, TipoAdd, DocAdd, RevisionAdd, Reportes,
     PanicButtonView, ReportesList, PanicResolve, IndexLDP, IndexLDT,
-    get_notification_recipients_count
+    NotificacionListView, NotificacionDetailView
 )
 
 app_name = 'docs'
@@ -40,5 +40,7 @@ urlpatterns = [
     path('ldp/', IndexLDP.as_view(), name='ldp'),
     path('ldt/', IndexLDT.as_view(), name='ldt'),
     path('<int:pk>/add', RevisionAdd.as_view(), name='rev_add'),
+    path('notificaciones/', login_required(NotificacionListView.as_view()), name='notificaciones_list'),
+    path('notificaciones/<int:pk>/', login_required(NotificacionDetailView.as_view()), name='notificaciones_detail'),
     path('get_notification_recipients_count/', views.get_notification_recipients_count, name='get_notification_recipients_count')
 ]
