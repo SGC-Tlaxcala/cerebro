@@ -70,6 +70,7 @@ class Profile(models.Model):
     site = models.PositiveSmallIntegerField(choices=SITIO, default=0)
     position = models.CharField(choices=PUESTOS, max_length=5, default=RA)
     order = models.PositiveSmallIntegerField(default=99, blank=True, null=True)
+    recibe_notificaciones = models.BooleanField(default=False)
 
 
 @receiver(post_save, sender=User)

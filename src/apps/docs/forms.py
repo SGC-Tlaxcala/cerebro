@@ -178,7 +178,8 @@ class VersionForm(forms.ModelForm):
             'revision',
             'f_actualizacion',
             'archivo',
-            'cambios'
+            'cambios',
+            'notificacion_urgente'
         ]
 
     def __init__(self, *args, **kwargs):
@@ -206,6 +207,10 @@ class VersionForm(forms.ModelForm):
                 css_class='row'
             ),
             Div(
+                Field('notificacion_urgente', wrapper_class='col-md-12', css_class='form-check-input'),
+                css_class='form-check form-switch row'
+            ),
+            Div(
                 HTML('<hr>'),
                 FormActions(
                     Submit('save', GUARDAR_CAMBIOS)
@@ -220,7 +225,7 @@ class PanicResolveForm(forms.ModelForm):
 
     Formulario para resolver un documento en estado de pánico.
     """
-    
+
     class Meta:
         model = Reporte
         fields = ['resuelto', 'resolucion']

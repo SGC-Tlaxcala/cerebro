@@ -22,9 +22,13 @@ from django.urls import reverse_lazy
 from django.db.models import Q
 from django.views.generic import (ListView, TemplateView, DetailView, FormView)
 from django.views.generic.edit import CreateView, UpdateView
+from django.template.loader import render_to_string
 from django.template.defaultfilters import slugify
 from django.contrib.auth.mixins import LoginRequiredMixin
-from apps.docs.models import Documento, Proceso, Tipo, Revision, Reporte
+from django.core.mail import send_mail
+from django.contrib import messages
+from apps.docs.models import Documento, Proceso, Tipo, Revision, Reporte, Notificacion
+from apps.profiles.models import Profile
 from apps.docs.forms import (
     DocForm,
     ProcesoForm,
@@ -232,7 +236,10 @@ class RevisionAdd(LoginRequiredMixin, CreateView):
 
     def get_initial(self):
         super(RevisionAdd, self).get_initial()
-        revision = self.doc.revision_set.order_by('-revision')[0].revision + 1
+        try:
+            revision = self.doc.revision_set.order_by('-revision')[0].revision + 1
+        except IndexError:
+            revision = 0
         fecha = datetime.today()
         self.initial['revision'] = revision
         self.initial['f_actualizacion'] = fecha
@@ -248,6 +255,64 @@ class RevisionAdd(LoginRequiredMixin, CreateView):
         self.object.documento = self.doc
         self.object.autor = self.request.user
         self.object.save()
+
+        if form.cleaned_data['notificacion_urgente']:
+            # Obtener los perfiles de los usuarios que desean recibir notificaciones
+            perfiles = Profile.objects.filter(
+                recibe_notificaciones=True, 
+                user__email__isnull=False
+            ).select_related('user')
+
+            if perfiles:
+                asunto = f"Notificación Urgente: Actualización del documento {self.doc.clave()}"
+                correos_enviados = []
+                
+                for perfil in perfiles:
+                    nombre_usuario = perfil.user.get_full_name() or perfil.user.username
+                    
+                    # Renderizar la plantilla de correo para cada usuario
+                    cuerpo_html = render_to_string('docs/notificacion_urgente.html', {
+                        'documento': self.doc,
+                        'revision': self.object,
+                        'nombre_usuario': nombre_usuario,
+                    })
+
+                    try:
+                        send_mail(
+                            subject=asunto,
+                            message='',  # El mensaje de texto plano no es necesario si se envía HTML
+                            from_email=None,  # Usará DEFAULT_FROM_EMAIL de settings.py
+                            recipient_list=[perfil.user.email],
+                            html_message=cuerpo_html,
+                            fail_silently=False,
+                        )
+                        correos_enviados.append(perfil.user.email)
+
+                    except Exception as e:
+                        messages.error(self.request, f"Error al enviar la notificación a {perfil.user.email}: {e}")
+                
+                if correos_enviados:
+                    # Marcar la notificación como enviada
+                    self.object.notificacion_enviada = True
+                    self.object.fecha_notificacion = datetime.now()
+                    self.object.save()
+
+                    # Crear un registro de la notificación
+                    notif = Notificacion.objects.create(
+                        tipo='U',
+                        asunto=asunto,
+                        cuerpo_html="Correo personalizado enviado a cada destinatario.", # El cuerpo es genérico aquí
+                        destinatarios=", ".join(correos_enviados),
+                    )
+                    notif.revisiones.add(self.object)
+
+                    messages.success(self.request, f"Se enviaron {len(correos_enviados)} notificaciones urgentes correctamente.")
+                else:
+                    messages.error(self.request, "No se pudo enviar ninguna notificación urgente.")
+
+            else:
+                messages.warning(self.request, "No hay usuarios configurados para recibir notificaciones urgentes.")
+
         return super().form_valid(form)
 
     def get_success_url(self):

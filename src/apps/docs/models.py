@@ -53,7 +53,6 @@ class Proceso (models.Model):
 
     def __str__(self) -> str:
         """Formato en texto de la salida del modelo."""
-        nombre_proceso: str = ""
         if self.slug == 'sgc':
             nombre_proceso = 'Documentos del Sistema'
         elif self.slug == 'stn':
@@ -201,7 +200,7 @@ class Revision (models.Model):
 
     Campos:
     - documento: referencia al modelo Documento
-    - revision: entero. número de revisión
+    - revision: entero. Número de revisión
     - f_actualización: fecha de actualización
     - archivo: archivo del documento
     - cambios: registro de cambios
@@ -232,6 +231,9 @@ class Revision (models.Model):
         on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+    notificacion_enviada = models.BooleanField(default=False)
+    fecha_notificacion = models.DateTimeField(blank=True, null=True)
+    notificacion_urgente = models.BooleanField(default=False)
 
     class Meta:
         """Metadatos del modelo Revision."""
@@ -255,7 +257,7 @@ class Reporte(models.Model):
     """
     Modelo Reporte.
 
-    Almacena los reportes hecho con el botón de pánico. Permite hacer
+    Almacena los reportes hechos con el botón de pánico. Permite hacer
     seguimiento de las acciones tomadas para resolver el problema.
 
     Campos
@@ -302,3 +304,34 @@ class Reporte(models.Model):
         return f"{self.documento} - {self.get_causa_display()}"
 
 
+class Notificacion(models.Model):
+    """
+    Modelo Notificacion.
+
+    Almacena las notificaciones enviadas a los usuarios sobre revisiones de documentos.
+    Campos:
+    - fecha_envio: Fecha y hora en que se envió la notificación.
+    - tipo: Tipo de notificación (S para semanal, U para urgente).
+    - asunto: Asunto del correo de notificación.
+    - cuerpo_html: Contenido HTML del mensaje.
+    - destinatarios: Lista de destinatarios de la notificación.
+    - revisiones: Revisiones de documentos asociadas a la notificación.
+    """
+
+    TIPOS = (
+        ('S', 'Semanal'),
+        ('U', 'Urgente')
+    )
+    fecha_envio = models.DateTimeField(auto_now_add=True)
+    tipo = models.CharField(max_length=1, choices=TIPOS)
+    asunto = models.CharField(max_length=255)
+    cuerpo_html = models.TextField()
+    destinatarios = models.TextField()
+    revisiones = models.ManyToManyField(Revision)
+
+    class Meta:
+        verbose_name = "Notificación"
+        verbose_name_plural = "Notificaciones"
+
+    def __str__(self):
+        return f"{self.get_tipo_display()} - {self.fecha_envio}"

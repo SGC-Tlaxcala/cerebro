@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django import forms
+from django.db import models
 from apps.docs.models import Tipo, Proceso, Documento, Revision
 
 
@@ -28,6 +29,10 @@ class ProcesoAdmin(admin.ModelAdmin):
 class RevisionInline (admin.TabularInline):
     model = Revision
     extra = 1
+    fields = ('revision', 'f_actualizacion', 'archivo', 'cambios', 'notificacion_urgente')
+    formfield_overrides = {
+        models.TextField: {'widget': forms.Textarea(attrs={'rows': 4, 'cols': 50})},
+    }
 
 
 class DocumentoAdmin(admin.ModelAdmin):

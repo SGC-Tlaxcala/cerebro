@@ -221,10 +221,12 @@ AUTHENTICATION_BACKENDS = (
 
 # Caso no. 35, Backend para correo
 EMAIL_HOST = env("EMAIL_HOST")
-EMAIL_USE_TLS = env("EMAIL_USE_TLS", default=True)
+EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=False)
+EMAIL_USE_SSL = env.bool("EMAIL_USE_SSL", default=False)
 EMAIL_PORT = env("EMAIL_PORT")
 EMAIL_HOST_USER = env('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = 'Cerebro <cerebro@sgctlaxcala.com.mx>'
 
 ANYMAIL = {
     "MAILGUN_API_KEY": env('EMAIL_HOST_USER'),

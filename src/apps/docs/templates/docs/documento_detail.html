@@ -18,52 +18,68 @@
   crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
 <script type="application/javascript">
-  $(document).ready(function () {
-    $(".iframe").colorbox({ iframe: true, width: "80%", height: "80%" });
-    $(".callbacks").colorbox({
-      onOpen: function () { alert('onOpen: colorbox is about to open'); },
-      onLoad: function () { alert('onLoad: colorbox has started to load the targeted content'); },
-      onComplete: function () { alert('onComplete: colorbox has displayed the loaded content'); },
-      onCleanup: function () { alert('onCleanup: colorbox has begun the close process'); },
-      onClosed: function () { alert('onClosed: colorbox has completely closed'); }
-    });
+  (function($) { // Pass jQuery as $
+    $(document).ready(function () {
+      console.log("document.ready fired in documento_detail.html");
 
-    //Example of preserving a JavaScript event for inline calls.
-    $("#click").click(function () {
-      $('#click').css({ "background-color": "#f00", "color": "#fff", "cursor": "inherit" }).text("Open this window again and this message will still be here.");
-      return false;
-    });
+      // Inicializa Colorbox para iframes
+      $(".iframe").colorbox({ iframe: true, width: "80%", height: "80%" });
+      console.log("Colorbox initialized.");
 
-    // ✅ CÓDIGO DEL BOTÓN MOVIDO AQUÍ DENTRO
-    $(document).on('click', '#btn-descarga', function () {
-      $.confirm({
-        title: 'Control de documentos',
-        content: 'La descarga y/o impresión de este documento se considera una copia no controlada.',
-        closeIcon: true,
-        closeIconClass: 'fa fa-close',
-        backgroundDismiss: true,
-        buttons: {
-          confirmar: function () {
-            window.location = "/media/{{doc.revision_actual.archivo}}";
-          },
-          cerrar: function () { }
-        }
+      // Muestra el modal si el documento está en aprobación
+      {% if doc.aprobado %}
+      $('#modal').modal('show');
+      console.log("Modal shown for approved doc.");
+      {% endif %}
+
+      // Delegación de eventos para todos los botones de descarga
+      $(document).on('click', '.btn-descarga-confirm', function (e) {
+        e.preventDefault(); // Prevenir la acción por defecto del botón
+        console.log("Botón de descarga clickeado."); // Log para depuración
+        
+        var button = $(this);
+        var url = button.data('url');
+        var nombre = button.data('nombre');
+        var esHistorico = button.hasClass('btn-descarga-historico');
+
+        var titulo = 'Control de documentos';
+        var contenido = esHistorico 
+          ? 'ADVERTENCIA: Estás descargando una versión anterior del documento. ¿Estás seguro de que deseas continuar?'
+          : 'La descarga y/o impresión de este documento se considera una copia no controlada.';
+
+        $.confirm({
+          title: titulo,
+          content: contenido,
+          closeIcon: true,
+          closeIconClass: 'fa fa-close',
+          backgroundDismiss: true,
+          buttons: {
+            confirmar: function () {
+              if (esHistorico) {
+                descargarArchivo(url, nombre);
+              } else {
+                window.location = url;
+              }
+            },
+            cerrar: function () { }
+          }
+        });
+        console.log("$.confirm called.");
       });
-    });
 
-    // ✅ CÓDIGO DEL MODAL TAMBIÉN DENTRO DEL MISMO READY
-    {% if doc.aprobado %}
-    $('#modal').modal('show');
-    {% endif %}
-  });
+      // Función para descargar el archivo (solo para históricos si es necesario un manejo especial)
+      function descargarArchivo(url, nombre) {
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', nombre || '');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        console.log("descargarArchivo called.");
+      }
+    });
+  })(jQuery); // Pass jQuery object
 </script>
-{% if doc.aprobado %}
-<script type="application/javascript">
-  $(document).ready(function () {
-    $('#modal').modal('show');
-  });
-</script>
-{% endif %}
 
 {% if doc.aprobado %}
 <div id="modal" class="modal modal-wide fade" data-keyboard="false" data-backdrop="static">
@@ -127,37 +143,6 @@
   </div>
 </div>
 {% endif %}
-
-<script>
-function descargarArchivo(url, nombre) {
-  fetch(url)
-    .then(response => response.blob())
-    .then(blob => {
-      const link = document.createElement('a');
-      link.href = window.URL.createObjectURL(blob);
-      link.download = nombre;
-      link.click();
-      window.URL.revokeObjectURL(link.href);
-    })
-    .catch(error => console.error('Error al descargar:', error));
-}
-
-$(document).on('click', '.btn-descarga-historico', function () {
-  const url = $(this).data('url');
-  const nombre = $(this).data('nombre');
-  $.confirm({
-    title: 'Control de documentos',
-    content: 'ADVERTENCIA: Estás descargando una versión anterior del documento. ¿Estás seguro de que deseas continuar?',
-    closeIcon: true,
-    buttons: {
-      confirmar: function () {
-        descargarArchivo(url, nombre);
-      },
-      cerrar: function () { }
-    }
-  });
-});
-</script>
 {% endblock footer%}
 
 {% block head_title %}{{ doc.nombre }}{% endblock %}
@@ -281,7 +266,7 @@ $(document).on('click', '.btn-descarga-historico', function () {
   {{ r.cambios | safe }}
   {% if request.user.is_staff %}
   <br />
-<button class="btn btn-success btn-descarga-historico"
+<button class="btn btn-success btn-descarga-confirm btn-descarga-historico"
         data-url="/media/{{ r.archivo }}"
         data-nombre="{{ r.nombre }}">
   Descargar documento histórico
@@ -376,7 +361,11 @@ $(document).on('click', '.btn-descarga-historico', function () {
             <i class="fa fa-cloud-download"></i> Descargar archivo
           </div>
           <div class="card-body">
-            <button id="btn-descarga" class="btn btn-outline-danger">Descargar</button>
+            <button class="btn btn-outline-danger btn-descarga-confirm" 
+                    data-url="/media/{{doc.revision_actual.archivo}}" 
+                    data-nombre="{{doc.revision_actual.nombre}}">
+              Descargar
+            </button>
           </div>
         </div>
       </div>
