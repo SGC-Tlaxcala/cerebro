@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -5,7 +6,7 @@
     <title>{% block head_title %}Cuadro de Mando{% endblock head_title %}</title>
     {% include 'partials/_meta.html' %}
     {% include 'partials/_styles.html' %}
-    {% block header %}{% endblock header %}
+    <link rel="stylesheet" href="{% static 'docs/estilos.css' %}">
   </head>
   <body>
     {% include 'partials/_navbar.html' %}

@@ -188,6 +188,7 @@ class VersionForm(forms.ModelForm):
         self.fields['f_actualizacion'].label = "Fecha de Actualización"
 
         self.helper = FormHelper()
+        self.helper.form_id = 'formulario_revision'
         self.helper.layout = Layout(
             Div(
                 Field('revision', wrapper_class='col-md-6', attrs={

@@ -5,10 +5,12 @@
 from django.urls import path
 from django.contrib.auth.decorators import login_required
 from django.views.generic import TemplateView
+from apps.docs import views
 from apps.docs.views import (
     IndexLMD, DocDetail, ProcesoList, Buscador, SetupDoc,
     ProcessAdd, TipoAdd, DocAdd, RevisionAdd, Reportes,
-    PanicButtonView, ReportesList, PanicResolve, IndexLDP, IndexLDT
+    PanicButtonView, ReportesList, PanicResolve, IndexLDP, IndexLDT,
+    get_notification_recipients_count
 )
 
 app_name = 'docs'
@@ -37,5 +39,6 @@ urlpatterns = [
     path('tipo_add/', login_required(TipoAdd.as_view()), name='tipo_add'),
     path('ldp/', IndexLDP.as_view(), name='ldp'),
     path('ldt/', IndexLDT.as_view(), name='ldt'),
-    path('<int:pk>/add', RevisionAdd.as_view(), name='rev_add')
+    path('<int:pk>/add', RevisionAdd.as_view(), name='rev_add'),
+    path('get_notification_recipients_count/', views.get_notification_recipients_count, name='get_notification_recipients_count')
 ]

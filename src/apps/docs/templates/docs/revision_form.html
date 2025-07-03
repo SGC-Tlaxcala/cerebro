@@ -9,7 +9,22 @@
     $('.dateinput').datepicker({
       format: 'dd/mm/yyyy',
       locale: 'es'
-    })
+    });
+
+    $(document).ready(function() {
+      $('#formulario_revision').submit(function(e) {
+        var $formulario = $(this);
+        var $casillaNotificacionUrgente = $('#id_notificacion_urgente');
+
+        if ($casillaNotificacionUrgente.is(':checked')) {
+          var mensajeConfirmacion = 'Se enviará una notificación urgente. ¿Desea continuar?';
+          if (!confirm(mensajeConfirmacion)) {
+            e.preventDefault(); // Prevenir el envío del formulario si el usuario cancela
+            $casillaNotificacionUrgente.prop('checked', false); // Desmarcar la casilla
+          }
+        }
+      });
+    });
   </script>
 {% endblock footer %}
 

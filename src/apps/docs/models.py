@@ -252,6 +252,10 @@ class Revision (models.Model):
     def nombre(self) -> str:
         return basename(self.archivo.name)
 
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse('docs:detalle', args=[self.documento.id])
+
 
 class Reporte(models.Model):
     """

@@ -16,7 +16,7 @@ Incluye las siguientes vistas:
 
 from datetime import datetime
 from django.forms.models import BaseModelForm
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from watson import search as watson
 from django.urls import reverse_lazy
 from django.db.models import Q
@@ -235,15 +235,15 @@ class RevisionAdd(LoginRequiredMixin, CreateView):
         return super(RevisionAdd, self).dispatch(request, *args, **kwargs)
 
     def get_initial(self):
-        super(RevisionAdd, self).get_initial()
+        initial = super(RevisionAdd, self).get_initial()
         try:
             revision = self.doc.revision_set.order_by('-revision')[0].revision + 1
         except IndexError:
             revision = 0
         fecha = datetime.today()
-        self.initial['revision'] = revision
-        self.initial['f_actualizacion'] = fecha
-        return self.initial
+        initial['revision'] = revision
+        initial['f_actualizacion'] = fecha
+        return initial
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -254,69 +254,38 @@ class RevisionAdd(LoginRequiredMixin, CreateView):
         self.object = form.save(commit=False)
         self.object.documento = self.doc
         self.object.autor = self.request.user
+
         self.object.save()
 
-        if form.cleaned_data['notificacion_urgente']:
-            # Obtener los perfiles de los usuarios que desean recibir notificaciones
-            perfiles = Profile.objects.filter(
-                recibe_notificaciones=True, 
-                user__email__isnull=False
-            ).select_related('user')
-
-            if perfiles:
-                asunto = f"Notificación Urgente: Actualización del documento {self.doc.clave()}"
-                correos_enviados = []
-                
-                for perfil in perfiles:
-                    nombre_usuario = perfil.user.get_full_name() or perfil.user.username
-                    
-                    # Renderizar la plantilla de correo para cada usuario
-                    cuerpo_html = render_to_string('docs/notificacion_urgente.html', {
-                        'documento': self.doc,
-                        'revision': self.object,
-                        'nombre_usuario': nombre_usuario,
-                    })
-
-                    try:
-                        send_mail(
-                            subject=asunto,
-                            message='',  # El mensaje de texto plano no es necesario si se envía HTML
-                            from_email=None,  # Usará DEFAULT_FROM_EMAIL de settings.py
-                            recipient_list=[perfil.user.email],
-                            html_message=cuerpo_html,
-                            fail_silently=False,
-                        )
-                        correos_enviados.append(perfil.user.email)
-
-                    except Exception as e:
-                        messages.error(self.request, f"Error al enviar la notificación a {perfil.user.email}: {e}")
-                
-                if correos_enviados:
-                    # Marcar la notificación como enviada
-                    self.object.notificacion_enviada = True
-                    self.object.fecha_notificacion = datetime.now()
-                    self.object.save()
-
-                    # Crear un registro de la notificación
-                    notif = Notificacion.objects.create(
-                        tipo='U',
-                        asunto=asunto,
-                        cuerpo_html="Correo personalizado enviado a cada destinatario.", # El cuerpo es genérico aquí
-                        destinatarios=", ".join(correos_enviados),
-                    )
-                    notif.revisiones.add(self.object)
-
-                    messages.success(self.request, f"Se enviaron {len(correos_enviados)} notificaciones urgentes correctamente.")
-                else:
-                    messages.error(self.request, "No se pudo enviar ninguna notificación urgente.")
-
-            else:
-                messages.warning(self.request, "No hay usuarios configurados para recibir notificaciones urgentes.")
-
-        return super().form_valid(form)
+        if self.object.notificacion_urgente:
+            # Enviar notificación urgente
+            destinatarios = Profile.objects.filter(recibe_notificaciones=True, user__email__isnull=False)
+            asunto = f"Notificación Urgente: Nueva Revisión de {self.doc.nombre}"
+            mensaje = render_to_string('docs/notificacion_urgente.html', {
+                'documento': self.doc,
+                'revision': self.object,
+                'autor': self.request.user,
+            })
+            from_email = 'no-reply@example.com' # Reemplazar con su correo electrónico real
+            for destinatario_perfil in destinatarios:
+                if destinatario_perfil.user.email:
+                    send_mail(asunto, mensaje, from_email, [destinatario_perfil.user.email])
+            messages.success(self.request, "Revisión guardada y notificación urgente enviada.")
+        else:
+            messages.success(self.request, "Revisión guardada correctamente.")
+        return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self):
-        return reverse_lazy('docs:detalle', args=(self.kwargs['pk'], ))
+        return reverse_lazy('docs:detalle', args=(self.doc.id, ))
+
+
+from django.http import JsonResponse
+
+def get_notification_recipients_count(request):
+    if request.method == 'GET':
+        count = Profile.objects.filter(recibe_notificaciones=True, user__email__isnull=False).count()
+        return JsonResponse({'count': count})
+    return JsonResponse({'count': 0})
 
 
 class ProcesoList(DetailView):
@@ -328,14 +297,16 @@ class ProcesoList(DetailView):
 class ProcessAdd(CreateView):
     """Formulario para agregar un nuevo proceso."""
     model = Proceso
-    fields = ['proceso', 'slug']
+    form_class = ProcesoForm
+    template_name = 'docs/proceso_form.html'
     success_url = reverse_lazy('docs:setup')
 
 
 class TipoAdd(CreateView):
     """Formulario para agregar un nuevo tipo de documento."""
     model = Tipo
-    fields = ['tipo', 'slug']
+    form_class = TipoForm
+    template_name = 'docs/tipo_form.html'
     success_url = reverse_lazy('docs:setup')
 
 
