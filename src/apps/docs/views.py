@@ -292,16 +292,18 @@ class RevisionAdd(LoginRequiredMixin, CreateView):
                             html_message=mensaje_html,
                             fail_silently=False
                         )
-                        Notificacion.objects.create(
-                            documento=self.doc,
-                            revision_obj=self.object,
-                            destinatario=destinatario_profile.user,
-                            tipo='U',  # Urgente
-                            asunto=asunto,
-                            cuerpo_html=mensaje_html,
-                        )
                     except Exception as e:
                         messages.error(self.request, f"Error al enviar notificación a {destinatario_profile.user.email}: {e}")
+                
+                # Crear una única instancia de Notificacion después de enviar todos los correos
+                Notificacion.objects.create(
+                    documento=self.doc,
+                    revision_obj=self.object,
+                    destinatarios=", ".join([p.user.email for p in destinatarios if p.user.email]),
+                    tipo='U',  # Urgente
+                    asunto=asunto,
+                    cuerpo_html=mensaje_html,
+                )
                 messages.success(self.request, "Revisión guardada y notificación urgente enviada.")
             else:
                 messages.warning(self.request, "Revisión guardada, pero no se encontraron destinatarios para la notificación urgente.")

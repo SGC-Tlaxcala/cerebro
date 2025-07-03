@@ -332,7 +332,7 @@ class Notificacion(models.Model):
     cuerpo_html = models.TextField()
     documento = models.ForeignKey(Documento, on_delete=models.CASCADE, related_name='notificaciones', null=True, blank=True)
     revision_obj = models.ForeignKey(Revision, on_delete=models.CASCADE, related_name='notificaciones', null=True, blank=True)
-    destinatario = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notificaciones_recibidas', null=True, blank=True)
+    destinatarios = models.TextField(blank=True)
 
     class Meta:
         verbose_name = "Notificación"
