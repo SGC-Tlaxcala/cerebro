@@ -45,7 +45,7 @@
       {% endif %}
 
       // Delegación de eventos para todos los botones de descarga
-      $(document).off('click', '.btn-descarga-confirm').on('click', '.btn-descarga-confirm', function (e) {
+      $('#documento').off('click', '.btn-descarga-confirm').on('click', '.btn-descarga-confirm', function (e) {
         e.preventDefault(); // Prevenir la acción por defecto del botón
         console.log("Botón de descarga clickeado."); // Log para depuración
 
