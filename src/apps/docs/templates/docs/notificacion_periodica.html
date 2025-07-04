@@ -6,7 +6,7 @@
     <h2>Documentos Actualizados</h2>
     <p>Estimado(a) usuario(a),</p>
     <p>Se han realizado las siguientes actualizaciones en los documentos:</p>
-    
+
     {% if revisiones %}
     <table>
         <thead>
@@ -19,7 +19,7 @@
         <tbody>
             {% for revision in revisiones %}
             <tr>
-                <td>{{ revision.documento.nombre }}</td>
+                <td><a href="https://sgctlaxcala.com.mx{% url 'docs:detalle' pk=revision.documento.pk %}" target=_blank>{{ revision.documento.nombre }}</a></td>
                 <td>{{ revision.revision }}</td>
                 <td>{{ revision.cambios|safe }}</td>
             </tr>
