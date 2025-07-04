@@ -79,14 +79,14 @@ class Command(BaseCommand):
             revision.save()
         
         # Crear una única entrada en la tabla Notificacion
+        cuerpo_html_para_notificacion = render_to_string('docs/notificacion_periodica_content.html', context)
         Notificacion.objects.create(
             documento=None, # No hay un solo documento, es un resumen
             revision_obj=None, # No hay una sola revision, es un resumen
             destinatarios=", ".join([p.user.email for p in destinatarios if p.user.email]),
             tipo='P',  # Programada
             asunto=asunto,
-            cuerpo_html=mensaje_html,
+            cuerpo_html=cuerpo_html_para_notificacion,
         )
 
         self.stdout.write(self.style.SUCCESS(f'Notificaciones programadas enviadas a {destinatarios.count()} destinatarios.'))
-        logger.info(f"Notificaciones programadas enviadas a {destinatarios.count()} destinatarios.")

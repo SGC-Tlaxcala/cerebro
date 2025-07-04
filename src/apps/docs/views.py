@@ -348,7 +348,7 @@ class RevisionAdd(LoginRequiredMixin, CreateView):
                 )
 
                 # Render the message once for the notification record, using a generic user name
-                mensaje_html_para_notificacion = render_to_string('docs/notificacion_urgente.html', {
+                mensaje_html_para_notificacion = render_to_string('docs/notificacion_urgente_content.html', {
                     'documento': self.doc,
                     'revision': self.object,
                     'autor': self.request.user,
