@@ -223,6 +223,35 @@ class DocAdd(CreateView):
         return reverse_lazy('docs:detalle', args=(self.object.id, ))
 
 
+def envio_de_correo(request, destinatarios, asunto, documento, revision, autor):
+    """
+    Envía notificaciones por correo electrónico a una lista de destinatarios.
+    """
+    from_email = 'Cerebro <cerebro@sgctlaxcala.com.mx>'
+    for destinatario_profile in destinatarios:
+        nombre_usuario = destinatario_profile.user.get_full_name()
+        if not nombre_usuario:
+            nombre_usuario = destinatario_profile.user.username or destinatario_profile.user.email.split('@')[0]
+
+        mensaje_html = render_to_string('docs/notificacion_urgente.html', {
+            'documento': documento,
+            'revision': revision,
+            'autor': autor,
+            'nombre_usuario': nombre_usuario,
+        })
+        try:
+            send_mail(
+                asunto,
+                '',  # Mensaje de texto plano vacío
+                from_email,
+                [destinatario_profile.user.email],
+                html_message=mensaje_html,
+                fail_silently=False
+            )
+        except Exception as e:
+            messages.error(request, f"Error al enviar notificación a {destinatario_profile.user.email}: {e}")
+
+
 class RevisionAdd(LoginRequiredMixin, CreateView):
     """Formulario para crear una nueva revisión de un documento."""
 
@@ -258,51 +287,34 @@ class RevisionAdd(LoginRequiredMixin, CreateView):
         self.object.save()
 
         if self.object.notificacion_urgente:
-            # Enviar notificación urgente
             destinatarios = Profile.objects.filter(recibe_notificaciones=True, user__email__isnull=False)
             asunto = f"Notificación Urgente: Nueva Revisión de {self.doc.nombre}"
-            mensaje_html = render_to_string('docs/notificacion_urgente.html', {
-                'documento': self.doc,
-                'revision': self.object,
-                'autor': self.request.user,
-            })
-            from_email = 'cerebro@sgctlaxcala.com.mx'
+            
             if destinatarios.exists():
-                for destinatario_profile in destinatarios:
-                    nombre_usuario = destinatario_profile.user.first_name
-                    if destinatario_profile.user.last_name:
-                        nombre_usuario += f" {destinatario_profile.user.last_name}"
-                    
-                    # Si el nombre está vacío, usar el username o email
-                    if not nombre_usuario:
-                        nombre_usuario = destinatario_profile.user.username or destinatario_profile.user.email.split('@')[0]
+                envio_de_correo(
+                    self.request,
+                    destinatarios,
+                    asunto,
+                    self.doc,
+                    self.object,
+                    self.request.user
+                )
 
-                    mensaje_html = render_to_string('docs/notificacion_urgente.html', {
-                        'documento': self.doc,
-                        'revision': self.object,
-                        'autor': self.request.user,
-                        'nombre_usuario': nombre_usuario,
-                    })
-                    try:
-                        send_mail(
-                            asunto,
-                            '',  # Mensaje de texto plano vacío, ya que enviamos HTML
-                            from_email,
-                            [destinatario_profile.user.email],  # Enviar a un solo destinatario
-                            html_message=mensaje_html,
-                            fail_silently=False
-                        )
-                    except Exception as e:
-                        messages.error(self.request, f"Error al enviar notificación a {destinatario_profile.user.email}: {e}")
-                
-                # Crear una única instancia de Notificacion después de enviar todos los correos
+                # Render the message once for the notification record, using a generic user name
+                mensaje_html_para_notificacion = render_to_string('docs/notificacion_urgente.html', {
+                    'documento': self.doc,
+                    'revision': self.object,
+                    'autor': self.request.user,
+                    'nombre_usuario': 'Equipo', # Generic name for the notification record
+                })
+
                 Notificacion.objects.create(
                     documento=self.doc,
                     revision_obj=self.object,
                     destinatarios=", ".join([p.user.email for p in destinatarios if p.user.email]),
                     tipo='U',  # Urgente
                     asunto=asunto,
-                    cuerpo_html=mensaje_html,
+                    cuerpo_html=mensaje_html_para_notificacion,
                 )
                 messages.success(self.request, "Revisión guardada y notificación urgente enviada.")
             else:
