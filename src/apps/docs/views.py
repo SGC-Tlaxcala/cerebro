@@ -27,6 +27,9 @@ from django.template.defaultfilters import slugify
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.mail import send_mail
 from django.contrib import messages
+import os
+import requests
+import logging
 from apps.docs.models import Documento, Proceso, Tipo, Revision, Reporte, Notificacion
 from apps.profiles.models import Profile
 from apps.docs.forms import (
@@ -251,6 +254,50 @@ def envio_de_correo(request, destinatarios, asunto, documento, revision, autor):
         except Exception as e:
             messages.error(request, f"Error al enviar notificación a {destinatario_profile.user.email}: {e}")
 
+def send_message(request, destinatarios, asunto, documento, revision, autor):
+    """
+    Envía notificaciones por correo electrónico a una lista de destinatarios utilizando la API de Mailgun.
+    """
+    logger = logging.getLogger(__name__)
+    logging.getLogger("urllib3").setLevel(logging.WARNING)
+    api_key = os.getenv('EMAIL_API_KEY')
+    from_email = 'Cerebro <cerebro@sgctlaxcala.com.mx>'
+
+    if not api_key:
+        logger.critical("No se encontró la variable de entorno EMAIL_API_KEY.")
+        messages.error(request, "Error de configuración del servidor: no se pudo enviar la notificación.")
+        return
+
+    for destinatario_profile in destinatarios:
+        nombre_usuario = destinatario_profile.user.get_full_name()
+        if not nombre_usuario:
+            nombre_usuario = destinatario_profile.user.username or destinatario_profile.user.email.split('@')[0]
+
+        mensaje_html = render_to_string('docs/notificacion_urgente.html', {
+            'documento': documento,
+            'revision': revision,
+            'autor': autor,
+            'nombre_usuario': nombre_usuario,
+        })
+
+        try:
+            response = requests.post(
+                "https://api.mailgun.net/v3/sgctlaxcala.com.mx/messages",
+                auth=("api", api_key),
+                data={
+                    "from": from_email,
+                    "to": f"{nombre_usuario} <{destinatario_profile.user.email}>",
+                    "subject": asunto,
+                    "html": mensaje_html
+                }
+            )
+            response.raise_for_status()
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Error al enviar notificación a {destinatario_profile.user.email}: {e}")
+            messages.error(request, f"Error al enviar notificación a {destinatario_profile.user.email}: {e}")
+    
+    logger.info(f"Notificación para '{documento.nombre}': Enviada a {destinatarios.count()} destinatarios.")
+
 
 class RevisionAdd(LoginRequiredMixin, CreateView):
     """Formulario para crear una nueva revisión de un documento."""
@@ -289,9 +336,9 @@ class RevisionAdd(LoginRequiredMixin, CreateView):
         if self.object.notificacion_urgente:
             destinatarios = Profile.objects.filter(recibe_notificaciones=True, user__email__isnull=False)
             asunto = f"Notificación Urgente: Nueva Revisión de {self.doc.nombre}"
-            
+
             if destinatarios.exists():
-                envio_de_correo(
+                send_message(
                     self.request,
                     destinatarios,
                     asunto,
