@@ -178,7 +178,8 @@ class VersionForm(forms.ModelForm):
             'revision',
             'f_actualizacion',
             'archivo',
-            'cambios'
+            'cambios',
+            'notificacion_urgente'
         ]
 
     def __init__(self, *args, **kwargs):
@@ -187,6 +188,7 @@ class VersionForm(forms.ModelForm):
         self.fields['f_actualizacion'].label = "Fecha de Actualización"
 
         self.helper = FormHelper()
+        self.helper.form_id = 'formulario_revision'
         self.helper.layout = Layout(
             Div(
                 Field('revision', wrapper_class='col-md-6', attrs={
@@ -206,6 +208,10 @@ class VersionForm(forms.ModelForm):
                 css_class='row'
             ),
             Div(
+                Field('notificacion_urgente', wrapper_class='col-md-12', css_class='form-check-input'),
+                css_class='form-check form-switch row'
+            ),
+            Div(
                 HTML('<hr>'),
                 FormActions(
                     Submit('save', GUARDAR_CAMBIOS)
@@ -220,7 +226,7 @@ class PanicResolveForm(forms.ModelForm):
 
     Formulario para resolver un documento en estado de pánico.
     """
-    
+
     class Meta:
         model = Reporte
         fields = ['resuelto', 'resolucion']

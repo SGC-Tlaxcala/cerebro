@@ -16,15 +16,22 @@ Incluye las siguientes vistas:
 
 from datetime import datetime
 from django.forms.models import BaseModelForm
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from watson import search as watson
 from django.urls import reverse_lazy
 from django.db.models import Q
 from django.views.generic import (ListView, TemplateView, DetailView, FormView)
 from django.views.generic.edit import CreateView, UpdateView
+from django.template.loader import render_to_string
 from django.template.defaultfilters import slugify
 from django.contrib.auth.mixins import LoginRequiredMixin
-from apps.docs.models import Documento, Proceso, Tipo, Revision, Reporte
+from django.core.mail import send_mail
+from django.contrib import messages
+import os
+import requests
+import logging
+from apps.docs.models import Documento, Proceso, Tipo, Revision, Reporte, Notificacion
+from apps.profiles.models import Profile
 from apps.docs.forms import (
     DocForm,
     ProcesoForm,
@@ -219,6 +226,79 @@ class DocAdd(CreateView):
         return reverse_lazy('docs:detalle', args=(self.object.id, ))
 
 
+def envio_de_correo(request, destinatarios, asunto, documento, revision, autor):
+    """
+    Envía notificaciones por correo electrónico a una lista de destinatarios.
+    """
+    from_email = 'Cerebro <cerebro@sgctlaxcala.com.mx>'
+    for destinatario_profile in destinatarios:
+        nombre_usuario = destinatario_profile.user.get_full_name()
+        if not nombre_usuario:
+            nombre_usuario = destinatario_profile.user.username or destinatario_profile.user.email.split('@')[0]
+
+        mensaje_html = render_to_string('docs/notificacion_urgente.html', {
+            'documento': documento,
+            'revision': revision,
+            'autor': autor,
+            'nombre_usuario': nombre_usuario,
+        })
+        try:
+            send_mail(
+                asunto,
+                '',  # Mensaje de texto plano vacío
+                from_email,
+                [destinatario_profile.user.email],
+                html_message=mensaje_html,
+                fail_silently=False
+            )
+        except Exception as e:
+            messages.error(request, f"Error al enviar notificación a {destinatario_profile.user.email}: {e}")
+
+def send_message(request, destinatarios, asunto, documento, revision, autor):
+    """
+    Envía notificaciones por correo electrónico a una lista de destinatarios utilizando la API de Mailgun.
+    """
+    logger = logging.getLogger(__name__)
+    logging.getLogger("urllib3").setLevel(logging.WARNING)
+    api_key = os.getenv('EMAIL_API_KEY')
+    from_email = 'Cerebro <cerebro@sgctlaxcala.com.mx>'
+
+    if not api_key:
+        logger.critical("No se encontró la variable de entorno EMAIL_API_KEY.")
+        messages.error(request, "Error de configuración del servidor: no se pudo enviar la notificación.")
+        return
+
+    for destinatario_profile in destinatarios:
+        nombre_usuario = destinatario_profile.user.get_full_name()
+        if not nombre_usuario:
+            nombre_usuario = destinatario_profile.user.username or destinatario_profile.user.email.split('@')[0]
+
+        mensaje_html = render_to_string('docs/notificacion_urgente.html', {
+            'documento': documento,
+            'revision': revision,
+            'autor': autor,
+            'nombre_usuario': nombre_usuario,
+        })
+
+        try:
+            response = requests.post(
+                "https://api.mailgun.net/v3/sgctlaxcala.com.mx/messages",
+                auth=("api", api_key),
+                data={
+                    "from": from_email,
+                    "to": f"{nombre_usuario} <{destinatario_profile.user.email}>",
+                    "subject": asunto,
+                    "html": mensaje_html
+                }
+            )
+            response.raise_for_status()
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Error al enviar notificación a {destinatario_profile.user.email}: {e}")
+            messages.error(request, f"Error al enviar notificación a {destinatario_profile.user.email}: {e}")
+    
+    logger.info(f"Notificación para '{documento.nombre}': Enviada a {destinatarios.count()} destinatarios.")
+
+
 class RevisionAdd(LoginRequiredMixin, CreateView):
     """Formulario para crear una nueva revisión de un documento."""
 
@@ -231,12 +311,15 @@ class RevisionAdd(LoginRequiredMixin, CreateView):
         return super(RevisionAdd, self).dispatch(request, *args, **kwargs)
 
     def get_initial(self):
-        super(RevisionAdd, self).get_initial()
-        revision = self.doc.revision_set.order_by('-revision')[0].revision + 1
+        initial = super(RevisionAdd, self).get_initial()
+        try:
+            revision = self.doc.revision_set.order_by('-revision')[0].revision + 1
+        except IndexError:
+            revision = 0
         fecha = datetime.today()
-        self.initial['revision'] = revision
-        self.initial['f_actualizacion'] = fecha
-        return self.initial
+        initial['revision'] = revision
+        initial['f_actualizacion'] = fecha
+        return initial
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -247,11 +330,56 @@ class RevisionAdd(LoginRequiredMixin, CreateView):
         self.object = form.save(commit=False)
         self.object.documento = self.doc
         self.object.autor = self.request.user
+
         self.object.save()
-        return super().form_valid(form)
+
+        if self.object.notificacion_urgente:
+            destinatarios = Profile.objects.filter(recibe_notificaciones=True, user__email__isnull=False)
+            asunto = f"Notificación Urgente: Nueva Revisión de {self.doc.nombre}"
+
+            if destinatarios.exists():
+                send_message(
+                    self.request,
+                    destinatarios,
+                    asunto,
+                    self.doc,
+                    self.object,
+                    self.request.user
+                )
+
+                # Render the message once for the notification record, using a generic user name
+                mensaje_html_para_notificacion = render_to_string('docs/notificacion_urgente_content.html', {
+                    'documento': self.doc,
+                    'revision': self.object,
+                    'autor': self.request.user,
+                    'nombre_usuario': 'Equipo', # Generic name for the notification record
+                })
+
+                Notificacion.objects.create(
+                    documento=self.doc,
+                    revision_obj=self.object,
+                    destinatarios=", ".join([p.user.email for p in destinatarios if p.user.email]),
+                    tipo='U',  # Urgente
+                    asunto=asunto,
+                    cuerpo_html=mensaje_html_para_notificacion,
+                )
+                messages.success(self.request, "Revisión guardada y notificación urgente enviada.")
+            else:
+                messages.warning(self.request, "Revisión guardada, pero no se encontraron destinatarios para la notificación urgente.")
+        else:
+            messages.success(self.request, "Revisión guardada correctamente.")
+        return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self):
-        return reverse_lazy('docs:detalle', args=(self.kwargs['pk'], ))
+        return reverse_lazy('docs:detalle', args=(self.doc.id, ))
+
+
+
+def get_notification_recipients_count(request):
+    if request.method == 'GET':
+        count = Profile.objects.filter(recibe_notificaciones=True, user__email__isnull=False).count()
+        return JsonResponse({'count': count})
+    return JsonResponse({'count': 0})
 
 
 class ProcesoList(DetailView):
@@ -263,14 +391,16 @@ class ProcesoList(DetailView):
 class ProcessAdd(CreateView):
     """Formulario para agregar un nuevo proceso."""
     model = Proceso
-    fields = ['proceso', 'slug']
+    form_class = ProcesoForm
+    template_name = 'docs/proceso_form.html'
     success_url = reverse_lazy('docs:setup')
 
 
 class TipoAdd(CreateView):
     """Formulario para agregar un nuevo tipo de documento."""
     model = Tipo
-    fields = ['tipo', 'slug']
+    form_class = TipoForm
+    template_name = 'docs/tipo_form.html'
     success_url = reverse_lazy('docs:setup')
 
 
@@ -337,6 +467,19 @@ class ReportesList(ListView):
         context['pendientes'] = Reporte.objects.filter(resuelto=False).order_by('-created')
         context['resueltos'] = Reporte.objects.filter(resuelto=True).order_by('-resuelto_en')
         return context
+
+
+class NotificacionListView(LoginRequiredMixin, ListView):
+    model = Notificacion
+    template_name = 'docs/notificacion_list.html'
+    context_object_name = 'notificaciones'
+    ordering = ['-fecha_envio']
+
+
+class NotificacionDetailView(LoginRequiredMixin, DetailView):
+    model = Notificacion
+    template_name = 'docs/notificacion_detail.html'
+    context_object_name = 'notificacion'
 
 
 class PanicResolve(LoginRequiredMixin, UpdateView):

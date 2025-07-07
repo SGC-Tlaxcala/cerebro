@@ -1,0 +1,34 @@
+{% extends 'docs/base_email.html' %}
+
+{% block title %}Notificación de Revisiones de Documentos{% endblock %}
+
+{% block content %}
+    <h2>Documentos Actualizados</h2>
+    <p>Estimado(a) usuario(a),</p>
+    <p>Se han realizado las siguientes actualizaciones en los documentos:</p>
+
+    {% if revisiones %}
+    <table>
+        <thead>
+            <tr>
+                <th>Documento</th>
+                <th>Revisión</th>
+                <th>Cambios</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for revision in revisiones %}
+            <tr>
+                <td><a href="https://sgctlaxcala.com.mx{% url 'docs:detalle' pk=revision.documento.pk %}" target=_blank>{{ revision.documento.nombre }}</a></td>
+                <td>{{ revision.revision }}</td>
+                <td>{{ revision.cambios|safe }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No hay revisiones pendientes de notificación en este momento.</p>
+    {% endif %}
+
+    <p>Saludos cordiales,<br>El equipo de Cerebro</p>
+{% endblock content %}

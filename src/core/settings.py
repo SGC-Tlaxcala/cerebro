@@ -179,27 +179,25 @@ CACHES = {
 LOGGING = {
     'disable_existing_loggers': False,
     'version': 1,
+    'formatters': {
+        'verbose': {
+            'format': '[%(asctime)s] %(message)s',
+            'datefmt': '%d/%b/%Y %H:%M:%S'
+        },
+    },
     'handlers': {
         'console': {
-            # logging handler that outputs log messages to terminal
             'class': 'logging.StreamHandler',
-            'level': 'DEBUG',  # message level to be written to console
+            'level': 'DEBUG',
+            'formatter': 'verbose',
         },
     },
     'loggers': {
         '': {
-            # this sets root level logger to log debug and higher level
-            # logs to console. All other loggers inherit settings from
-            # root level logger.
             'handlers': ['console'],
             'level': 'DEBUG',
-            'propagate': False,    # this tells logger to send logging message
-                                   # to its parent (will send if set to True)
+            'propagate': False,
         },
-        # 'django.db': {
-        #     # django also has database level logging
-        #     'level': 'DEBUG'
-        # },
     },
 }
 
@@ -221,10 +219,12 @@ AUTHENTICATION_BACKENDS = (
 
 # Caso no. 35, Backend para correo
 EMAIL_HOST = env("EMAIL_HOST")
-EMAIL_USE_TLS = env("EMAIL_USE_TLS", default=True)
+EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=False)
+EMAIL_USE_SSL = env.bool("EMAIL_USE_SSL", default=False)
 EMAIL_PORT = env("EMAIL_PORT")
 EMAIL_HOST_USER = env('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = 'Cerebro <cerebro@sgctlaxcala.com.mx>'
 
 ANYMAIL = {
     "MAILGUN_API_KEY": env('EMAIL_HOST_USER'),

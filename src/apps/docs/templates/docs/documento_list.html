@@ -12,13 +12,13 @@
     <div class="col-md-12 mb-3">
       <ul class="nav nav-pills nav-justified">
         <li class="nav-item">
-          <a 
-            class="nav-link{% if activeLMD %} active{% endif %}" 
-            aria-current="page" 
+          <a
+            class="nav-link{% if activeLMD %} active{% endif %}"
+            aria-current="page"
             href="{% url 'docs:index' %}">Lista maestra de documentos</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link{% if activeLDP %} active{% endif %}" 
+          <a class="nav-link{% if activeLDP %} active{% endif %}"
             aria-current="page"
             href="{% url 'docs:ldp' %}">Lista por procesos</a>
         </li>
@@ -75,7 +75,7 @@
                 {%  endif %}</td>
               {% else %}
                 <td colspan="3">
-                  <a href="{% url "docs.views.agregar_control" doc=doc.id %}">
+                  <a href="{% url 'docs:rev_add' pk=doc.id %}">
                     <i class="icon-plus-2"></i> Agregar una nueva revisión
                   </a>
                 </td>

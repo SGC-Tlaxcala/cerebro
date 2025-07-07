@@ -1,0 +1,18 @@
+<p>Hola, {{ nombre_usuario }},</p>
+<p>Se ha realizado una actualización urgente en un documento que podría ser de tu interés.</p>
+
+<p>
+    <strong>Documento:</strong> {{ documento.nombre }}<br>
+    <strong>Revisión:</strong> {{ revision.revision|stringformat:"02d" }}<br>
+    <strong>Fecha:</strong> {{ revision.f_actualizacion|date:"d/m/Y" }}
+</p>
+
+<p><strong>Resumen de cambios:</strong></p>
+<div>
+    {{ revision.cambios|safe }}
+</div>
+
+<hr />
+<p>Puedes consultar el <a href="https://sgctlaxcala.com.mx{% url 'docs:detalle' documento.id %}" target=_blank>documento actualizado</a> en el Cuadro de Mando Integral.</p>
+
+<p>Saludos cordiales,<br>El equipo de Cerebro</p>
