@@ -45,24 +45,34 @@ class Campaign(models.Model):
     year = models.PositiveIntegerField()
     type = models.CharField(max_length=3, choices=TYPE_CHOICES)
     meta = models.DecimalField(max_digits=5, decimal_places=2)
-    forecast = models.PositiveIntegerField()
-    acumulado = models.FloatField(default=0.0)
+    forecast = models.PositiveIntegerField('Pronóstico de trámites esperados')
+    acumulado = models.PositiveIntegerField('Trámites acumulados', default=0,
+                                            editable=False, help_text='Número de trámites acumulados hasta la fecha')
+    avance = models.FloatField(default=0.0, editable=False, help_text='Porcentaje de avance de la campaña')
 
     class Meta:
         unique_together = ('year', 'type')
+        verbose_name = 'Campaña'
+        verbose_name_plural = 'Campañas'
 
     def __str__(self):
         return f"{self.get_type_display()} {self.year}"
 
     def update_acumulado(self):
         """
-        Recalcula el acumulado de la campaña basado en los trámites mensuales registrados.
+        Recalcula el acumulado y el avance de la campaña basado en los trámites mensuales registrados.
         """
         total = self.tramitemensual_set.aggregate(
-            total=models.Sum('total_tramites')
+            total=models.Sum('tramites')
         )['total'] or 0
-        self.acumulado = (total / self.forecast) * 100 if self.forecast else 0
-        self.save(update_fields=['acumulado'])
+
+        avance = (total / self.forecast) * 100 if self.forecast else 0
+
+        # Solo actualiza si hay cambios
+        if self.acumulado != total or self.avance != avance:
+            self.acumulado = total
+            self.avance = avance
+            self.save(update_fields=['acumulado', 'avance'])
 
 
 class TramiteMensual(models.Model):
@@ -74,7 +84,7 @@ class TramiteMensual(models.Model):
     - campaign: Relación con la campaña asociada.
     - year: Año en el que se realizaron los trámites.
     - month: Mes en el que se realizaron los trámites (1 para enero, 12 para diciembre).
-    - total_tramites: Número total de trámites realizados en el mes.
+    - tramites: Número total de trámites realizados en el mes.
 
     Métodos:
     - clean: Valida que el mes corresponda al tipo de campaña antes de guardar.
@@ -86,15 +96,15 @@ class TramiteMensual(models.Model):
     MONTH_CHOICES = [(i, i) for i in range(1, 13)]
 
     campaign = models.ForeignKey(Campaign, on_delete=models.CASCADE)
-    year = models.PositiveIntegerField()
     month = models.PositiveSmallIntegerField(choices=MONTH_CHOICES)
     tramites = models.PositiveIntegerField()
 
     class Meta:
-        unique_together = ('campaign', 'year', 'month')
+        unique_together = ('campaign', 'month')
+        verbose_name = 'Trámites'
 
     def __str__(self):
-        return f"{self.campaign} - {self.year}/{self.month:02d}"
+        return f"{self.campaign} - {self.month:02d}"
 
     def clean(self):
         """
