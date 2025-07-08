@@ -42,9 +42,9 @@ class Campaign(models.Model):
         (CAI, 'Campaña Anual Intensa'),
     ]
 
-    year = models.PositiveIntegerField()
-    type = models.CharField(max_length=3, choices=TYPE_CHOICES)
-    meta = models.DecimalField(max_digits=5, decimal_places=2)
+    year = models.PositiveIntegerField('Año')
+    type = models.CharField('Tipo de Campaña', max_length=3, choices=TYPE_CHOICES)
+    goal = models.DecimalField('Meta', max_digits=5, decimal_places=2, default=0)
     forecast = models.PositiveIntegerField('Pronóstico de trámites esperados')
     acumulado = models.PositiveIntegerField('Trámites acumulados', default=0,
                                             editable=False, help_text='Número de trámites acumulados hasta la fecha')

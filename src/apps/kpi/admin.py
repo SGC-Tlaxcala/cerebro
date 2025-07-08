@@ -10,7 +10,7 @@ class TramiteMensualInline(admin.TabularInline):
 
 
 class CampaignAdmin(admin.ModelAdmin):
-    list_display = ('type', 'year', 'meta', 'forecast', 'acumulado', 'avance_percent')
+    list_display = ('type', 'year', 'goal', 'forecast', 'acumulado', 'avance_percent')
     search_fields = ('type', 'year')
     inlines = [TramiteMensualInline]
     list_filter = ('type', 'year')
@@ -21,7 +21,7 @@ class CampaignAdmin(admin.ModelAdmin):
 
     def get_readonly_fields(self, request, obj=None):
         if obj:
-            return self.readonly_fields + ('acumulado','avance')
+            return self.readonly_fields + ('acumulado','avance_percent')
         return self.readonly_fields
 
 
