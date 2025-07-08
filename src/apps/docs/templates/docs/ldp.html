@@ -15,13 +15,13 @@
     <div class="col-md-12 mb-3">
       <ul class="nav nav-pills nav-justified">
         <li class="nav-item">
-          <a 
-            class="nav-link{% if activeLMD %} active{% endif %}" 
-            aria-current="page" 
+          <a
+            class="nav-link{% if activeLMD %} active{% endif %}"
+            aria-current="page"
             href="{% url 'docs:index' %}">Lista maestra de documentos</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link{% if activeLDP %} active{% endif %}" 
+          <a class="nav-link{% if activeLDP %} active{% endif %}"
             aria-current="page"
             href="{% url 'docs:ldp' %}">Lista por procesos</a>
         </li>
@@ -29,8 +29,11 @@
           <a class="nav-link" href="{% url 'docs:ldt' %}">Lista por tipo</a>
         </li>
         <li class="nav-item">
-          <a 
-            class="btn btn-danger"  
+           <a class="nav-link" href="#">Resultados del SGC</a>
+        </li>
+        <li class="nav-item">
+          <a
+            class="btn btn-danger"
             href="{% url 'docs:panic' pk=831 %}">
             Notificar documento faltante
           </a>
@@ -54,17 +57,17 @@
         {% for proceso, docs in proceso_list %}
         <div class="accordion-item">
           <h2 class="accordion-header">
-            <button 
-              class="accordion-button" 
-              type="button" 
+            <button
+              class="accordion-button"
+              type="button"
               data-bs-toggle="collapse"
-              data-bs-target="#collapse-{{proceso.id}}" 
-              aria-expanded="false"  
+              data-bs-target="#collapse-{{proceso.id}}"
+              aria-expanded="false"
               aria-controls="collapse-{{proceso.id}}">
               {{ proceso }}
             </button>
           </h2>
-          <div id="collapse-{{proceso.id}}" class="accordion-collapse collapse" 
+          <div id="collapse-{{proceso.id}}" class="accordion-collapse collapse"
             data-bs-parent="#acordeonLDP">
             <div class="accordion-body">
               <div class="row">
@@ -114,7 +117,7 @@
               </div>
             </div>
           </div>
-        </div>  
+        </div>
         {% endfor %}
       </div>
     </div>
