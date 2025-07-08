@@ -3,7 +3,7 @@
 {% load static %}
 
 
-{% block  head_title %}Lista de Documentos por Proceso{% endblock %}
+{% block  head_title %}Resultados del SGC{% endblock %}
 
 {% block header %}
   <link rel="stylesheet" href="{% static 'docs/estilos.css' %}">
@@ -16,12 +16,12 @@
       <ul class="nav nav-pills nav-justified">
         <li class="nav-item">
           <a
-            class="nav-link{% if activeLMD %} active{% endif %}"
+            class="nav-link"
             aria-current="page"
             href="{% url 'docs:index' %}">Lista maestra de documentos</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link{% if activeLDP %} active{% endif %}"
+          <a class="nav-link"
             aria-current="page"
             href="{% url 'docs:ldp' %}">Lista por procesos</a>
         </li>
@@ -29,7 +29,7 @@
           <a class="nav-link" href="{% url 'docs:ldt' %}">Lista por tipo</a>
         </li>
         <li class="nav-item">
-           <a class="nav-link" href="{% url 'docs:ldr' %}">Resultados del SGC</a>
+           <a class="nav-link active" href="{url 'docs:ldr'}">Resultados del SGC</a>
         </li>
         <li class="nav-item">
           <a
@@ -45,7 +45,7 @@
   <div class="row">
     <div class="col-md-12">
       <div class="jumbotron">
-        <h1>Lista de Documentos por Proceso</h1>
+        <h1>Resultados del SGC</h1>
       </div>
     </div>
   </div>

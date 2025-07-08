@@ -9,7 +9,7 @@ from apps.docs import views
 from apps.docs.views import (
     IndexLMD, DocDetail, ProcesoList, Buscador, SetupDoc,
     ProcessAdd, TipoAdd, DocAdd, RevisionAdd, Reportes,
-    PanicButtonView, ReportesList, PanicResolve, IndexLDP, IndexLDT,
+    PanicButtonView, ReportesList, PanicResolve, IndexLDP, IndexLDT, IndexLDR,
     NotificacionListView, NotificacionDetailView
 )
 
@@ -39,6 +39,7 @@ urlpatterns = [
     path('tipo_add/', login_required(TipoAdd.as_view()), name='tipo_add'),
     path('ldp/', IndexLDP.as_view(), name='ldp'),
     path('ldt/', IndexLDT.as_view(), name='ldt'),
+    path('ldr/', IndexLDR.as_view(), name='ldr'),
     path('<int:pk>/add', RevisionAdd.as_view(), name='rev_add'),
     path('notificaciones/', login_required(NotificacionListView.as_view()), name='notificaciones_list'),
     path('notificaciones/<int:pk>/', login_required(NotificacionDetailView.as_view()), name='notificaciones_detail'),

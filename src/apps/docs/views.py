@@ -131,6 +131,24 @@ class IndexLDT(ListView):
             .filter(lmd=False, activo=True).order_by('tipo', 'proceso', 'id')
 
 
+class IndexLDR(ListView):
+    """Lista de resultados del SGC."""
+
+    model = Documento
+    template_name = 'docs/ldr.html'
+    context_object_name = 'docs'
+
+    def get_context_data(self, **kwargs):
+        """Agregamos la variable panicButton al contexto de la vista."""
+        context = super().get_context_data(**kwargs)
+        context['panicButton'] = True
+        return context
+
+    def get_queryset(self):
+        """Genera la consulta de la LDR."""
+        return Documento.objects.filter(resultados=True, activo=True).order_by('proceso', 'id')
+
+
 class IndexList(ListView):
     """
     Vista que genera la portada de la app docs.
@@ -295,7 +313,7 @@ def send_message(request, destinatarios, asunto, documento, revision, autor):
         except requests.exceptions.RequestException as e:
             logger.error(f"Error al enviar notificación a {destinatario_profile.user.email}: {e}")
             messages.error(request, f"Error al enviar notificación a {destinatario_profile.user.email}: {e}")
-    
+
     logger.info(f"Notificación para '{documento.nombre}': Enviada a {destinatarios.count()} destinatarios.")
 
 

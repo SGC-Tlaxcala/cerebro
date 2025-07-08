@@ -96,6 +96,11 @@ class Documento (models.Model):
         help_text="Pertenece a la Lista Maestra de Documentos",
         default=False
     )
+    resultados = models.BooleanField(
+        "Resultados",
+        help_text="Documento que contiene resultados del SGC",
+        default=False
+    )
     aprobado = models.BooleanField("Documento en aprobación", default=False)
     activo = models.BooleanField(default=True)
     texto_ayuda = models.TextField(blank=True)
