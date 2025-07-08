@@ -1,4 +1,3 @@
-# coding: utf-8
 """Patrones de rutas generales."""
 
 from django.conf import settings
@@ -7,10 +6,6 @@ from django.contrib import admin
 from django.urls import path, include
 from django.contrib.auth.views import LoginView, LogoutView
 from core.views import Index
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
-    TokenRefreshView,
-)
 
 
 urlpatterns = [
@@ -23,9 +18,6 @@ urlpatterns = [
     path('ideas/', include('apps.ideas.urls')),
     path('pas/', include('apps.pas.urls')),
     path('', Index.as_view(), name='index'),
-    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
