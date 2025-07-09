@@ -7,6 +7,7 @@
     {% include 'partials/_meta.html' %}
     {% include 'partials/_styles.html' %}
     <link rel="stylesheet" href="{% static 'docs/estilos.css' %}">
+    {% block head %}{% endblock head %}
   </head>
   <body>
     {% include 'partials/_navbar.html' %}
@@ -20,5 +21,6 @@
     {% include 'partials/_footer.html' %}
     {% include 'partials/_scripts.html' %}
     {% block footer %}{% endblock footer%}
+    {% block scripts %}{% endblock scripts%}
   </body>
 </html>

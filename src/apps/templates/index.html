@@ -58,6 +58,13 @@
             la ciudadanía en los Módulos de Atención Ciudadana en al
             menos el 90% del rango mínimo establecido en el pronóstico.
           </p>
+          <!-- Button to trigger modal -->
+          <button type="button" class="btn btn-outline-primary btn-lg" data-bs-toggle="modal" data-bs-target="#kpi1">
+            {{ cap }}
+            {% for t in cap.tramitemensual_set.all %}
+              <span class="badge bg-secondary">{{ t.month }}: {{ t.tramites }}</span>
+            {% endfor %}
+          </button>
         </div>
       </div>
     </div>
@@ -118,3 +125,125 @@
 
   </div>
 {% endblock content %}
+
+{% block footer %}
+<!-- Modal KPI#1 -->
+<div class="modal fade" id="kpi1" tabindex="-1" aria-labelledby="kpi1Label" aria-hidden="true">
+
+  <script type="text/javascript">
+    google.charts.load("current", { packages: ["corechart"] });
+    google.charts.setOnLoadCallback(drawChart);
+
+    function calcularMinimoEstetico(valorMin) {
+      const unidades = valorMin % 10;
+      if (unidades >= 5) {
+        return valorMin - unidades;
+      } else {
+        return valorMin - unidades - 5;
+      }
+    }
+
+    function mes(n) {
+      const nombres = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+      return nombres[n - 1] || '';
+    }
+
+
+    function drawChart() {
+      const meses = [
+                      {% for t in cap.tramitemensual_set.all|dictsort:"month" %}
+                        '{{ t.month|stringformat:"02d" }}'{% if not forloop.last %}, {% endif %}
+                      {% endfor %}
+                    ];
+      const tramites = [
+                        {% for t in cap.tramitemensual_set.all %}
+                          {{ t.tramites }}{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                       ];
+      const pronostico = {{ cap.forecast|default:0 }};
+
+      let suma = 0;
+      const acumulado = tramites.map(v => (suma += v));
+      const porcentajeAcum = acumulado.map(v => parseFloat((v / pronostico * 100).toFixed(2)));
+
+      const data = new google.visualization.DataTable();
+      data.addColumn('string', 'Mes');
+      data.addColumn('number', 'Trámites mensuales');
+      data.addColumn('number', '% Acumulado');
+      data.addColumn('number', 'Meta {{ cap.goal }}%');
+
+      for (let i = 0; i < meses.length; i++) {
+        data.addRow([
+          mes(parseInt(meses[i])),
+          tramites[i],
+          porcentajeAcum[i],
+          {{ cap.goal|default:0 }} // Meta del KPI#1
+        ]);
+      }
+
+      const minY2 = calcularMinimoEstetico(Math.min(...porcentajeAcum));
+
+      const options = {
+        chartArea: { width: '80%', height: '70%' },
+        legend: { position: 'top', alignment: 'center' },
+        vAxes: {
+          0: { title: 'Número de trámites', minValue: 0 },
+          1: {
+            title: '% Acumulado',
+            viewWindow: {
+              min: minY2,
+              max: 100
+            },
+            textStyle: { color: '#d5007f' },
+            titleTextStyle: { color: '#d5007f' },
+            gridlines: { color: 'transparent' }
+          }
+        },
+        seriesType: 'bars',
+        series: {
+          0: { targetAxisIndex: 0 }, // Trámites
+          1: {
+            type: 'line',
+            targetAxisIndex: 1,
+            color: '#d5007f',
+            lineWidth: 2,
+            pointSize: 5
+          },
+          2: {
+            type: 'line',
+            targetAxisIndex: 1,
+            color: '#000',
+            lineDashStyle: [4, 4],
+            lineWidth: 1,
+            pointSize: 0
+          }
+        },
+        tooltip: { trigger: 'focus' }
+      };
+
+      const chart = new google.visualization.ComboChart(document.getElementById('chartKPI1'));
+      chart.draw(data, options);
+    }
+
+    document.getElementById('kpi1').addEventListener('shown.bs.modal', function () {
+      drawChart();
+    });
+  </script>
+
+  <div class="modal-dialog" style="min-width: 75%;">
+    <div class="modal-content" style="min-height: 600px;">
+      <div class="modal-header">
+        <h5 class="modal-title" id="kpi1Label">{{ cap }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body p-0" style="height: 600px;">
+        <div id="chartKPI1" style="width: 100%; height: 100%;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock footer %}
+
+{% block head %}
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+{% endblock head %}

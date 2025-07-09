@@ -7,7 +7,7 @@ Clases:
 
 Detalles:
 - Campaign incluye métodos para calcular el acumulado basado en los trámites mensuales registrados.
-- TramiteMensual valida que los meses correspondan al tipo de campaña antes de guardar los datos.
+- TramiteMensual verifica que los meses correspondan al tipo de campaña antes de guardar los datos.
 
 Dependencias:
 - models: Proporciona las clases base para definir modelos en Django.
@@ -43,7 +43,7 @@ class Campaign(models.Model):
     ]
 
     year = models.PositiveIntegerField('Año')
-    type = models.CharField('Tipo de Campaña', max_length=3, choices=TYPE_CHOICES)
+    campaign_type = models.CharField('Tipo de Campaña', max_length=3, choices=TYPE_CHOICES)
     goal = models.DecimalField('Meta', max_digits=5, decimal_places=2, default=0)
     forecast = models.PositiveIntegerField('Pronóstico de trámites esperados')
     acumulado = models.PositiveIntegerField('Trámites acumulados', default=0,
@@ -51,12 +51,12 @@ class Campaign(models.Model):
     avance = models.FloatField(default=0.0, editable=False, help_text='Porcentaje de avance de la campaña')
 
     class Meta:
-        unique_together = ('year', 'type')
+        unique_together = ('year', 'campaign_type')
         verbose_name = 'Trámites por Campaña'
         verbose_name_plural = 'Campañas'
 
     def __str__(self):
-        return f"{self.get_type_display()} {self.year}"
+        return f"{self.get_campaign_type_display()} {self.year}"
 
     def update_acumulado(self):
         """
@@ -74,6 +74,13 @@ class Campaign(models.Model):
             self.avance = avance
             self.save(update_fields=['acumulado', 'avance'])
 
+    @classmethod
+    def actual(cls, year, campaign_type):
+        """
+        Devuelve el queryset de campañas del año y tipo especificados.
+        """
+        return cls.objects.get(year=year, campaign_type=campaign_type)
+
 
 class TramiteMensual(models.Model):
     """
@@ -87,7 +94,7 @@ class TramiteMensual(models.Model):
     - tramites: Número total de trámites realizados en el mes.
 
     Métodos:
-    - clean: Valida que el mes corresponda al tipo de campaña antes de guardar.
+    - clean: Verifica que el mes corresponda al tipo de campaña antes de guardar.
     - save: Ejecuta la validación y actualiza el acumulado de la campaña asociada.
 
     Meta:
@@ -110,9 +117,9 @@ class TramiteMensual(models.Model):
         """
         Valida que el mes corresponda al tipo de campaña.
         """
-        if self.campaign.type == Campaign.CAP and not (1 <= self.month <= 8):
+        if self.campaign.campaign_type == Campaign.CAP and not (1 <= self.month <= 8):
             raise ValidationError('CAP solo permite meses de enero a agosto.')
-        if self.campaign.type == Campaign.CAI and not (9 <= self.month <= 12):
+        if self.campaign.campaign_type == Campaign.CAI and not (9 <= self.month <= 12):
             raise ValidationError('CAI solo permite meses de septiembre a diciembre.')
 
     def save(self, *args, **kwargs):

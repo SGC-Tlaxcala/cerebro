@@ -10,10 +10,10 @@ class TramiteMensualInline(admin.TabularInline):
 
 
 class CampaignAdmin(admin.ModelAdmin):
-    list_display = ('type', 'year', 'goal', 'forecast', 'acumulado', 'avance_percent')
-    search_fields = ('type', 'year')
+    list_display = ('campaign_type', 'year', 'goal', 'forecast', 'acumulado', 'avance_percent')
+    search_fields = ('campaign_type', 'year')
     inlines = [TramiteMensualInline]
-    list_filter = ('type', 'year')
+    list_filter = ('campaign_type', 'year')
 
     def avance_percent(self, obj):
         return f"{obj.avance:.2f}%"
