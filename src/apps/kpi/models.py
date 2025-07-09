@@ -52,7 +52,7 @@ class Campaign(models.Model):
 
     class Meta:
         unique_together = ('year', 'type')
-        verbose_name = 'Campaña'
+        verbose_name = 'Trámites por Campaña'
         verbose_name_plural = 'Campañas'
 
     def __str__(self):
