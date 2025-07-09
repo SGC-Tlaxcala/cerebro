@@ -77,6 +77,7 @@ TEMPLATES = [
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
             APPS_DIR.child('templates'),
+            APPS_DIR.child('kpi', 'templates'),
             'templates'
         ],
         'APP_DIRS': True,
