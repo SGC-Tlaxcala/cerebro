@@ -56,6 +56,7 @@ LOCAL_APPS = [
     'apps.ideas.config.IdeasConfig',
     'apps.carto.config.CartoConfig',
     'apps.pas.config.PasConfig',
+    'apps.kpi.config.KpiConfig',
 ]
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
@@ -76,6 +77,7 @@ TEMPLATES = [
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
             APPS_DIR.child('templates'),
+            APPS_DIR.child('kpi', 'templates'),
             'templates'
         ],
         'APP_DIRS': True,

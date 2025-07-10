@@ -1,0 +1,53 @@
+{# Modal KPI#5 #}
+<style>
+  #kpi5 {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    padding: 40px;
+  }
+</style>
+
+<script type="text/javascript">
+  // Carga la librería de Gauge
+  google.charts.load('current', {'packages':['gauge']});
+  google.charts.setOnLoadCallback(drawKPI2);
+
+  function drawKPI2() {
+    // Datos: etiqueta y valor actual (en %)
+    var data = google.visualization.arrayToDataTable([
+      ['Label', 'Value'],
+      ['%', 96.01]  // Valor de ejemplo: 96.01%
+    ]);
+
+    // Opciones del gauge
+    var options = {
+      width: 600,
+      height: 600,
+      min: 0,
+      max: 100,
+      redFrom: 0,    redTo: 75,   // <70% rojo
+      yellowFrom: 75, yellowTo: 95, // 70–95% amarillo
+      greenFrom: 95, greenTo: 100,  // >95% verde (meta)
+      minorTicks: 1,
+      majorTicks: ['0', '25', '50', '75', '100']
+    };
+
+    // Dibujar
+    var chart = new google.visualization.Gauge(document.getElementById('chartKPI5'));
+    chart.draw(data, options);
+  }
+</script>
+
+<div class="modal fade" id="kpi5" tabindex="-1" aria-labelledby="kpi5Label" aria-hidden="true">
+  <div class="modal-dialog" style="min-width: 600px;">
+    <div class="modal-content" style="min-height: 600px;">
+      <div class="modal-header">
+        <h5 class="modal-title" id="kpi5Label">Satisfacción Ciudadana</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body p-0" style="height: 600px;">
+        <div id="chartKPI5" style="width: 100%; height: 100%;"></div>
+      </div>
+    </div>
+  </div>
+</div>

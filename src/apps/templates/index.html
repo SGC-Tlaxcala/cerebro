@@ -58,6 +58,10 @@
             la ciudadanía en los Módulos de Atención Ciudadana en al
             menos el 90% del rango mínimo establecido en el pronóstico.
           </p>
+          <!-- Button to trigger modal -->
+          <button type="button" class="btn btn-outline-primary btn-lg" data-bs-toggle="modal" data-bs-target="#kpi1">
+            {{ cap }}
+          </button>
         </div>
       </div>
     </div>
@@ -72,6 +76,9 @@
             de la entidad, con base en el Reporte porcentaje de
             avance en la implementación del modelo institucional vigente.
           </p>
+          <button type="button" class="btn btn-outline-primary btn-lg" data-bs-toggle="modal" data-bs-target="#kpi2">
+            MAC con imagen institucional
+          </button>
         </div>
       </div>
     </div>
@@ -87,6 +94,7 @@
             vigente, en los conceptos de pintura en muros, aire acondicionado,
             marquesina, entre otros.
           </p>
+
         </div>
       </div>
     </div>
@@ -100,6 +108,9 @@
             lo que establece el artículo 141 de la Ley General
             de Instituciones y Procedimientos Electorales.
           </p>
+          <button type="button" class="btn btn-outline-primary btn-lg" data-bs-toggle="modal" data-bs-target="#kpi4">
+            Solicitudes art. 141
+          </button>
         </div>
       </div>
     </div>
@@ -112,9 +123,24 @@
             5. Cumplir en un 95% la satisfacción ciudadana sobre
             el servicio de los Módulos de Atención Ciudadana.
           </p>
+          <button type="button" class="btn btn-outline-primary btn-lg" data-bs-toggle="modal" data-bs-target="#kpi5">
+            Aprobación Ciudadana
+          </button>
         </div>
       </div>
     </div>
 
   </div>
+
 {% endblock content %}
+
+{% block footer %}
+  {% include "kpi/modal1.html" %}
+  {% include "kpi/modal2.html" %}
+  {% include 'kpi/modal4.html' %}
+  {% include 'kpi/modal5.html' %}
+{% endblock footer %}
+
+{% block head %}
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+{% endblock head %}

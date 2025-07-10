@@ -1,0 +1,52 @@
+{# Modal KPI#2 #}
+<style>
+  #kpi2 {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    padding: 40px;
+  }
+</style>
+
+<script type="text/javascript">
+  // Carga la librería de Gauge
+  google.charts.load('current', {'packages':['gauge']});
+  google.charts.setOnLoadCallback(drawKPI2);
+
+  function drawKPI2() {
+    // Datos: etiqueta y valor actual (en %)
+    var data = google.visualization.arrayToDataTable([
+      ['Label', 'Value'],
+      ['', {{ imagen.mac_imagen }}]  // Valor de ejemplo: 96.01%
+    ]);
+
+    // Opciones del gauge
+    var options = {
+      width: 600,
+      height: 600,
+      max: {{ imagen.mac_totales }},
+      redFrom: 0,    redTo: 1,   // <70% rojo
+      yellowFrom: 1, yellowTo: 3, // 70–95% amarillo
+      greenFrom: 3, greenTo: {{ imagen.mac_totales }},  // >95% verde (meta)
+      minorTicks: 0,
+      majorTicks: ['0', '1', '2', '3', '4', '5', '6']
+    };
+
+    // Dibujar
+    var chart = new google.visualization.Gauge(document.getElementById('chartKPI2'));
+    chart.draw(data, options);
+  }
+</script>
+
+<div class="modal fade" id="kpi2" tabindex="-1" aria-labelledby="kpi2Label" aria-hidden="true">
+  <div class="modal-dialog" style="min-width: 600px;">
+    <div class="modal-content" style="min-height: 600px;">
+      <div class="modal-header">
+        <h5 class="modal-title" id="kpi2Label">{{ imagen.title }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body p-0" style="height: 600px;">
+        <div id="chartKPI2" style="width: 100%; height: 100%;"></div>
+      </div>
+    </div>
+  </div>
+</div>
