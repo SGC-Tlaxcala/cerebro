@@ -94,6 +94,7 @@
             vigente, en los conceptos de pintura en muros, aire acondicionado,
             marquesina, entre otros.
           </p>
+
         </div>
       </div>
     </div>
@@ -107,6 +108,9 @@
             lo que establece el artículo 141 de la Ley General
             de Instituciones y Procedimientos Electorales.
           </p>
+          <button type="button" class="btn btn-outline-primary btn-lg" data-bs-toggle="modal" data-bs-target="#kpi4">
+            Solicitudes art. 141
+          </button>
         </div>
       </div>
     </div>
@@ -119,6 +123,9 @@
             5. Cumplir en un 95% la satisfacción ciudadana sobre
             el servicio de los Módulos de Atención Ciudadana.
           </p>
+          <button type="button" class="btn btn-outline-primary btn-lg" data-bs-toggle="modal" data-bs-target="#kpi5">
+            Aprobación Ciudadana
+          </button>
         </div>
       </div>
     </div>
@@ -130,6 +137,8 @@
 {% block footer %}
   {% include "kpi/modal1.html" %}
   {% include "kpi/modal2.html" %}
+  {% include 'kpi/modal4.html' %}
+  {% include 'kpi/modal5.html' %}
 {% endblock footer %}
 
 {% block head %}
