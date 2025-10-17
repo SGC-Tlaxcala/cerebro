@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block head_title %}Carga de encuestas - Cuadro de Mando{% endblock head_title %}
+
+{% block content %}
+  <div class="container mt-4">
+    <h2>Subir archivo de encuestas</h2>
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="row">
+        {% crispy form %}
+      </div>
+    </form>
+
+    {# Mensajes de éxito/error #}
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} mt-3">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+
+    {# Tabla de las 20 cargas más recientes #}
+    <div class="mt-5">
+      <h4>Últimas 20 cargas de encuestas</h4>
+      <table class="table table-striped table-bordered">
+        <thead>
+          <tr>
+            <th>Archivo</th>
+            <th>MAC</th>
+            <th>Device ID</th>
+            <th>Registros</th>
+            <th>Fecha de carga</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for carga in cargas_recientes %}
+            <tr>
+              <td>{{ carga.file_name }}</td>
+              <td>{{ carga.mac }}</td>
+              <td>{{ carga.device_id }}</td>
+              <td>{{ carga.record_count }}</td>
+              <td>{{ carga.uploaded_at|date:'Y-m-d H:i' }}</td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="5" class="text-center">No hay cargas recientes.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endblock content %}

@@ -1,4 +1,4 @@
-{# docs/index.html #}
+{# docs/add.html #}
 {% extends "base.html" %}
 
 {% block header %}
@@ -15,7 +15,7 @@ $(function () {
 
 function bootstrap_tab_bookmark (selector) { if (selector == undefined) {
     selector = ""; }
- 
+
     /* Automagically jump on good tab based on anchor */
     $(document).ready(function() {
         url = document.location.href.split('#');
@@ -23,11 +23,11 @@ function bootstrap_tab_bookmark (selector) { if (selector == undefined) {
             $(selector + '[href=#'+url[1]+']').tab('show');
         }
     });
- 
+
     var update_location = function (event) {
         document.location.hash = this.getAttribute("href");
     }
- 
+
     /* Update hash based on tab */
     $(selector + "[data-toggle=pill]").click(update_location);
     $(selector + "[data-toggle=tab]").click(update_location);
@@ -37,7 +37,7 @@ function bootstrap_tab_bookmark (selector) { if (selector == undefined) {
 
 {% block contextual %}
   <a class="btn btn-large btn-danger" type="button" href="{% url "docs.views.agregar_documento" %}">
-    Agregar un Documento <strong>Nuevo</strong></a>   
+    Agregar un Documento <strong>Nuevo</strong></a>
 {% endblock %}
 
 {% block content %}
@@ -128,7 +128,7 @@ function bootstrap_tab_bookmark (selector) { if (selector == undefined) {
           {% endifchanged %}
           <tr>
             <td>
-              {{ doc.nombre }}               
+              {{ doc.nombre }}
               {% if request.user.is_superuser and not doc.activo %}
                   <a title="Revisar documento OBSOLETO" class="pull-right" href="/docs/{{ doc.id }}/detalles"><i class="icon-eye"></i></a>
               {% endif %}
@@ -245,7 +245,7 @@ function bootstrap_tab_bookmark (selector) { if (selector == undefined) {
         </tr>
         {% endfor %}
       </tbody>
-    </table>    
+    </table>
   </div>
   <div class="tab-pane fade" id="registros">
     <h3>Registros</h3>
@@ -288,7 +288,7 @@ function bootstrap_tab_bookmark (selector) { if (selector == undefined) {
         </tr>
         {% endfor %}
       </tbody>
-    </table>    
+    </table>
   </div>
   <div class="tab-pane fade" id="stn">
     <h3>Opiniones Técnicas</h3>
@@ -329,7 +329,7 @@ function bootstrap_tab_bookmark (selector) { if (selector == undefined) {
         </tr>
         {% endfor %}
       </tbody>
-    </table>    
+    </table>
   </div>
   <div class="tab-pane fade" id="coc">
     <h3>Oficios COC</h3>
@@ -370,7 +370,7 @@ function bootstrap_tab_bookmark (selector) { if (selector == undefined) {
         </tr>
         {% endfor %}
       </tbody>
-    </table>    
+    </table>
   </div>
 </div>
 </div>

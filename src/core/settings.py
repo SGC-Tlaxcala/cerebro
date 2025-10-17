@@ -57,6 +57,7 @@ LOCAL_APPS = [
     'apps.carto.config.CartoConfig',
     'apps.pas.config.PasConfig',
     'apps.kpi.config.KpiConfig',
+    'apps.vozmac.config.VozmacConfig',
 ]
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
