@@ -16,7 +16,7 @@ class RespuestaEncuestaAdmin(admin.ModelAdmin):
         'batch', 'created_at',
         'p0_tipo_visita', 'p1_claridad_info', 'p2_amabilidad', 'p3_instalaciones', 'p4_tiempo_espera'
     )
-    list_filter = ('p0_tipo_visita', 'p1_claridad_info', 'p2_amabilidad', 'p3_instalaciones', 'p4_tiempo_espera', 'created_at')
+    list_filter = ('batch__mac',)
     search_fields = ('batch__file_name',)
     readonly_fields = (
         'batch', 'created_at',

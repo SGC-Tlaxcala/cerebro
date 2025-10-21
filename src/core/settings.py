@@ -48,6 +48,7 @@ THIRD_PARTY_APPS = [
     'captcha',
     'anymail',
     "compressor",
+    'rest_framework',  # added so DRF templates (browsable API) are found
 ]
 LOCAL_APPS = [
     'core',
@@ -161,6 +162,12 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
         'rest_framework.authentication.SessionAuthentication',
+    ),
+    # Forzar solo JSON renderer para evitar la dependencia de la plantilla
+    # `rest_framework/api.html` (Browsable API). Si prefieres la browsable API,
+    # instala djangorestframework en el entorno (pip install djangorestframework)
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
     ),
 }
 

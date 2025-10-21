@@ -14,98 +14,242 @@
     <title>VozMAC</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
-    <script src="https://unpkg.com/htmx.org@1.9.12" integrity="sha384-0L7m3T7nA3eUQ5uV0rKpXMkgzP8sE5Xq1Clb9xG7tL6m4vO0yQqZ8CjQ0V5F7Lq2" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script src="https://unpkg.com/htmx.org@1.11.1"></script>
   </head>
-  <body class="min-h-screen" data-theme="winter">
-    <nav class="navbar bg-base-100 shadow-sm">
-  <div class="navbar-start">
-    <div class="dropdown">
-      <div tabindex="0" role="button" class="btn btn-ghost lg:hidden">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16" /> </svg>
-      </div>
-      <ul
-        tabindex="-1"
-        class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
-        <li><a>
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-            <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
-          </svg>
-          Portada</a></li>
-        <li>
-          <a>Parent</a>
-          <ul class="p-2">
-            <li><a>Submenu 1</a></li>
-            <li><a>Submenu 2</a></li>
-          </ul>
-        </li>
-        <li><a>
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
-          </svg>
-          Documentación
-        </a></li>
-      </ul>
-    </div>
-    <a class="btn btn-ghost text-xl">SGC Tlaxcala</a>
-  </div>
-  <div class="navbar-center hidden lg:flex">
-    <ul class="menu menu-horizontal px-1">
-      <li><a>
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-          <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
-        </svg>
-        Portada
-      </a></li>
-      <li>
-        <details>
-          <summary>
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z" />
-            </svg>
-            Indicadores
-          </summary>
-          <ul class="p-2">
-            <li><a>Submenu 1</a></li>
-            <li><a>Submenu 2</a></li>
-          </ul>
-        </details>
-      </li>
-      <li><a>Item 3</a></li>
-    </ul>
-  </div>
 
-      <div class="navbar-end">
-        <div class="flex gap-2">
-        <input type="text" placeholder="Buscar documento" class="input input-bordered w-24 md:w-auto" />
-        <div class="dropdown dropdown-end">
-          <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
-            <div class="w-10 rounded-full">
-              <img
-                alt="Tailwind CSS Navbar component"
-                src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
-            </div>
+  <body class="min-h-screen" data-theme="fantasy">
+    <nav class="navbar bg-base-100 shadow-sm">
+      <div class="navbar-start">
+        <div class="dropdown">
+          <div tabindex="0" role="button" class="btn btn-ghost lg:hidden">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16" /> </svg>
           </div>
-          <ul
-            tabindex="-1"
-            class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
+          <ul tabindex="-1" class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
+            <li><a>Portada</a></li>
             <li>
-              <a class="justify-between">
-                Profile
-                <span class="badge">New</span>
-              </a>
+              <a>Parent</a>
+              <ul class="p-2">
+                <li><a>Submenu 1</a></li>
+                <li><a>Submenu 2</a></li>
+              </ul>
             </li>
-            <li><a>Settings</a></li>
-            <li><a>Logout</a></li>
+            <li><a>Documentación</a></li>
           </ul>
         </div>
+        <a class="btn btn-ghost text-xl">SGC Tlaxcala</a>
       </div>
+      <div class="navbar-center hidden lg:flex">
+        <ul class="menu menu-horizontal px-1">
+          <li><a>Portada</a></li>
+          <li>
+            <details>
+              <summary>Indicadores</summary>
+              <ul class="p-2">
+                <li><a>Submenu 1</a></li>
+                <li><a>Submenu 2</a></li>
+              </ul>
+            </details>
+          </li>
+          <li><a>Item 3</a></li>
+        </ul>
+      </div>
+      <div class="navbar-end">
+        <div class="flex gap-2">
+          <input type="text" placeholder="Buscar documento" class="input input-bordered w-24 md:w-auto" />
+          <div class="dropdown dropdown-end">
+            <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
+              <div class="w-10 rounded-full">
+                <img alt="avatar" src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
+              </div>
+            </div>
+            <ul tabindex="-1" class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
+              <li><a class="justify-between">Profile <span class="badge">New</span></a></li>
+              <li><a>Settings</a></li>
+              <li><a>Logout</a></li>
+            </ul>
+          </div>
+        </div>
       </div>
     </nav>
 
-    <main class="container mx-auto px-4 py-8">
+    <main class="max-w-[960px] mx-auto px-4 py-8">
       <h1 class="text-4xl font-bold">VozMAC</h1>
+
+      <div id="filter" class="mb-6">
+        <div class="tabs tabs-boxed w-full justify-center" role="tablist" aria-label="Filtros de datos">
+          <button type="button" class="tab tab-lg" role="tab" aria-selected="true" data-filter="estatal" data-d="0">Estatal</button>
+          <button type="button" class="tab tab-lg" role="tab" aria-selected="false" data-filter="distrito-01" data-d="1">Distrito 01</button>
+          <button type="button" class="tab tab-lg" role="tab" aria-selected="false" data-filter="distrito-02" data-d="2">Distrito 02</button>
+          <button type="button" class="tab tab-lg" role="tab" aria-selected="false" data-filter="distrito-03" data-d="3">Distrito 03</button>
+        </div>
+      </div>
+
+      <div id="general" class="flex flex-wrap -mx-3 mt-6">
+        <div class="w-full md:w-5/12 px-3 mb-6">
+          <div id="motivo-visita" class="card bg-base-100 shadow h-full">
+            <div class="card-body">
+              <h2 class="card-title">Motivo de Visita</h2>
+              <div id="motivo-chart" class="w-full" style="min-height:260px"></div>
+              <div id="motivo-fetcher" hx-swap="none" style="display:none"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="w-full md:w-7/12 px-3 mb-6">
+          <div class="card bg-base-100 shadow h-full">
+            <div class="card-body">
+              <h2 class="card-title">Columna de 7/12</h2>
+              <p>Aquí puedes poner más contenido.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card bg-base-100 shadow mt-6">
+        <div class="card-body">
+          <h2 class="card-title">Respuestas Likert por MAC</h2>
+          <div id="sales-chart" class="w-full" data-url="{% url 'vozmac:api_metrics_likert_by_mac' %}"></div>
+        </div>
+      </div>
+
     </main>
+
+    <footer class="footer footer-center bg-base-100 text-base-content p-4">
+      <aside>
+        <p>SGC Tlaxcala (c) 2025.</p>
+      </aside>
+    </footer>
+
+    <script>
+    // Motivo de visita: usar htmx para traer datos JSON y dibujar un pie chart con ApexCharts
+    (function () {
+      function buildMotivoChart(data) {
+        // Mapeo de motivos y iconos
+        const labelMap = { '1': 'Trámite', '2': 'Recoger credencial' };
+        const iconMap = { '1': '🧾', '2': '🎫' };
+
+        const labels = data.map(function(i) {
+          const key = String(i.p0_tipo_visita);
+          const text = labelMap[key] || ('Tipo ' + key);
+          const icon = iconMap[key] ? iconMap[key] + ' ' : '';
+          return icon + text;
+        });
+
+        const series = data.map(function(i) { return Number(i.total); });
+        // Intenta actualizar de forma segura (con recreación si falla)
+        safeUpdateChart(labels, series);
+      }
+
+      // Escuchar respuestas de htmx y procesar la JSON devuelta
+      document.addEventListener('htmx:afterRequest', function (evt) {
+        try {
+          const xhr = evt.detail && evt.detail.xhr;
+          if (!xhr) return;
+          const fetcher = document.getElementById('motivo-fetcher');
+          if (!fetcher) return;
+          if (evt.target !== fetcher && !(evt.detail && evt.detail.elt === fetcher)) return;
+          const text = xhr.responseText;
+          const data = JSON.parse(text || '[]');
+          buildMotivoChart(data);
+        } catch (e) {
+          console.error('Error procesando datos de motivo', e);
+        }
+      });
+
+      // Preparar y disparar la petición con el parámetro d si existe en la URL
+      document.addEventListener('DOMContentLoaded', function () {
+        const params = new URLSearchParams(window.location.search);
+        const d = params.get('d');
+        // Inicializar tabs y cargar datos para el valor d (0 = estatal/no filtro)
+        const selectedD = (d && d !== '0') ? d : '0';
+        setActiveTab(selectedD);
+        loadMotivoForD(selectedD);
+
+        // Delegación: manejar clicks en el contenedor de tabs. Más robusto si el DOM cambia.
+        const filter = document.getElementById('filter');
+        if (filter) {
+          filter.addEventListener('click', function(e) {
+            const btn = e.target.closest('[data-d]');
+            if (!btn) return;
+            e.preventDefault();
+            const newD = btn.getAttribute('data-d') || '0';
+            console.log('VozMAC: tab clicked (delegation), d=', newD);
+            updateUrlAndLoad(newD);
+          });
+        }
+
+        // Manejar back/forward del navegador
+        window.addEventListener('popstate', function () {
+          const params = new URLSearchParams(window.location.search);
+          const d2 = params.get('d') || '0';
+          setActiveTab(d2);
+          loadMotivoForD(d2);
+        });
+      });
+
+      // Actualiza la URL y recarga el gráfico para el nuevo d
+      function updateUrlAndLoad(newD) {
+        const url = new URL(window.location.href);
+        if (newD === '0') url.searchParams.delete('d'); else url.searchParams.set('d', newD);
+        window.history.pushState({}, '', url.toString());
+        setActiveTab(newD);
+        loadMotivoForD(newD);
+      }
+
+      // Marca visual del tab activo
+      function setActiveTab(dValue) {
+        const tabs = document.querySelectorAll('#filter [data-d]');
+        tabs.forEach(function(t){
+          if (t.getAttribute('data-d') === String(dValue)) {
+            t.classList.add('tab-active');
+            t.setAttribute('aria-selected', 'true');
+          } else {
+            t.classList.remove('tab-active');
+            t.setAttribute('aria-selected', 'false');
+          }
+        });
+      }
+
+      // Carga de datos para el gráfico (usa fetch para ser directo y compatible)
+      function loadMotivoForD(dValue) {
+        let apiUrl = '/api/v1/vozmac/motivo';
+        if (dValue && dValue !== '0') apiUrl += '?d=' + encodeURIComponent(dValue);
+        // Si htmx se está usando y prefieres la abstracción, podríamos usar htmx.ajax
+        fetch(apiUrl)
+          .then(r => r.ok ? r.json() : Promise.reject(r.status))
+          .then(buildMotivoChart)
+          .catch(err => console.error('fetch motivo error', err));
+      }
+
+      // Mejor manejo de actualización: si update falla, destruimos y recreamos
+      function safeUpdateChart(labels, series) {
+        if (window.motivoChart) {
+          try {
+            window.motivoChart.updateOptions({ labels: labels });
+            window.motivoChart.updateSeries(series);
+            return;
+          } catch (err) {
+            console.warn('Motivo chart update failed, will recreate', err);
+            try { window.motivoChart.destroy(); } catch (e) { /* ignore */ }
+            window.motivoChart = null;
+          }
+        }
+        // create new chart
+        const el = document.getElementById('motivo-chart');
+        if (!el) return;
+        const options = {
+          chart: { type: 'pie', height: 320 },
+          labels: labels,
+          series: series,
+          legend: { position: 'bottom' },
+          responsive: [{ breakpoint: 640, options: { chart: { height: 260 } } }]
+        };
+        window.motivoChart = new ApexCharts(el, options);
+        window.motivoChart.render();
+      }
+    })();
+    </script>
+
   </body>
-
 </html>
-
