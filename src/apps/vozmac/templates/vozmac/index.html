@@ -112,10 +112,17 @@
         </div>
 
         <div class="w-full md:w-7/12 px-3 mb-6">
-          <div class="card bg-base-100 shadow h-full">
+          <div class="card bg-base-100 shadow h-full" id="seguimiento">
             <div class="card-body">
-              <h2 class="card-title">Columna de 7/12</h2>
-              <p>Aquí puedes poner más contenido.</p>
+              <h2 class="card-title">Seguimiento mensual</h2>
+              <div id="seguimiento-loading" class="flex justify-center items-center py-6" style="display:none">
+                <svg class="animate-spin h-8 w-8 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                </svg>
+              </div>
+              <div id="seguimiento-chart" style="min-height:280px"></div>
+              <div id="seguimiento-empty" class="text-center text-sm text-gray-500 mt-4" style="display:none">Sin datos para el año anterior.</div>
             </div>
           </div>
         </div>
@@ -256,6 +263,8 @@
         const selectedD = (d && d !== '0') ? d : '0';
         setActiveTab(selectedD);
         loadMotivoForD(selectedD);
+        loadSatisfaccionForD(selectedD);
+        loadSeguimientoForD(selectedD);
 
         // Delegación: manejar clicks en el contenedor de tabs. Más robusto si el DOM cambia.
         const filter = document.getElementById('filter');
@@ -275,6 +284,8 @@
           const d2 = params.get('d') || '0';
           setActiveTab(d2);
           loadMotivoForD(d2);
+          loadSatisfaccionForD(d2);
+          loadSeguimientoForD(d2);
         });
       });
 
@@ -285,8 +296,8 @@
         window.history.pushState({}, '', url.toString());
         setActiveTab(newD);
         loadMotivoForD(newD);
-        // También recargar gráfica de satisfacción
-        if (typeof loadSatisfaccionForD === 'function') loadSatisfaccionForD(newD);
+        loadSatisfaccionForD(newD);
+        loadSeguimientoForD(newD);
       }
 
       // Marca visual del tab activo
@@ -356,7 +367,7 @@
         const questions = ['p1_claridad_info','p2_amabilidad','p3_instalaciones','p4_tiempo_espera'];
         const categories = questions.map(q => resp.by_question[q].label);
 
-        // For diverging: negative = 1+2 (as negative values), neutral = 3, positive = 4+5
+        // For diverging: negative = 1+2 (as negative values), neutral = 3, positive = 4-5
         const negSeries = { name: 'Negativo (1-2)', data: [] };
         const neuSeries = { name: 'Neutral (3)', data: [] };
         const posSeries = { name: 'Positivo (4-5)', data: [] };
@@ -423,12 +434,98 @@
         }catch(e){ hideSatisSpinner(); console.error('Error satisfaccion htmx', e); }
       });
 
-      // Inicializar satisfaccion en carga
-      (function(){
-        // attempt to trigger initial load alongside motivo initialization
-        try{ const params = new URLSearchParams(window.location.search); const d = params.get('d'); const selectedD = (d && d !== '0')? d : '0'; if(typeof loadSatisfaccionForD==='function') loadSatisfaccionForD(selectedD);}catch(e){}
-      })();
+    })();
 
+    // -------------------- Seguimiento Chart --------------------
+    (function(){
+      function showSeguimientoSpinner(){ const s = document.getElementById('seguimiento-loading'); if (s) s.style.display='flex'; }
+      function hideSeguimientoSpinner(){ const s = document.getElementById('seguimiento-loading'); if (s) s.style.display='none'; }
+      function showSeguimientoEmpty(){ const e = document.getElementById('seguimiento-empty'); if (e) e.style.display='block'; }
+      function hideSeguimientoEmpty(){ const e = document.getElementById('seguimiento-empty'); if (e) e.style.display='none'; }
+
+      function safeUpdateSeguimientoChart(chartData) {
+        if (window.seguimientoChart) {
+          try {
+            window.seguimientoChart.updateOptions({ xaxis: { categories: chartData.labels } });
+            window.seguimientoChart.updateSeries(chartData.datasets.map(d => ({ name: d.label, data: d.data })));
+            return;
+          } catch (err) {
+            try { window.seguimientoChart.destroy(); } catch (e) {}
+            window.seguimientoChart = null;
+          }
+        }
+        const el = document.getElementById('seguimiento-chart');
+        if (!el) return;
+
+        const options = {
+          series: chartData.datasets.map(d => ({ name: d.label, data: d.data })),
+          chart: {
+            height: 280,
+            type: 'line',
+            zoom: { enabled: false },
+            toolbar: { show: true, tools: { download: true, selection: false, zoom: false, zoomin: false, zoomout: false, pan: false, reset: false } }
+          },
+          colors: chartData.datasets.map(d => d.borderColor),
+          dataLabels: { enabled: false },
+          stroke: { curve: 'smooth', width: 3 },
+          title: {
+            text: 'Promedio Mensual (Año Anterior)',
+            align: 'left'
+          },
+          grid: {
+            borderColor: '#e7e7e7',
+            row: { colors: ['#f3f3f3', 'transparent'], opacity: 0.5 },
+          },
+          xaxis: {
+            categories: chartData.labels,
+          },
+          yaxis: {
+            title: { text: 'Calificación Promedio' },
+            min: 1,
+            max: 5,
+            tickAmount: 4
+          },
+          legend: {
+              position: 'top',
+              horizontalAlign: 'right',
+              floating: true,
+              offsetY: -25,
+              offsetX: -5
+          }
+        };
+        window.seguimientoChart = new ApexCharts(el, options);
+        window.seguimientoChart.render();
+      }
+
+      function buildSeguimientoChart(data) {
+        hideSeguimientoSpinner();
+        if (!data || !data.datasets || data.datasets.every(d => d.data.every(val => val === 0))) {
+          if (window.seguimientoChart) { try { window.seguimientoChart.destroy(); } catch (e) {} window.seguimientoChart = null; }
+          showSeguimientoEmpty();
+          return;
+        }
+        hideSeguimientoEmpty();
+        safeUpdateSeguimientoChart(data);
+      }
+
+      window.loadSeguimientoForD = function(dValue) {
+        let apiUrl = '/api/v1/vozmac/seguimiento/';
+        if (dValue && dValue !== '0') apiUrl += '?d=' + encodeURIComponent(dValue);
+        showSeguimientoSpinner();
+        hideSeguimientoEmpty();
+
+        fetch(apiUrl)
+          .then(response => {
+            if (!response.ok) throw new Error('Network response was not ok ' + response.statusText);
+            return response.json();
+          })
+          .then(buildSeguimientoChart)
+          .catch(error => {
+            hideSeguimientoSpinner();
+            showSeguimientoEmpty();
+            console.error('Error fetching seguimiento data:', error);
+          });
+      }
     })();
     </script>
 

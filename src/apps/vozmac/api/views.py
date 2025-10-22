@@ -3,13 +3,13 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.db.models import Count, Avg
 from django.utils import timezone
+from django.db.models.functions import TruncMonth
 from apps.vozmac.models import RespuestaEncuesta
+from datetime import datetime
 
 class MotivoAPIView(APIView):
     """
     API de solo lectura para motivo de visita.
-    Devuelve una lista de dicts: [{"p0_tipo_visita": int, "total": int}, ...]
-    Permite filtrar por distrito con el parámetro 'd'.
     """
     authentication_classes = []
     permission_classes = []
@@ -31,15 +31,6 @@ class MotivoAPIView(APIView):
 class SatisfaccionAPIView(APIView):
     """
     API de solo lectura para métricas de satisfacción (preguntas p1..p4) para el año en curso.
-    Devuelve para cada pregunta:
-      - average: promedio de respuestas (float)
-      - total: número de respuestas consideradas
-      - distribution: dict con conteo por valor 1..5
-      - favorable_count: conteo de respuestas 4 y 5
-      - unfavorable_count: conteo de respuestas 1,2,3
-      - favorable_pct: porcentaje favorable (0-100)
-
-    Acepta parámetro opcional 'd' para filtrar por `distrito`.
     """
     authentication_classes = []
     permission_classes = []
@@ -63,12 +54,10 @@ class SatisfaccionAPIView(APIView):
         total_responses = qs.count()
 
         for field, label in self.QUESTIONS:
-            # distribution values 1..5
             dist_qs = qs.values(field).annotate(total=Count('id'))
             dist_map = {str(item[field]): item['total'] for item in dist_qs}
             distribution = {str(v): dist_map.get(str(v), 0) for v in range(1, 6)}
 
-            # averages
             avg_obj = qs.aggregate(avg=Avg(field))
             avg = avg_obj.get('avg') or 0
 
@@ -94,3 +83,86 @@ class SatisfaccionAPIView(APIView):
         }
 
         return Response(response, status=status.HTTP_200_OK)
+
+class MacsAPIView(APIView):
+    """
+    API de solo lectura para obtener los MACs únicos.
+    """
+    authentication_classes = []
+    permission_classes = []
+
+    def get(self, request, format=None):
+        distrito_param = request.GET.get('d')
+        queryset = RespuestaEncuesta.objects.all()
+
+        if distrito_param and distrito_param != '0':
+            try:
+                distrito_int = int(distrito_param)
+                queryset = queryset.filter(distrito=distrito_int)
+            except ValueError:
+                return Response({"error": "Invalid district parameter. Must be an integer."}, status=status.HTTP_400_BAD_REQUEST)
+
+        macs = queryset.values_list('mac', flat=True).distinct()
+
+        return Response(list(macs), status=status.HTTP_200_OK)
+
+
+class SeguimientoAPIView(APIView):
+    """
+    API de solo lectura para el seguimiento mensual de promedios.
+    """
+    authentication_classes = []
+    permission_classes = []
+
+    def get(self, request, format=None):
+        distrito_param = request.GET.get('d')
+        today = datetime.now()
+        previous_year = today.year - 1
+
+        queryset = RespuestaEncuesta.objects.filter(created_at__year=previous_year)
+
+        if distrito_param and distrito_param != '0':
+            try:
+                distrito_int = int(distrito_param)
+                queryset = queryset.filter(distrito=distrito_int)
+            except ValueError:
+                return Response({"error": "Invalid district parameter."}, status=status.HTTP_400_BAD_REQUEST)
+
+        question_fields = {
+            'p1_claridad_info': 'Claridad de la información',
+            'p2_amabilidad': 'Amabilidad',
+            'p3_instalaciones': 'Instalaciones',
+            'p4_tiempo_espera': 'Tiempo de espera',
+        }
+
+        monthly_averages = queryset.annotate(
+            month=TruncMonth('created_at')
+        ).values('month').annotate(
+            avg_p1=Avg('p1_claridad_info'),
+            avg_p2=Avg('p2_amabilidad'),
+            avg_p3=Avg('p3_instalaciones'),
+            avg_p4=Avg('p4_tiempo_espera'),
+        ).order_by('month')
+
+        month_data_map = {entry['month'].month: entry for entry in monthly_averages}
+
+        labels = [datetime(previous_year, i, 1).strftime('%b') for i in range(1, 13)]
+
+        def get_monthly_data(avg_key):
+            data = []
+            for i in range(1, 13):
+                avg_val = month_data_map.get(i, {}).get(avg_key)
+                data.append(round(avg_val, 2) if avg_val is not None else 0)
+            return data
+
+        chart_data = {
+            'labels': labels,
+            'datasets': [
+                {'label': question_fields['p1_claridad_info'], 'data': get_monthly_data('avg_p1'), 'borderColor': 'rgba(255, 99, 132, 1)'},
+                {'label': question_fields['p2_amabilidad'], 'data': get_monthly_data('avg_p2'), 'borderColor': 'rgba(54, 162, 235, 1)'},
+                {'label': question_fields['p3_instalaciones'], 'data': get_monthly_data('avg_p3'), 'borderColor': 'rgba(255, 206, 86, 1)'},
+                {'label': question_fields['p4_tiempo_espera'], 'data': get_monthly_data('avg_p4'), 'borderColor': 'rgba(75, 192, 192, 1)'},
+            ]
+        }
+
+        return Response(chart_data, status=status.HTTP_200_OK)

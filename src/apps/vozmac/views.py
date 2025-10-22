@@ -3,10 +3,12 @@ import hashlib
 import gzip
 import logging
 import json
+from datetime import datetime, timedelta
 from django.views.generic import TemplateView
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.db.models import Avg, Count
+from django.db.models.functions import TruncMonth
 from django.conf import settings
 from django.contrib import messages
 from .forms import SurveyBatchForm
