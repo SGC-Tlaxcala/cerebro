@@ -90,8 +90,23 @@
           <div id="motivo-visita" class="card bg-base-100 shadow h-full">
             <div class="card-body">
               <h2 class="card-title">Motivo de Visita</h2>
+
+              <!-- Spinner (oculto por defecto) -->
+              <div id="motivo-loading" class="flex justify-center items-center py-6" style="display:none">
+                <svg class="animate-spin h-8 w-8 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                </svg>
+              </div>
+
+              <!-- Contenedor del chart y mensaje "Sin datos" -->
               <div id="motivo-chart" class="w-full" style="min-height:260px"></div>
-              <div id="motivo-fetcher" hx-swap="none" style="display:none"></div>
+              <div id="motivo-legend" class="mt-4 text-sm"></div>
+              <div id="motivo-empty" class="text-center text-sm text-gray-500 mt-4" style="display:none">Sin datos</div>
+
+              <!-- elemento oculto para htmx (se usa como target) -->
+              <div id="motivo-fetcher" style="display:none" aria-hidden="true"></div>
+
             </div>
           </div>
         </div>
@@ -106,10 +121,20 @@
         </div>
       </div>
 
-      <div class="card bg-base-100 shadow mt-6">
+      <div class="card bg-base-100 shadow mt-6" id="satisfaccion">
         <div class="card-body">
-          <h2 class="card-title">Respuestas Likert por MAC</h2>
-          <div id="sales-chart" class="w-full" data-url="{% url 'vozmac:api_metrics_likert_by_mac' %}"></div>
+          <h2 class="card-title">Satisfacción Ciudadana</h2>
+          <div id="satisfaccion-loading" class="flex justify-center items-center py-6" style="display:none">
+            <svg class="animate-spin h-8 w-8 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+            </svg>
+          </div>
+
+          <div id="satisfaccion-chart" class="w-full" style="min-height:360px"></div>
+          <div id="satisfaccion-legend" class="mt-4 text-sm grid grid-cols-1 gap-2"></div>
+          <div id="satisfaccion-empty" class="text-center text-sm text-gray-500 mt-4" style="display:none">Sin datos</div>
+          <div id="satisfaccion-fetcher" style="display:none" aria-hidden="true"></div>
         </div>
       </div>
 
@@ -124,36 +149,102 @@
     <script>
     // Motivo de visita: usar htmx para traer datos JSON y dibujar un pie chart con ApexCharts
     (function () {
-      function buildMotivoChart(data) {
-        // Mapeo de motivos y iconos
-        const labelMap = { '1': 'Trámite', '2': 'Recoger credencial' };
-        const iconMap = { '1': '🧾', '2': '🎫' };
 
-        const labels = data.map(function(i) {
-          const key = String(i.p0_tipo_visita);
-          const text = labelMap[key] || ('Tipo ' + key);
-          const icon = iconMap[key] ? iconMap[key] + ' ' : '';
-          return icon + text;
-        });
+      // Mapeo visual con iconos (Heroicons-like inline SVGs)
+      const MOTIVO_LABELS = {
+        // Heroicons - document-text (outline)
+        '1': { text: 'Trámite', svg: '<svg xmlns="http://www.w3.org/2000/svg" class="inline-block h-5 w-5 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h10M7 16h10"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"/></svg>' },
+        // Recoger credencial - icono proporcionado (convertido a atributos HTML)
+        '2': { text: 'Recoger credencial', svg: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 inline-block h-5 w-5 mr-1">  <path stroke-linecap="round" stroke-linejoin="round" d="M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Zm6-10.125a1.875 1.875 0 1 1-3.75 0 1.875 1.875 0 0 1 3.75 0Zm1.294 6.336a6.721 6.721 0 0 1-3.17.789 6.721 6.721 0 0 1-3.168-.789 3.376 3.376 0 0 1 6.338 0Z" /> </svg>' }
+      };
 
-        const series = data.map(function(i) { return Number(i.total); });
-        // Intenta actualizar de forma segura (con recreación si falla)
-        safeUpdateChart(labels, series);
+      function showSpinner() {
+        const s = document.getElementById('motivo-loading'); if (s) s.style.display = 'flex';
+      }
+      function hideSpinner() {
+        const s = document.getElementById('motivo-loading'); if (s) s.style.display = 'none';
+      }
+      function showEmpty() { const e = document.getElementById('motivo-empty'); if (e) e.style.display = 'block'; }
+      function hideEmpty() { const e = document.getElementById('motivo-empty'); if (e) e.style.display = 'none'; }
+
+      function safeUpdateChart(labels, series) {
+        if (window.motivoChart) {
+          try {
+            window.motivoChart.updateOptions({ labels: labels });
+            window.motivoChart.updateSeries(series);
+            return;
+          } catch (err) {
+            try { window.motivoChart.destroy(); } catch (e) {}
+            window.motivoChart = null;
+          }
+        }
+        const el = document.getElementById('motivo-chart');
+        if (!el) return;
+        const options = {
+          chart: { type: 'pie', height: 320 },
+          labels: labels,
+          series: series,
+          legend: { position: 'bottom' },
+          responsive: [{ breakpoint: 640, options: { chart: { height: 260 } } }]
+        };
+        window.motivoChart = new ApexCharts(el, options);
+        window.motivoChart.render();
       }
 
-      // Escuchar respuestas de htmx y procesar la JSON devuelta
-      document.addEventListener('htmx:afterRequest', function (evt) {
+      function buildMotivoChart(data) {
+        hideSpinner();
+        if (!Array.isArray(data) || data.length === 0) {
+          // no hay datos
+          if (window.motivoChart) { try { window.motivoChart.destroy(); } catch (e) {} window.motivoChart = null; }
+          hideSpinner(); showEmpty();
+          return;
+        }
+        hideEmpty();
+        const series = data.map(function(i) { return Number(i.total); });
+        // Renderizar leyenda con iconos y totales
         try {
-          const xhr = evt.detail && evt.detail.xhr;
-          if (!xhr) return;
+          const legendEl = document.getElementById('motivo-legend');
+          if (legendEl) {
+            legendEl.innerHTML = data.map(function(i){
+              const key = String(i.p0_tipo_visita);
+              const meta = MOTIVO_LABELS[key];
+              const svg = meta ? meta.svg : '';
+              const text = meta ? meta.text : ('Tipo ' + key);
+              const count = Number(i.total) || 0;
+              return `<div class="flex items-center gap-2"><span>${svg}</span><span>${text} <span class="text-gray-500">(${count})</span></span></div>`;
+            }).join('');
+          }
+        } catch(e) { /* ignore legend rendering errors */ }
+        // ApexCharts expects plain text labels; it will render HTML encoded. We will strip SVGs in labels and instead build legend manually if needed.
+        // For now use plain text labels but we can show icons in a custom legend below if required.
+        const plainLabels = data.map(function(i){ const key = String(i.p0_tipo_visita); const meta=MOTIVO_LABELS[key]; return meta? meta.text : ('Tipo ' + key); });
+        safeUpdateChart(plainLabels, series);
+      }
+
+      // htmx lifecycle: show spinner before, hide after
+      document.body.addEventListener('htmx:beforeRequest', function(evt){
+        try {
           const fetcher = document.getElementById('motivo-fetcher');
           if (!fetcher) return;
+          // si la petición involucra al fetcher, mostrar spinner
+          if (evt.detail && (evt.detail.elt === fetcher || evt.detail.path && evt.detail.path.includes('/api/v1/vozmac/motivo')) ) {
+            showSpinner(); hideEmpty();
+          }
+        } catch (e) { }
+      });
+
+      document.body.addEventListener('htmx:afterRequest', function (evt) {
+        try {
+          const xhr = evt.detail && evt.detail.xhr;
+          const fetcher = document.getElementById('motivo-fetcher');
+          if (!xhr || !fetcher) return;
           if (evt.target !== fetcher && !(evt.detail && evt.detail.elt === fetcher)) return;
+          hideSpinner();
           const text = xhr.responseText;
           const data = JSON.parse(text || '[]');
           buildMotivoChart(data);
         } catch (e) {
-          console.error('Error procesando datos de motivo', e);
+          hideSpinner(); console.error('Error procesando datos de motivo', e);
         }
       });
 
@@ -174,7 +265,6 @@
             if (!btn) return;
             e.preventDefault();
             const newD = btn.getAttribute('data-d') || '0';
-            console.log('VozMAC: tab clicked (delegation), d=', newD);
             updateUrlAndLoad(newD);
           });
         }
@@ -195,6 +285,8 @@
         window.history.pushState({}, '', url.toString());
         setActiveTab(newD);
         loadMotivoForD(newD);
+        // También recargar gráfica de satisfacción
+        if (typeof loadSatisfaccionForD === 'function') loadSatisfaccionForD(newD);
       }
 
       // Marca visual del tab activo
@@ -211,43 +303,132 @@
         });
       }
 
-      // Carga de datos para el gráfico (usa fetch para ser directo y compatible)
+      // Carga de datos para el gráfico (usa htmx.ajax si está disponible, si no fetch)
       function loadMotivoForD(dValue) {
         let apiUrl = '/api/v1/vozmac/motivo';
         if (dValue && dValue !== '0') apiUrl += '?d=' + encodeURIComponent(dValue);
-        // Si htmx se está usando y prefieres la abstracción, podríamos usar htmx.ajax
-        fetch(apiUrl)
-          .then(r => r.ok ? r.json() : Promise.reject(r.status))
-          .then(buildMotivoChart)
-          .catch(err => console.error('fetch motivo error', err));
+        showSpinner(); hideEmpty();
+        const fetcher = document.getElementById('motivo-fetcher');
+        if (window.htmx && typeof window.htmx.ajax === 'function' && fetcher) {
+          // htmx.ajax(method, path, elt)
+          try { window.htmx.ajax('GET', apiUrl, fetcher); }
+          catch(e){
+            // fallback
+            fetch(apiUrl).then(r=>r.ok? r.json(): Promise.reject(r.status)).then(buildMotivoChart).catch(err=>{hideSpinner(); console.error('fetch motivo error', err)});
+          }
+        } else {
+          fetch(apiUrl)
+            .then(r => r.ok ? r.json() : Promise.reject(r.status))
+            .then(buildMotivoChart)
+            .catch(err => { hideSpinner(); console.error('fetch motivo error', err); });
+        }
       }
 
-      // Mejor manejo de actualización: si update falla, destruimos y recreamos
-      function safeUpdateChart(labels, series) {
-        if (window.motivoChart) {
-          try {
-            window.motivoChart.updateOptions({ labels: labels });
-            window.motivoChart.updateSeries(series);
-            return;
-          } catch (err) {
-            console.warn('Motivo chart update failed, will recreate', err);
-            try { window.motivoChart.destroy(); } catch (e) { /* ignore */ }
-            window.motivoChart = null;
-          }
+      // -------------------- Satisfaccion chart --------------------
+      function showSatisSpinner(){ const s = document.getElementById('satisfaccion-loading'); if (s) s.style.display='flex'; }
+      function hideSatisSpinner(){ const s = document.getElementById('satisfaccion-loading'); if (s) s.style.display='none'; }
+      function showSatisEmpty(){ const e = document.getElementById('satisfaccion-empty'); if (e) e.style.display='block'; }
+      function hideSatisEmpty(){ const e = document.getElementById('satisfaccion-empty'); if (e) e.style.display='none'; }
+
+      // Diverging horizontal stacked bar: negative (1-2) -> left (negative values), neutral (3) -> small center/right, positive (4-5) -> right
+      function safeUpdateSatisChart(categories, series){
+        if (window.satisChart){
+          try{ window.satisChart.updateOptions({ xaxis:{ categories }}); window.satisChart.updateSeries(series); return; } catch(e){ try{ window.satisChart.destroy(); }catch(_){} window.satisChart=null; }
         }
-        // create new chart
-        const el = document.getElementById('motivo-chart');
-        if (!el) return;
+        const el = document.getElementById('satisfaccion-chart'); if(!el) return;
         const options = {
-          chart: { type: 'pie', height: 320 },
-          labels: labels,
-          series: series,
+          chart: { type: 'bar', stacked: true, stackType: 'normal', height: 340 },
+          plotOptions: { bar: { horizontal: true, barHeight: '40%' } },
+          dataLabels: { enabled: false },
+          stroke: { width: 1, colors: ['#fff'] },
+          xaxis: { labels: { formatter: v => Math.abs(v) + '%' } },
+          tooltip: { y: { formatter: v => Math.abs(v) + '%' } },
           legend: { position: 'bottom' },
-          responsive: [{ breakpoint: 640, options: { chart: { height: 260 } } }]
+          colors: ['#ef4444','#f59e0b','#10b981'] // negativo, neutral, positivo
         };
-        window.motivoChart = new ApexCharts(el, options);
-        window.motivoChart.render();
+        window.satisChart = new ApexCharts(el, Object.assign(options, { series }));
+        window.satisChart.render();
       }
+
+      function buildSatisfaccionChart(resp){
+        hideSatisSpinner();
+        if (!resp || !resp.by_question) { showSatisEmpty(); return; }
+        const questions = ['p1_claridad_info','p2_amabilidad','p3_instalaciones','p4_tiempo_espera'];
+        const categories = questions.map(q => resp.by_question[q].label);
+
+        // For diverging: negative = 1+2 (as negative values), neutral = 3, positive = 4+5
+        const negSeries = { name: 'Negativo (1-2)', data: [] };
+        const neuSeries = { name: 'Neutral (3)', data: [] };
+        const posSeries = { name: 'Positivo (4-5)', data: [] };
+
+        questions.forEach(function(q){
+          const dist = resp.by_question[q].distribution || {};
+          const total = (resp.by_question[q].total && resp.by_question[q].total>0)? resp.by_question[q].total : 0;
+          const c1 = Number(dist['1']||0);
+          const c2 = Number(dist['2']||0);
+          const c3 = Number(dist['3']||0);
+          const c4 = Number(dist['4']||0);
+          const c5 = Number(dist['5']||0);
+          if (!total) { negSeries.data.push(0); neuSeries.data.push(0); posSeries.data.push(0); return; }
+          const negPct = Math.round(((c1 + c2) / total) * 10000) / 100; // two decimals
+          const neuPct = Math.round((c3 / total) * 10000) / 100;
+          const posPct = Math.round(((c4 + c5) / total) * 10000) / 100;
+          // negative values for left side
+          negSeries.data.push(-negPct);
+          neuSeries.data.push(neuPct);
+          posSeries.data.push(posPct);
+        });
+
+        // render legend with favorable pct
+        try{
+          const legendEl = document.getElementById('satisfaccion-legend');
+          if (legendEl){
+            legendEl.innerHTML = questions.map(function(q){
+              const meta = resp.by_question[q];
+              const pct = meta ? (meta.favorable_pct || 0) : 0;
+              return `<div class="flex items-center justify-between"><div>${meta.label}</div><div class="font-semibold">${pct}% favorables</div></div>`;
+            }).join('');
+          }
+        }catch(e){}
+
+        hideSatisEmpty();
+        safeUpdateSatisChart(categories, [negSeries, neuSeries, posSeries]);
+      }
+
+      function loadSatisfaccionForD(dValue){
+        let apiUrl = '/api/v1/vozmac/satisfaccion';
+        if (dValue && dValue !== '0') apiUrl += '?d=' + encodeURIComponent(dValue);
+        showSatisSpinner(); hideSatisEmpty();
+        const fetcher = document.getElementById('satisfaccion-fetcher');
+        if (window.htmx && typeof window.htmx.ajax === 'function' && fetcher) {
+          try{ window.htmx.ajax('GET', apiUrl, fetcher); }
+          catch(e){ fetch(apiUrl).then(r=>r.ok?r.json():Promise.reject(r.status)).then(buildSatisfaccionChart).catch(err=>{hideSatisSpinner(); console.error('fetch satisfaccion error', err)}); }
+        } else {
+          fetch(apiUrl).then(r=>r.ok?r.json():Promise.reject(r.status)).then(buildSatisfaccionChart).catch(err=>{hideSatisSpinner(); console.error('fetch satisfaccion error', err)});
+        }
+      }
+
+      // htmx hooks for satisfaccion: reuse motiv's fetcher pattern
+      document.body.addEventListener('htmx:beforeRequest', function(evt){
+        try{
+          const fetcher = document.getElementById('satisfaccion-fetcher'); if(!fetcher) return;
+          if (evt.detail && (evt.detail.elt===fetcher || (evt.detail.path && evt.detail.path.includes('/api/v1/vozmac/satisfaccion')))) { showSatisSpinner(); hideSatisEmpty(); }
+        }catch(e){}
+      });
+      document.body.addEventListener('htmx:afterRequest', function(evt){
+        try{
+          const xhr = evt.detail && evt.detail.xhr; const fetcher = document.getElementById('satisfaccion-fetcher'); if(!xhr||!fetcher) return;
+          if (evt.target!==fetcher && !(evt.detail && evt.detail.elt===fetcher)) return;
+          hideSatisSpinner(); const text = xhr.responseText; const data = JSON.parse(text||'{}'); buildSatisfaccionChart(data);
+        }catch(e){ hideSatisSpinner(); console.error('Error satisfaccion htmx', e); }
+      });
+
+      // Inicializar satisfaccion en carga
+      (function(){
+        // attempt to trigger initial load alongside motivo initialization
+        try{ const params = new URLSearchParams(window.location.search); const d = params.get('d'); const selectedD = (d && d !== '0')? d : '0'; if(typeof loadSatisfaccionForD==='function') loadSatisfaccionForD(selectedD);}catch(e){}
+      })();
+
     })();
     </script>
 
