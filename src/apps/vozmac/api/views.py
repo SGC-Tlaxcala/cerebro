@@ -1,11 +1,15 @@
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-from django.db.models import Count, Avg
-from django.utils import timezone
-from django.db.models.functions import TruncMonth
-from apps.vozmac.models import RespuestaEncuesta
+import csv
 from datetime import datetime
+
+from django.db.models import Count, Avg
+from django.db.models.functions import TruncMonth
+from django.http import HttpResponse
+from django.utils import timezone
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from apps.vozmac.models import RespuestaEncuesta
 
 class MotivoAPIView(APIView):
     """
@@ -130,6 +134,76 @@ class MacsAPIView(APIView):
         )
 
         return Response(list(macs), status=status.HTTP_200_OK)
+
+
+class ExportEncuestasCSVAPIView(APIView):
+    """
+    Exporta las encuestas filtradas a un archivo CSV.
+    """
+    authentication_classes = []
+    permission_classes = []
+
+    HEADERS = [
+        'fecha',
+        'entidad',
+        'distrito',
+        'mac',
+        'p0_tipo_visita',
+        'p1_claridad_info',
+        'p2_amabilidad',
+        'p3_instalaciones',
+        'p4_tiempo_espera',
+    ]
+
+    def get(self, request, format=None):
+        distrito = request.GET.get('d')
+        mac_param = (request.GET.get('mac') or '').strip()
+        mac_filter = mac_param or None
+
+        queryset = RespuestaEncuesta.objects.select_related('batch').all()
+
+        if mac_filter:
+            queryset = queryset.filter(mac=mac_filter)
+        elif distrito and distrito != '0':
+            try:
+                distrito_int = int(distrito)
+                queryset = queryset.filter(distrito=distrito_int)
+            except ValueError:
+                return Response({"error": "Invalid district parameter."}, status=status.HTTP_400_BAD_REQUEST)
+
+        queryset = queryset.order_by('-created_at')
+
+        timestamp = timezone.localtime(timezone.now()).strftime('%Y%m%d_%H%M%S')
+        filename = f'vozmac_encuestas_{timestamp}.csv'
+
+        response = HttpResponse(content_type='text/csv; charset=utf-8')
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+
+        response.write('\ufeff')  # UTF-8 BOM for Excel compatibility
+        writer = csv.writer(response)
+        writer.writerow(self.HEADERS)
+
+        motivo_labels = {
+            1: 'Trámite',
+            2: 'Credencial',
+        }
+
+        for encuesta in queryset.iterator():
+            created_at = timezone.localtime(encuesta.created_at).strftime('%Y-%m-%d %H:%M:%S')
+            motivo = motivo_labels.get(encuesta.p0_tipo_visita, encuesta.p0_tipo_visita)
+            writer.writerow([
+                created_at,
+                encuesta.entidad,
+                encuesta.distrito,
+                encuesta.mac,
+                motivo,
+                encuesta.p1_claridad_info,
+                encuesta.p2_amabilidad,
+                encuesta.p3_instalaciones,
+                encuesta.p4_tiempo_espera,
+            ])
+
+        return response
 
 
 class SeguimientoAPIView(APIView):

@@ -87,6 +87,15 @@
           <div id="mac-filter-tabs" class="tabs tabs-sm tabs-boxed w-full justify-center" role="tablist" aria-label="Filtro por MAC"></div>
           <div id="mac-filter-empty" class="text-center text-xs text-gray-500 mt-2" style="display:none">Sin MACs disponibles.</div>
         </div>
+        <div class="mt-4 flex justify-center">
+          <a id="download-btn" href="/api/v1/vozmac/export" class="btn btn-sm btn-outline gap-2" download>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v12m0 0 4-4m-4 4-4-4"/>
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 15v3a3 3 0 0 0 3 3h6a3 3 0 0 0 3-3v-3"/>
+            </svg>
+            Descargar CSV
+          </a>
+        </div>
       </div>
 
       <div id="general" class="flex flex-wrap -mx-3 mt-6">
@@ -306,6 +315,20 @@
         });
       }
 
+      function updateDownloadLink() {
+        const btn = document.getElementById('download-btn');
+        if (!btn) return;
+        let url = '/api/v1/vozmac/export';
+        const params = new URLSearchParams();
+        if (FILTER_STATE.mac) {
+          params.set('mac', FILTER_STATE.mac);
+        } else if (FILTER_STATE.d && FILTER_STATE.d !== '0') {
+          params.set('d', FILTER_STATE.d);
+        }
+        const query = params.toString();
+        btn.href = query ? `${url}?${query}` : url;
+      }
+
       function syncUrl(push) {
         const url = new URL(window.location.href);
         if (FILTER_STATE.d && FILTER_STATE.d !== '0') {
@@ -318,6 +341,7 @@
         } else {
           url.searchParams.delete('mac');
         }
+        updateDownloadLink();
         if (push) {
           window.history.pushState({}, '', url.toString());
         } else {
@@ -438,6 +462,7 @@
         const macParam = params.get('mac');
         FILTER_STATE.d = (dParam && dParam !== '0') ? dParam : '0';
         FILTER_STATE.mac = normalizeMacValue(macParam);
+        updateDownloadLink();
       }
 
       function handleDistrictChange(newD) {
@@ -655,7 +680,7 @@
 
         const options = {
           chart: {
-            height: 400,
+            height: 420,
             type: 'line',
             zoom: { enabled: false },
             toolbar: { show: true, tools: { download: true, selection: false, zoom: false, zoomin: false, zoomout: false, pan: false, reset: false } }
