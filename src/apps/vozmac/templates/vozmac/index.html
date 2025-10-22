@@ -83,6 +83,10 @@
           <button type="button" class="tab tab-lg" role="tab" aria-selected="false" data-filter="distrito-02" data-d="2">Distrito 02</button>
           <button type="button" class="tab tab-lg" role="tab" aria-selected="false" data-filter="distrito-03" data-d="3">Distrito 03</button>
         </div>
+        <div id="mac-filter-wrapper" class="mt-3 hidden">
+          <div id="mac-filter-tabs" class="tabs tabs-sm tabs-boxed w-full justify-center" role="tablist" aria-label="Filtro por MAC"></div>
+          <div id="mac-filter-empty" class="text-center text-xs text-gray-500 mt-2" style="display:none">Sin MACs disponibles.</div>
+        </div>
       </div>
 
       <div id="general" class="flex flex-wrap -mx-3 mt-6">
@@ -255,55 +259,28 @@
         }
       });
 
-      // Preparar y disparar la petición con el parámetro d si existe en la URL
-      document.addEventListener('DOMContentLoaded', function () {
-        const params = new URLSearchParams(window.location.search);
-        const d = params.get('d');
-        // Inicializar tabs y cargar datos para el valor d (0 = estatal/no filtro)
-        const selectedD = (d && d !== '0') ? d : '0';
-        setActiveTab(selectedD);
-        loadMotivoForD(selectedD);
-        loadSatisfaccionForD(selectedD);
-        loadSeguimientoForD(selectedD);
+      const FILTER_STATE = { d: '0', mac: null };
 
-        // Delegación: manejar clicks en el contenedor de tabs. Más robusto si el DOM cambia.
-        const filter = document.getElementById('filter');
-        if (filter) {
-          filter.addEventListener('click', function(e) {
-            const btn = e.target.closest('[data-d]');
-            if (!btn) return;
-            e.preventDefault();
-            const newD = btn.getAttribute('data-d') || '0';
-            updateUrlAndLoad(newD);
-          });
-        }
-
-        // Manejar back/forward del navegador
-        window.addEventListener('popstate', function () {
-          const params = new URLSearchParams(window.location.search);
-          const d2 = params.get('d') || '0';
-          setActiveTab(d2);
-          loadMotivoForD(d2);
-          loadSatisfaccionForD(d2);
-          loadSeguimientoForD(d2);
-        });
-      });
-
-      // Actualiza la URL y recarga el gráfico para el nuevo d
-      function updateUrlAndLoad(newD) {
-        const url = new URL(window.location.href);
-        if (newD === '0') url.searchParams.delete('d'); else url.searchParams.set('d', newD);
-        window.history.pushState({}, '', url.toString());
-        setActiveTab(newD);
-        loadMotivoForD(newD);
-        loadSatisfaccionForD(newD);
-        loadSeguimientoForD(newD);
+      function normalizeMacValue(value) {
+        if (value === null || value === undefined) return null;
+        const trimmed = String(value).trim();
+        return trimmed ? trimmed : null;
       }
 
-      // Marca visual del tab activo
+      function buildQueryFromFilters(filters) {
+        const params = new URLSearchParams();
+        if (filters.mac) {
+          params.set('mac', filters.mac);
+        } else if (filters.d && filters.d !== '0') {
+          params.set('d', filters.d);
+        }
+        const query = params.toString();
+        return query ? `?${query}` : '';
+      }
+
       function setActiveTab(dValue) {
         const tabs = document.querySelectorAll('#filter [data-d]');
-        tabs.forEach(function(t){
+        tabs.forEach(function (t) {
           if (t.getAttribute('data-d') === String(dValue)) {
             t.classList.add('tab-active');
             t.setAttribute('aria-selected', 'true');
@@ -314,17 +291,49 @@
         });
       }
 
-      // Carga de datos para el gráfico (usa htmx.ajax si está disponible, si no fetch)
-      function loadMotivoForD(dValue) {
+      function setActiveMac(macValue) {
+        const macTabs = document.querySelectorAll('#mac-filter-tabs [data-mac]');
+        macTabs.forEach(function (tab) {
+          const current = normalizeMacValue(tab.getAttribute('data-mac'));
+          const isActive = macValue ? current === macValue : current === null;
+          if (isActive) {
+            tab.classList.add('tab-active');
+            tab.setAttribute('aria-selected', 'true');
+          } else {
+            tab.classList.remove('tab-active');
+            tab.setAttribute('aria-selected', 'false');
+          }
+        });
+      }
+
+      function syncUrl(push) {
+        const url = new URL(window.location.href);
+        if (FILTER_STATE.d && FILTER_STATE.d !== '0') {
+          url.searchParams.set('d', FILTER_STATE.d);
+        } else {
+          url.searchParams.delete('d');
+        }
+        if (FILTER_STATE.mac) {
+          url.searchParams.set('mac', FILTER_STATE.mac);
+        } else {
+          url.searchParams.delete('mac');
+        }
+        if (push) {
+          window.history.pushState({}, '', url.toString());
+        } else {
+          window.history.replaceState({}, '', url.toString());
+        }
+      }
+
+      function loadMotivoForFilters(filters) {
         let apiUrl = '/api/v1/vozmac/motivo';
-        if (dValue && dValue !== '0') apiUrl += '?d=' + encodeURIComponent(dValue);
+        const query = buildQueryFromFilters(filters);
+        if (query) apiUrl += query;
         showSpinner(); hideEmpty();
         const fetcher = document.getElementById('motivo-fetcher');
         if (window.htmx && typeof window.htmx.ajax === 'function' && fetcher) {
-          // htmx.ajax(method, path, elt)
           try { window.htmx.ajax('GET', apiUrl, fetcher); }
           catch(e){
-            // fallback
             fetch(apiUrl).then(r=>r.ok? r.json(): Promise.reject(r.status)).then(buildMotivoChart).catch(err=>{hideSpinner(); console.error('fetch motivo error', err)});
           }
         } else {
@@ -334,6 +343,165 @@
             .catch(err => { hideSpinner(); console.error('fetch motivo error', err); });
         }
       }
+
+      function loadAllData() {
+        const filters = { d: FILTER_STATE.d, mac: FILTER_STATE.mac };
+        loadMotivoForFilters(filters);
+        if (typeof window.loadSatisfaccionForFilters === 'function') {
+          window.loadSatisfaccionForFilters(filters);
+        }
+        if (typeof window.loadSeguimientoForFilters === 'function') {
+          window.loadSeguimientoForFilters(filters);
+        }
+      }
+
+      function loadMacOptions(dValue, options) {
+        const opts = Object.assign({ preserveSelection: false, syncOnSelectionChange: true }, options || {});
+        const wrapper = document.getElementById('mac-filter-wrapper');
+        const tabs = document.getElementById('mac-filter-tabs');
+        const empty = document.getElementById('mac-filter-empty');
+        if (!wrapper || !tabs || !empty) {
+          return Promise.resolve([]);
+        }
+        if (!dValue || dValue === '0') {
+          wrapper.classList.add('hidden');
+          tabs.innerHTML = '';
+          empty.style.display = 'none';
+          if (!opts.preserveSelection && FILTER_STATE.mac) {
+            FILTER_STATE.mac = null;
+            if (opts.syncOnSelectionChange) {
+              syncUrl(false);
+            }
+          }
+          setActiveMac(null);
+          return Promise.resolve([]);
+        }
+        wrapper.classList.remove('hidden');
+        empty.textContent = 'Cargando MACs...';
+        empty.style.display = 'block';
+        tabs.innerHTML = '';
+        const endpoint = '/api/v1/vozmac/macs?d=' + encodeURIComponent(dValue);
+        return fetch(endpoint)
+          .then(function (response) {
+            if (!response.ok) {
+              throw new Error('Network response was not ok ' + response.statusText);
+            }
+            return response.json();
+          })
+          .then(function (data) {
+            let macs = Array.isArray(data) ? data.map(normalizeMacValue).filter(Boolean) : [];
+            macs = Array.from(new Set(macs));
+            if (!macs.length) {
+              empty.textContent = 'Sin MACs disponibles.';
+              tabs.innerHTML = '';
+            } else {
+              empty.style.display = 'none';
+              const buttons = ['<button type="button" class="tab tab-sm" role="tab" data-mac=\"\">Todos los MAC</button>']
+                .concat(macs.map(function (mac) {
+                  const label = String(mac);
+                  return `<button type=\"button\" class=\"tab tab-sm\" role=\"tab\" data-mac=\"${label}\">${label}</button>`;
+                }));
+              tabs.innerHTML = buttons.join('');
+            }
+            let selectionChanged = false;
+            if (!opts.preserveSelection || (FILTER_STATE.mac && !macs.includes(FILTER_STATE.mac))) {
+              if (FILTER_STATE.mac) selectionChanged = true;
+              FILTER_STATE.mac = null;
+            }
+            setActiveMac(FILTER_STATE.mac);
+            if (selectionChanged && opts.syncOnSelectionChange) {
+              syncUrl(false);
+            }
+            return macs;
+          })
+          .catch(function (error) {
+            console.error('Error fetching macs:', error);
+            empty.textContent = 'No se pudieron cargar los MAC.';
+            empty.style.display = 'block';
+            tabs.innerHTML = '';
+            let selectionChanged = false;
+            if (FILTER_STATE.mac) {
+              FILTER_STATE.mac = null;
+              selectionChanged = true;
+            }
+            setActiveMac(null);
+            if (selectionChanged && opts.syncOnSelectionChange) {
+              syncUrl(false);
+            }
+            return [];
+          });
+      }
+
+      function parseStateFromUrl(search) {
+        const params = new URLSearchParams(search);
+        const dParam = params.get('d');
+        const macParam = params.get('mac');
+        FILTER_STATE.d = (dParam && dParam !== '0') ? dParam : '0';
+        FILTER_STATE.mac = normalizeMacValue(macParam);
+      }
+
+      function handleDistrictChange(newD) {
+        const normalized = (newD && newD !== '0') ? String(newD) : '0';
+        if (FILTER_STATE.d === normalized) {
+          return;
+        }
+        FILTER_STATE.d = normalized;
+        FILTER_STATE.mac = null;
+        syncUrl(true);
+        setActiveTab(FILTER_STATE.d);
+        loadAllData();
+        loadMacOptions(FILTER_STATE.d, { preserveSelection: false, syncOnSelectionChange: true });
+      }
+
+      function handleMacChange(newMac) {
+        if (FILTER_STATE.d === '0') return;
+        const normalized = normalizeMacValue(newMac);
+        if (FILTER_STATE.mac === normalized) {
+          return;
+        }
+        FILTER_STATE.mac = normalized;
+        syncUrl(true);
+        setActiveMac(FILTER_STATE.mac);
+        loadAllData();
+      }
+
+      document.addEventListener('DOMContentLoaded', function () {
+        parseStateFromUrl(window.location.search);
+        setActiveTab(FILTER_STATE.d);
+
+        const filterContainer = document.getElementById('filter');
+        if (filterContainer) {
+          filterContainer.addEventListener('click', function (e) {
+            const macBtn = e.target.closest('[data-mac]');
+            if (macBtn) {
+              e.preventDefault();
+              handleMacChange(macBtn.getAttribute('data-mac'));
+              return;
+            }
+            const districtBtn = e.target.closest('[data-d]');
+            if (!districtBtn) return;
+            e.preventDefault();
+            const newD = districtBtn.getAttribute('data-d') || '0';
+            handleDistrictChange(newD);
+          });
+        }
+
+        loadMacOptions(FILTER_STATE.d, { preserveSelection: true, syncOnSelectionChange: true })
+          .then(function () {
+            setActiveMac(FILTER_STATE.mac);
+            loadAllData();
+          });
+      });
+
+      window.addEventListener('popstate', function () {
+        parseStateFromUrl(window.location.search);
+        setActiveTab(FILTER_STATE.d);
+        loadMacOptions(FILTER_STATE.d, { preserveSelection: true, syncOnSelectionChange: true })
+          .then(function () {
+            setActiveMac(FILTER_STATE.mac);
+            loadAllData();
+          });
+      });
 
       // -------------------- Satisfaccion chart --------------------
       function showSatisSpinner(){ const s = document.getElementById('satisfaccion-loading'); if (s) s.style.display='flex'; }
@@ -406,9 +574,16 @@
         safeUpdateSatisChart(categories, [negSeries, neuSeries, posSeries]);
       }
 
-      function loadSatisfaccionForD(dValue){
+      window.loadSatisfaccionForFilters = function(filters){
         let apiUrl = '/api/v1/vozmac/satisfaccion';
-        if (dValue && dValue !== '0') apiUrl += '?d=' + encodeURIComponent(dValue);
+        const params = new URLSearchParams();
+        if (filters && filters.mac) {
+          params.set('mac', filters.mac);
+        } else if (filters && filters.d && filters.d !== '0') {
+          params.set('d', filters.d);
+        }
+        const query = params.toString();
+        if (query) apiUrl += '?' + query;
         showSatisSpinner(); hideSatisEmpty();
         const fetcher = document.getElementById('satisfaccion-fetcher');
         if (window.htmx && typeof window.htmx.ajax === 'function' && fetcher) {
@@ -417,7 +592,7 @@
         } else {
           fetch(apiUrl).then(r=>r.ok?r.json():Promise.reject(r.status)).then(buildSatisfaccionChart).catch(err=>{hideSatisSpinner(); console.error('fetch satisfaccion error', err)});
         }
-      }
+      };
 
       // htmx hooks for satisfaccion: reuse motiv's fetcher pattern
       document.body.addEventListener('htmx:beforeRequest', function(evt){
@@ -443,11 +618,89 @@
       function showSeguimientoEmpty(){ const e = document.getElementById('seguimiento-empty'); if (e) e.style.display='block'; }
       function hideSeguimientoEmpty(){ const e = document.getElementById('seguimiento-empty'); if (e) e.style.display='none'; }
 
+      function prepareSeguimientoConfig(chartData){
+        const labels = Array.isArray(chartData.labels) ? chartData.labels : [];
+        const datasets = Array.isArray(chartData.datasets) ? chartData.datasets : [];
+
+        const series = datasets.map(d => ({
+          name: d.label,
+          data: (d.data || []).map(v => (typeof v === 'number' ? v : parseFloat(v))).map(val => (isNaN(val) ? 0 : val))
+        }));
+
+        const colors = datasets.map(d => d.borderColor || '#8884d8');
+        const allValues = [];
+        series.forEach(ds => {
+          ds.data.forEach(val => { if (typeof val === 'number' && val > 0) allValues.push(val); });
+        });
+
+        let yMin = 1;
+        let yMax = 5;
+        let tickAmount = 4;
+        if (allValues.length) {
+          const minVal = Math.min(...allValues);
+          const maxVal = Math.max(...allValues);
+          const range = maxVal - minVal;
+          const padding = Math.max(0.05, range * 0.15);
+          const rawMin = minVal - padding;
+          const rawMax = maxVal + padding;
+          yMin = Math.max(1, Math.floor(rawMin * 100) / 100);
+          yMax = Math.min(5, Math.ceil(rawMax * 100) / 100);
+          if (yMax - yMin < 0.2) {
+            yMin = Math.max(1, yMin - 0.1);
+            yMax = Math.min(5, yMax + 0.1);
+          }
+          const desiredTicks = Math.ceil((yMax - yMin) / 0.1);
+          tickAmount = Math.min(10, Math.max(3, desiredTicks));
+        }
+
+        const options = {
+          chart: {
+            height: 400,
+            type: 'line',
+            zoom: { enabled: false },
+            toolbar: { show: true, tools: { download: true, selection: false, zoom: false, zoomin: false, zoomout: false, pan: false, reset: false } }
+          },
+          colors: colors,
+          dataLabels: { enabled: false },
+          stroke: { curve: 'smooth', width: 3 },
+          title: {
+            text: chartData.year ? `Promedio Mensual (${chartData.year})` : 'Promedio Mensual',
+            align: 'left'
+          },
+          grid: {
+            borderColor: '#e7e7e7',
+            row: { colors: ['#f3f3f3', 'transparent'], opacity: 0.5 },
+          },
+          xaxis: {
+            categories: labels,
+          },
+          yaxis: {
+            title: { text: 'Calificación Promedio' },
+            min: Number(yMin.toFixed(2)),
+            max: Number(yMax.toFixed(2)),
+            tickAmount,
+            decimalsInFloat: 2
+          },
+          legend: {
+            position: 'bottom',
+            horizontalAlign: 'center',
+            floating: false,
+            offsetY: 10
+          },
+          tooltip: {
+            y: { formatter: function(val){ return typeof val === 'number' ? val.toFixed(2) : val; } }
+          }
+        };
+
+        return { series, options };
+      }
+
       function safeUpdateSeguimientoChart(chartData) {
+        const config = prepareSeguimientoConfig(chartData);
         if (window.seguimientoChart) {
           try {
-            window.seguimientoChart.updateOptions({ xaxis: { categories: chartData.labels } });
-            window.seguimientoChart.updateSeries(chartData.datasets.map(d => ({ name: d.label, data: d.data })));
+            window.seguimientoChart.updateOptions(config.options);
+            window.seguimientoChart.updateSeries(config.series);
             return;
           } catch (err) {
             try { window.seguimientoChart.destroy(); } catch (e) {}
@@ -457,43 +710,7 @@
         const el = document.getElementById('seguimiento-chart');
         if (!el) return;
 
-        const options = {
-          series: chartData.datasets.map(d => ({ name: d.label, data: d.data })),
-          chart: {
-            height: 280,
-            type: 'line',
-            zoom: { enabled: false },
-            toolbar: { show: true, tools: { download: true, selection: false, zoom: false, zoomin: false, zoomout: false, pan: false, reset: false } }
-          },
-          colors: chartData.datasets.map(d => d.borderColor),
-          dataLabels: { enabled: false },
-          stroke: { curve: 'smooth', width: 3 },
-          title: {
-            text: 'Promedio Mensual (Año Anterior)',
-            align: 'left'
-          },
-          grid: {
-            borderColor: '#e7e7e7',
-            row: { colors: ['#f3f3f3', 'transparent'], opacity: 0.5 },
-          },
-          xaxis: {
-            categories: chartData.labels,
-          },
-          yaxis: {
-            title: { text: 'Calificación Promedio' },
-            min: 1,
-            max: 5,
-            tickAmount: 4
-          },
-          legend: {
-              position: 'top',
-              horizontalAlign: 'right',
-              floating: true,
-              offsetY: -25,
-              offsetX: -5
-          }
-        };
-        window.seguimientoChart = new ApexCharts(el, options);
+        window.seguimientoChart = new ApexCharts(el, Object.assign({}, config.options, { series: config.series }));
         window.seguimientoChart.render();
       }
 
@@ -508,9 +725,16 @@
         safeUpdateSeguimientoChart(data);
       }
 
-      window.loadSeguimientoForD = function(dValue) {
-        let apiUrl = '/api/v1/vozmac/seguimiento/';
-        if (dValue && dValue !== '0') apiUrl += '?d=' + encodeURIComponent(dValue);
+      window.loadSeguimientoForFilters = function(filters) {
+        let apiUrl = '/api/v1/vozmac/seguimiento';
+        const params = new URLSearchParams();
+        if (filters && filters.mac) {
+          params.set('mac', filters.mac);
+        } else if (filters && filters.d && filters.d !== '0') {
+          params.set('d', filters.d);
+        }
+        const query = params.toString();
+        if (query) apiUrl += '?' + query;
         showSeguimientoSpinner();
         hideSeguimientoEmpty();
 
@@ -523,9 +747,9 @@
           .catch(error => {
             hideSeguimientoSpinner();
             showSeguimientoEmpty();
-            console.error('Error fetching seguimiento data:', error);
+              console.error('Error fetching seguimiento data:', error);
           });
-      }
+      };
     })();
     </script>
 

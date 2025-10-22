@@ -65,6 +65,7 @@ def insertar_respuestas(paquete, respuestas):
 
             datos.pop('device_id', None)
             datos.pop('is_exported', None)
+            datos.pop('id', None)
 
             instancia = RespuestaEncuesta(batch=paquete, **datos)
             if entidad is not None:

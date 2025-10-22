@@ -16,9 +16,18 @@ class MotivoAPIView(APIView):
 
     def get(self, request, format=None):
         distrito = request.GET.get('d')
+        mac_param = (request.GET.get('mac') or '').strip()
+        mac_filter = mac_param or None
+
         queryset = RespuestaEncuesta.objects.all()
-        if distrito and distrito != '0':
-            queryset = queryset.filter(distrito=distrito)
+        if mac_filter:
+            queryset = queryset.filter(mac=mac_filter)
+        elif distrito and distrito != '0':
+            try:
+                distrito_int = int(distrito)
+            except ValueError:
+                return Response({"error": "Invalid district parameter."}, status=status.HTTP_400_BAD_REQUEST)
+            queryset = queryset.filter(distrito=distrito_int)
         data = (
             queryset
             .values('p0_tipo_visita')
@@ -44,11 +53,21 @@ class SatisfaccionAPIView(APIView):
 
     def get(self, request, format=None):
         distrito = request.GET.get('d')
+        mac_param = (request.GET.get('mac') or '').strip()
+        mac_filter = mac_param or None
         now = timezone.now()
         year = now.year
         qs = RespuestaEncuesta.objects.filter(created_at__year=year)
-        if distrito and distrito != '0':
-            qs = qs.filter(distrito=distrito)
+        selected_distrito = None
+
+        if mac_filter:
+            qs = qs.filter(mac=mac_filter)
+        elif distrito and distrito != '0':
+            try:
+                selected_distrito = int(distrito)
+                qs = qs.filter(distrito=selected_distrito)
+            except ValueError:
+                return Response({"error": "Invalid district parameter."}, status=status.HTTP_400_BAD_REQUEST)
 
         result = {}
         total_responses = qs.count()
@@ -77,7 +96,8 @@ class SatisfaccionAPIView(APIView):
 
         response = {
             'year': year,
-            'distrito': int(distrito) if distrito and distrito != '0' else None,
+            'distrito': selected_distrito,
+            'mac': mac_filter,
             'total_responses': total_responses,
             'by_question': result,
         }
@@ -102,7 +122,12 @@ class MacsAPIView(APIView):
             except ValueError:
                 return Response({"error": "Invalid district parameter. Must be an integer."}, status=status.HTTP_400_BAD_REQUEST)
 
-        macs = queryset.values_list('mac', flat=True).distinct()
+        macs = (
+            queryset
+            .order_by('mac')
+            .values_list('mac', flat=True)
+            .distinct()
+        )
 
         return Response(list(macs), status=status.HTTP_200_OK)
 
@@ -116,17 +141,36 @@ class SeguimientoAPIView(APIView):
 
     def get(self, request, format=None):
         distrito_param = request.GET.get('d')
-        today = datetime.now()
-        previous_year = today.year - 1
+        mac_param = (request.GET.get('mac') or '').strip()
+        mac_filter = mac_param or None
+        today = timezone.now()
+        distrito = None
 
-        queryset = RespuestaEncuesta.objects.filter(created_at__year=previous_year)
+        base_queryset = RespuestaEncuesta.objects.all()
 
-        if distrito_param and distrito_param != '0':
+        if mac_filter:
+            base_queryset = base_queryset.filter(mac=mac_filter)
+        elif distrito_param and distrito_param != '0':
             try:
-                distrito_int = int(distrito_param)
-                queryset = queryset.filter(distrito=distrito_int)
+                distrito = int(distrito_param)
             except ValueError:
                 return Response({"error": "Invalid district parameter."}, status=status.HTTP_400_BAD_REQUEST)
+            base_queryset = base_queryset.filter(distrito=distrito)
+
+        years_to_try = [today.year, today.year - 1]
+        selected_year = None
+        queryset = None
+
+        for year in years_to_try:
+            candidate_queryset = base_queryset.filter(created_at__year=year)
+            if candidate_queryset.exists():
+                selected_year = year
+                queryset = candidate_queryset
+                break
+
+        if queryset is None:
+            selected_year = years_to_try[0]
+            queryset = base_queryset.filter(created_at__year=selected_year)
 
         question_fields = {
             'p1_claridad_info': 'Claridad de la información',
@@ -144,18 +188,30 @@ class SeguimientoAPIView(APIView):
             avg_p4=Avg('p4_tiempo_espera'),
         ).order_by('month')
 
-        month_data_map = {entry['month'].month: entry for entry in monthly_averages}
+        month_data_map = {
+            entry['month'].month: entry
+            for entry in monthly_averages
+            if entry.get('month') is not None
+        }
 
-        labels = [datetime(previous_year, i, 1).strftime('%b') for i in range(1, 13)]
+        spanish_months = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"]
+        labels = [spanish_months[i - 1] for i in range(1, 13)]
 
         def get_monthly_data(avg_key):
             data = []
             for i in range(1, 13):
                 avg_val = month_data_map.get(i, {}).get(avg_key)
-                data.append(round(avg_val, 2) if avg_val is not None else 0)
+                if avg_val is None:
+                    data.append(0.0)
+                else:
+                    data.append(round(float(avg_val), 2))
             return data
 
         chart_data = {
+            'year': selected_year,
+            'distrito': distrito,
+            'mac': mac_filter,
+            'total_responses': queryset.count(),
             'labels': labels,
             'datasets': [
                 {'label': question_fields['p1_claridad_info'], 'data': get_monthly_data('avg_p1'), 'borderColor': 'rgba(255, 99, 132, 1)'},
