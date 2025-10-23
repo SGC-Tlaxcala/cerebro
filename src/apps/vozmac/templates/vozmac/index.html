@@ -207,21 +207,41 @@ Documentación</a></li>
         </div>
       </div>
 
-      <div class="card bg-base-100 shadow mt-6" id="satisfaccion">
-        <div class="card-body">
-          <h2 class="card-title">Satisfacción Ciudadana</h2>
-          <div id="satisfaccion-loading" class="flex justify-center items-center py-6" style="display:none">
-            <svg class="animate-spin h-8 w-8 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
-            </svg>
-          </div>
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-6 mt-6">
+        <div class="md:col-span-7">
+          <div class="card bg-base-100 shadow h-full" id="satisfaccion">
+            <div class="card-body">
+              <h2 class="card-title">Satisfacción Ciudadana</h2>
+              <div id="satisfaccion-loading" class="flex justify-center items-center py-6" style="display:none">
+                <svg class="animate-spin h-8 w-8 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                </svg>
+              </div>
 
-          <div id="satisfaccion-chart" class="w-full" style="min-height:360px"></div>
-          <div id="satisfaccion-legend" class="mt-4 text-sm grid grid-cols-1 gap-2"></div>
-          <div id="satisfaccion-empty" class="text-center text-sm text-gray-500 mt-4" style="display:none">Sin datos</div>
-          <div id="satisfaccion-fetcher" style="display:none" aria-hidden="true"></div>
+              <div id="satisfaccion-chart" class="w-full" style="min-height:360px"></div>
+              <div id="satisfaccion-legend" class="mt-4 text-sm grid grid-cols-1 gap-2"></div>
+              <div id="satisfaccion-empty" class="text-center text-sm text-gray-500 mt-4" style="display:none">Sin datos</div>
+              <div id="satisfaccion-fetcher" style="display:none" aria-hidden="true"></div>
+            </div>
+          </div>
         </div>
+
+        <div class="md:col-span-5">
+          <div class="card bg-base-100 shadow h-full" id="objetivo-calidad">
+            <div class="card-body flex flex-col items-center">
+              <h2 class="card-title self-start">Objetivo de Calidad</h2>
+              <div id="objetivo-gauge" class="w-full" style="min-height:280px; min-width:300px"></div>
+              <div class="mt-6 w-full text-left space-y-2">
+                <p class="text-base font-semibold text-gray-700 leading-relaxed">
+                  Cumplir en un 95% la satisfacción ciudadana sobre el servicio de los Módulos de Atención Ciudadana.
+                </p>
+                <p id="objetivo-resumen" class="text-base font-semibold text-gray-700 leading-relaxed"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
 
     </main>
@@ -723,47 +743,78 @@ Documentación</a></li>
 
       function buildSatisfaccionChart(resp){
         hideSatisSpinner();
-        if (!resp || !resp.by_question) { showSatisEmpty(); return; }
+        if (typeof window.updateObjetivoCalidadResumen === 'function') {
+          const firstDate = resp && resp.first_response_date ? resp.first_response_date : null;
+          const lastDate = resp && resp.last_response_date ? resp.last_response_date : null;
+          const total = resp && typeof resp.total_responses === 'number' ? resp.total_responses : 0;
+          window.updateObjetivoCalidadResumen(firstDate, lastDate, total);
+        }
+        if (!resp || !resp.by_question) { showSatisEmpty(); if (typeof window.updateObjetivoCalidadGauge === 'function') { window.updateObjetivoCalidadGauge(0); } return; }
         const questions = ['p1_claridad_info','p2_amabilidad','p3_instalaciones','p4_tiempo_espera'];
-        const categories = questions.map(q => resp.by_question[q].label);
+        const categories = questions.map(function(q){
+          const meta = resp.by_question[q];
+          return meta && meta.label ? meta.label : q;
+        });
 
         // For diverging: negative = 1+2 (as negative values), neutral = 3, positive = 4-5
         const negSeries = { name: 'Negativo (1-2)', data: [] };
         const neuSeries = { name: 'Neutral (3)', data: [] };
         const posSeries = { name: 'Positivo (4-5)', data: [] };
+        const legendRows = [];
+        const favorableValues = [];
 
         questions.forEach(function(q){
-          const dist = resp.by_question[q].distribution || {};
-          const total = (resp.by_question[q].total && resp.by_question[q].total>0)? resp.by_question[q].total : 0;
+          const meta = resp.by_question[q] || {};
+          const dist = meta.distribution || {};
+          const total = (meta.total && meta.total > 0) ? meta.total : 0;
           const c1 = Number(dist['1']||0);
           const c2 = Number(dist['2']||0);
           const c3 = Number(dist['3']||0);
           const c4 = Number(dist['4']||0);
           const c5 = Number(dist['5']||0);
-          if (!total) { negSeries.data.push(0); neuSeries.data.push(0); posSeries.data.push(0); return; }
-          const negPct = Math.round(((c1 + c2) / total) * 10000) / 100; // two decimals
-          const neuPct = Math.round((c3 / total) * 10000) / 100;
-          const posPct = Math.round(((c4 + c5) / total) * 10000) / 100;
+          let negPct = 0, neuPct = 0, posPct = 0;
+          if (total) {
+            negPct = Math.round(((c1 + c2) / total) * 10000) / 100; // two decimals
+            neuPct = Math.round((c3 / total) * 10000) / 100;
+            posPct = Math.round(((c4 + c5) / total) * 10000) / 100;
+          }
           // negative values for left side
           negSeries.data.push(-negPct);
           neuSeries.data.push(neuPct);
           posSeries.data.push(posPct);
+
+          let favorablePct = meta && meta.favorable_pct != null ? Number(meta.favorable_pct) : posPct;
+          if (!isFinite(favorablePct)) favorablePct = 0;
+          legendRows.push({
+            label: meta.label || q,
+            favorable: favorablePct
+          });
+          if (total || meta.favorable_pct != null) {
+            favorableValues.push(favorablePct);
+          }
         });
 
         // render legend with favorable pct
         try{
           const legendEl = document.getElementById('satisfaccion-legend');
           if (legendEl){
-            legendEl.innerHTML = questions.map(function(q){
-              const meta = resp.by_question[q];
-              const pct = meta ? (meta.favorable_pct || 0) : 0;
-              return `<div class="flex items-center justify-between"><div>${meta.label}</div><div class="font-semibold">${pct}% favorables</div></div>`;
+            legendEl.innerHTML = legendRows.map(function(row){
+              return `<div class="flex items-center justify-between"><div>${row.label}</div><div class="font-semibold">${row.favorable}% favorables</div></div>`;
             }).join('');
           }
         }catch(e){}
 
         hideSatisEmpty();
         safeUpdateSatisChart(categories, [negSeries, neuSeries, posSeries]);
+        if (typeof window.updateObjetivoCalidadGauge === 'function') {
+          if (favorableValues.length) {
+            const gaugeAverage = favorableValues.reduce(function(acc, val){ return acc + val; }, 0) / favorableValues.length;
+            window.updateObjetivoCalidadGauge(gaugeAverage);
+          } else {
+            window.updateObjetivoCalidadGauge(0);
+          }
+        }
+
       }
 
       window.loadSatisfaccionForFilters = function(filters){
@@ -801,6 +852,126 @@ Documentación</a></li>
         }catch(e){ hideSatisSpinner(); console.error('Error satisfaccion htmx', e); }
       });
 
+    })();
+
+    // -------------------- Objetivo de Calidad Gauge --------------------
+    (function(){
+      const GAUGE_ELEMENT_ID = 'objetivo-gauge';
+      const SUMMARY_ELEMENT_ID = 'objetivo-resumen';
+      const COLOR_GREEN = '#16a34a';
+      const COLOR_ORANGE = '#fb923c';
+      const COLOR_RED = '#ef4444';
+      let gaugeChart = null;
+
+      function getGaugeColor(value) {
+        if (value >= 95) return COLOR_GREEN;
+        if (value >= 75) return COLOR_ORANGE;
+        return COLOR_RED;
+      }
+
+      function createGauge() {
+        if (typeof ApexCharts === 'undefined') {
+          console.warn('ApexCharts no está disponible; gauge de Objetivo de Calidad no se renderizará.');
+          return null;
+        }
+        const el = document.getElementById(GAUGE_ELEMENT_ID);
+        if (!el) return null;
+
+        const options = {
+          chart: {
+            type: 'radialBar',
+            height: 280,
+            sparkline: { enabled: true }
+          },
+          series: [0],
+          colors: [getGaugeColor(0)],
+          plotOptions: {
+            radialBar: {
+              startAngle: -120,
+              endAngle: 120,
+              hollow: {
+                size: '62%',
+                background: 'transparent'
+              },
+              track: {
+                background: '#e5e7eb',
+                strokeWidth: '100%'
+              },
+              dataLabels: {
+                name: {
+                  show: true,
+                  color: '#6b7280',
+                  fontSize: '14px',
+                  offsetY: 60,
+                  formatter: function () { return 'Promedio favorable'; }
+                },
+                value: {
+                  show: true,
+                  fontSize: '34px',
+                  fontWeight: 700,
+                  offsetY: -10,
+                  formatter: function (val) {
+                    const num = Number(val);
+                    return isFinite(num) ? num.toFixed(1) + '%' : '--';
+                  }
+                }
+              }
+            }
+          },
+          stroke: { lineCap: 'round' },
+          fill: { type: 'solid' }
+        };
+
+        const chart = new ApexCharts(el, options);
+        chart.render();
+        return chart;
+      }
+
+      function ensureGauge() {
+        if (gaugeChart) return gaugeChart;
+        gaugeChart = createGauge();
+        return gaugeChart;
+      }
+
+      function formatDateLabel(isoString) {
+        if (!isoString) return '--';
+        const date = new Date(isoString);
+        if (Number.isNaN(date.getTime())) return '--';
+        return date.toLocaleDateString('es-MX', {
+          day: '2-digit',
+          month: 'long',
+          year: 'numeric'
+        });
+      }
+
+      function formatCount(value) {
+        try {
+          return new Intl.NumberFormat('es-MX').format(value || 0);
+        } catch (e) {
+          return String(value || 0);
+        }
+      }
+
+      window.updateObjetivoCalidadGauge = function(value) {
+        const chart = ensureGauge();
+        if (!chart) return;
+        const numeric = Number(value);
+        const safeValue = isFinite(numeric) ? Math.max(0, Math.min(100, numeric)) : 0;
+        const rounded = Number(safeValue.toFixed(2));
+        chart.updateOptions({ colors: [getGaugeColor(rounded)] }, false, false);
+        chart.updateSeries([rounded]);
+      };
+
+      window.updateObjetivoCalidadResumen = function(firstDate, lastDate, total) {
+        const el = document.getElementById(SUMMARY_ELEMENT_ID);
+        if (!el) return;
+        const startLabel = formatDateLabel(firstDate);
+        const endLabel = formatDateLabel(lastDate);
+        const totalLabel = formatCount(total);
+        el.textContent = `Desde ${startLabel} hasta ${endLabel} se han capturado ${totalLabel} encuestas.`;
+      };
+
+      ensureGauge();
     })();
 
     // -------------------- Seguimiento Chart --------------------

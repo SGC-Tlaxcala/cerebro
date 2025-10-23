@@ -1,7 +1,7 @@
 import csv
 from datetime import datetime
 
-from django.db.models import Count, Avg
+from django.db.models import Count, Avg, Min, Max
 from django.db.models.functions import TruncMonth
 from django.http import HttpResponse
 from django.utils import timezone
@@ -75,6 +75,7 @@ class SatisfaccionAPIView(APIView):
 
         result = {}
         total_responses = qs.count()
+        date_bounds = qs.aggregate(first_date=Min('created_at'), last_date=Max('created_at')) if total_responses else {'first_date': None, 'last_date': None}
 
         for field, label in self.QUESTIONS:
             dist_qs = qs.values(field).annotate(total=Count('id'))
@@ -103,6 +104,8 @@ class SatisfaccionAPIView(APIView):
             'distrito': selected_distrito,
             'mac': mac_filter,
             'total_responses': total_responses,
+            'first_response_date': timezone.localtime(date_bounds['first_date']).isoformat() if date_bounds['first_date'] else None,
+            'last_response_date': timezone.localtime(date_bounds['last_date']).isoformat() if date_bounds['last_date'] else None,
             'by_question': result,
         }
 
