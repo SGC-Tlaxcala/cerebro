@@ -166,26 +166,16 @@ Documentación</a></li>
 
       <div id="general" class="grid grid-cols-1 md:grid-cols-12 gap-6 mt-6">
         <div class="md:col-span-5">
-          <div id="motivo-visita" class="card bg-base-100 shadow h-full">
-            <div class="card-body">
-              <h2 class="card-title">Motivo de Visita</h2>
-
-              <!-- Spinner (oculto por defecto) -->
-              <div id="motivo-loading" class="flex justify-center items-center py-6" style="display:none">
-                <svg class="animate-spin h-8 w-8 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
-                </svg>
+          <div id="objetivo-calidad" class="card bg-base-100 shadow h-full">
+            <div class="card-body flex flex-col items-center">
+              <h2 class="card-title self-start">Objetivo de Calidad</h2>
+              <div id="objetivo-gauge" class="w-full" style="min-height:280px; min-width:300px"></div>
+              <div class="mt-6 w-full text-left space-y-2">
+                <p class="text-base font-semibold text-gray-700 leading-relaxed">
+                  Cumplir en un 95% la satisfacción ciudadana sobre el servicio de los Módulos de Atención Ciudadana.
+                </p>
+                <p id="objetivo-resumen" class="text-base font-semibold text-gray-700 leading-relaxed"></p>
               </div>
-
-              <!-- Contenedor del chart y mensaje "Sin datos" -->
-              <div id="motivo-chart" class="w-full" style="min-height:260px"></div>
-              <div id="motivo-legend" class="mt-4 text-sm"></div>
-              <div id="motivo-empty" class="text-center text-sm text-gray-500 mt-4" style="display:none">Sin datos</div>
-
-              <!-- elemento oculto para htmx (se usa como target) -->
-              <div id="motivo-fetcher" style="display:none" aria-hidden="true"></div>
-
             </div>
           </div>
         </div>
@@ -228,16 +218,26 @@ Documentación</a></li>
         </div>
 
         <div class="md:col-span-5">
-          <div class="card bg-base-100 shadow h-full" id="objetivo-calidad">
-            <div class="card-body flex flex-col items-center">
-              <h2 class="card-title self-start">Objetivo de Calidad</h2>
-              <div id="objetivo-gauge" class="w-full" style="min-height:280px; min-width:300px"></div>
-              <div class="mt-6 w-full text-left space-y-2">
-                <p class="text-base font-semibold text-gray-700 leading-relaxed">
-                  Cumplir en un 95% la satisfacción ciudadana sobre el servicio de los Módulos de Atención Ciudadana.
-                </p>
-                <p id="objetivo-resumen" class="text-base font-semibold text-gray-700 leading-relaxed"></p>
+          <div id="motivo-visita" class="card bg-base-100 shadow h-full">
+            <div class="card-body">
+              <h2 class="card-title">Motivo de Visita</h2>
+
+              <!-- Spinner (oculto por defecto) -->
+              <div id="motivo-loading" class="flex justify-center items-center py-6" style="display:none">
+                <svg class="animate-spin h-8 w-8 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                </svg>
               </div>
+
+              <!-- Contenedor del chart y mensaje "Sin datos" -->
+              <div id="motivo-chart" class="w-full" style="min-height:260px"></div>
+              <div id="motivo-legend" class="mt-4 text-sm"></div>
+              <div id="motivo-empty" class="text-center text-sm text-gray-500 mt-4" style="display:none">Sin datos</div>
+
+              <!-- elemento oculto para htmx (se usa como target) -->
+              <div id="motivo-fetcher" style="display:none" aria-hidden="true"></div>
+
             </div>
           </div>
         </div>
