@@ -6,7 +6,7 @@ from apps.kpi.models import Campaign
 
 class Index(TemplateView):
     """Vista del índice del SGC."""
-    template_name = 'add.html'
+    template_name = 'index.html'
 
     # Se agrega al contexto Campaigns.actual(2025, 'CAP')
     def get_context_data(self, **kwargs):
