@@ -40,6 +40,7 @@ DJANGO_APPS = [
 THIRD_PARTY_APPS = [
     'crispy_forms',
     "crispy_bootstrap5",
+    'crispy_tailwind',
     'django_extensions',
     'watson',
     'simple_history',
@@ -153,7 +154,7 @@ MEDIA_URL = '/media/'
 FILE_UPLOAD_PERMISSIONS = 0o644
 
 CRISPY_TEMPLATE_PACK = 'bootstrap5'
-CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_ALLOWED_TEMPLATE_PACKS = ('bootstrap5', 'tailwind')
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
