@@ -1,0 +1,460 @@
+{% extends 'cerebro/base.html' %}
+{% load static %}
+
+{% block title %}Cuadro de Mando Integral{% endblock title %}
+
+{% block content %}
+<section class="mx-auto flex max-w-3xl flex-col items-center gap-6 text-center">
+  <div class="w-full">
+    <form class="card bg-base-100 shadow-md" method="get" action="{% url 'docs:buscador' %}">
+      <div class="card-body">
+        <h2 class="card-title justify-center text-2xl font-semibold">Busca un documento</h2>
+        <p class="text-sm text-base-content/70">Escribe el nombre o palabra clave del documento que necesitas.</p>
+        <div class="flex flex-col gap-3 sm:flex-row">
+          <label for="search-docs" class="sr-only">Nombre del documento</label>
+          <input
+            id="search-docs"
+            type="search"
+            name="q"
+            placeholder="Escribe el documento a buscar"
+            class="input input-bordered w-full"
+            aria-label="Nombre del documento"
+          />
+          <button type="submit" class="btn btn-primary gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="size-5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+            </svg>
+            Buscar
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</section>
+
+<section class="mx-auto mt-12 w-full max-w-5xl">
+  <div class="card bg-base-100 shadow-xl border border-base-200">
+    <div class="card-body gap-6 md:flex md:items-start">
+      <div class="mx-auto flex shrink-0 items-center justify-center">
+        <img src="{% static 'img/logo.svg' %}" alt="INE logo" class="h-20 w-auto object-contain" />
+      </div>
+      <div class="flex-1 space-y-4 text-left">
+        <div class="flex flex-col gap-2 md:flex-row md:items-baseline md:justify-between">
+          <h2 class="text-3xl font-bold leading-tight">Política de la Calidad</h2>
+          <span class="badge badge-outline">Revisión: 00 · 2021</span>
+        </div>
+        <p class="text-base leading-relaxed text-base-content/80">
+          En el Instituto Nacional Electoral (INE), estamos comprometidos en proporcionar a la ciudadanía un servicio eficiente y de calidad en el trámite de expedición de su credencial para votar, desde la entrevista hasta la entrega de la credencial para votar, para contribuir al derecho a la identidad ciudadana. Lo hacemos con base en el marco normativo, reglamentario y en un entorno de mejora continua con apego a los requisitos de la norma ISO 9001:2015.
+        </p>
+        <div class="divider my-6"></div>
+        <div class="grid gap-4 text-sm md:grid-cols-2">
+          <div class="rounded-lg border border-base-200 bg-base-100/50 p-4">
+            <h3 class="text-sm font-semibold uppercase tracking-wide text-primary">Nuestro compromiso</h3>
+            <p class="mt-2 text-base leading-relaxed text-base-content/80">
+              Garantizar procesos oportunos y confiables que acompañen a las personas en cada etapa de su trámite, asegurando la integridad y confidencialidad de su información.
+            </p>
+          </div>
+          <div class="rounded-lg border border-base-200 bg-base-100/50 p-4">
+            <h3 class="text-sm font-semibold uppercase tracking-wide text-primary">Enfoque de mejora continua</h3>
+            <p class="mt-2 text-base leading-relaxed text-base-content/80">
+              Evaluamos de forma permanente nuestros resultados y prácticas para alinear nuestros servicios a las necesidades ciudadanas y los estándares internacionales de calidad.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="mx-auto mt-12 w-full max-w-4xl">
+  <div class="card border border-primary/30 bg-primary/5 shadow-md">
+    <div class="card-body">
+      <h2 class="card-title text-3xl font-bold text-primary">Alcance del Sistema</h2>
+      <p class="mt-4 text-lg leading-relaxed text-base-content">
+        Dar un Servicio de Atención a la Ciudadanía durante el trámite de expedición de su credencial para votar, dese la primera entrevista hasta la entrega de la credencial en los MAC en la entidad.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="mx-auto mt-12 w-full max-w-6xl space-y-8">
+  <div class="flex flex-col items-center gap-3 text-center">
+    <h2 class="text-3xl font-bold">Objetivos de la calidad</h2>
+  </div>
+
+  <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+    <article class="card bg-base-100 shadow-lg border border-base-200">
+      <div class="card-body space-y-4">
+        <div class="flex items-center gap-3">
+          <span class="badge badge-primary badge-outline text-sm">01</span>
+          <h3 class="text-lg font-semibold">Actualizar el Padrón Electoral</h3>
+        </div>
+        <p class="text-base leading-relaxed text-base-content/80">
+          1. Actualizar el Padrón Electoral en la entidad mediante la captación de solicitudes de credencial requeridas por la ciudadanía en los Módulos de Atención Ciudadana en al menos el 90% del rango mínimo establecido en el pronóstico.
+        </p>
+        <button type="button" class="btn btn-outline btn-primary" data-modal="kpi1-modal" data-chart="kpi1">
+          {{ cap }}
+        </button>
+      </div>
+    </article>
+
+    <article class="card bg-base-100 shadow-lg border border-base-200">
+      <div class="card-body space-y-4">
+        <div class="flex items-center gap-3">
+          <span class="badge badge-primary badge-outline text-sm">02</span>
+          <h3 class="text-lg font-semibold">Implementación del modelo MAC</h3>
+        </div>
+        <p class="text-base leading-relaxed text-base-content/80">
+          2. Incrementar en un 30% la implementación del modelo institucional de Módulos de Atención Ciudadana fijos de la entidad, con base en el Reporte porcentaje de avance en la implementación del modelo institucional vigente.
+        </p>
+        <button type="button" class="btn btn-outline btn-primary" data-modal="kpi2-modal" data-chart="kpi2">
+          MAC con imagen institucional
+        </button>
+      </div>
+    </article>
+
+    <article class="card bg-base-100 shadow-lg border border-base-200">
+      <div class="card-body space-y-4">
+        <div class="flex items-center gap-3">
+          <span class="badge badge-primary badge-outline text-sm">03</span>
+          <h3 class="text-lg font-semibold">Mantenimiento del 100% de los MAC</h3>
+        </div>
+        <p class="text-base leading-relaxed text-base-content/80">
+          3. Lograr el mantenimiento del 100% de los Módulos de Atención Ciudadana con modelo institucional, con base en el Reporte del porcentaje de avance en la implementación del modelo institucional vigente, en los conceptos de pintura en muros, aire acondicionado, marquesina, entre otros.
+        </p>
+      </div>
+    </article>
+
+    <article class="card bg-base-100 shadow-lg border border-base-200">
+      <div class="card-body space-y-4">
+        <div class="flex items-center gap-3">
+          <span class="badge badge-primary badge-outline text-sm">04</span>
+          <h3 class="text-lg font-semibold">Servicio a domicilio</h3>
+        </div>
+        <p class="text-base leading-relaxed text-base-content/80">
+          4. Mantener el servicio a domicilio, acorde con lo que establece el artículo 141 de la Ley General de Instituciones y Procedimientos Electorales.
+        </p>
+        <button type="button" class="btn btn-outline btn-primary" data-modal="kpi4-modal">
+          Solicitudes art. 141
+        </button>
+      </div>
+    </article>
+
+    <article class="card bg-base-100 shadow-lg border border-base-200 md:col-span-2 xl:col-span-1">
+      <div class="card-body space-y-4">
+        <div class="flex items-center gap-3">
+          <span class="badge badge-primary badge-outline text-sm">05</span>
+          <h3 class="text-lg font-semibold">Satisfacción ciudadana</h3>
+        </div>
+        <p class="text-base leading-relaxed text-base-content/80">
+          5. Cumplir en un 95% la satisfacción ciudadana sobre el servicio de los Módulos de Atención Ciudadana.
+        </p>
+        <button type="button" class="btn btn-outline btn-primary" data-modal="kpi5-modal" data-chart="kpi5">
+          Aprobación Ciudadana
+        </button>
+      </div>
+    </article>
+  </div>
+</section>
+
+<dialog id="kpi1-modal" class="modal">
+  <div class="modal-box w-11/12 max-w-5xl space-y-6">
+    <div class="flex items-start justify-between gap-4">
+      <div>
+        <h3 class="text-2xl font-semibold text-base-content">{{ cap }}</h3>
+        <p class="text-sm text-base-content/70">Seguimiento mensual de trámites</p>
+      </div>
+      <button type="button" class="btn btn-sm btn-circle btn-ghost" aria-label="Cerrar" data-close-modal="kpi1-modal">✕</button>
+    </div>
+    <div class="rounded-2xl border border-base-200 bg-base-100 p-4">
+      <div id="chartKPI1" class="h-[480px] w-full"></div>
+    </div>
+  </div>
+  <form method="dialog" class="modal-backdrop">
+    <button aria-label="Cerrar" class="hidden">cerrar</button>
+  </form>
+</dialog>
+
+<dialog id="kpi2-modal" class="modal">
+  <div class="modal-box w-11/12 max-w-3xl space-y-6">
+    <div class="flex items-start justify-between gap-4">
+      <div>
+        <h3 class="text-2xl font-semibold text-base-content">{{ imagen.title }}</h3>
+        <p class="text-sm text-base-content/70">Monitoreo de módulos con imagen institucional</p>
+      </div>
+      <button type="button" class="btn btn-sm btn-circle btn-ghost" aria-label="Cerrar" data-close-modal="kpi2-modal">✕</button>
+    </div>
+    <div class="rounded-2xl border border-base-200 bg-base-100 p-4">
+      <div id="chartKPI2" class="h-[360px] w-full"></div>
+    </div>
+  </div>
+  <form method="dialog" class="modal-backdrop">
+    <button aria-label="Cerrar" class="hidden">cerrar</button>
+  </form>
+</dialog>
+
+<dialog id="kpi4-modal" class="modal">
+  <div class="modal-box w-11/12 max-w-4xl space-y-4">
+    <div class="flex items-start justify-between gap-4">
+      <div>
+        <h3 class="text-2xl font-semibold text-base-content">Trámites art. 141</h3>
+        <p class="text-sm text-base-content/70">Detalle mensual de solicitudes recibidas y atendidas</p>
+      </div>
+      <button type="button" class="btn btn-sm btn-circle btn-ghost" aria-label="Cerrar" data-close-modal="kpi4-modal">✕</button>
+    </div>
+    <div class="overflow-x-auto rounded-2xl border border-base-200 bg-base-100">
+      <table class="table table-zebra">
+        <thead>
+          <tr class="text-base-content/70">
+            <th>Solicitudes</th>
+            <th>Ene</th>
+            <th>Feb</th>
+            <th>Mar</th>
+            <th>Abr</th>
+            <th>May</th>
+            <th>Jun</th>
+            <th>Jul</th>
+            <th>Ago</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="font-medium">Recibidas</td>
+            <td>4</td>
+            <td>19</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+          </tr>
+          <tr>
+            <td class="font-medium">Atendidas</td>
+            <td>4</td>
+            <td>19</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <form method="dialog" class="modal-backdrop">
+    <button aria-label="Cerrar" class="hidden">cerrar</button>
+  </form>
+</dialog>
+
+<dialog id="kpi5-modal" class="modal">
+  <div class="modal-box w-11/12 max-w-3xl space-y-6">
+    <div class="flex items-start justify-between gap-4">
+      <div>
+        <h3 class="text-2xl font-semibold text-base-content">Satisfacción Ciudadana</h3>
+        <p class="text-sm text-base-content/70">Indicador de percepción ciudadana en los MAC</p>
+      </div>
+      <button type="button" class="btn btn-sm btn-circle btn-ghost" aria-label="Cerrar" data-close-modal="kpi5-modal">✕</button>
+    </div>
+    <div class="rounded-2xl border border-base-200 bg-base-100 p-4">
+      <div id="chartKPI5" class="h-[360px] w-full"></div>
+    </div>
+  </div>
+  <form method="dialog" class="modal-backdrop">
+    <button aria-label="Cerrar" class="hidden">cerrar</button>
+  </form>
+</dialog>
+{% endblock content %}
+
+{% block scripts %}
+  <script src="https://www.gstatic.com/charts/loader.js"></script>
+  <script>
+    google.charts.load('current', { packages: ['corechart', 'gauge'] });
+
+    window.kpiCharts = window.kpiCharts || {};
+
+    window.kpiCharts.kpi1 = function drawKPI1() {
+      const container = document.getElementById('chartKPI1');
+      if (!container) return;
+
+      const meses = [
+        {% for t in cap.tramitemensual_set.all|dictsort:"month" %}
+          '{{ t.month|stringformat:"02d" }}'{% if not forloop.last %}, {% endif %}
+        {% endfor %}
+      ];
+      const tramites = [
+        {% for t in cap.tramitemensual_set.all|dictsort:"month" %}
+          {{ t.tramites|default:0 }}{% if not forloop.last %}, {% endif %}
+        {% endfor %}
+      ];
+      const pronosticoRaw = {{ cap.forecast|default:0 }};
+      const pronostico = pronosticoRaw || 1;
+      let acumuladoTemp = 0;
+      const acumulado = tramites.map((v) => (acumuladoTemp += v));
+      const porcentajeAcum = acumulado.map((v) => parseFloat(((v / pronostico) * 100).toFixed(2)));
+
+      const data = new google.visualization.DataTable();
+      data.addColumn('string', 'Mes');
+      data.addColumn('number', 'Trámites mensuales');
+      data.addColumn('number', '% Acumulado');
+      data.addColumn('number', 'Meta {{ cap.goal|default:0 }}%');
+
+      const monthLabel = (m) => {
+        const labels = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+        const index = parseInt(m, 10) - 1;
+        return labels[index] || '';
+      };
+
+      for (let i = 0; i < meses.length; i++) {
+        data.addRow([
+          monthLabel(meses[i]),
+          tramites[i] || 0,
+          porcentajeAcum[i] || 0,
+          {{ cap.goal|default:0 }}
+        ]);
+      }
+
+      const calcularMinimoEstetico = (valorMin) => {
+        if (!Number.isFinite(valorMin)) return 0;
+        const unidades = valorMin % 10;
+        if (unidades >= 5) {
+          return valorMin - unidades;
+        }
+        return valorMin - unidades - 5;
+      };
+
+      const minY2 = porcentajeAcum.length ? calcularMinimoEstetico(Math.min(...porcentajeAcum)) : 0;
+
+      const options = {
+        chartArea: { width: '85%', height: '70%' },
+        legend: { position: 'top', alignment: 'center' },
+        vAxes: {
+          0: { title: 'Número de trámites', minValue: 0 },
+          1: {
+            title: '% Acumulado',
+            viewWindow: {
+              min: minY2,
+              max: 100
+            },
+            textStyle: { color: '#d5007f' },
+            titleTextStyle: { color: '#d5007f' },
+            gridlines: { color: 'transparent' }
+          }
+        },
+        seriesType: 'bars',
+        series: {
+          0: { targetAxisIndex: 0 },
+          1: {
+            type: 'line',
+            targetAxisIndex: 1,
+            color: '#d5007f',
+            lineWidth: 2,
+            pointSize: 5
+          },
+          2: {
+            type: 'line',
+            targetAxisIndex: 1,
+            color: '#000',
+            lineDashStyle: [4, 4],
+            lineWidth: 1,
+            pointSize: 0
+          }
+        },
+        tooltip: { trigger: 'focus' }
+      };
+
+      container.innerHTML = '';
+      const chart = new google.visualization.ComboChart(container);
+      chart.draw(data, options);
+    };
+
+    window.kpiCharts.kpi2 = function drawKPI2() {
+      const container = document.getElementById('chartKPI2');
+      if (!container) return;
+
+      const data = google.visualization.arrayToDataTable([
+        ['Label', 'Value'],
+        ['', {{ imagen.mac_imagen|default:0 }}]
+      ]);
+
+      const options = {
+        width: container.offsetWidth || 600,
+        height: container.offsetHeight || 360,
+        max: {{ imagen.mac_totales|default:0 }},
+        redFrom: 0,    redTo: 1,
+        yellowFrom: 1, yellowTo: 3,
+        greenFrom: 3,  greenTo: {{ imagen.mac_totales|default:0 }},
+        minorTicks: 0,
+        majorTicks: ['0', '1', '2', '3', '4', '5', '6']
+      };
+
+      container.innerHTML = '';
+      const chart = new google.visualization.Gauge(container);
+      chart.draw(data, options);
+    };
+
+    window.kpiCharts.kpi5 = function drawKPI5() {
+      const container = document.getElementById('chartKPI5');
+      if (!container) return;
+
+      const data = google.visualization.arrayToDataTable([
+        ['Label', 'Value'],
+        ['%', {{ aprobacion_meta|default:96.01 }}]
+      ]);
+
+      const options = {
+        width: container.offsetWidth || 600,
+        height: container.offsetHeight || 360,
+        min: 0,
+        max: 100,
+        redFrom: 0,    redTo: 75,
+        yellowFrom: 75, yellowTo: 95,
+        greenFrom: 95, greenTo: 100,
+        minorTicks: 1,
+        majorTicks: ['0', '25', '50', '75', '100']
+      };
+
+      container.innerHTML = '';
+      const chart = new google.visualization.Gauge(container);
+      chart.draw(data, options);
+    };
+
+    function openModal(modalId, chartKey) {
+      const dialog = document.getElementById(modalId);
+      if (!dialog) return;
+
+      if (chartKey && window.kpiCharts && typeof window.kpiCharts[chartKey] === 'function') {
+        const drawFn = window.kpiCharts[chartKey];
+        if (google.visualization && google.visualization.arrayToDataTable) {
+          drawFn();
+        } else {
+          google.charts.setOnLoadCallback(drawFn);
+        }
+      }
+
+      dialog.showModal();
+    }
+
+    function closeModal(modalId) {
+      const dialog = document.getElementById(modalId);
+      if (dialog && dialog.open) {
+        dialog.close();
+      }
+    }
+
+    window.openModal = openModal;
+    window.closeModal = closeModal;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('[data-modal]').forEach((btn) => {
+        btn.addEventListener('click', () => openModal(btn.dataset.modal, btn.dataset.chart));
+      });
+
+      document.querySelectorAll('[data-close-modal]').forEach((btn) => {
+        btn.addEventListener('click', () => closeModal(btn.dataset.closeModal));
+      });
+    });
+  </script>
+{% endblock scripts %}
