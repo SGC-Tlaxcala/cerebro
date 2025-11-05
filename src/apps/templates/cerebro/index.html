@@ -82,7 +82,7 @@
     <h2 class="text-3xl font-bold">Objetivos de la calidad</h2>
   </div>
 
-  <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+  <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-3" id="obj1">
     <article class="card bg-base-100 shadow-lg border border-base-200">
       <div class="card-body space-y-4">
         <div class="flex items-center gap-3">
@@ -140,7 +140,7 @@
       </div>
     </article>
 
-    <article class="card bg-base-100 shadow-lg border border-base-200 md:col-span-2 xl:col-span-1">
+    <article class="card bg-base-100 shadow-lg border border-base-200 md:col-span-2 xl:col-span-1" id="obj2">
       <div class="card-body space-y-4">
         <div class="flex items-center gap-3">
           <span class="badge badge-primary badge-outline text-sm">05</span>
@@ -157,8 +157,8 @@
   </div>
 </section>
 
-<dialog id="kpi1-modal" class="modal" id="obj2">
-  <div class="modal-box w-11/12 max-w-5xl space-y-6">
+<dialog id="kpi1-modal" class="modal">
+  <div id="obj2" class="modal-box w-11/12 max-w-5xl space-y-6">
     <div class="flex items-start justify-between gap-4">
       <div>
         <h3 class="text-2xl font-semibold text-base-content">{{ cap }}</h3>
@@ -166,8 +166,29 @@
       </div>
       <button type="button" class="btn btn-sm btn-circle btn-ghost" aria-label="Cerrar" data-close-modal="kpi1-modal">✕</button>
     </div>
-    <div class="rounded-2xl border border-base-200 bg-base-100 p-4">
-      <div id="chartKPI1" class="h-[480px] w-full"></div>
+    <div class="rounded-2xl border border-base-200 bg-base-100 p-6 space-y-6">
+      <div
+        id="chartKPI1"
+        class="w-full"
+        style="min-height:360px;"
+        data-forecast="{{ cap.forecast|default:0 }}"
+        data-goal="{{ cap.goal|default:0 }}"
+      ></div>
+      <div id="kpi1-details" class="grid grid-cols-1 gap-3 text-sm text-base-content md:grid-cols-3">
+        <div class="rounded-xl border border-base-200 bg-base-100/80 p-4 shadow-sm">
+          <p class="text-xs font-semibold uppercase tracking-wide text-base-content/70">Trámites acumulados</p>
+          <p class="mt-2 text-2xl font-bold text-base-content" id="kpi1-total">0</p>
+        </div>
+        <div class="rounded-xl border border-base-200 bg-base-100/80 p-4 shadow-sm">
+          <p class="text-xs font-semibold uppercase tracking-wide text-base-content/70">Pronóstico anual</p>
+          <p class="mt-2 text-2xl font-bold text-base-content" id="kpi1-forecast">{{ cap.forecast|default:0 }}</p>
+        </div>
+        <div class="rounded-xl border border-base-200 bg-base-100/80 p-4 shadow-sm">
+          <p class="text-xs font-semibold uppercase tracking-wide text-base-content/70">Meta de cumplimiento</p>
+          <p class="mt-2 text-2xl font-bold text-base-content" id="kpi1-goal">{{ cap.goal|default:0 }}%</p>
+        </div>
+      </div>
+      <p id="kpi1-summary" class="text-xs text-base-content/60"></p>
     </div>
   </div>
   <form method="dialog" class="modal-backdrop">
@@ -175,8 +196,8 @@
   </form>
 </dialog>
 
-<dialog id="kpi2-modal" class="modal" id="obj3">
-  <div class="modal-box w-11/12 max-w-3xl space-y-6">
+<dialog id="kpi2-modal" class="modal">
+  <div id="obj3" class="modal-box w-11/12 max-w-3xl space-y-6">
     <div class="flex items-start justify-between gap-4">
       <div>
         <h3 class="text-2xl font-semibold text-base-content">{{ imagen.title }}</h3>
@@ -210,8 +231,8 @@
   </form>
 </dialog>
 
-<dialog id="kpi4-modal" class="modal" id="obj4">
-  <div class="modal-box w-11/12 max-w-4xl space-y-4">
+<dialog id="kpi4-modal" class="modal">
+  <div id="obj4" class="modal-box w-11/12 max-w-4xl space-y-4">
     <div class="flex items-start justify-between gap-4">
       <div>
         <h3 class="text-2xl font-semibold text-base-content">Trámites art. 141</h3>
@@ -297,15 +318,29 @@
 {% endblock content %}
 
 {% block scripts %}
-  <script src="https://www.gstatic.com/charts/loader.js"></script>
   <script>
-    google.charts.load('current', { packages: ['corechart', 'gauge'] });
-
     window.kpiCharts = window.kpiCharts || {};
 
     window.kpiCharts.kpi1 = function drawKPI1() {
       const container = document.getElementById('chartKPI1');
       if (!container) return;
+
+      const formatNumber = (value) => {
+        try {
+          return new Intl.NumberFormat('es-MX').format(value || 0);
+        } catch (err) {
+          return String(value || 0);
+        }
+      };
+
+      const calcularMinimoEstetico = (valorMin) => {
+        if (!Number.isFinite(valorMin)) return 0;
+        const unidades = valorMin % 10;
+        if (unidades >= 5) {
+          return valorMin - unidades;
+        }
+        return valorMin - unidades - 5;
+      };
 
       const meses = [
         {% for t in cap.tramitemensual_set.all|dictsort:"month" %}
@@ -317,17 +352,8 @@
           {{ t.tramites|default:0 }}{% if not forloop.last %}, {% endif %}
         {% endfor %}
       ];
-      const pronosticoRaw = {{ cap.forecast|default:0 }};
-      const pronostico = pronosticoRaw || 1;
-      let acumuladoTemp = 0;
-      const acumulado = tramites.map((v) => (acumuladoTemp += v));
-      const porcentajeAcum = acumulado.map((v) => parseFloat(((v / pronostico) * 100).toFixed(2)));
-
-      const data = new google.visualization.DataTable();
-      data.addColumn('string', 'Mes');
-      data.addColumn('number', 'Trámites mensuales');
-      data.addColumn('number', '% Acumulado');
-      data.addColumn('number', 'Meta {{ cap.goal|default:0 }}%');
+      const forecastValue = Number(container.dataset.forecast || {{ cap.forecast|default:0 }}) || 0;
+      const goalValue = Number(container.dataset.goal || {{ cap.goal|default:0 }}) || 0;
 
       const monthLabel = (m) => {
         const labels = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
@@ -335,68 +361,103 @@
         return labels[index] || '';
       };
 
-      for (let i = 0; i < meses.length; i++) {
-        data.addRow([
-          monthLabel(meses[i]),
-          tramites[i] || 0,
-          porcentajeAcum[i] || 0,
-          {{ cap.goal|default:0 }}
-        ]);
+      const tramitesData = tramites.map((value) => Number(value) || 0);
+      const categorias = meses.map(monthLabel);
+
+      let acumuladoTemp = 0;
+      const porcentajeAcum = tramitesData.map((value) => {
+        acumuladoTemp += value;
+        if (forecastValue > 0) {
+          return Number(((acumuladoTemp / forecastValue) * 100).toFixed(2));
+        }
+        return 0;
+      });
+
+      const minPct = porcentajeAcum.length ? Math.min(...porcentajeAcum, goalValue) : goalValue;
+      const maxPct = porcentajeAcum.length ? Math.max(...porcentajeAcum, goalValue) : goalValue;
+      const rawMinY2 = porcentajeAcum.length ? calcularMinimoEstetico(minPct) : 0;
+      const minY2 = Math.max(0, rawMinY2);
+      const maxValueForAxis = Math.max(maxPct, goalValue);
+      const maxY2 = Math.max(100, Math.ceil((maxValueForAxis || 0) / 5) * 5 || 100);
+      const goalSeriesData = categorias.map(() => goalValue);
+
+      if (window.kpi1Chart) {
+        try { window.kpi1Chart.destroy(); } catch (err) { /* noop */ }
+        window.kpi1Chart = null;
       }
 
-      const calcularMinimoEstetico = (valorMin) => {
-        if (!Number.isFinite(valorMin)) return 0;
-        const unidades = valorMin % 10;
-        if (unidades >= 5) {
-          return valorMin - unidades;
-        }
-        return valorMin - unidades - 5;
-      };
-
-      const minY2 = porcentajeAcum.length ? calcularMinimoEstetico(Math.min(...porcentajeAcum)) : 0;
-
       const options = {
-        chartArea: { width: '85%', height: '70%' },
-        legend: { position: 'top', alignment: 'center' },
-        vAxes: {
-          0: { title: 'Número de trámites', minValue: 0 },
-          1: {
-            title: '% Acumulado',
-            viewWindow: {
-              min: minY2,
-              max: 100
-            },
-            textStyle: { color: '#d5007f' },
-            titleTextStyle: { color: '#d5007f' },
-            gridlines: { color: 'transparent' }
-          }
+        chart: {
+          height: 420,
+          type: 'line',
+          animations: { easing: 'easeinout', speed: 400 }
         },
-        seriesType: 'bars',
-        series: {
-          0: { targetAxisIndex: 0 },
-          1: {
-            type: 'line',
-            targetAxisIndex: 1,
-            color: '#d5007f',
-            lineWidth: 2,
-            pointSize: 5
+        series: [
+          { name: 'Trámites mensuales', type: 'column', data: tramitesData, yAxisIndex: 0 },
+          { name: '% Acumulado', type: 'line', data: porcentajeAcum, yAxisIndex: 1 },
+          { name: goalValue ? `Meta ${goalValue}%` : 'Meta', type: 'line', data: goalSeriesData, yAxisIndex: 1 }
+        ],
+        stroke: { width: [0, 3, 2], curve: 'smooth' },
+        plotOptions: { bar: { columnWidth: '45%', borderRadius: 6 } },
+        dataLabels: { enabled: false },
+        colors: ['#4f46e5', '#d946ef', '#0ea5e9'],
+        xaxis: { categories: categorias },
+        yaxis: [
+          {
+            title: { text: 'Número de trámites' },
+            min: 0,
+            labels: { formatter: (value) => formatNumber(value) }
           },
-          2: {
-            type: 'line',
-            targetAxisIndex: 1,
-            color: '#000',
-            lineDashStyle: [4, 4],
-            lineWidth: 1,
-            pointSize: 0
+          {
+            opposite: true,
+            title: { text: '% Acumulado' },
+            min: minY2,
+            max: maxY2,
+            labels: { formatter: (value) => `${Number(value).toFixed(0)}%` }
           }
+        ],
+        legend: {
+          position: 'top',
+          horizontalAlign: 'center',
+          markers: { radius: 6 }
         },
-        tooltip: { trigger: 'focus' }
+        tooltip: {
+          shared: true,
+          y: {
+            formatter: (value, { seriesIndex }) => {
+              if (seriesIndex === 0) {
+                return `${formatNumber(value)} trámites`;
+              }
+              return `${Number(value).toFixed(2)}%`;
+            }
+          }
+        }
       };
 
-      container.innerHTML = '';
-      const chart = new google.visualization.ComboChart(container);
-      chart.draw(data, options);
+      window.kpi1Chart = new ApexCharts(container, options);
+      window.kpi1Chart.render();
+
+      const totalTramites = tramitesData.reduce((acc, value) => acc + value, 0);
+      const totalEl = document.getElementById('kpi1-total');
+      if (totalEl) totalEl.textContent = formatNumber(totalTramites);
+
+      const forecastEl = document.getElementById('kpi1-forecast');
+      if (forecastEl) forecastEl.textContent = formatNumber(forecastValue);
+
+      const goalEl = document.getElementById('kpi1-goal');
+      if (goalEl) {
+        const goalLabel = Number.isFinite(goalValue) ? (goalValue % 1 === 0 ? goalValue.toFixed(0) : goalValue.toFixed(1)) : '0';
+        goalEl.textContent = `${goalLabel}%`;
+      }
+
+      const lastPercent = porcentajeAcum.length ? porcentajeAcum[porcentajeAcum.length - 1] : 0;
+      const summaryEl = document.getElementById('kpi1-summary');
+      if (summaryEl) {
+        const percentLabel = Number.isFinite(lastPercent) ? lastPercent.toFixed(1) : '0.0';
+        summaryEl.textContent = `Acumulado: ${formatNumber(totalTramites)} trámites (${percentLabel}% del pronóstico anual).`;
+      }
     };
+    window.kpiCharts.kpi1.requiresGoogleCharts = false;
 
     (function () {
       const CHART_ID = 'chartKPI2';
