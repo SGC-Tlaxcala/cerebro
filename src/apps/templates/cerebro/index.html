@@ -250,7 +250,7 @@
 </dialog>
 
 <dialog id="kpi5-modal" class="modal">
-  <div class="modal-box w-11/12 max-w-3xl space-y-6">
+  <div id="obj5" class="modal-box w-11/12 max-w-3xl space-y-6">
     <div class="flex items-start justify-between gap-4">
       <div>
         <h3 class="text-2xl font-semibold text-base-content">Satisfacción Ciudadana</h3>
@@ -258,8 +258,19 @@
       </div>
       <button type="button" class="btn btn-sm btn-circle btn-ghost" aria-label="Cerrar" data-close-modal="kpi5-modal">✕</button>
     </div>
-    <div class="rounded-2xl border border-base-200 bg-base-100 p-4">
-      <div id="chartKPI5" class="h-[360px] w-full"></div>
+    <div class="rounded-2xl border border-base-200 bg-base-100 p-4 space-y-4">
+      <div id="kpi5-loading" class="flex justify-center items-center py-6" style="display:none">
+        <svg class="animate-spin h-8 w-8 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+        </svg>
+      </div>
+      <div id="kpi5-empty" class="text-center text-sm text-gray-500" style="display:none">
+        Sin datos de satisfacción disponibles.
+      </div>
+      <div id="chartKPI5" class="w-full" style="min-height:320px;"></div>
+      <div id="kpi5-legend" class="space-y-2 text-sm text-base-content/80"></div>
+      <p id="kpi5-summary" class="text-xs text-base-content/60"></p>
     </div>
   </div>
   <form method="dialog" class="modal-backdrop">
@@ -395,31 +406,245 @@
       chart.draw(data, options);
     };
 
-    window.kpiCharts.kpi5 = function drawKPI5() {
-      const container = document.getElementById('chartKPI5');
-      if (!container) return;
+    (function () {
+      const ENDPOINT = '/api/v1/vozmac/satisfaccion';
+      const CHART_ID = 'chartKPI5';
+      const LOADING_ID = 'kpi5-loading';
+      const EMPTY_ID = 'kpi5-empty';
+      const DETAILS_ID = 'kpi5-legend';
+      const SUMMARY_ID = 'kpi5-summary';
+      const QUESTIONS = [
+        { field: 'p1_claridad_info', label: 'Claridad de la información' },
+        { field: 'p2_amabilidad', label: 'Amabilidad' },
+        { field: 'p3_instalaciones', label: 'Instalaciones' },
+        { field: 'p4_tiempo_espera', label: 'Tiempo de espera' },
+      ];
+      const COLOR_GREEN = '#16a34a';
+      const COLOR_ORANGE = '#fb923c';
+      const COLOR_RED = '#ef4444';
+      let gaugeChart = null;
 
-      const data = google.visualization.arrayToDataTable([
-        ['Label', 'Value'],
-        ['%', {{ aprobacion_meta|default:96.01 }}]
-      ]);
+      function getEl(id) {
+        return document.getElementById(id);
+      }
 
-      const options = {
-        width: container.offsetWidth || 600,
-        height: container.offsetHeight || 360,
-        min: 0,
-        max: 100,
-        redFrom: 0,    redTo: 75,
-        yellowFrom: 75, yellowTo: 95,
-        greenFrom: 95, greenTo: 100,
-        minorTicks: 1,
-        majorTicks: ['0', '25', '50', '75', '100']
+      function showSpinner() {
+        const el = getEl(LOADING_ID);
+        if (el) el.style.display = 'flex';
+      }
+
+      function hideSpinner() {
+        const el = getEl(LOADING_ID);
+        if (el) el.style.display = 'none';
+      }
+
+      function showEmpty() {
+        const el = getEl(EMPTY_ID);
+        if (el) el.style.display = 'block';
+      }
+
+      function hideEmpty() {
+        const el = getEl(EMPTY_ID);
+        if (el) el.style.display = 'none';
+      }
+
+      function formatDateLabel(isoString) {
+        if (!isoString) return '--';
+        const date = new Date(isoString);
+        if (Number.isNaN(date.getTime())) return '--';
+        return date.toLocaleDateString('es-MX', {
+          day: '2-digit',
+          month: 'long',
+          year: 'numeric'
+        });
+      }
+
+      function formatNumber(value) {
+        try {
+          return new Intl.NumberFormat('es-MX').format(value || 0);
+        } catch (err) {
+          return String(value || 0);
+        }
+      }
+
+      function getGaugeColor(value) {
+        if (value >= 95) return COLOR_GREEN;
+        if (value >= 75) return COLOR_ORANGE;
+        return COLOR_RED;
+      }
+
+      function ensureGauge() {
+        if (typeof ApexCharts === 'undefined') {
+          console.warn('ApexCharts no está disponible; no se puede renderizar KPI5.');
+          return null;
+        }
+        if (gaugeChart) return gaugeChart;
+        const el = getEl(CHART_ID);
+        if (!el) return null;
+
+        const options = {
+          chart: {
+            type: 'radialBar',
+            height: 320,
+            sparkline: { enabled: true }
+          },
+          series: [0],
+          colors: [getGaugeColor(0)],
+          plotOptions: {
+            radialBar: {
+              startAngle: -120,
+              endAngle: 120,
+              hollow: {
+                size: '62%',
+                background: 'transparent'
+              },
+              track: {
+                background: '#e5e7eb',
+                strokeWidth: '100%'
+              },
+              dataLabels: {
+                name: {
+                  show: true,
+                  color: '#6b7280',
+                  fontSize: '14px',
+                  offsetY: 60,
+                  formatter: function () { return 'Promedio favorable'; }
+                },
+                value: {
+                  show: true,
+                  fontSize: '34px',
+                  fontWeight: 700,
+                  offsetY: -10,
+                  formatter: function (val) {
+                    const num = Number(val);
+                    return Number.isFinite(num) ? num.toFixed(1) + '%' : '--';
+                  }
+                }
+              }
+            }
+          },
+          stroke: { lineCap: 'round' },
+          fill: { type: 'solid' }
+        };
+
+        gaugeChart = new ApexCharts(el, options);
+        gaugeChart.render();
+        return gaugeChart;
+      }
+
+      function updateGauge(value) {
+        const chart = ensureGauge();
+        if (!chart) return;
+        const numeric = Number(value);
+        const safeValue = Number.isFinite(numeric) ? Math.max(0, Math.min(100, numeric)) : 0;
+        const rounded = Number(safeValue.toFixed(2));
+        chart.updateOptions({ colors: [getGaugeColor(rounded)] }, false, false);
+        chart.updateSeries([rounded]);
+      }
+
+      function renderDetails(rows) {
+        const el = getEl(DETAILS_ID);
+        if (!el) return;
+        if (!rows || !rows.length) {
+          el.innerHTML = '';
+          return;
+        }
+        el.innerHTML = rows.map(function (row) {
+          const favorable = Number.isFinite(row.favorablePct) ? row.favorablePct.toFixed(1) : '0.0';
+          const average = Number.isFinite(row.average) ? row.average.toFixed(2) : '0.00';
+          return `<div class="flex items-center justify-between gap-4"><div>${row.label}</div><div class="text-right"><span class="font-semibold">${favorable}%</span><span class="text-xs text-base-content/60 ml-2">Prom. ${average}</span></div></div>`;
+        }).join('');
+      }
+
+      function updateSummary(resp, avgFavorable) {
+        const el = getEl(SUMMARY_ID);
+        if (!el) return;
+        if (!resp) {
+          el.textContent = 'Sin información disponible.';
+          return;
+        }
+        const startLabel = formatDateLabel(resp.first_response_date);
+        const endLabel = formatDateLabel(resp.last_response_date);
+        const total = formatNumber(resp.total_responses || 0);
+        const favorableLabel = Number.isFinite(avgFavorable) ? avgFavorable.toFixed(1) : '0.0';
+        el.textContent = `Periodo: ${startLabel} – ${endLabel} · ${total} encuestas · ${favorableLabel}% favorable promedio`;
+      }
+
+      function resetView() {
+        updateGauge(0);
+        renderDetails([]);
+        updateSummary(null);
+      }
+
+      function processResponse(resp) {
+        hideSpinner();
+        if (!resp || !resp.by_question) {
+          resetView();
+          showEmpty();
+          return;
+        }
+
+        const rows = [];
+        const favorableValues = [];
+
+        QUESTIONS.forEach(function (item) {
+          const meta = resp.by_question[item.field] || {};
+          const label = meta.label || item.label || item.field;
+          const average = Number(meta.average);
+          const favorable = Number(meta.favorable_pct);
+
+          if (Number.isFinite(favorable)) {
+            favorableValues.push(favorable);
+          }
+
+          rows.push({
+            label: label,
+            average: Number.isFinite(average) ? average : 0,
+            favorablePct: Number.isFinite(favorable) ? favorable : 0
+          });
+        });
+
+        const avgFavorable = favorableValues.length
+          ? favorableValues.reduce(function (acc, val) { return acc + val; }, 0) / favorableValues.length
+          : 0;
+
+        hideEmpty();
+        updateGauge(avgFavorable);
+        renderDetails(rows);
+        updateSummary(resp, avgFavorable);
+      }
+
+      function fetchData() {
+        showSpinner();
+        hideEmpty();
+        const detailsEl = getEl(DETAILS_ID);
+        if (detailsEl) detailsEl.innerHTML = '';
+        const summaryEl = getEl(SUMMARY_ID);
+        if (summaryEl) summaryEl.textContent = '';
+        updateGauge(0);
+
+        fetch(ENDPOINT, { headers: { 'Accept': 'application/json' } })
+          .then(function (resp) {
+            if (!resp.ok) {
+              throw new Error('Error al obtener datos de satisfacción (' + resp.status + ')');
+            }
+            return resp.json();
+          })
+          .then(processResponse)
+          .catch(function (err) {
+            console.error('No se pudo cargar la información de satisfacción para KPI5', err);
+            hideSpinner();
+            resetView();
+            showEmpty();
+          });
+      }
+
+      window.kpiCharts.kpi5 = function drawKPI5() {
+        if (!getEl(CHART_ID)) return;
+        fetchData();
       };
-
-      container.innerHTML = '';
-      const chart = new google.visualization.Gauge(container);
-      chart.draw(data, options);
-    };
+      window.kpiCharts.kpi5.requiresGoogleCharts = false;
+    })();
 
     function openModal(modalId, chartKey) {
       const dialog = document.getElementById(modalId);
@@ -427,10 +652,20 @@
 
       if (chartKey && window.kpiCharts && typeof window.kpiCharts[chartKey] === 'function') {
         const drawFn = window.kpiCharts[chartKey];
-        if (google.visualization && google.visualization.arrayToDataTable) {
+        const needsGoogle = drawFn.requiresGoogleCharts !== false;
+        const hasGoogleViz = typeof google !== 'undefined'
+          && google.visualization
+          && typeof google.visualization.arrayToDataTable === 'function';
+        if (!needsGoogle) {
           drawFn();
-        } else {
+        } else if (hasGoogleViz) {
+          drawFn();
+        } else if (typeof google !== 'undefined'
+          && google.charts
+          && typeof google.charts.setOnLoadCallback === 'function') {
           google.charts.setOnLoadCallback(drawFn);
+        } else {
+          drawFn();
         }
       }
 
