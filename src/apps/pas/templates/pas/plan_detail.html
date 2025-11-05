@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'cerebro/base.html' %}
 {% load pas_tags %}
 
 {% block head_title %} {% if plan.documento == 1 %} CNC: {{ plan.nombre }}{% else %} PCM: {{ plan.nombre }}{% endif %}{% endblock head_title %}
