@@ -157,7 +157,7 @@
   </div>
 </section>
 
-<dialog id="kpi1-modal" class="modal">
+<dialog id="kpi1-modal" class="modal" id="obj2">
   <div class="modal-box w-11/12 max-w-5xl space-y-6">
     <div class="flex items-start justify-between gap-4">
       <div>
@@ -175,7 +175,7 @@
   </form>
 </dialog>
 
-<dialog id="kpi2-modal" class="modal">
+<dialog id="kpi2-modal" class="modal" id="obj3">
   <div class="modal-box w-11/12 max-w-3xl space-y-6">
     <div class="flex items-start justify-between gap-4">
       <div>
@@ -184,8 +184,25 @@
       </div>
       <button type="button" class="btn btn-sm btn-circle btn-ghost" aria-label="Cerrar" data-close-modal="kpi2-modal">✕</button>
     </div>
-    <div class="rounded-2xl border border-base-200 bg-base-100 p-4">
-      <div id="chartKPI2" class="h-[360px] w-full"></div>
+    <div class="rounded-2xl border border-base-200 bg-base-100 p-6 space-y-6">
+      <div
+        id="chartKPI2"
+        class="w-full"
+        style="min-height:320px;"
+        data-current="{{ imagen.mac_imagen|default:0 }}"
+        data-total="{{ imagen.mac_totales|default:0 }}"
+      ></div>
+      <div id="kpi2-details" class="grid grid-cols-1 gap-3 text-sm text-base-content md:grid-cols-2">
+        <div class="rounded-xl border border-base-200 bg-base-100/80 p-4 shadow-sm">
+          <p class="text-xs font-semibold uppercase tracking-wide text-base-content/70">MAC con imagen</p>
+          <p class="mt-2 text-2xl font-bold text-base-content" id="kpi2-current">{{ imagen.mac_imagen|default:0 }}</p>
+        </div>
+        <div class="rounded-xl border border-base-200 bg-base-100/80 p-4 shadow-sm">
+          <p class="text-xs font-semibold uppercase tracking-wide text-base-content/70">Total de MAC</p>
+          <p class="mt-2 text-2xl font-bold text-base-content" id="kpi2-total">{{ imagen.mac_totales|default:0 }}</p>
+        </div>
+      </div>
+      <p id="kpi2-summary" class="text-xs text-base-content/60"></p>
     </div>
   </div>
   <form method="dialog" class="modal-backdrop">
@@ -381,30 +398,129 @@
       chart.draw(data, options);
     };
 
-    window.kpiCharts.kpi2 = function drawKPI2() {
-      const container = document.getElementById('chartKPI2');
-      if (!container) return;
+    (function () {
+      const CHART_ID = 'chartKPI2';
+      const SUMMARY_ID = 'kpi2-summary';
+      const CURRENT_ID = 'kpi2-current';
+      const TOTAL_ID = 'kpi2-total';
+      const COLOR_GREEN = '#16a34a';
+      const COLOR_ORANGE = '#fb923c';
+      const COLOR_RED = '#ef4444';
+      let chartInstance = null;
 
-      const data = google.visualization.arrayToDataTable([
-        ['Label', 'Value'],
-        ['', {{ imagen.mac_imagen|default:0 }}]
-      ]);
+      function getEl(id) {
+        return document.getElementById(id);
+      }
 
-      const options = {
-        width: container.offsetWidth || 600,
-        height: container.offsetHeight || 360,
-        max: {{ imagen.mac_totales|default:0 }},
-        redFrom: 0,    redTo: 1,
-        yellowFrom: 1, yellowTo: 3,
-        greenFrom: 3,  greenTo: {{ imagen.mac_totales|default:0 }},
-        minorTicks: 0,
-        majorTicks: ['0', '1', '2', '3', '4', '5', '6']
+      function formatNumber(value) {
+        try {
+          return new Intl.NumberFormat('es-MX').format(value || 0);
+        } catch (err) {
+          return String(value || 0);
+        }
+      }
+
+      function getGaugeColor(percent) {
+        if (percent >= 95) return COLOR_GREEN;
+        if (percent >= 75) return COLOR_ORANGE;
+        return COLOR_RED;
+      }
+
+      function ensureChart() {
+        if (typeof ApexCharts === 'undefined') {
+          console.warn('ApexCharts no está disponible; no se puede renderizar KPI2.');
+          return null;
+        }
+        if (chartInstance) return chartInstance;
+        const el = getEl(CHART_ID);
+        if (!el) return null;
+
+        const options = {
+          chart: {
+            type: 'radialBar',
+            height: 320,
+            sparkline: { enabled: true }
+          },
+          series: [0],
+          colors: [getGaugeColor(0)],
+          plotOptions: {
+            radialBar: {
+              startAngle: -120,
+              endAngle: 120,
+              hollow: {
+                size: '60%',
+                background: 'transparent'
+              },
+              track: {
+                background: '#e5e7eb',
+                strokeWidth: '100%'
+              },
+              dataLabels: {
+                name: {
+                  show: true,
+                  color: '#6b7280',
+                  fontSize: '14px',
+                  offsetY: 60,
+                  formatter: function () { return 'Avance con imagen'; }
+                },
+                value: {
+                  show: true,
+                  fontSize: '34px',
+                  fontWeight: 700,
+                  offsetY: -10,
+                  formatter: function (val) {
+                    const num = Number(val);
+                    return Number.isFinite(num) ? num.toFixed(1) + '%' : '--';
+                  }
+                }
+              }
+            }
+          },
+          stroke: { lineCap: 'round' },
+          fill: { type: 'solid' }
+        };
+
+        chartInstance = new ApexCharts(el, options);
+        chartInstance.render();
+        return chartInstance;
+      }
+
+      function updateGauge(percent) {
+        const chart = ensureChart();
+        if (!chart) return;
+        const safe = Number.isFinite(percent) ? Math.max(0, Math.min(100, percent)) : 0;
+        const rounded = Number(safe.toFixed(2));
+        chart.updateOptions({ colors: [getGaugeColor(rounded)] }, false, false);
+        chart.updateSeries([rounded]);
+      }
+
+      function updateSummary(current, total, percent) {
+        const summaryEl = getEl(SUMMARY_ID);
+        if (!summaryEl) return;
+        const totalLabel = formatNumber(total);
+        const currentLabel = formatNumber(current);
+        const percentLabel = Number.isFinite(percent) ? percent.toFixed(1) : '0.0';
+        summaryEl.textContent = `Se han certificado ${currentLabel} de ${totalLabel} módulos (${percentLabel}% con imagen).`;
+      }
+
+      window.kpiCharts.kpi2 = function drawKPI2() {
+        const container = getEl(CHART_ID);
+        if (!container) return;
+
+        const current = Number(container.dataset.current || 0);
+        const total = Number(container.dataset.total || 0);
+        const percent = total > 0 ? (current / total) * 100 : 0;
+
+        const currentEl = getEl(CURRENT_ID);
+        if (currentEl) currentEl.textContent = formatNumber(current);
+        const totalEl = getEl(TOTAL_ID);
+        if (totalEl) totalEl.textContent = formatNumber(total);
+
+        updateGauge(percent);
+        updateSummary(current, total, percent);
       };
-
-      container.innerHTML = '';
-      const chart = new google.visualization.Gauge(container);
-      chart.draw(data, options);
-    };
+      window.kpiCharts.kpi2.requiresGoogleCharts = false;
+    })();
 
     (function () {
       const ENDPOINT = '/api/v1/vozmac/satisfaccion';
