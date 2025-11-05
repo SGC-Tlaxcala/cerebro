@@ -1,4 +1,16 @@
 {% load static %}
+    <style>
+      .navbar :where(.menu li > a.is-active, .menu li > summary.is-active) {
+        background: linear-gradient(135deg, var(--fallback-p, oklch(var(--p)/1)), #b83280);
+        color: #fbcfe8 !important;
+        border-radius: var(--rounded-btn, 0.5rem);
+        box-shadow: 0 8px 20px -6px rgba(186, 50, 128, 0.45);
+      }
+
+      .navbar :where(.menu li > a.is-active svg, .menu li > summary.is-active svg) {
+        color: currentColor;
+      }
+    </style>
     <nav class="navbar bg-base-100 shadow-sm">
       <div class="navbar-start">
         <div class="dropdown">
