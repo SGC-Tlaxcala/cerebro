@@ -19,6 +19,7 @@ urlpatterns = [
     path('pas/', include('apps.pas.urls')),
     path('vozmac/', include('apps.vozmac.urls')),
     path('api/v1/vozmac/', include('apps.vozmac.api.urls')),
+    path('api/v1/pas/', include('apps.pas.api.urls')),
     path('', Index.as_view(), name='index'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
