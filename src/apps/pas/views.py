@@ -41,10 +41,14 @@ class PASIndex(ListView):
             accion=OuterRef('pk')
         ).order_by('-fecha').values('estado')[:1]
 
-        priority_map = {
-            'Abierta Fuera de Tiempo': 0,
-            'Abierta en Tiempo': 2,
-        }
+        def state_priority(estado):
+            if estado == 'Abierta Fuera de Tiempo':
+                return 0
+            if estado == 'Cerrada':
+                return 3
+            if estado == 'Abierta en Tiempo':
+                return 2
+            return 1
 
         action_items = []
         action_qs = Accion.objects.select_related('plan').annotate(
@@ -55,7 +59,7 @@ class PASIndex(ListView):
             estado = action.get_estado
             if estado == 'Cerrada':
                 continue
-            priority = priority_map.get(estado, 1)
+            priority = state_priority(estado)
             action_items.append((
                 priority,
                 action.fecha_fin or date.max,
@@ -178,20 +182,24 @@ class PlanActivitiesView(DetailView):
         followups_prefetch = Prefetch(
             'seguimiento_set', queryset=Seguimiento.objects.order_by('-fecha', '-created')
         )
-        priority_map = {
-            'Abierta Fuera de Tiempo': 0,
-            'Abierta en Tiempo': 2,
-        }
+
+        def state_priority(estado):
+            if estado == 'Abierta Fuera de Tiempo':
+                return 0
+            if estado == 'Cerrada':
+                return 3
+            if estado == 'Abierta en Tiempo':
+                return 2
+            return 1
+
         activities = []
         for activity in plan.accion_set.prefetch_related(followups_prefetch).order_by('fecha_fin', 'id'):
             estado = activity.get_estado
-            if estado == 'Cerrada':
-                continue
             followups = list(activity.seguimiento_set.all())
             activities.append({
                 'activity': activity,
                 'estado': estado,
-                'estado_priority': priority_map.get(estado, 1),
+                'estado_priority': state_priority(estado),
                 'followup_count': len(followups),
                 'latest_followup': followups[0] if followups else None,
             })
