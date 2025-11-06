@@ -12,6 +12,7 @@ from .views import (
     ActivityUpdateView,
     ActivityDeleteView,
     FollowUpCreateView,
+    FollowUpListView,
 )
 
 app_name = 'pas'
@@ -27,5 +28,6 @@ urlpatterns = [
     path('<int:pk>/activities/add/', ActivityCreateView.as_view(), name='activity-add'),
     path('activities/<int:pk>/edit/', ActivityUpdateView.as_view(), name='activity-edit'),
     path('activities/<int:pk>/delete/', ActivityDeleteView.as_view(), name='activity-delete'),
+    path('activities/<int:pk>/followups/', FollowUpListView.as_view(), name='followup-list'),
     path('activities/<int:pk>/followups/add/', FollowUpCreateView.as_view(), name='followup-add'),
 ]

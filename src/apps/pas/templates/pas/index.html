@@ -79,7 +79,6 @@
         <table class="table table-zebra">
           <thead class="bg-base-200/60 text-sm text-base-content/70">
             <tr>
-              <th class="text-center">#</th>
               <th class="text-center">Plan</th>
               <th class="text-left">Actividad</th>
               <th class="text-center">Fecha compromiso</th>
@@ -91,7 +90,6 @@
           <tbody class="text-sm">
             {% for action in action_list %}
               <tr class="align-top">
-                <td class="text-center font-semibold text-base-content/80">{{ forloop.counter }}</td>
                 <td class="text-center">
                   <a class="link link-primary font-medium" href="{% url 'pas:detalle' action.plan.id %}">{{ action.plan.folio }}</a>
                 </td>
@@ -104,7 +102,14 @@
                 <td class="text-center text-base-content/80">{{ action.fecha_fin|date:"d/m/Y" }}</td>
                 <td class="text-center text-base-content/80">{{ action.responsable }}</td>
                 <td class="text-center text-base-content/80">
-                  <span class="badge badge-outline">{{ action.seguimiento_set.count }}</span>
+                  <button type="button"
+                          class="btn btn-ghost btn-xs gap-2"
+                          hx-get="{% url 'pas:followup-list' action.pk %}"
+                          hx-target="#pas-modal-content"
+                          hx-swap="innerHTML">
+                    Seguimientos
+                    <span class="badge badge-outline badge-sm">{{ action.seguimiento_set.count }}</span>
+                  </button>
                 </td>
                 <td class="text-center">
                   {% if action.get_estado == 'Cerrada' %}
@@ -150,7 +155,6 @@
         <table class="table table-zebra">
           <thead class="bg-base-200/60 text-sm text-base-content/70">
             <tr>
-              <th class="text-center">#</th>
               <th class="text-center">Folio</th>
               <th class="text-center">Tipo</th>
               <th class="text-left">Descripción</th>
@@ -161,16 +165,21 @@
           <tbody class="text-sm">
             {% for plan in plan_list %}
               <tr class="align-top">
-                <td class="text-center font-semibold text-base-content/80">{{ forloop.counter }}</td>
                 <td class="text-center">
                   <a class="link link-secondary font-medium" href="{% url 'pas:detalle' plan.id %}">{{ plan.folio }}</a>
                 </td>
                 <td class="text-center text-base-content/80">
-                  <span class="badge badge-outline badge-info">{{ plan.get_documento_display }}</span>
+                  <span class="badge badge-outline badge-info badge-lg min-h-[3.5rem] items-center px-4 py-2 text-sm">{{ plan.get_documento_display }}</span>
                 </td>
                 <td class="space-y-3">
                   <div class="flex items-center gap-2 text-base-content">
-                    <span class="font-semibold text-base-content">{{ plan.nombre }}</span>
+                    <a class="link link-hover flex items-center gap-2 text-base-content hover:text-primary transition-colors"
+                       href="{% url 'pas:detalle' plan.id %}">
+                      <span class="font-semibold text-base-content">{{ plan.nombre }}</span>
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                      </svg>
+                    </a>
                   </div>
                   <div class="prose prose-sm max-w-none text-base-content/70">
                     {% if plan.documento == 1 %}
@@ -181,12 +190,23 @@
                   </div>
                 </td>
                 <td class="text-center text-base-content/80">
-                  <div class="flex items-center justify-center gap-2">
-                    <span class="badge badge-sm badge-success" title="Cerradas">{{ plan.cerradas }}</span>
-                    <span class="badge badge-sm badge-warning text-warning-content" title="En tiempo">{{ plan.abiertas_en_tiempo }}</span>
-                    <span class="badge badge-sm badge-error" title="Fuera de tiempo">{{ plan.abiertas_fuera_de_tiempo }}</span>
-                    <span class="text-base-content/50">=</span>
-                    <span class="badge badge-sm badge-primary" title="Total">{{ plan.accion_set.count }}</span>
+                  <div class="flex flex-wrap items-center justify-center gap-2">
+                    <span class="badge badge-success badge-sm gap-1" title="Actividades cerradas">
+                      <span class="font-semibold">{{ plan.cerradas }}</span>
+                      <span>Cerradas</span>
+                    </span>
+                    <span class="badge badge-warning badge-sm text-warning-content gap-1" title="Actividades en tiempo">
+                      <span class="font-semibold">{{ plan.abiertas_en_tiempo }}</span>
+                      <span>En tiempo</span>
+                    </span>
+                    <span class="badge badge-error badge-sm gap-1" title="Actividades fuera de tiempo">
+                      <span class="font-semibold">{{ plan.abiertas_fuera_de_tiempo }}</span>
+                      <span>Fuera de tiempo</span>
+                    </span>
+                    <span class="badge badge-outline badge-primary badge-sm gap-1" title="Total de actividades">
+                      <span class="font-semibold">{{ plan.total_actividades }}</span>
+                      <span>Total</span>
+                    </span>
                   </div>
                 </td>
                 <td class="text-center text-base-content/80">{{ plan.fecha_llenado|date:"d/m/Y" }}</td>
@@ -203,39 +223,8 @@
   </section>
 </section>
 
-<dialog id="pdfModal" class="modal">
-  <div class="modal-box max-w-5xl space-y-4">
-    <div class="flex items-start justify-between gap-4">
-      <div>
-        <h3 class="text-xl font-semibold text-base-content">Ver documento</h3>
-        <p class="text-sm text-base-content/70">Visualiza el PDF sin salir del módulo.</p>
-      </div>
-      <button type="button" class="btn btn-sm btn-circle btn-ghost" data-close-modal="pdfModal" aria-label="Cerrar">✕</button>
-    </div>
-    <div class="rounded-2xl border border-base-200 bg-base-100/80 p-2">
-      <iframe id="pdfFrame" class="h-[70vh] w-full rounded-xl bg-base-200" src=""></iframe>
-    </div>
-  </div>
-  <form method="dialog" class="modal-backdrop">
-    <button class="hidden">Cerrar</button>
-  </form>
-</dialog>
-
-<dialog id="actionModal" class="modal">
-  <div class="modal-box max-w-4xl space-y-4">
-    <div class="flex items-start justify-between gap-4">
-      <div>
-        <h3 class="text-xl font-semibold text-base-content">Detalle de seguimiento</h3>
-        <p class="text-sm text-base-content/70">Consulta los eventos registrados para la actividad.</p>
-      </div>
-      <button type="button" class="btn btn-sm btn-circle btn-ghost" data-close-modal="actionModal" aria-label="Cerrar">✕</button>
-    </div>
-    <div id="actionModalContent" class="space-y-4 text-sm text-base-content/80">
-      <div class="flex items-center justify-center py-10 text-base-content/60">
-        Cargando información…
-      </div>
-    </div>
-  </div>
+<dialog id="pas-modal" class="modal">
+  <div class="modal-box max-w-4xl space-y-4" id="pas-modal-content"></div>
   <form method="dialog" class="modal-backdrop">
     <button class="hidden">Cerrar</button>
   </form>
@@ -276,6 +265,8 @@
     const addButton = document.getElementById('pas-add-button');
     const formContainer = document.getElementById('pas-form-container');
     const listContainer = document.getElementById('pas-list-container');
+    const modal = document.getElementById('pas-modal');
+    const modalContent = document.getElementById('pas-modal-content');
 
     function updateAddButtonState() {
       if (!addButton || !formContainer || !listContainer) return;
@@ -285,6 +276,12 @@
     }
 
     updateAddButtonState();
+
+    function closeModal() {
+      if (!modal.open) return;
+      modal.close();
+      modalContent.innerHTML = '';
+    }
 
     function closeModal(modalId) {
       const dialog = document.getElementById(modalId);
@@ -355,7 +352,33 @@
         addButton.disabled = true;
         listContainer.classList.add('hidden');
       }
+      if (evt.detail && evt.detail.requestConfig) {
+        const target = evt.detail.requestConfig.target;
+        if (target && target.id === 'pas-modal-content' && !modal.open) {
+          modal.showModal();
+        }
+      }
     });
+
+    document.body.addEventListener('htmx:afterSwap', function (evt) {
+      if (evt.target === modalContent && !modal.open) {
+        modal.showModal();
+      }
+    });
+
+    document.body.addEventListener('click', function (evt) {
+      const closeTrigger = evt.target.closest('[data-close-modal]');
+      if (closeTrigger) {
+        const modalId = closeTrigger.dataset.closeModal || 'pas-modal';
+        if (modalId === 'pas-modal') {
+          closeModal();
+        } else {
+          closeModal(modalId);
+        }
+      }
+    });
+
+    document.body.addEventListener('pas:close-modal', closeModal);
   })();
 </script>
 {% endblock content %}

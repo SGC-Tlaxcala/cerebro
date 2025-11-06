@@ -37,7 +37,7 @@
         </thead>
         <tbody class="text-sm">
           {% for item in activities %}
-            {% with activity=item.activity %}
+            {% with activity=item.activity estado=item.estado %}
             <tr class="align-top">
               <td class="text-center font-semibold text-base-content/70">{{ forloop.counter }}</td>
               <td class="space-y-2">
@@ -55,31 +55,29 @@
               <td class="text-center text-base-content/80">{{ activity.fecha_fin|date:'d/m/Y'|default:'—' }}</td>
               <td class="text-center text-base-content/80">{{ activity.responsable|default:'—' }}</td>
               <td class="text-center text-base-content/80">
-                <span class="badge badge-outline">{{ item.followup_count }}</span>
+                <button type="button"
+                        class="btn btn-ghost btn-xs gap-2"
+                        hx-get="{% url 'pas:followup-list' activity.pk %}"
+                        hx-target="#pas-modal-content"
+                        hx-swap="innerHTML">
+                  Seguimientos
+                  <span class="badge badge-outline badge-sm">{{ item.followup_count }}</span>
+                </button>
               </td>
               <td class="text-center">
-                {% with estado=activity.get_estado %}
-                  {% if estado == 'Cerrada' %}
-                    <span class="badge badge-success badge-outline">{{ estado }}</span>
-                  {% elif estado == 'Abierta en Tiempo' %}
-                    <span class="badge badge-warning badge-outline text-warning-content">{{ estado }}</span>
-                  {% elif estado == 'Abierta Fuera de Tiempo' %}
-                    <span class="badge badge-error badge-outline">{{ estado }}</span>
-                  {% else %}
-                    <span class="badge badge-neutral badge-outline">{{ estado }}</span>
-                  {% endif %}
-                {% endwith %}
+                {% if estado == 'Cerrada' %}
+                  <span class="badge badge-success badge-outline">{{ estado }}</span>
+                {% elif estado == 'Abierta en Tiempo' %}
+                  <span class="badge badge-warning badge-outline text-warning-content">{{ estado }}</span>
+                {% elif estado == 'Abierta Fuera de Tiempo' %}
+                  <span class="badge badge-error badge-outline">{{ estado }}</span>
+                {% else %}
+                  <span class="badge badge-neutral badge-outline">{{ estado }}</span>
+                {% endif %}
               </td>
               <td class="text-center">
                 <div class="flex flex-col items-center gap-2">
                   {% if can_modify %}
-                    <button type="button"
-                            class="btn btn-ghost btn-xs"
-                            hx-get="{% url 'pas:followup-add' activity.pk %}"
-                            hx-target="#pas-modal-content"
-                            hx-swap="innerHTML">
-                      Seguimiento
-                    </button>
                     <button type="button"
                             class="btn btn-ghost btn-xs"
                             hx-get="{% url 'pas:activity-edit' activity.pk %}"

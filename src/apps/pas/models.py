@@ -176,7 +176,12 @@ class Seguimiento(TrackingFields, models.Model):
     fecha = models.DateField(help_text="Fecha de la actualización")
     evidencia = models.FileField(upload_to='pas', blank=True, null=True)
     estado = models.IntegerField(choices=A_ESTADO)
-    responsable = models.CharField(max_length=5, help_text='Iniciales del Responsable', blank=True, null=True)
+    responsable = models.CharField(
+        max_length=255,
+        help_text='Persona responsable de la actualización',
+        blank=True,
+        null=True,
+    )
 
     class Meta:
         verbose_name = _(u'Seguimiento de Acciones')

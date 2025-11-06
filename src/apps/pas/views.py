@@ -1,5 +1,7 @@
 import json
 
+from datetime import date
+
 from django.contrib.auth.decorators import login_required
 from django.db.models import OuterRef, Subquery, Prefetch
 from django.http import HttpResponse
@@ -34,13 +36,35 @@ class PASIndex(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        plan_list = Plan.objects.all()
+        plan_list = Plan.objects.all().order_by('-fecha_llenado')
         latest_estado = Seguimiento.objects.filter(
             accion=OuterRef('pk')
         ).order_by('-fecha').values('estado')[:1]
-        action_list = Accion.objects.annotate(
+
+        priority_map = {
+            'Abierta Fuera de Tiempo': 0,
+            'Abierta en Tiempo': 2,
+        }
+
+        action_items = []
+        action_qs = Accion.objects.select_related('plan').annotate(
             latest_estado=Subquery(latest_estado)
-        ).order_by('latest_estado', 'fecha_fin')
+        ).prefetch_related('seguimiento_set')
+
+        for action in action_qs:
+            estado = action.get_estado
+            if estado == 'Cerrada':
+                continue
+            priority = priority_map.get(estado, 1)
+            action_items.append((
+                priority,
+                action.fecha_fin or date.max,
+                action.pk,
+                action,
+            ))
+
+        action_items.sort(key=lambda item: (item[0], item[1], item[2]))
+        action_list = [item[3] for item in action_items]
 
         for plan in plan_list:
             cerradas = 0
@@ -59,6 +83,7 @@ class PASIndex(ListView):
             plan.cerradas = cerradas
             plan.abiertas_en_tiempo = abiertas_en_tiempo
             plan.abiertas_fuera_de_tiempo = abiertas_fuera_de_tiempo
+            plan.total_actividades = cerradas + abiertas_en_tiempo + abiertas_fuera_de_tiempo
 
         context['plan_list'] = plan_list
         context['action_list'] = action_list
@@ -151,22 +176,28 @@ class PlanActivitiesView(DetailView):
         context = super().get_context_data(**kwargs)
         plan = self.object
         followups_prefetch = Prefetch(
-            'seguimiento_set', queryset=Seguimiento.objects.order_by('-fecha')
+            'seguimiento_set', queryset=Seguimiento.objects.order_by('-fecha', '-created')
         )
+        priority_map = {
+            'Abierta Fuera de Tiempo': 0,
+            'Abierta en Tiempo': 2,
+        }
         activities = []
         for activity in plan.accion_set.prefetch_related(followups_prefetch).order_by('fecha_fin', 'id'):
+            estado = activity.get_estado
+            if estado == 'Cerrada':
+                continue
             followups = list(activity.seguimiento_set.all())
             activities.append({
                 'activity': activity,
+                'estado': estado,
+                'estado_priority': priority_map.get(estado, 1),
                 'followup_count': len(followups),
                 'latest_followup': followups[0] if followups else None,
             })
+        activities.sort(key=lambda item: (item['estado_priority'], item['activity'].fecha_fin or date.max, item['activity'].pk))
         can_modify = not (plan.eliminacion or plan.recurrencia)
-        context.update({
-            'plan': plan,
-            'activities': activities,
-            'can_modify': can_modify,
-        })
+        context.update({'plan': plan, 'activities': activities, 'can_modify': can_modify})
         return context
 
 
@@ -335,10 +366,7 @@ class ActivityDeleteView(DeleteView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context.update({
-            'activity': self.object,
-            'form_action': self.request.path,
-        })
+        context.update({'activity': self.object, 'form_action': self.request.path, 'modal_id': 'pas-modal'})
         return context
 
     def delete(self, request, *args, **kwargs):
@@ -395,3 +423,18 @@ class FollowUpBaseView(CreateView):
 @method_decorator(login_required, name='dispatch')
 class FollowUpCreateView(FollowUpBaseView):
     pass
+
+
+@method_decorator(login_required, name='dispatch')
+class FollowUpListView(DetailView):
+    model = Accion
+    template_name = 'pas/partials/_followup_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        followups = self.object.seguimiento_set.order_by('-fecha', '-created')
+        context.update({
+            'activity': self.object,
+            'followups': followups,
+        })
+        return context
