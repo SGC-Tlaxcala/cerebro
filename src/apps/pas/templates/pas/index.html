@@ -20,17 +20,19 @@
           </p>
         </div>
       </div>
-      <div class="flex flex-col items-end gap-3 text-right">
-        <div class="flex items-center gap-2">
+      <div class="flex flex-col items-stretch gap-3 text-right">
+        <div class="flex items-center justify-end gap-2">
           <span class="badge badge-outline badge-primary badge-lg">PAS</span>
           {% now "d/m/Y H:i" as current_timestamp %}
           <span class="text-sm text-base-content/60">Última actualización · {{ current_timestamp }}</span>
         </div>
         <button type="button"
-                class="btn btn-primary btn-sm"
+                id="pas-add-button"
+                class="btn btn-primary btn-sm w-full"
                 hx-get="{% url 'pas:add' %}"
                 hx-target="#pas-form-container"
-                hx-swap="innerHTML">
+                hx-swap="innerHTML"
+                {% if request.resolver_match.url_name == 'add' %}disabled{% endif %}>
           Agregar plan de acción
         </button>
       </div>
@@ -276,6 +278,17 @@
 
     setActiveTab('actions-panel');
 
+    const addButton = document.getElementById('pas-add-button');
+    const formContainer = document.getElementById('pas-form-container');
+
+    function updateAddButtonState() {
+      if (!addButton || !formContainer) return;
+      const hasContent = formContainer.innerHTML.trim().length > 0;
+      addButton.disabled = hasContent;
+    }
+
+    updateAddButtonState();
+
     function closeModal(modalId) {
       const dialog = document.getElementById(modalId);
       if (dialog && dialog.open) dialog.close();
@@ -330,6 +343,18 @@
       const closeBtn = event.target.closest('[data-close-modal]');
       if (closeBtn) {
         closeModal(closeBtn.dataset.closeModal);
+      }
+    });
+
+    document.body.addEventListener('htmx:afterSwap', function (evt) {
+      if (evt.target && evt.target.id === 'pas-form-container') {
+        updateAddButtonState();
+      }
+    });
+
+    document.body.addEventListener('htmx:beforeRequest', function (evt) {
+      if (evt.target && evt.target === addButton) {
+        addButton.disabled = true;
       }
     });
   })();
