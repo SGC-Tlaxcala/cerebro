@@ -1,11 +1,33 @@
+import json
+
+from django.contrib.auth.decorators import login_required
+from django.db.models import OuterRef, Subquery, Prefetch
 from django.http import HttpResponse
-from django.urls import reverse_lazy
-from django.views.generic import ListView, CreateView, DetailView
-from django.db.models import OuterRef, Subquery
+from django.shortcuts import get_object_or_404
+from django.urls import reverse
+from django.utils import timezone
+from django.utils.decorators import method_decorator
+from django.views.generic import (
+    CreateView,
+    DetailView,
+    FormView,
+    ListView,
+    UpdateView,
+    DeleteView,
+)
+
+from .forms import PlanForm, AccionForm, SeguimientoForm, PlanClosureForm
 from .models import Plan, Accion, Seguimiento
-from .forms import PlanForm
 
 
+def hx_trigger_header(*events):
+    if not events:
+        return ''
+    payload = {event: '' for event in events}
+    return json.dumps(payload)
+
+
+@method_decorator(login_required, name='dispatch')
 class PASIndex(ListView):
     model = Plan
     template_name = 'pas/index.html'
@@ -13,11 +35,9 @@ class PASIndex(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         plan_list = Plan.objects.all()
-        # Subquery to get the latest estado for each Accion
         latest_estado = Seguimiento.objects.filter(
             accion=OuterRef('pk')
         ).order_by('-fecha').values('estado')[:1]
-        # Annotate each Accion with the latest estado
         action_list = Accion.objects.annotate(
             latest_estado=Subquery(latest_estado)
         ).order_by('latest_estado', 'fecha_fin')
@@ -44,21 +64,35 @@ class PASIndex(ListView):
         context['action_list'] = action_list
         return context
 
+
+@method_decorator(login_required, name='dispatch')
 class PASAdd(CreateView):
     model = Plan
     form_class = PlanForm
     template_name = 'pas/add.html'
-    success_url = reverse_lazy('pas:index')
 
     def dispatch(self, request, *args, **kwargs):
         if request.headers.get('HX-Request') and request.GET.get('close'):
             return HttpResponse('')
         return super().dispatch(request, *args, **kwargs)
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'form_action': reverse('pas:add'),
+            'hx_target': '#pas-form-container',
+            'hx_swap': 'innerHTML',
+            'form_in_modal': False,
+        })
+        return context
+
     def get_template_names(self):
         if self.request.headers.get('HX-Request'):
             return ['pas/partials/_plan_form.html']
         return super().get_template_names()
+
+    def get_success_url(self):
+        return reverse('pas:detalle', args=[self.object.pk])
 
     def form_valid(self, form):
         form.instance.user = self.request.user
@@ -74,9 +108,290 @@ class PASAdd(CreateView):
         return super().form_invalid(form)
 
 
+@method_decorator(login_required, name='dispatch')
 class PASDetail(DetailView):
     model = Plan
+    template_name = 'pas/plan_detail.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['plan'] = self.object
+        return context
 
 
-class PASAction(DetailView):
+@method_decorator(login_required, name='dispatch')
+class PlanSummaryView(DetailView):
+    model = Plan
+    template_name = 'pas/partials/_plan_summary.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        plan = self.object
+        activities = list(plan.accion_set.all())
+        total = len(activities)
+        closed = sum(1 for activity in activities if activity.get_estado == 'Cerrada')
+        progress = round((closed / total) * 100) if total else 0
+        context.update({
+            'plan': plan,
+            'total_activities': total,
+            'closed_activities': closed,
+            'open_activities': total - closed,
+            'progress': progress,
+            'all_closed': total > 0 and closed == total,
+        })
+        return context
+
+
+@method_decorator(login_required, name='dispatch')
+class PlanActivitiesView(DetailView):
+    model = Plan
+    template_name = 'pas/partials/_activities_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        plan = self.object
+        followups_prefetch = Prefetch(
+            'seguimiento_set', queryset=Seguimiento.objects.order_by('-fecha')
+        )
+        activities = []
+        for activity in plan.accion_set.prefetch_related(followups_prefetch).order_by('fecha_fin', 'id'):
+            followups = list(activity.seguimiento_set.all())
+            activities.append({
+                'activity': activity,
+                'followup_count': len(followups),
+                'latest_followup': followups[0] if followups else None,
+            })
+        can_modify = not (plan.eliminacion or plan.recurrencia)
+        context.update({
+            'plan': plan,
+            'activities': activities,
+            'can_modify': can_modify,
+        })
+        return context
+
+
+class PlanFormMixin:
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'form_action': self.request.path,
+            'hx_target': '#pas-modal-content',
+            'hx_swap': 'innerHTML',
+            'form_in_modal': True,
+            'modal_id': 'pas-modal',
+        })
+        return context
+
+    def form_invalid(self, form):
+        if self.request.headers.get('HX-Request'):
+            return self.render_to_response(self.get_context_data(form=form), status=422)
+        return super().form_invalid(form)
+
+
+@method_decorator(login_required, name='dispatch')
+class PlanUpdateView(PlanFormMixin, UpdateView):
+    model = Plan
+    form_class = PlanForm
+    template_name = 'pas/partials/_plan_form.html'
+
+    def get_success_url(self):
+        return reverse('pas:detalle', args=[self.object.pk])
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        if self.request.headers.get('HX-Request'):
+            header = hx_trigger_header('pas:refresh-summary', 'pas:close-modal')
+            return HttpResponse('', status=204, headers={'HX-Trigger': header})
+        return response
+
+
+@method_decorator(login_required, name='dispatch')
+class PlanClosureView(FormView):
+    form_class = PlanClosureForm
+    template_name = 'pas/partials/_plan_closure_form.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        self.plan = get_object_or_404(Plan, pk=kwargs['pk'])
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'plan': self.plan,
+            'form_action': self.request.path,
+            'modal_id': 'pas-modal',
+        })
+        return context
+
+    def get_initial(self):
+        initial = super().get_initial()
+        if self.plan.eliminacion:
+            initial['resultado'] = 'close'
+            initial['comentarios'] = self.plan.txt_eliminacion
+        elif self.plan.recurrencia:
+            initial['resultado'] = 'recurrence'
+            initial['comentarios'] = self.plan.txt_recurrencia
+        return initial
+
+    def form_invalid(self, form):
+        if self.request.headers.get('HX-Request'):
+            return self.render_to_response(self.get_context_data(form=form), status=422)
+        return super().form_invalid(form)
+
+    def form_valid(self, form):
+        if any(activity.get_estado != 'Cerrada' for activity in self.plan.accion_set.all()):
+            form.add_error(None, 'Aún existen actividades abiertas.')
+            return self.form_invalid(form)
+
+        resultado = form.cleaned_data['resultado']
+        comentarios = form.cleaned_data.get('comentarios')
+
+        if resultado == 'close':
+            self.plan.eliminacion = True
+            self.plan.txt_eliminacion = comentarios
+            self.plan.recurrencia = False
+            self.plan.txt_recurrencia = ''
+        else:
+            self.plan.recurrencia = True
+            self.plan.txt_recurrencia = comentarios
+            self.plan.eliminacion = False
+            self.plan.txt_eliminacion = ''
+
+        self.plan.save(update_fields=['eliminacion', 'txt_eliminacion', 'recurrencia', 'txt_recurrencia'])
+
+        if self.request.headers.get('HX-Request'):
+            header = hx_trigger_header('pas:refresh-summary', 'pas:close-modal')
+            return HttpResponse('', status=204, headers={'HX-Trigger': header})
+
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse('pas:detalle', args=[self.plan.pk])
+
+
+class ActivityBaseView:
+    form_class = AccionForm
+    template_name = 'pas/partials/_activity_form.html'
+
+    def get_success_url(self):
+        return reverse('pas:detalle', args=[self.plan.pk])
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'plan': self.plan,
+            'form_action': self.request.path,
+            'modal_id': 'pas-modal',
+        })
+        return context
+
+    def form_invalid(self, form):
+        if self.request.headers.get('HX-Request'):
+            return self.render_to_response(self.get_context_data(form=form), status=422)
+        return super().form_invalid(form)
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        if self.request.headers.get('HX-Request'):
+            header = hx_trigger_header('pas:refresh-activities', 'pas:refresh-summary', 'pas:close-modal')
+            return HttpResponse('', status=204, headers={'HX-Trigger': header})
+        return response
+
+
+@method_decorator(login_required, name='dispatch')
+class ActivityCreateView(ActivityBaseView, CreateView):
     model = Accion
+
+    def dispatch(self, request, *args, **kwargs):
+        self.plan = get_object_or_404(Plan, pk=kwargs['pk'])
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        form.instance.plan = self.plan
+        form.instance.user = self.request.user
+        return super().form_valid(form)
+
+
+@method_decorator(login_required, name='dispatch')
+class ActivityUpdateView(ActivityBaseView, UpdateView):
+    model = Accion
+
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
+        self.plan = obj.plan
+        return obj
+
+
+@method_decorator(login_required, name='dispatch')
+class ActivityDeleteView(DeleteView):
+    model = Accion
+    template_name = 'pas/partials/_confirm_delete.html'
+
+    def get_success_url(self):
+        return reverse('pas:detalle', args=[self.object.plan.pk])
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'activity': self.object,
+            'form_action': self.request.path,
+        })
+        return context
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        plan_pk = self.object.plan.pk
+        response = super().delete(request, *args, **kwargs)
+        if request.headers.get('HX-Request'):
+            header = hx_trigger_header('pas:refresh-activities', 'pas:refresh-summary', 'pas:close-modal')
+            return HttpResponse('', status=204, headers={'HX-Trigger': header})
+        return response
+
+
+class FollowUpBaseView(CreateView):
+    model = Seguimiento
+    form_class = SeguimientoForm
+    template_name = 'pas/partials/_followup_form.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        self.activity = get_object_or_404(Accion, pk=kwargs['pk'])
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_success_url(self):
+        return reverse('pas:detalle', args=[self.activity.plan.pk])
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'form_action': self.request.path,
+            'activity': self.activity,
+            'modal_id': 'pas-modal',
+        })
+        return context
+
+    def get_initial(self):
+        initial = super().get_initial()
+        initial.setdefault('fecha', timezone.now().date())
+        return initial
+
+    def form_invalid(self, form):
+        if self.request.headers.get('HX-Request'):
+            return self.render_to_response(self.get_context_data(form=form), status=422)
+        return super().form_invalid(form)
+
+    def form_valid(self, form):
+        form.instance.accion = self.activity
+        form.instance.user = self.request.user
+        response = super().form_valid(form)
+        if self.request.headers.get('HX-Request'):
+            header = hx_trigger_header('pas:refresh-activities', 'pas:refresh-summary', 'pas:close-modal')
+            return HttpResponse('', status=204, headers={'HX-Trigger': header})
+        return response
+
+
+@method_decorator(login_required, name='dispatch')
+class FollowUpCreateView(FollowUpBaseView):
+    pass

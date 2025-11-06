@@ -1,269 +1,71 @@
 {% extends 'cerebro/base.html' %}
-{% load pas_tags %}
 
-{% block head_title %} {% if plan.documento == 1 %} CNC: {{ plan.nombre }}{% else %} PCM: {{ plan.nombre }}{% endif %}{% endblock head_title %}
-
-{% block footer %}
-<!-- Script para cargar el PDF en el iframe con zoom de ancho de página -->
-<script>
-  function loadPDF(url) {
-    const pdfUrl = url + '#view=FitH';
-    document.getElementById('pdfFrame').src = pdfUrl;
-  }
-
-  function loadActionContent(url) {
-    fetch(url)
-      .then(response => response.text())
-      .then(html => {
-        document.getElementById('actionModalContent').innerHTML = html;
-      })
-      .catch(error => console.error('Error loading action content:', error));
-  }
-</script>
-{% endblock footer %}
-
-{% block after_content %}
-<!-- Modal for PDF -->
-<div class="modal fade" id="pdfModal" tabindex="-1" role="dialog" aria-labelledby="pdfModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg" role="document" style="max-width: 90%; height: 90%;">
-    <div class="modal-content" style="height: 100%;">
-      <div class="modal-header">
-        <h5 class="modal-title" id="pdfModalLabel">Ver PDF</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body" style="height: calc(100% - 56px);">
-        <iframe id="pdfFrame" style="width: 100%; height: 100%;" src=""></iframe>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Modal for Action Content -->
-<div class="modal fade" id="actionModal" tabindex="-1" role="dialog" aria-labelledby="actionModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="actionModalLabel">Detalles de la Acción</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body" id="actionModalContent">
-        <!-- Content will be loaded here -->
-      </div>
-    </div>
-  </div>
-</div>
-{% endblock after_content %}
-
-{% block before_content %}{% endblock before_content %}
+{% block title %}Plan de Acción{% endblock %}
 
 {% block content %}
-  <div class="container py-4">
-    <div class="row p-5 mb-4 bg-body-tertiary rounded-3">
-      <div class="col">
-        <div class="jumbotron">
-          <h1 class="display-2">
-            <i class="fa fa-{{ plan.documento | pas_icon }}" aria-hidden="true"></i>
-            {{ plan.nombre }}
-          </h1>
-          <p class="well text-muted display-6">{{ plan.get_documento_display }}</p>
-          <p><a class="btn btn-outline-primary btn-lg" href="{% url 'pas:index' %}">Regresar al control de Planes</a></p>
-        </div>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-md-12">
-        <ul class="nav nav-tabs justify-content-center" role="tablist">
-          <li class="nav-item" role="presentation">
-            <a id="identificacion-tab"
-               data-bs-toggle="tab"
-               href="#identificacion-panel"
-               role="tab"
-               aria-controls="identificacion-panel"
-               aria-selected="true"
-               class="nav-link active" aria-current="page"><i class="fa fa-info-circle"></i>  Identificación</a>
-          </li><!-- ./identificacion-tab -->
-          <li class="nav-item" role="presentation">
-            <a class="nav-link"
-              id="causa-tab" data-bs-toggle="tab" href="#causa-panel" role="tab" aria-controls="causa-panel" aria-selected="false"><i class="fa fa-paw"></i> Causa raíz</a>
-          </li><!-- ./causa-tab -->
-          <li class="nav-item" role="presentation">
-            <a class="nav-link{% if plan.documento == 2 %} disabled{% endif %}" {% if plan.documento == 2 %} aria-disabled="true"{% endif %}
-              id="correccion-tab" data-bs-toggle="tab" href="#correccion-panel" role="tab" aria-controls="correccion-panel" aria-selected="false"><i class="fa fa-fire-extinguisher"></i> Corrección</a>
-          </li><!-- ./correccion-tab -->
-          <li class="nav-item" role="presentation">
-            <a class="nav-link"
-              id="acciones-tab" data-bs-toggle="tab" href="#acciones-panel" role="tab" aria-controls="acciones-panel" aria-selected="false"><i class="fa fa-ambulance"></i> Actividades</a>
-          </li><!-- ./acciones-tab -->
-        </ul>
-      </div>
-    </div>
+<section class="space-y-10" data-plan-id="{{ plan.pk }}">
+  <div id="plan-summary"
+       class="space-y-4"
+       hx-get="{% url 'pas:plan-summary' plan.pk %}"
+       hx-trigger="load, pas:refresh-summary from:body"
+       hx-target="this"
+       hx-swap="innerHTML">
+    <div class="skeleton h-48 w-full rounded-3xl"></div>
   </div>
 
-  <div class="tab-content" id="tab-content">
-    <div class="tab-pane active" id="identificacion-panel" role="tabpanel" aria-labelledby="identificacion-tab">
-      <div class="row tab-pane active" id="identificacion-panel">
-        <div class="col">
-          <div class="panel panel primary">
-            <div class="panel-heading"><h3 class="panel-title"><i class="fa fa-info-circle"></i> Identificación</h3></div>
-            <div class="panel-body"><!-- identificación del plan -->
-              <div class="row"><!-- \-> nombre y folio -->
-                <div class="col-md-1"><strong>Nombre</strong></div><div class="col-md-5">{{ plan.nombre }}</div>
-                <div class="col-md-1"><strong>Folio</strong></div><div class="col-md-5">{{ plan.folio }}</div>
-                <hr class="">
-              </div><!-- ./nombre y folio <-/ -->
-              {% if plan.documento == 1 %}
-                <div class="row"><!-- Fechas y tipo -->
-                  <div class="col-md-1"><strong>Fecha</strong></div>
-                  <div class="col-md-5">{{ plan.fecha_llenado }}</div>
-
-                  <div class="col-md-2"><strong>Tipo de acción correctiva</strong></div>
-                  <div class="col-md-4">{{ plan.get_tipo_display }}</div>
-                  <hr>
-                </div><!-- ./Fechas y tipo -->
-                <div class="row"><!-- Descripción CNC -->
-                  <div class="col-md-1"><strong>Fuente</strong></div>
-                  <div class="col-md-11">{{ plan.get_fuente_display }}</div>
-
-                  <div class="col-md-1"><strong>Descripción</strong></div>
-                  <div class="col-md-11">{{ plan.desc_cnc|safe }}</div>
-                  <hr>
-                </div><!-- ./Descripción CNC -->
-              {% else %}<!-- PCM identificación -->
-                <div class="row"><!-- Fechas -->
-                  <div class="col-md-1"><strong>Fecha llenado</strong></div>
-                  <div class="col-md-3"><em>{{ plan.fecha_llenado }}</em></div>
-
-                  <div class="col-md-1"><strong>Fecha de inicio</strong></div>
-                  <div class="col-md-3">{{ plan.fecha_inicio }}</div>
-
-                  <div class="col-md-1"><strong>Fecha de término</strong></div>
-                  <div class="col-md-3">{{ plan.fecha_termino }}</div>
-                  <hr>
-                </div> <!-- ./Fechas -->
-                <div class="row"><!-- Propósito y Requisito -->
-                  <div class="col-md-1"><strong>Propósito: </strong></div><div class="col-md-5">{{ plan.proposito }}</div>
-                  <div class="col"><strong>Requisito: </strong></div><div class="col-md-5"><em>{{ plan.requisito }}</em></div>
-                  <hr />
-                </div><!-- ./Propósito y Requisito -->
-                <div class="row"><!-- Descripción PCM -->
-                  <div class="col-md-1"><strong>Descripción: </strong></div>
-                  <div class="col-md-11">{{ plan.desc_pcm|safe }}</div>
-                  <hr />
-                </div><!-- ./Descripción PCM -->
-                <div class="row"><!-- Consecuencias -->
-                  <div class="col-md-1"><strong>Consecuencias: </strong></div>
-                  <div class="col-md-11">{{ plan.consecuencias|safe }}</div>
-                  <hr />
-                </div><!-- ./Consecuencias -->
-              {% endif %}<!-- ./PCM identificación -->
-            </div><!-- ./panel-body./identificación del plan -->
-          </div><!-- ./panel./panel-primary./identificación -->
-        </div><!-- ./col./identificación -->
-      </div>
-    </div><!-- ./identificación-panel -->
-    <div class="tab-pane" id="causa-panel" role="tabpanel" aria-labelledby="causa-tab">
-      <div class="row" id="causa">
-        <div class="col-md-12">
-          <div class="panel panel-warning">
-            <div class="panel-heading">
-              <h3 class="panel-title"><i class="fa fa-paw"></i> Análisis de la causa raíz {% if plan.documento == 1 %}de la No Conformidad/Riesgo{% else %}del cambio o mejora al SGC{% endif %}</h3>
-            </div>
-            <div class="panel-body">
-              {{ plan.analisis|safe }}
-              <!-- Botón que activa el modal -->
-              {% if plan.evidencia_analisis %}
-                {% if plan.evidencia_analisis.url|slice:"-4:" == ".pdf" %}
-                  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#pdfModal" onclick="loadPDF('{{ plan.evidencia_analisis.url }}')">
-                    Ver evidencia
-                  </button>
-                {% else %}
-                  <a href="{{ plan.evidencia_analisis.url }}" class="btn btn-primary" download>Descargar Evidencia</a>
-                {% endif %}
-              {% endif %}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div><!-- ./causa-tab -->
-    <div class="tab-pane" id="correccion-panel" role="tabpanel" aria-labelledby="correccion-tab">
-      <div class="row" id="corr">
-        <div class="col-md-12">
-          <div class="panel panel-danger">
-            <div class="panel-heading">
-              <h3 class="panel-title"><i class="fa fa-fire-extinguisher"></i> Corrección</h3>
-            </div>
-            <div class="panel-body">
-              {{ plan.correccion|safe }}
-            </div>
-            <div class="panel-footer">
-              <div class="row">
-                <div class="col-md-4">
-                  Responsable: <strong>{{ plan.reaccion_responsable }}</strong>
-                </div>
-                <div class="col-md-4">
-                  {% if plan.reaccion_evidencia %}Evidencia: <a target="_blank" href="{{ plan.reaccion_evidencia.url }}" onClick="abrir(this.href);return false" class="btn btn-primary btn-xs">Revisar</a>{% endif %}
-                </div>
-                <div class="col-md-4">
-                  Consecuencias: <strong>{{ plan.consecuencias }}</strong>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div><!-- ./correccion-tab -->
-    <div class="tab-pane" id="acciones-panel" role="tabpanel" aria-labelledby="acciones-tab">
-      <div class="row" id="acciones">
-    <div class="col-md-12">
-      <div class="panel panel-danger">
-        <div class="panel-heading">
-          <h3 class="panel-title"><i class="fa fa-ambulance"></i> Descripción de las Actividades</h3>
-        </div>
-        <div class="panel-body">
-          <table class="table table-bordered table-hover">
-            <thead>
-              <tr>
-                <th class="text-center col-md-1">Núm</th>
-                <th class="col-md-4 text-center">Actividades</th>
-                <th class="col-md-1 text-center">Fecha</th>
-                <th class="col-md-1 text-center">Responsable</th>
-                <th class="col-md-1 text-center">Recursos</th>
-                <th class="col-md-2 text-center">Evidencia</th>
-                <th class="col-md-1 text-center">Seguimiento</th>
-                <th class="col-md-2 text-center">Estado</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for action in plan.accion_set.all %}
-                <tr>
-                  <td class="text-center align-middle">{{ forloop.counter }}</td>
-                  <td class="align-middle">{{ action.accion|safe }}</td>
-                  <td class="text-center align-middle">{{ action.fecha_fin | date:"d/m/Y" }}</td>
-                  <td class="text-center align-middle">{{ action.responsable }}</td>
-                  <td class="text-center align-middle">{{ action.recursos }}</td>
-                  <td class="text-center align-middle">{% if action.evidencia %}{{ action.evidencia }}{% endif %}</td>
-                  <td class="text-center align-middle">
-                    <button type="button" class="btn
-                      {% if action.get_estado == 'Cerrada' %}btn-success
-                      {% elif action.get_estado == 'Abierta en Tiempo' %}btn-warning
-                      {% elif action.get_estado == 'Abierta Fuera de Tiempo' %}btn-danger
-                      {% endif %}"
-                      data-bs-toggle="modal" data-bs-target="#actionModal" onclick="loadActionContent('{% url 'pas:action' action.id %}')">
-                      {{ action.seguimiento_set.count }}
-                    </button>
-                  </td><!-- ./Seguimiento -->
-                  <td class="align-middle">{{ action.get_estado }}</td>
-                </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-        <div class="panel-footer">
-          <strong>Total de acciones: </strong> {{ plan.accion_set.count }}
-        </div>
-      </div>
-    </div>
+  <div id="plan-activities"
+       class="space-y-4"
+       hx-get="{% url 'pas:plan-activities' plan.pk %}"
+       hx-trigger="load, pas:refresh-activities from:body"
+       hx-target="this"
+       hx-swap="innerHTML">
+    <div class="skeleton h-64 w-full rounded-3xl"></div>
   </div>
-    </div><!-- ./acciones-tab -->
-  </div>
+</section>
+
+<dialog id="pas-modal" class="modal">
+  <div class="modal-box max-w-4xl space-y-4" id="pas-modal-content"></div>
+  <form method="dialog" class="modal-backdrop">
+    <button aria-label="Cerrar">Cerrar</button>
+  </form>
+</dialog>
+
+<script>
+  (function () {
+    const modal = document.getElementById('pas-modal');
+    const modalContent = document.getElementById('pas-modal-content');
+
+    function closeModal() {
+      if (!modal.open) return;
+      modal.close();
+      modalContent.innerHTML = '';
+    }
+
+    document.body.addEventListener('htmx:afterSwap', function (evt) {
+      if (evt.target === modalContent) {
+        modal.showModal();
+      }
+    });
+
+    document.body.addEventListener('pas:close-modal', closeModal);
+
+    document.body.addEventListener('click', function (evt) {
+      const closeTrigger = evt.target.closest('[data-close-modal]');
+      if (closeTrigger) {
+        closeModal();
+      }
+    });
+
+    document.body.addEventListener('htmx:beforeRequest', function (evt) {
+      if (evt.detail && evt.detail.requestConfig) {
+        const swapTarget = evt.detail.requestConfig.target;
+        if (swapTarget && swapTarget.id === 'pas-modal-content') {
+          if (!modal.open) {
+            modal.showModal();
+          }
+        }
+      }
+    });
+  })();
+</script>
 {% endblock content %}

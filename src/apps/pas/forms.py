@@ -12,11 +12,36 @@ from django.forms import (
     CheckboxInput,
     ClearableFileInput,
 )
-from .models import Plan
+
+from .models import Plan, Accion, Seguimiento
+
+
+WIDGET_CLASS_MAP = {
+    TextInput: 'input input-bordered w-full',
+    NumberInput: 'input input-bordered w-full',
+    EmailInput: 'input input-bordered w-full',
+    DateInput: 'input input-bordered w-full',
+    TimeInput: 'input input-bordered w-full',
+    URLInput: 'input input-bordered w-full',
+    Select: 'select select-bordered w-full',
+    SelectMultiple: 'select select-bordered w-full',
+    Textarea: 'textarea textarea-bordered w-full min-h-[160px]',
+    CheckboxInput: 'toggle toggle-primary',
+    ClearableFileInput: 'file-input file-input-bordered w-full',
+}
+
+
+def apply_tailwind_widgets(form):
+    for field in form.fields.values():
+        widget = field.widget
+        for widget_type, css_class in WIDGET_CLASS_MAP.items():
+            if isinstance(widget, widget_type):
+                existing = widget.attrs.get('class', '')
+                widget.attrs['class'] = f'{existing} {css_class}'.strip()
+                break
 
 
 class PlanForm(forms.ModelForm):
-
     otra_fuente = forms.CharField(
         label='Otra fuente',
         required=False,
@@ -26,9 +51,14 @@ class PlanForm(forms.ModelForm):
     class Meta:
         model = Plan
         exclude = ['user']
+        widgets = {
+            'fecha_llenado': DateInput(attrs={'type': 'date'}),
+            'fecha_inicio': DateInput(attrs={'type': 'date'}),
+            'fecha_termino': DateInput(attrs={'type': 'date'}),
+        }
 
     def clean(self):
-        cleaned_data = super(PlanForm, self).clean()
+        cleaned_data = super().clean()
         fuente = cleaned_data.get('fuente')
         otra_fuente = cleaned_data.get('otra_fuente')
         if fuente == 4 and not otra_fuente:
@@ -36,25 +66,46 @@ class PlanForm(forms.ModelForm):
         return cleaned_data
 
     def __init__(self, *args, **kwargs):
-        super(PlanForm, self).__init__(*args, **kwargs)
-        widget_class_map = {
-            TextInput: 'input input-bordered w-full',
-            NumberInput: 'input input-bordered w-full',
-            EmailInput: 'input input-bordered w-full',
-            DateInput: 'input input-bordered w-full',
-            TimeInput: 'input input-bordered w-full',
-            URLInput: 'input input-bordered w-full',
-            Select: 'select select-bordered w-full',
-            SelectMultiple: 'select select-bordered w-full',
-            Textarea: 'textarea textarea-bordered w-full min-h-[160px]',
-            CheckboxInput: 'toggle toggle-primary',
-            ClearableFileInput: 'file-input file-input-bordered w-full',
+        super().__init__(*args, **kwargs)
+        apply_tailwind_widgets(self)
+
+
+class AccionForm(forms.ModelForm):
+    class Meta:
+        model = Accion
+        exclude = ['user', 'plan']
+        widgets = {
+            'fecha_inicio': DateInput(attrs={'type': 'date'}),
+            'fecha_fin': DateInput(attrs={'type': 'date'}),
         }
 
-        for name, field in self.fields.items():
-            widget = field.widget
-            for widget_type, css_class in widget_class_map.items():
-                if isinstance(widget, widget_type):
-                    existing = widget.attrs.get('class', '')
-                    widget.attrs['class'] = f'{existing} {css_class}'.strip()
-                    break
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        apply_tailwind_widgets(self)
+
+
+class SeguimientoForm(forms.ModelForm):
+    class Meta:
+        model = Seguimiento
+        exclude = ['user', 'accion']
+        widgets = {
+            'fecha': DateInput(attrs={'type': 'date'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        apply_tailwind_widgets(self)
+
+
+class PlanClosureForm(forms.Form):
+    RESULTADO_CHOICES = (
+        ('close', 'Cerrar plan'),
+        ('recurrence', 'Registrar recurrencia'),
+    )
+
+    resultado = forms.ChoiceField(choices=RESULTADO_CHOICES)
+    comentarios = forms.CharField(widget=Textarea, label='Comentarios', required=False)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        apply_tailwind_widgets(self)

@@ -1,14 +1,31 @@
 from django.urls import path
-from django.contrib.auth.decorators import login_required
+
 from .views import (
-    PASIndex, PASAdd, PASDetail, PASAction
+    PASIndex,
+    PASAdd,
+    PASDetail,
+    PlanSummaryView,
+    PlanActivitiesView,
+    PlanUpdateView,
+    PlanClosureView,
+    ActivityCreateView,
+    ActivityUpdateView,
+    ActivityDeleteView,
+    FollowUpCreateView,
 )
 
-
 app_name = 'pas'
+
 urlpatterns = [
-    path('', login_required(PASIndex.as_view()), name='index'),
-    path('add/', login_required(PASAdd.as_view()), name='add'),
-    path('detalle/<int:pk>/', login_required(PASDetail.as_view()), name='detalle'),
-    path('accion/<int:pk>/', login_required(PASAction.as_view()), name='action')
+    path('', PASIndex.as_view(), name='index'),
+    path('add/', PASAdd.as_view(), name='add'),
+    path('detalle/<int:pk>/', PASDetail.as_view(), name='detalle'),
+    path('<int:pk>/summary/', PlanSummaryView.as_view(), name='plan-summary'),
+    path('<int:pk>/activities/', PlanActivitiesView.as_view(), name='plan-activities'),
+    path('<int:pk>/edit/', PlanUpdateView.as_view(), name='plan-edit'),
+    path('<int:pk>/closure/', PlanClosureView.as_view(), name='plan-closure'),
+    path('<int:pk>/activities/add/', ActivityCreateView.as_view(), name='activity-add'),
+    path('activities/<int:pk>/edit/', ActivityUpdateView.as_view(), name='activity-edit'),
+    path('activities/<int:pk>/delete/', ActivityDeleteView.as_view(), name='activity-delete'),
+    path('activities/<int:pk>/followups/add/', FollowUpCreateView.as_view(), name='followup-add'),
 ]

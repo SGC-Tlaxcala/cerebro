@@ -103,13 +103,8 @@
                 </td>
                 <td class="text-center text-base-content/80">{{ action.fecha_fin|date:"d/m/Y" }}</td>
                 <td class="text-center text-base-content/80">{{ action.responsable }}</td>
-                <td class="text-center">
-                  <button type="button"
-                          class="btn btn-sm btn-outline btn-primary"
-                          data-action-url="{% url 'pas:action' action.id %}"
-                          data-modal-target="actionModal">
-                    {{ action.seguimiento_set.count }}
-                  </button>
+                <td class="text-center text-base-content/80">
+                  <span class="badge badge-outline">{{ action.seguimiento_set.count }}</span>
                 </td>
                 <td class="text-center">
                   {% if action.get_estado == 'Cerrada' %}

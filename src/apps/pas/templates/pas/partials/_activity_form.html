@@ -1,0 +1,63 @@
+<form hx-post="{{ form_action }}"
+      hx-target="#pas-modal-content"
+      hx-swap="innerHTML"
+      class="space-y-6"
+      enctype="multipart/form-data">
+  {% csrf_token %}
+  <header class="space-y-1">
+    <h3 class="text-xl font-semibold text-base-content">{% if form.instance.pk %}Editar actividad{% else %}Agregar actividad{% endif %}</h3>
+    <p class="text-sm text-base-content/70">Define la actividad que formará parte del plan de acción.</p>
+  </header>
+
+  {{ form.media }}
+
+  {% if form.non_field_errors %}
+    <div class="alert alert-error">
+      {% for error in form.non_field_errors %}
+        <span>{{ error }}</span>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <div class="grid gap-6">
+    <div class="form-control">
+      {{ form.accion.label_tag }}
+      {{ form.accion }}
+      {% for error in form.accion.errors %}<p class="mt-1 text-xs text-error">{{ error }}</p>{% endfor %}
+    </div>
+    <div class="grid gap-6 md:grid-cols-2">
+      <div class="form-control">
+        {{ form.responsable.label_tag }}
+        {{ form.responsable }}
+        {% for error in form.responsable.errors %}<p class="mt-1 text-xs text-error">{{ error }}</p>{% endfor %}
+      </div>
+      <div class="form-control">
+        {{ form.recursos.label_tag }}
+        {{ form.recursos }}
+        {% for error in form.recursos.errors %}<p class="mt-1 text-xs text-error">{{ error }}</p>{% endfor %}
+      </div>
+    </div>
+    <div class="grid gap-6 md:grid-cols-2">
+      <div class="form-control">
+        {{ form.fecha_inicio.label_tag }}
+        {{ form.fecha_inicio }}
+        {% for error in form.fecha_inicio.errors %}<p class="mt-1 text-xs text-error">{{ error }}</p>{% endfor %}
+      </div>
+      <div class="form-control">
+        {{ form.fecha_fin.label_tag }}
+        {{ form.fecha_fin }}
+        {% for error in form.fecha_fin.errors %}<p class="mt-1 text-xs text-error">{{ error }}</p>{% endfor %}
+      </div>
+    </div>
+    <div class="form-control">
+      {{ form.evidencia.label_tag }}
+      {{ form.evidencia }}
+      {% for error in form.evidencia.errors %}<p class="mt-1 text-xs text-error">{{ error }}</p>{% endfor %}
+    </div>
+  </div>
+
+  <div class="flex flex-wrap items-center gap-3">
+    <button type="submit" class="btn btn-primary">Guardar actividad</button>
+    <button type="button" class="btn btn-ghost" data-close-modal="{{ modal_id|default:'pas-modal' }}">Cancelar</button>
+  </div>
+</form>

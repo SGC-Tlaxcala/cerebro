@@ -1,0 +1,116 @@
+<div class="space-y-6">
+  <header class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+    <div class="space-y-1">
+      <h2 class="text-2xl font-semibold text-base-content">Actividades del plan</h2>
+      <p class="text-sm text-base-content/70">Gestiona la ejecución y seguimiento de cada una de las actividades definidas.</p>
+    </div>
+    {% if can_modify %}
+      <button type="button"
+              class="btn btn-primary btn-sm"
+              hx-get="{% url 'pas:activity-add' plan.pk %}"
+              hx-target="#pas-modal-content"
+              hx-swap="innerHTML">
+        Agregar actividad
+      </button>
+    {% endif %}
+  </header>
+
+  {% if not can_modify %}
+    <div class="alert alert-warning">
+      <span>El plan se encuentra cerrado o con recurrencia registrada. Las actividades están en modo de solo lectura.</span>
+    </div>
+  {% endif %}
+
+  {% if activities %}
+    <div class="overflow-x-auto">
+      <table class="table table-zebra">
+        <thead class="text-xs uppercase tracking-wide text-base-content/60">
+          <tr>
+            <th class="w-16 text-center">#</th>
+            <th>Actividad</th>
+            <th class="w-32 text-center">Fecha compromiso</th>
+            <th class="w-32 text-center">Responsable</th>
+            <th class="w-32 text-center">Seguimiento</th>
+            <th class="w-32 text-center">Estado</th>
+            <th class="w-32 text-center">Acciones</th>
+          </tr>
+        </thead>
+        <tbody class="text-sm">
+          {% for item in activities %}
+            {% with activity=item.activity %}
+            <tr class="align-top">
+              <td class="text-center font-semibold text-base-content/70">{{ forloop.counter }}</td>
+              <td class="space-y-2">
+                <div class="prose prose-sm max-w-none text-base-content/80">{{ activity.accion|safe }}</div>
+                {% if activity.recursos %}
+                  <p class="text-xs text-base-content/60"><span class="font-semibold">Recursos:</span> {{ activity.recursos }}</p>
+                {% endif %}
+                {% if item.latest_followup %}
+                  <div class="rounded-lg bg-base-200/60 p-3 text-xs text-base-content/70">
+                    <p class="font-semibold text-base-content/80">Último seguimiento · {{ item.latest_followup.fecha|date:'d/m/Y' }}</p>
+                    <p class="mt-1">{{ item.latest_followup.descripcion|safe }}</p>
+                  </div>
+                {% endif %}
+              </td>
+              <td class="text-center text-base-content/80">{{ activity.fecha_fin|date:'d/m/Y'|default:'—' }}</td>
+              <td class="text-center text-base-content/80">{{ activity.responsable|default:'—' }}</td>
+              <td class="text-center text-base-content/80">
+                <span class="badge badge-outline">{{ item.followup_count }}</span>
+              </td>
+              <td class="text-center">
+                {% with estado=activity.get_estado %}
+                  {% if estado == 'Cerrada' %}
+                    <span class="badge badge-success badge-outline">{{ estado }}</span>
+                  {% elif estado == 'Abierta en Tiempo' %}
+                    <span class="badge badge-warning badge-outline text-warning-content">{{ estado }}</span>
+                  {% elif estado == 'Abierta Fuera de Tiempo' %}
+                    <span class="badge badge-error badge-outline">{{ estado }}</span>
+                  {% else %}
+                    <span class="badge badge-neutral badge-outline">{{ estado }}</span>
+                  {% endif %}
+                {% endwith %}
+              </td>
+              <td class="text-center">
+                <div class="flex flex-col items-center gap-2">
+                  {% if can_modify %}
+                    <button type="button"
+                            class="btn btn-ghost btn-xs"
+                            hx-get="{% url 'pas:followup-add' activity.pk %}"
+                            hx-target="#pas-modal-content"
+                            hx-swap="innerHTML">
+                      Seguimiento
+                    </button>
+                    <button type="button"
+                            class="btn btn-ghost btn-xs"
+                            hx-get="{% url 'pas:activity-edit' activity.pk %}"
+                            hx-target="#pas-modal-content"
+                            hx-swap="innerHTML">
+                      Editar
+                    </button>
+                    <button type="button"
+                            class="btn btn-ghost btn-xs text-error"
+                            hx-get="{% url 'pas:activity-delete' activity.pk %}"
+                            hx-target="#pas-modal-content"
+                            hx-swap="innerHTML">
+                      Eliminar
+                    </button>
+                  {% else %}
+                    <span class="text-xs text-base-content/50">Plan cerrado</span>
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+            {% endwith %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="alert alert-info">
+      <div>
+        <h3 class="font-semibold">No hay actividades registradas</h3>
+        <p class="text-sm">Agrega la primera para comenzar a dar seguimiento al plan.</p>
+      </div>
+    </div>
+  {% endif %}
+</div>
