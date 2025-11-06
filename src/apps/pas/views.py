@@ -1,3 +1,4 @@
+from django.http import HttpResponse
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, DetailView
 from django.db.models import OuterRef, Subquery
@@ -49,12 +50,28 @@ class PASAdd(CreateView):
     template_name = 'pas/add.html'
     success_url = reverse_lazy('pas:index')
 
+    def dispatch(self, request, *args, **kwargs):
+        if request.headers.get('HX-Request') and request.GET.get('close'):
+            return HttpResponse('')
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_template_names(self):
+        if self.request.headers.get('HX-Request'):
+            return ['pas/partials/_plan_form.html']
+        return super().get_template_names()
+
     def form_valid(self, form):
-        obj = form.save(commit=False)
-        obj.user = self.request.user  # Asignar el usuario actual
-        print(f'-- Este es el usuario: {obj.user}')
-        obj.save()
-        return super().form_valid(form)
+        form.instance.user = self.request.user
+        response = super().form_valid(form)
+        if self.request.headers.get('HX-Request'):
+            redirect_url = str(self.get_success_url())
+            return HttpResponse('', status=204, headers={'HX-Redirect': redirect_url})
+        return response
+
+    def form_invalid(self, form):
+        if self.request.headers.get('HX-Request'):
+            return self.render_to_response(self.get_context_data(form=form), status=422)
+        return super().form_invalid(form)
 
 
 class PASDetail(DetailView):

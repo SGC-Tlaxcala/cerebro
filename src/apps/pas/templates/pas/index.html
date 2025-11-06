@@ -20,13 +20,24 @@
           </p>
         </div>
       </div>
-      <div class="flex items-center gap-2">
-        <span class="badge badge-outline badge-primary badge-lg">PAS</span>
-        {% now "d/m/Y H:i" as current_timestamp %}
-        <span class="text-sm text-base-content/60">Última actualización · {{ current_timestamp }}</span>
+      <div class="flex flex-col items-end gap-3 text-right">
+        <div class="flex items-center gap-2">
+          <span class="badge badge-outline badge-primary badge-lg">PAS</span>
+          {% now "d/m/Y H:i" as current_timestamp %}
+          <span class="text-sm text-base-content/60">Última actualización · {{ current_timestamp }}</span>
+        </div>
+        <button type="button"
+                class="btn btn-primary btn-sm"
+                hx-get="{% url 'pas:add' %}"
+                hx-target="#pas-form-container"
+                hx-swap="innerHTML">
+          Agregar plan de acción
+        </button>
       </div>
     </div>
   </header>
+
+  <div id="pas-form-container" class="space-y-6"></div>
 
   <div class="mx-auto max-w-5xl">
     <div role="tablist" class="tabs tabs-boxed w-full justify-center" id="pas-tabs">

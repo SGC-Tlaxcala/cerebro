@@ -1,82 +1,18 @@
 {% extends 'cerebro/base.html' %}
 {% load static %}
-{% load crispy_forms_tags %}
-
-{% block header %}
-  <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.0/themes/base/jquery-ui.css">
-{% endblock header %}
-
-{% block footer %}
-  <script src="/assets/tinymce/tinymce.min.js"></script>
-  <script src="https://code.jquery.com/ui/1.14.0/jquery-ui.js"></script>
-  {{ form.media }}
-  <script>
-    $( function() {
-      $( ".dateinput" ).datepicker();
-      $( ".dateinput" ).datepicker( "option", "showAnim", "slide" );
-      $(".dateinput").datepicker( "option", "dateFormat", "dd/mm/yy" );
-    } );
-
-    $(function(){
-        $('#id_fuente').change(function(){
-            if ($(this).val() == '9') { // Si la opción seleccionada es "Otros"
-                $('#id_otra_fuente').prop('disabled', false); // Habilitar el campo de texto
-            } else {
-                $('#id_otra_fuente').prop('disabled', true); // Deshabilitar el campo de texto
-            }
-        });
-    });
-
-    $(document).ready(function(){
-        // Obtener la fecha y hora actual
-        let currentDate = new Date()
-
-        // Formatear la fecha y hora a 'YYYY-MM-DD HH:MM:SS+00:00'
-        let formattedDate = currentDate.getFullYear() + '-' +
-            ('0' + (currentDate.getMonth() + 1)).slice(-2) + '-' +
-            ('0' + currentDate.getDate()).slice(-2) + ' ' +
-            ('0' + currentDate.getHours()).slice(-2) + ':' +
-            ('0' + currentDate.getMinutes()).slice(-2) + ':' +
-            ('0' + currentDate.getSeconds()).slice(-2) + '+00:00';
-
-        // Establecer el valor del input
-        $('#initial-id_fecha_llenado').val(formattedDate)
-    });
-
-    $(document).ready(function(){
-      $('#descripcion_cnc, #descripcion_pcm, #tabs').hide();
-      $('#id_documento').change(function(){
-        let selectedValue = $(this).val();
-        if (selectedValue == '1') {
-          // Mostrar descripcion_cnc
-          $('#descripcion_pcm').hide()
-          $('#descripcion_cnc, #tabs').show();
-        } else if (selectedValue == '2') {
-          // Mostrar descripcion_pcm
-          $('#descripcion_cnc').hide()
-          $('#descripcion_pcm, #tabs').show();
-        } else {
-          $('#descripcion_cnc, #descripcion_pcm, #tabs').hide();
-        }
-      });
-    });
-  </script>
-{% endblock footer %}
+{% block title %}Nuevo Plan de Acción{% endblock %}
 
 {% block content %}
+<section class="space-y-8">
+  <header class="space-y-2">
+    <h1 class="text-3xl font-bold text-base-content">Capturar plan de acción</h1>
+    <p class="text-base text-base-content/70 max-w-3xl">
+      Completa los campos requeridos para registrar un nuevo plan de acción dentro del sistema.
+    </p>
+  </header>
 
-
-<div class="row">
-  <div class="col-md-12">
-    <div class="page-header">
-      <h1><i class="fa fa-bug"></i> Agregar un nuevo plan - {{ request.user.id }}</h1>
-    </div>
+  <div id="pas-form-container">
+    {% include 'pas/partials/_plan_form.html' %}
   </div>
-  <div class="row">
-    {% crispy form %}
-  </div>
-</div>
-
-
-
+</section>
 {% endblock content %}
