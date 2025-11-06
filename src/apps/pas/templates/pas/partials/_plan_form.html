@@ -51,7 +51,7 @@
       </div>
     </div>
 
-    <section id="pas-section-cnc" class="space-y-4 rounded-2xl border border-base-300 bg-base-200/40 p-6">
+    <section id="pas-section-cnc" class="space-y-4 rounded-2xl border border-base-300 bg-base-200/40 p-6 hidden">
       <header class="space-y-1">
         <h3 class="text-lg font-semibold text-base-content">Descripción de la No Conformidad / Riesgo</h3>
         <p class="text-sm text-base-content/70">Completa estos campos cuando el plan derive de una CNC.</p>
@@ -95,7 +95,7 @@
       </div>
     </section>
 
-    <section id="pas-section-pcm" class="space-y-4 rounded-2xl border border-base-300 bg-base-200/40 p-6">
+    <section id="pas-section-pcm" class="space-y-4 rounded-2xl border border-base-300 bg-base-200/40 p-6 hidden">
       <header class="space-y-1">
         <h3 class="text-lg font-semibold text-base-content">Plan de Cambios y Mejoras al SGC</h3>
         <p class="text-sm text-base-content/70">Completa estos campos cuando el plan sea un PCM.</p>
@@ -225,16 +225,20 @@
 
       function toggleSections() {
         const value = documentoField ? documentoField.value : null;
-        if (!value) return;
+        if (!value) {
+          cncSection?.classList.add('hidden');
+          pcmSection?.classList.add('hidden');
+          return;
+        }
         if (value === '1') {
-          cncSection?.classList.remove('opacity-50');
-          pcmSection?.classList.add('opacity-50');
+          cncSection?.classList.remove('hidden');
+          pcmSection?.classList.add('hidden');
         } else if (value === '2') {
-          cncSection?.classList.add('opacity-50');
-          pcmSection?.classList.remove('opacity-50');
+          cncSection?.classList.add('hidden');
+          pcmSection?.classList.remove('hidden');
         } else {
-          cncSection?.classList.remove('opacity-50');
-          pcmSection?.classList.remove('opacity-50');
+          cncSection?.classList.remove('hidden');
+          pcmSection?.classList.remove('hidden');
         }
       }
 

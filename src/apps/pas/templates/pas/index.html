@@ -41,7 +41,7 @@
 
   <div id="pas-form-container" class="space-y-6"></div>
 
-  <div class="mx-auto max-w-5xl">
+  <div id="pas-list-container" class="mx-auto max-w-5xl">
     <div role="tablist" class="tabs tabs-boxed w-full justify-center" id="pas-tabs">
       <button role="tab" class="tab tab-lg tab-active" data-target="actions-panel">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
@@ -280,11 +280,13 @@
 
     const addButton = document.getElementById('pas-add-button');
     const formContainer = document.getElementById('pas-form-container');
+    const listContainer = document.getElementById('pas-list-container');
 
     function updateAddButtonState() {
-      if (!addButton || !formContainer) return;
+      if (!addButton || !formContainer || !listContainer) return;
       const hasContent = formContainer.innerHTML.trim().length > 0;
       addButton.disabled = hasContent;
+      listContainer.classList.toggle('hidden', hasContent);
     }
 
     updateAddButtonState();
@@ -353,8 +355,10 @@
     });
 
     document.body.addEventListener('htmx:beforeRequest', function (evt) {
+      if (!addButton || !formContainer || !listContainer) return;
       if (evt.target && evt.target === addButton) {
         addButton.disabled = true;
+        listContainer.classList.add('hidden');
       }
     });
   })();
