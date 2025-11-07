@@ -151,20 +151,26 @@ class Accion(TrackingFields):
         verbose_name = _(u'Actividad')
         verbose_name_plural = _('Actividades')
 
+    def _latest_seguimiento(self):
+        return self.seguimiento_set.order_by('-fecha', '-created').first()
+
     @property
     def estado(self):
-        return self.seguimiento_set.latest().estado
+        latest = self._latest_seguimiento()
+        return latest.estado if latest else None
 
     @property
     def get_estado(self):
         """Regresa el estado de una acción correctiva, de acuerdo al último seguimiento capturado."""
-        if self.seguimiento_set.count() == 0:
-            if self.fecha_fin >= datetime.date.today():
-                return 'Abierta en Tiempo'
-            else:
-                return 'Abierta Fuera de Tiempo'
-        else:
-            return self.seguimiento_set.latest().get_estado_display()
+        latest = self._latest_seguimiento()
+        if latest and latest.estado == CERRADA:
+            return 'Cerrada'
+
+        fecha_limite = self.fecha_fin
+        hoy = datetime.date.today()
+        if fecha_limite and fecha_limite < hoy:
+            return 'Abierta Fuera de Tiempo'
+        return 'Abierta en Tiempo'
 
     def __str__(self):
         return f'{self.id} - {self.plan}: {self.get_estado}'

@@ -31,7 +31,20 @@
             <th class="w-32 text-center">Fecha compromiso</th>
             <th class="w-32 text-center">Responsable</th>
             <th class="w-32 text-center">Seguimiento</th>
-            <th class="w-32 text-center">Estado</th>
+            <th class="w-32 text-center">
+              <span class="inline-flex items-center justify-center gap-1">
+                <span>Estado</span>
+                <button type="button"
+                        class="btn btn-ghost btn-xs btn-circle text-base-content/70"
+                        aria-label="Ver leyenda de estados"
+                        onclick="document.getElementById('estado-legend-dialog').showModal()">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093v.75m0 3.75h.008v.008H12v-.008Z" />
+                    <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5" />
+                  </svg>
+                </button>
+              </span>
+            </th>
             <th class="w-32 text-center">Acciones</th>
           </tr>
         </thead>
@@ -64,15 +77,11 @@
                 </button>
               </td>
               <td class="text-center">
-                {% if estado == 'Cerrada' %}
-                  <span class="badge badge-success badge-outline badge-lg min-h-[3.125rem] items-center px-4 text-center">{{ estado }}</span>
-                {% elif estado == 'Abierta en Tiempo' %}
-                  <span class="badge badge-warning badge-outline text-warning-content badge-lg min-h-[3.125rem] items-center px-4 text-center">{{ estado }}</span>
-                {% elif estado == 'Abierta Fuera de Tiempo' %}
-                  <span class="badge badge-error badge-outline badge-lg min-h-[3.125rem] items-center px-4 text-center">{{ estado }}</span>
-                {% else %}
-                  <span class="badge badge-neutral badge-outline badge-lg min-h-[3.125rem] items-center px-4 text-center">{{ estado }}</span>
-                {% endif %}
+                {% with badge=item.badge %}
+                  <span class="badge badge-lg min-h-[3.125rem] items-center px-4 text-center {{ badge.classes }}" title="{{ badge.title }}">
+                    {{ badge.text }}
+                  </span>
+                {% endwith %}
               </td>
               <td class="text-center">
                 <div class="flex flex-col items-center gap-2">
@@ -111,3 +120,35 @@
     </div>
   {% endif %}
 </div>
+
+<dialog id="estado-legend-dialog" class="modal">
+  <div class="modal-box max-w-md space-y-4">
+    <h3 class="text-lg font-semibold text-base-content">Leyenda de estados</h3>
+    <ul class="space-y-2 text-sm text-base-content/80">
+      <li class="flex items-center gap-2">
+        <span class="badge badge-warning badge-outline text-warning-content">Abierta</span>
+        <span>Actividad abierta dentro del tiempo comprometido.</span>
+      </li>
+      <li class="flex items-center gap-2">
+        <span class="badge badge-error text-error-content">Abierta</span>
+        <span>Actividad abierta fuera del tiempo comprometido.</span>
+      </li>
+      <li class="flex items-center gap-2">
+        <span class="badge badge-success text-success-content">Cerrada</span>
+        <span>Actividad cerrada en tiempo.</span>
+      </li>
+      <li class="flex items-center gap-2">
+        <span class="badge badge-success badge-outline text-success">Cerrada</span>
+        <span>Actividad cerrada fuera de tiempo.</span>
+      </li>
+    </ul>
+    <div class="text-right">
+      <form method="dialog">
+        <button type="submit" class="btn btn-primary btn-sm">Entendido</button>
+      </form>
+    </div>
+  </div>
+  <form method="dialog" class="modal-backdrop">
+    <button aria-label="Cerrar">Cerrar</button>
+  </form>
+</dialog>

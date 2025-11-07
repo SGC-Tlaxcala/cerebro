@@ -192,19 +192,19 @@
                 <td class="text-center text-base-content/80">
                   <div class="flex flex-wrap items-center justify-center gap-2">
                     <span class="badge badge-success badge-sm gap-1" title="Actividades cerradas">
-                      <span class="font-semibold">{{ plan.cerradas }}</span>
+                      <span class="font-semibold">{{ plan.cerradas|default_if_none:0 }}</span>
                       <span>Cerradas</span>
                     </span>
                     <span class="badge badge-warning badge-sm text-warning-content gap-1" title="Actividades en tiempo">
-                      <span class="font-semibold">{{ plan.abiertas_en_tiempo }}</span>
+                      <span class="font-semibold">{{ plan.abiertas_en_tiempo|default_if_none:0 }}</span>
                       <span>En tiempo</span>
                     </span>
                     <span class="badge badge-error badge-sm gap-1" title="Actividades fuera de tiempo">
-                      <span class="font-semibold">{{ plan.abiertas_fuera_de_tiempo }}</span>
+                      <span class="font-semibold">{{ plan.abiertas_fuera_de_tiempo|default_if_none:0 }}</span>
                       <span>Fuera de tiempo</span>
                     </span>
                     <span class="badge badge-outline badge-primary badge-sm gap-1" title="Total de actividades">
-                      <span class="font-semibold">{{ plan.total_actividades }}</span>
+                      <span class="font-semibold">{{ plan.accion_set.count }}</span>
                       <span>Total</span>
                     </span>
                   </div>

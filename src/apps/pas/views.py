@@ -19,7 +19,7 @@ from django.views.generic import (
 )
 
 from .forms import PlanForm, AccionForm, SeguimientoForm, PlanClosureForm
-from .models import Plan, Accion, Seguimiento
+from .models import Plan, Accion, Seguimiento, CERRADA
 
 
 def hx_trigger_header(*events):
@@ -192,16 +192,56 @@ class PlanActivitiesView(DetailView):
                 return 2
             return 1
 
+        def build_estado_badge(estado, closed_in_time):
+            if estado == 'Abierta Fuera de Tiempo':
+                return {
+                    'classes': 'badge-error text-error-content',
+                    'text': 'Abierta',
+                    'title': 'Abierta fuera de tiempo',
+                }
+            if estado == 'Abierta en Tiempo':
+                return {
+                    'classes': 'badge-warning badge-outline text-warning-content',
+                    'text': 'Abierta',
+                    'title': 'Abierta en tiempo',
+                }
+            if estado == 'Cerrada':
+                if closed_in_time is False:
+                    return {
+                        'classes': 'badge-success badge-outline text-success',
+                        'text': 'Cerrada',
+                        'title': 'Cerrada fuera de tiempo',
+                    }
+                return {
+                    'classes': 'badge-success text-success-content',
+                    'text': 'Cerrada',
+                    'title': 'Cerrada en tiempo',
+                }
+            return {
+                'classes': 'badge-neutral badge-outline',
+                'text': estado or 'Sin estado',
+                'title': estado or 'Sin estado',
+            }
+
         activities = []
         for activity in plan.accion_set.prefetch_related(followups_prefetch).order_by('fecha_fin', 'id'):
             estado = activity.get_estado
             followups = list(activity.seguimiento_set.all())
+            closure_followup = next((f for f in followups if f.estado == CERRADA), None)
+            closed_in_time = None
+            if closure_followup:
+                if activity.fecha_fin:
+                    closed_in_time = closure_followup.fecha <= activity.fecha_fin
+                else:
+                    closed_in_time = True
             activities.append({
                 'activity': activity,
                 'estado': estado,
                 'estado_priority': state_priority(estado),
                 'followup_count': len(followups),
                 'latest_followup': followups[0] if followups else None,
+                'closed_in_time': closed_in_time,
+                'badge': build_estado_badge(estado, closed_in_time),
             })
         activities.sort(key=lambda item: (item['estado_priority'], item['activity'].fecha_fin or date.max, item['activity'].pk))
         can_modify = not (plan.eliminacion or plan.recurrencia)
