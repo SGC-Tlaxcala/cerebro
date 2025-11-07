@@ -19,7 +19,7 @@
             {{ seguimiento.descripcion|safe }}
           </div>
           {% if seguimiento.responsable %}
-            <p class="text-xs text-base-content/60"><span class="font-semibold">Responsable:</span> {{ seguimiento.responsable }}</p>
+            <p class="text-xs text-base-content/60"><span class="font-semibold">Responsable:</span> {{ seguimiento.responsable_display }}</p>
           {% endif %}
           {% if seguimiento.evidencia %}
             <a class="link link-primary text-xs" href="{{ seguimiento.evidencia.url }}" target="_blank">Ver evidencia</a>

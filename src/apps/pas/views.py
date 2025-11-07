@@ -51,7 +51,7 @@ class PASIndex(ListView):
             return 1
 
         action_items = []
-        action_qs = Accion.objects.select_related('plan').annotate(
+        action_qs = Accion.objects.select_related('plan', 'responsable').annotate(
             latest_estado=Subquery(latest_estado)
         ).prefetch_related('seguimiento_set')
 
@@ -75,7 +75,7 @@ class PASIndex(ListView):
             abiertas_en_tiempo = 0
             abiertas_fuera_de_tiempo = 0
 
-            for accion in plan.accion_set.all():
+            for accion in plan.accion_set.select_related('responsable'):
                 estado = accion.get_estado
                 if estado == 'Cerrada':
                     cerradas += 1
@@ -180,7 +180,8 @@ class PlanActivitiesView(DetailView):
         context = super().get_context_data(**kwargs)
         plan = self.object
         followups_prefetch = Prefetch(
-            'seguimiento_set', queryset=Seguimiento.objects.order_by('-fecha', '-created')
+            'seguimiento_set',
+            queryset=Seguimiento.objects.select_related('responsable').order_by('-fecha', '-created'),
         )
 
         def state_priority(estado):
@@ -224,7 +225,11 @@ class PlanActivitiesView(DetailView):
             }
 
         activities = []
-        for activity in plan.accion_set.prefetch_related(followups_prefetch).order_by('fecha_fin', 'id'):
+        for activity in (
+            plan.accion_set.select_related('responsable')
+            .prefetch_related(followups_prefetch)
+            .order_by('fecha_fin', 'id')
+        ):
             estado = activity.get_estado
             followups = list(activity.seguimiento_set.all())
             closure_followup = next((f for f in followups if f.estado == CERRADA), None)
@@ -480,7 +485,7 @@ class FollowUpListView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        followups = self.object.seguimiento_set.order_by('-fecha', '-created')
+        followups = self.object.seguimiento_set.select_related('responsable').order_by('-fecha', '-created')
         context.update({
             'activity': self.object,
             'followups': followups,

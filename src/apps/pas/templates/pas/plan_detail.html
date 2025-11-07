@@ -30,10 +30,19 @@
   </form>
 </dialog>
 
+<dialog id="profiles-user-modal" class="modal">
+  <div class="modal-box max-w-xl space-y-4" id="profiles-user-modal-content"></div>
+  <form method="dialog" class="modal-backdrop">
+    <button aria-label="Cerrar">Cerrar</button>
+  </form>
+</dialog>
+
 <script>
   (function () {
     const modal = document.getElementById('pas-modal');
     const modalContent = document.getElementById('pas-modal-content');
+    const userModal = document.getElementById('profiles-user-modal');
+    const userModalContent = document.getElementById('profiles-user-modal-content');
 
     function closeModal() {
       if (!modal.open) return;
@@ -48,10 +57,23 @@
     });
 
     document.body.addEventListener('pas:close-modal', closeModal);
+    document.body.addEventListener('profiles:close-modal', function () {
+      if (userModal.open) {
+        userModal.close();
+        userModalContent.innerHTML = '';
+      }
+    });
 
     document.body.addEventListener('click', function (evt) {
       const closeTrigger = evt.target.closest('[data-close-modal]');
-      if (closeTrigger) {
+      if (!closeTrigger) return;
+      const modalId = closeTrigger.dataset.closeModal || 'pas-modal';
+      if (modalId === 'profiles-user-modal') {
+        if (userModal.open) {
+          userModal.close();
+          userModalContent.innerHTML = '';
+        }
+      } else {
         closeModal();
       }
     });
@@ -59,12 +81,36 @@
     document.body.addEventListener('htmx:beforeRequest', function (evt) {
       if (evt.detail && evt.detail.requestConfig) {
         const swapTarget = evt.detail.requestConfig.target;
-        if (swapTarget && swapTarget.id === 'pas-modal-content') {
-          if (!modal.open) {
-            modal.showModal();
-          }
+        if (swapTarget && swapTarget.id === 'pas-modal-content' && !modal.open) {
+          modal.showModal();
+        }
+        if (swapTarget && swapTarget.id === 'profiles-user-modal-content' && !userModal.open) {
+          userModal.showModal();
         }
       }
+    });
+
+    document.body.addEventListener('htmx:afterSwap', function (evt) {
+      if (evt.target === userModalContent && !userModal.open) {
+        userModal.showModal();
+      }
+    });
+
+    document.body.addEventListener('pas:user-created', function (evt) {
+      const detail = evt.detail || {};
+      if (!detail.id) return;
+      const select = modalContent.querySelector('#id_responsable');
+      if (!select) return;
+      const value = String(detail.id);
+      let option = Array.from(select.options).find(opt => opt.value === value);
+      if (!option) {
+        option = document.createElement('option');
+        option.value = value;
+        option.textContent = detail.label || detail.email || 'Nuevo usuario';
+        select.appendChild(option);
+      }
+      select.value = value;
+      select.dispatchEvent(new Event('change', { bubbles: true }));
     });
   })();
 </script>

@@ -1,4 +1,5 @@
 from django import forms
+from django.contrib.auth import get_user_model
 from django.forms import (
     TextInput,
     NumberInput,
@@ -14,6 +15,9 @@ from django.forms import (
 )
 
 from .models import Plan, Accion, Seguimiento
+
+
+User = get_user_model()
 
 
 WIDGET_CLASS_MAP = {
@@ -39,6 +43,14 @@ def apply_tailwind_widgets(form):
                 existing = widget.attrs.get('class', '')
                 widget.attrs['class'] = f'{existing} {css_class}'.strip()
                 break
+
+
+class ResponsableChoiceField(forms.ModelChoiceField):
+    def label_from_instance(self, obj):
+        full_name = (obj.get_full_name() or '').strip()
+        if full_name:
+            return full_name
+        return obj.email or obj.username
 
 
 class PlanForm(forms.ModelForm):
@@ -71,6 +83,12 @@ class PlanForm(forms.ModelForm):
 
 
 class AccionForm(forms.ModelForm):
+    responsable = ResponsableChoiceField(
+        queryset=User.objects.order_by('first_name', 'last_name', 'email'),
+        required=False,
+        label='Responsable',
+    )
+
     class Meta:
         model = Accion
         exclude = ['user', 'plan']
@@ -81,10 +99,18 @@ class AccionForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields['responsable'].empty_label = 'Selecciona un responsable'
         apply_tailwind_widgets(self)
 
 
 class SeguimientoForm(forms.ModelForm):
+    responsable = ResponsableChoiceField(
+        queryset=User.objects.order_by('first_name', 'last_name', 'email'),
+        required=False,
+        label='Responsable',
+        help_text='Persona responsable de la actualización',
+    )
+
     class Meta:
         model = Seguimiento
         exclude = ['user', 'accion']
@@ -94,6 +120,7 @@ class SeguimientoForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields['responsable'].empty_label = 'Selecciona un responsable'
         apply_tailwind_widgets(self)
 
 

@@ -23,7 +23,7 @@
       <span class="badge badge-outline badge-secondary">Seguimientos {{ accion.seguimiento_set.count }}</span>
     </div>
     <p class="text-sm text-base-content/70">
-      Responsable: <span class="font-semibold text-base-content">{{ accion.responsable|default:'No asignado' }}</span>
+      Responsable: <span class="font-semibold text-base-content">{{ accion.responsable_display|default:'No asignado' }}</span>
     </p>
   </header>
 
@@ -88,13 +88,13 @@
               </tr>
             </thead>
             <tbody class="text-sm">
-              {% for seguimiento in seguimientos %}
+              {% for seguimiento in seguimientos|dictsortreversed:'fecha' %}
                 <tr class="align-top">
                   <td class="text-center text-base-content/70">{{ seguimiento.id }}</td>
                   <td class="prose prose-sm max-w-none text-base-content/80">{{ seguimiento.descripcion|safe }}</td>
                   <td class="text-center text-base-content/80">{{ seguimiento.fecha|date:"d/m/Y" }}</td>
                   <td class="text-center text-base-content/80">{{ seguimiento.get_estado_display }}</td>
-                  <td class="text-center text-base-content/80">{{ seguimiento.responsable|default:'—' }}</td>
+                  <td class="text-center text-base-content/80">{{ seguimiento.responsable_display|default:'—' }}</td>
                   <td class="text-center">
                     {% if seguimiento.evidencia %}
                       <a class="link link-primary text-sm"
