@@ -61,17 +61,26 @@ class SatisfaccionAPIView(APIView):
         mac_filter = mac_param or None
         now = timezone.now()
         year = now.year
-        qs = RespuestaEncuesta.objects.filter(created_at__year=year)
+        base_queryset = RespuestaEncuesta.objects.all()
         selected_distrito = None
 
         if mac_filter:
-            qs = qs.filter(mac=mac_filter)
+            base_queryset = base_queryset.filter(mac=mac_filter)
         elif distrito and distrito != '0':
             try:
                 selected_distrito = int(distrito)
-                qs = qs.filter(distrito=selected_distrito)
+                base_queryset = base_queryset.filter(distrito=selected_distrito)
             except ValueError:
                 return Response({"error": "Invalid district parameter."}, status=status.HTTP_400_BAD_REQUEST)
+
+        qs = base_queryset.filter(created_at__year=year)
+        if not qs.exists():
+            latest_entry = base_queryset.order_by('-created_at').first()
+            if latest_entry:
+                year = latest_entry.created_at.year
+                qs = base_queryset.filter(created_at__year=year)
+            else:
+                qs = base_queryset.none()
 
         result = {}
         total_responses = qs.count()
