@@ -26,20 +26,13 @@
           {% now "d/m/Y H:i" as current_timestamp %}
           <span class="text-sm text-base-content/60">Última actualización · {{ current_timestamp }}</span>
         </div>
-        <button type="button"
-                id="pas-add-button"
-                class="btn btn-primary btn-sm w-full"
-                hx-get="{% url 'pas:add' %}"
-                hx-target="#pas-form-container"
-                hx-swap="innerHTML"
-                {% if request.resolver_match.url_name == 'add' %}disabled{% endif %}>
+        <a href="{% url 'pas:add' %}"
+           class="btn btn-primary btn-sm w-full">
           Agregar plan de acción
-        </button>
+        </a>
       </div>
     </div>
   </header>
-
-  <div id="pas-form-container" class="space-y-6"></div>
 
   <div id="pas-list-container" class="mx-auto max-w-5xl">
     <div role="tablist" class="tabs tabs-boxed w-full justify-center" id="pas-tabs">
@@ -269,22 +262,10 @@
 
     setActiveTab('actions-panel');
 
-    const addButton = document.getElementById('pas-add-button');
-    const formContainer = document.getElementById('pas-form-container');
-    const listContainer = document.getElementById('pas-list-container');
     const modal = document.getElementById('pas-modal');
     const modalContent = document.getElementById('pas-modal-content');
     const userModal = document.getElementById('profiles-user-modal');
     const userModalContent = document.getElementById('profiles-user-modal-content');
-
-    function updateAddButtonState() {
-      if (!addButton || !formContainer || !listContainer) return;
-      const hasContent = formContainer.innerHTML.trim().length > 0;
-      addButton.disabled = hasContent;
-      listContainer.classList.toggle('hidden', hasContent);
-    }
-
-    updateAddButtonState();
 
     function closePasModal() {
       if (!modal.open) return;
@@ -360,18 +341,7 @@
       }
     });
 
-    document.body.addEventListener('htmx:afterSwap', function (evt) {
-      if (evt.target && evt.target.id === 'pas-form-container') {
-        updateAddButtonState();
-      }
-    });
-
     document.body.addEventListener('htmx:beforeRequest', function (evt) {
-      if (!addButton || !formContainer || !listContainer) return;
-      if (evt.target && evt.target === addButton) {
-        addButton.disabled = true;
-        listContainer.classList.add('hidden');
-      }
       if (evt.detail && evt.detail.requestConfig) {
         const target = evt.detail.requestConfig.target;
         if (target && target.id === 'pas-modal-content' && !modal.open) {
