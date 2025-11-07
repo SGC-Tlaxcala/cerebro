@@ -1,60 +1,123 @@
-{% load pas_tags %}
-<div class="modal-header">
-  <h4 class="modal-title">{{ accion.plan.folio }} <small>Actividad de Seguimiento: {{ accion.id }}</small></h4>
-</div>
-<div class="modal-body">
-<div class="row">
-  <div class="col-12">{{ accion.accion|safe }}</div>
-    <pre>{{ accion.seguimiento_set.latest.estado }}</pre>
-</div>
+<div class="space-y-6">
+  <header class="rounded-2xl border border-base-300 bg-base-100 p-5 shadow-sm space-y-2">
+    <p class="text-sm text-base-content/60">Plan {{ accion.plan.folio }}</p>
+    <div class="flex flex-wrap items-baseline gap-3">
+      <h2 class="text-2xl font-semibold text-base-content flex items-center gap-2">
+        Actividad {{ accion.id }}
+      </h2>
+      <span class="badge badge-outline badge-primary">{{ accion.plan.get_documento_display }}</span>
+    </div>
+    <div class="flex flex-wrap items-center gap-2 text-sm">
+      <span class="badge badge-lg min-h-[2.25rem] items-center px-4 text-center
+                   {% if accion.get_estado == 'Cerrada' %}
+                     badge-success text-success-content
+                   {% elif accion.get_estado == 'Abierta en Tiempo' %}
+                     badge-warning badge-outline text-warning-content
+                   {% elif accion.get_estado == 'Abierta Fuera de Tiempo' %}
+                     badge-error text-error-content
+                   {% else %}
+                     badge-neutral badge-outline
+                   {% endif %}">
+        {{ accion.get_estado }}
+      </span>
+      <span class="badge badge-outline badge-secondary">Seguimientos {{ accion.seguimiento_set.count }}</span>
+    </div>
+    <p class="text-sm text-base-content/70">
+      Responsable: <span class="font-semibold text-base-content">{{ accion.responsable|default:'No asignado' }}</span>
+    </p>
+  </header>
 
-<div class="row mb-3">
-  <div class="col-6"><strong>Fecha de Inicio</strong> {{ accion.fecha_inicio|date:"d/m/Y" }}</div>
-  <div class="col-6"><strong>Fecha de Finalización</strong> {{ accion.fecha_fin|date:"d/m/Y" }}</div>
-  <div class="col-6"><strong>Responsable</strong> {{ accion.responsable }}</div>
-  <div class="col-6"><strong>Estado</strong> {{ accion.get_estado }}</div>
-  <div class="col-3"><strong>Evidencia solicitada</strong></div>
-  <div class="col-9">{% if accion.evidencia %}{{ accion.evidencia }}{% endif %}</div>
-</div>
+  <section class="rounded-2xl border border-base-300 bg-base-100 p-6 shadow-sm space-y-4">
+    <h3 class="text-lg font-semibold text-base-content">Descripción de la actividad</h3>
+    <div class="prose prose-sm max-w-none text-base-content/80">
+      {{ accion.accion|safe }}
+    </div>
+    {% if accion.evidencia %}
+      <div class="text-sm">
+        <span class="font-semibold text-base-content">Evidencia solicitada:</span>
+        <span class="text-base-content/80">{{ accion.evidencia }}</span>
+      </div>
+    {% endif %}
+    <dl class="grid gap-4 text-sm text-base-content/80 md:grid-cols-2">
+      <div>
+        <dt class="font-semibold text-base-content">Fecha de inicio</dt>
+        <dd>{{ accion.fecha_inicio|date:"d/m/Y"|default:"—" }}</dd>
+      </div>
+      <div>
+        <dt class="font-semibold text-base-content">Fecha compromiso</dt>
+        <dd>{{ accion.fecha_fin|date:"d/m/Y"|default:"—" }}</dd>
+      </div>
+    </dl>
+  </section>
 
-{% if accion.seguimiento_set.count == 0 %}
-    <h4 class="text-center text-danger">No hay seguimientos registrados</h4>
-{% else %}
-  <table class="table table-bordered table-hover">
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Descripción</th>
-        <th>Fecha</th>
-        <th>Estado</th>
-        <th>Responsable</th>
-        <th>Evidencia</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for s in accion.seguimiento_set.all %}
-      <tr>
-        <td class="text-center align-middle">{{ s.id }}</td>
-        <td class="align-middle">{{ s.descripcion|safe }}</td>
-        <td class="text-center align-middle">{{ s.fecha|date:"d/m/Y" }}</td>
-        <td class="text-center align-middle">{{ s.get_estado_display }}</td>
-        <td class="text-center align-middle">{{ s.responsable }}</td>
-        <td class="text-center align-middle">
-          {% if s.evidencia %}
-            {% if s.evidencia.url|endswith:".pdf" %}
-              <a href="{{ s.evidencia.url }}" target="_blank">
-                <i class="fa fa-download" aria-hidden="true" data-bs-toggle="tooltip" title="Ver Evidencia"></i>
-              </a>
-            {% else %}
-              <a href="https://docs.google.com/viewer?url=https://sgctlaxcala.com{{ s.evidencia.url }}" target="_blank">
-                <i class="fa fa-download" aria-hidden="true" data-bs-toggle="tooltip" title="Ver Evidencia"></i>
-              </a>
-            {% endif %}
-          {% endif %}
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-{% endif %}
+  <section class="space-y-3">
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <div>
+        <h3 class="text-lg font-semibold text-base-content">Seguimientos</h3>
+        <p class="text-sm text-base-content/70">Historial ordenado del más reciente al más antiguo.</p>
+      </div>
+      <div class="flex flex-wrap items-center gap-2">
+        <button type="button"
+                class="btn btn-primary btn-sm"
+                hx-get="{% url 'pas:followup-add' accion.pk %}"
+                hx-target="#pas-modal-content"
+                hx-swap="innerHTML">
+          Agregar seguimiento
+        </button>
+        <button type="button"
+                class="btn btn-ghost btn-sm"
+                data-close-modal="pas-modal">
+          Cerrar
+        </button>
+      </div>
+    </div>
+
+    {% with accion.seguimiento_set.all as seguimientos %}
+    {% if seguimientos %}
+      <div class="rounded-2xl border border-base-300 bg-base-100 shadow-sm">
+        <div class="overflow-x-auto">
+          <table class="table table-zebra">
+            <thead class="text-xs uppercase text-base-content/60">
+              <tr>
+                <th class="text-center">ID</th>
+                <th>Descripción</th>
+                <th class="text-center">Fecha</th>
+                <th class="text-center">Estado</th>
+                <th class="text-center">Responsable</th>
+                <th class="text-center">Evidencia</th>
+              </tr>
+            </thead>
+            <tbody class="text-sm">
+              {% for seguimiento in seguimientos %}
+                <tr class="align-top">
+                  <td class="text-center text-base-content/70">{{ seguimiento.id }}</td>
+                  <td class="prose prose-sm max-w-none text-base-content/80">{{ seguimiento.descripcion|safe }}</td>
+                  <td class="text-center text-base-content/80">{{ seguimiento.fecha|date:"d/m/Y" }}</td>
+                  <td class="text-center text-base-content/80">{{ seguimiento.get_estado_display }}</td>
+                  <td class="text-center text-base-content/80">{{ seguimiento.responsable|default:'—' }}</td>
+                  <td class="text-center">
+                    {% if seguimiento.evidencia %}
+                      <a class="link link-primary text-sm"
+                         href="{{ seguimiento.evidencia.url }}"
+                         target="_blank"
+                         rel="noopener">
+                        Ver evidencia
+                      </a>
+                    {% else %}
+                      <span class="text-base-content/40">—</span>
+                    {% endif %}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    {% else %}
+      <div class="alert alert-info">
+        <span>No se han registrado seguimientos para esta actividad.</span>
+      </div>
+    {% endif %}
+    {% endwith %}
+  </section>
 </div>
