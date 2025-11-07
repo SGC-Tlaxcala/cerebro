@@ -1,47 +1,89 @@
-{% extends 'base.html' %}
-{% load crispy_forms_tags %}
-{% load static %}
+{% extends 'cerebro/base.html' %}
 
-{% block footer %}
-  <link rel="stylesheet" href="{% static 'css/datepicker.css' %}" />
-  <script src="{% static 'js/bootstrap-datepicker.js' %}"></script>
-  <script>
-    $('.dateinput').datepicker({
-      format: 'dd/mm/yyyy',
-      locale: 'es'
-    })
-  </script>
-{% endblock footer %}
+{% block title %}Agregar Documento{% endblock %}
 
 {% block content %}
-  <div class="container">
-    <div class="row">
-      {% if form.errors %}
-        {% for field in form %}
-          {% for error in field.errors %}
-            <div class="alert alert-danger">
-              <strong>{{field.name }}: </strong> {{ error|escape }}
-            </div>
-          {% endfor %}
-        {% endfor %}
-        {% for error in form.non_field_errors %}
-          <div class="alert alert-danger">
-            <strong>{{ error|escape }}</strong>
-          </div>
-        {% endfor %}
-      {% endif %}
-    </div>
-    <div class="row">
-      <div class="col">
-        <h1 class="display-3"><i class="fa fa-book"></i> Agregar nuevo documento</h1>
-        {% include 'partials/_messages.html' %}
-        <hr>
-        <form method="post" class="form">
-          {% csrf_token %}
-          {% crispy form %}
-        </form>
-      </div>
-    </div>
-  </div>
-{% endblock content %}
+<section class="space-y-8 max-w-5xl mx-auto">
+  <header class="rounded-3xl border border-base-300 bg-base-100 p-8 shadow-lg space-y-3">
+    <p class="text-sm uppercase tracking-wide text-base-content/60">Gestor documental</p>
+    <h1 class="text-3xl font-bold text-base-content">Agregar documento</h1>
+    <p class="text-sm text-base-content/70">
+      Registra un nuevo documento en la lista maestra, selecciona su proceso y tipo, y describe la información relevante.
+    </p>
+  </header>
 
+  <div class="rounded-3xl border border-base-300 bg-base-100 p-8 shadow-sm">
+    <form method="post" class="space-y-8">
+      {% csrf_token %}
+
+      {% if form.errors %}
+        <div class="alert alert-error">
+          <span>Corrige los campos marcados antes de continuar.</span>
+        </div>
+      {% endif %}
+
+      <div class="space-y-3">
+        <h2 class="text-xl font-semibold text-base-content">Identificación</h2>
+        <div class="form-control">
+          <label class="label"><span class="label-text font-semibold">{{ form.nombre.label }}</span></label>
+          {{ form.nombre }}
+          {% for error in form.nombre.errors %}<p class="mt-1 text-xs text-error">{{ error }}</p>{% endfor %}
+        </div>
+        <div class="grid gap-4 md:grid-cols-2">
+          <div class="form-control">
+            <label class="label flex items-center justify-between">
+              <span class="label-text font-semibold">Proceso</span>
+              <a href="{% url 'docs:process_add' %}" class="link text-sm text-primary">Nuevo proceso</a>
+            </label>
+            {{ form.proceso }}
+            {% for error in form.proceso.errors %}<p class="mt-1 text-xs text-error">{{ error }}</p>{% endfor %}
+          </div>
+          <div class="form-control">
+            <label class="label flex items-center justify-between">
+              <span class="label-text font-semibold">Tipo</span>
+              <a href="{% url 'docs:tipo_add' %}" class="link text-sm text-primary">Nuevo tipo</a>
+            </label>
+            {{ form.tipo }}
+            {% for error in form.tipo.errors %}<p class="mt-1 text-xs text-error">{{ error }}</p>{% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <div class="space-y-3">
+        <h2 class="text-xl font-semibold text-base-content">Detalles</h2>
+        <div class="form-control">
+          <label class="label"><span class="label-text font-semibold">{{ form.ruta.label }}</span></label>
+          {{ form.ruta }}
+          {% for error in form.ruta.errors %}<p class="mt-1 text-xs text-error">{{ error }}</p>{% endfor %}
+        </div>
+        <div class="form-control">
+          <label class="label"><span class="label-text font-semibold">{{ form.texto_ayuda.label }}</span></label>
+          {{ form.texto_ayuda }}
+          {% for error in form.texto_ayuda.errors %}<p class="mt-1 text-xs text-error">{{ error }}</p>{% endfor %}
+        </div>
+        <div class="grid gap-4 md:grid-cols-2">
+          <label class="label cursor-pointer gap-4 rounded-2xl border border-base-300 p-4">
+            {{ form.lmd }}
+            <span>
+              <span class="font-semibold">{{ form.lmd.label }}</span>
+              <p class="text-xs text-base-content/60">Incluir en la Lista Maestra de Documentos</p>
+            </span>
+          </label>
+          <label class="label cursor-pointer gap-4 rounded-2xl border border-base-300 p-4">
+            {{ form.resultados }}
+            <span>
+              <span class="font-semibold">{{ form.resultados.label }}</span>
+              <p class="text-xs text-base-content/60">Marcar como documento con resultados</p>
+            </span>
+          </label>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-3">
+        <button type="submit" class="btn btn-primary">Guardar documento</button>
+        <a href="{% url 'docs:index' %}" class="btn btn-ghost">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock content %}

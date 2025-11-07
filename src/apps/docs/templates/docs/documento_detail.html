@@ -1,401 +1,105 @@
-{% extends 'base.html' %}
-{% load crispy_forms_tags %}
-{% load static %}
-{% load docs_tags %}
+{% extends 'cerebro/base.html' %}
 
-
-
-{% block footer %}
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.0/jquery-confirm.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.0/jquery-confirm.min.js"></script>
-<link rel="stylesheet" href="{% static 'css/datepicker.css' %}" />
-<script src="{% static 'js/bootstrap-datepicker.js' %}"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.colorbox/1.6.4/jquery.colorbox-min.js"
-  integrity="sha512-DAVSi/Ovew9ZRpBgHs6hJ+EMdj1fVKE+csL7mdf9v7tMbzM1i4c/jAvHE8AhcKYazlFl7M8guWuO3lDNzIA48A=="
-  crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
-<script type="application/javascript">
-  (function($) { // Pass jQuery as $
-    $(document).ready(function () {
-      console.log("document.ready fired in documento_detail.html");
-
-      // Mostrar cuadro de diálogo si hay un mensaje de notificación urgente
-      {% for message in messages %}
-        {% if "notification_sent" in message.tags %}
-          $.confirm({
-            title: 'Notificación Enviada',
-            content: '{{ message|escapejs }}',
-            buttons: {
-              ok: function () {
-                // No hacer nada, solo cerrar el diálogo
-              }
-            }
-          });
-        {% endif %}
-      {% endfor %}
-
-      // Inicializa Colorbox para iframes
-$(".iframe").colorbox({ iframe: true, width: "900px", height: "600px" });
-
-      // Muestra el modal si el documento está en aprobación
-      {% if doc.aprobado %}
-      $('#modal').modal('show');
-      console.log("Modal shown for approved doc.");
-      {% endif %}
-
-      // Delegación de eventos para todos los botones de descarga
-      $('#documento').off('click', '.btn-descarga-confirm').on('click', '.btn-descarga-confirm', function (e) {
-        e.preventDefault(); // Prevenir la acción por defecto del botón
-        console.log("Botón de descarga clickeado."); // Log para depuración
-
-        var button = $(this);
-        var url = button.data('url');
-        var nombre = button.data('nombre');
-        var esHistorico = button.hasClass('btn-descarga-historico');
-
-        var titulo = 'Control de documentos';
-        var contenido = esHistorico
-          ? 'ADVERTENCIA: Estás descargando una versión anterior del documento. ¿Estás seguro de que deseas continuar?'
-          : 'La descarga y/o impresión de este documento se considera una copia no controlada.';
-
-        $.confirm({
-          title: titulo,
-          content: contenido,
-          closeIcon: true,
-          closeIconClass: 'fa fa-close',
-          backgroundDismiss: true,
-          buttons: {
-            confirmar: function () {
-              if (esHistorico) {
-                descargarArchivo(url, nombre);
-              } else {
-                window.location = url;
-              }
-            },
-            cerrar: function () { }
-          }
-        });
-        console.log("$.confirm called.");
-      });
-
-      // Función para descargar el archivo (solo para históricos si es necesario un manejo especial)
-      function descargarArchivo(url, nombre) {
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', nombre || '');
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        console.log("descargarArchivo called.");
-      }
-    });
-  })(jQuery); // Pass jQuery object
-</script>
-
-{% if doc.aprobado %}
-<div id="modal" class="modal modal-wide fade" data-keyboard="false" data-backdrop="static">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Documento en aprobación</h5>
-      </div>
-      <div class="modal-body">
-        <p>
-          Este documento se revisó y aprobó por el Comité de la Calidad
-          en la entidad. Una vez que sea aprobado por Oficinas Centrales
-          la versión final sustituirá a la presente.
-        </p>
-        <p>
-          Podrá ser utilizado en los procesos del sistema, sin embargo, se
-          recomienda estar atento a las notificaciones de actualización.
-        </p>
-        <p>
-          Cualquier diferencia entre la versión aprobada y la actual será
-          consignada en el área de <em>Historial de actualizaciones</em>.
-        </p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-bs-dismiss="modal" aria-hidden="true">Cerrar</button>
-      </div>
-    </div><!-- /.modal-content -->
-  </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
-{% endif %}
-
-{% if not doc.r_actual %}
-<!-- Button trigger modal -->
-<script type="text/javascript">
-  $(function () {
-    $('#addVersionModal').modal('show');
-    $('.dateinput').datepicker({ format: "yyyy/mm/dd" });
-  });
-</script>
-
-<!-- Modal -->
-<div class="modal modal-xl fade" id="addVersionModal" tabindex="-1" aria-labelledby="addVersionModallabel"
-  aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="addVersionModallabel">Documento sin Revisiones</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <p>Este documento no tiene revisiones todavía, por favor, agregue una nueva revisión.</p>
-        <form method="post" class="form" action="{% url 'docs:rev_add' pk=doc.id %}">
-          {% csrf_token %}
-          <input type="hidden" id="docID" name="documento" value="{{ doc.id }}">
-          {% crispy version %}
-        </form>
-      </div>
-    </div>
-  </div>
-</div>
-{% endif %}
-{% endblock footer%}
-
-{% block head_title %}{{ doc.nombre }}{% endblock %}
+{% block title %}{{ doc.nombre }}{% endblock %}
 
 {% block content %}
-<div class="row">
-  <div class="col"><!-- contenido -->
-    <div class="page-header">
-      <h1 class="display-4">
-
-        {% if doc.aprobado %}
-        <span class="text-danger"><i class="fa fa-exclamation-triangle"></i></span>
+<section class="space-y-10">
+  <header class="rounded-3xl border border-base-300 bg-base-100 p-8 shadow-lg">
+    <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+      <div class="space-y-2">
+        <p class="text-sm uppercase tracking-wide text-base-content/60">Documento {{ doc.clave_display }}</p>
+        <h1 class="text-3xl font-bold text-base-content">{{ doc.nombre }}</h1>
+        <div class="flex flex-wrap gap-2 text-sm text-base-content/70">
+          <span class="badge badge-outline">{{ doc.tipo.tipo }}</span>
+          <span class="badge badge-outline badge-secondary">{{ doc.proceso.proceso }}</span>
+          {% if doc.lmd %}<span class="badge badge-outline badge-primary">LMD</span>{% endif %}
+          {% if doc.resultados %}<span class="badge badge-outline badge-success">Resultados</span>{% endif %}
+        </div>
+      </div>
+      <div class="flex flex-col gap-2 text-right">
+        {% if current_revision and current_revision.archivo %}
+          <a href="{{ current_revision.archivo.url }}" target="_blank" class="btn btn-primary btn-sm">
+            Descargar revisión {{ current_revision.revision|stringformat:"02d" }}
+          </a>
+        {% elif doc.ruta %}
+          <a href="{{ doc.ruta }}" target="_blank" class="btn btn-primary btn-sm">Abrir documento</a>
         {% endif %}
-        {{ doc.nombre }}
-        <small>
-          {% if doc.proceso.slug != "stn" %}ver. {{ doc.r_actual }}{% endif %}
-        </small>
-      </h1>
-    </div><!-- ./page-header -->
-    {% if request.user.is_staff %}
-    {% if reportes|length > 0 %}
-    <div class="alert alert-danger" role="alert">
-      El documento tiene <strong>{{ reportes|length }} reportes</strong>. <a href="{% url 'docs:panic_reportes' %}">Ver
-        reportes</a>
-    </div>{% endif %}
-    {% endif %}
-    <div class="alert alert-secondary" role="alert">
-      La impresión de este documento será considerada una <strong>copia no controlada.</strong>
-    </div>
-  </div>
-</div>
-<div class="row">
-  <div class="col">
-    {% if doc.proceso.slug == "stn" %}
-    <div class="well">
-      <h4>Resumen de la opinión técnica</h4>
-      {{doc.revision_actual.cambios | safe }}
-    </div>
-    <hr>
-    {% endif %}
-  </div>
-</div>
-<div class="row" id="documento">
-  <div class="col-md-9" id="mostrarPDF">
-    <div class="row">
-      <div class="col">
-        {% if doc.ext == 'pdf' %}
-        <div class="col">
-          <embed src="{{ doc.revision_actual.archivo.url }}#toolbar=0" type="application/pdf" width="100%"
-            height="600px" />
-        </div>
-        {% elif doc.ext == 'doc' or doc.ext == 'docx' or doc.ext == 'xls' or doc.ext == 'xlsx' or doc.ext == 'ppt' or doc.ext == 'pptx' %}
-        <div class="col">
-          <iframe
-            src="https://docs.google.com/gview?url=https://sgctlaxcala.com.mx{{ doc.revision_actual.archivo.url }}&embedded=true"
-            style="width:100%; height:600px;" frameborder="0"></iframe>
-        </div>
-        {% else %}
-        <p>El formato del archivo no es compatible para la visualización en línea.</p>
-        {% endif %}
+        <a href="{% url 'docs:index' %}" class="btn btn-ghost btn-sm">← Regresar</a>
       </div>
     </div>
+  </header>
 
-    {% if doc.proceso.slug != "stn" %}
-    <!-- Cambios actuales -->
-    <div class="row">
-      <div class="col">
-        <div class="card bg-light">
-          <div class="card-header">Cambios en esta versión</div>
-          <div class="card-body">
-            {{doc.revision_actual.cambios | safe }}
-          </div>
+  <div class="grid gap-6 lg:grid-cols-3">
+    <article class="rounded-3xl border border-base-300 bg-base-100 p-6 shadow-sm lg:col-span-2 space-y-4">
+      <h2 class="text-xl font-semibold text-base-content">Descripción</h2>
+      {% if doc.texto_ayuda %}
+        <p class="text-base-content/80">{{ doc.texto_ayuda }}</p>
+      {% else %}
+        <p class="text-base-content/60 text-sm">Este documento no tiene descripción registrada.</p>
+      {% endif %}
+      <dl class="grid gap-4 md:grid-cols-2 text-sm text-base-content/80">
+        <div>
+          <dt class="font-semibold text-base-content">Autor</dt>
+          <dd>{{ doc.autor.get_full_name|default:doc.autor.username }}</dd>
         </div>
-      </div>
-    </div>
-    <!-- ./Cambios actuales -->
-    {% endif %}
-
-    <p></p>
-    {% if doc.aprobado %}
-    <div class="row">
-      <div class="col">
-        <div class="alert alert-danger" role="alert">
-          <h5>Documento en revisión</h5>
-          <p>
-            Este documento se revisó y aprobó por el Comité de la Calidad
-            en la entidad. Una vez que sea aprobado por Oficinas Centrales
-            la versión final sustituirá a la presente.
-          </p>
-          <p>
-            Podrá ser utilizado en los procesos del sistema, sin embargo, se
-            recomienda estar atento a las notificaciones de actualización.
-          </p>
-          <p>
-            Cualquier diferencia entre la versión aprobada y la actual será
-            consignada en el área de <em>Historial de actualizaciones</em>.
-          </p>
+        <div>
+          <dt class="font-semibold text-base-content">Revisión actual</dt>
+          <dd>
+            {% if current_revision %}
+              Rev {{ current_revision.revision|stringformat:"02d" }} · {{ current_revision.f_actualizacion|date:"d/m/Y" }}
+            {% else %}
+              No disponible
+            {% endif %}
+          </dd>
         </div>
-      </div>
-    </div>
-    {% endif %}
-
-    <div class="row">
-      <div class="col">
-        <h4>Historial de actualizaciones</h4>
-
-        <div class="accordion" id="accordionChanges">
-          {% for r in doc.historial %}
-          <div class="accordion-item">
-            <h2 class="accordion-header" id="heading{{ forloop.counter }}">
-              <button class="accordion-button" type="button" data-bs-toggle="collapse"
-                data-bs-target="#collapse{{ forloop.counter }}" aria-expanded="true" aria-controls="collapseOne">
-                Revisión &nbsp; <strong>{{ r.revision }}</strong>
-              </button>
-            </h2>
-            <div id="collapse{{ forloop.counter }}"
-              class="accordion-collapse collapse {% if forloop.first %}show{% endif %}"
-              aria-labelledby="heading{{ forloop.counter }}" data-bs-parent="#accordionChanges">
-
-<div class="card-body p-3">
-  {{ r.cambios | safe }}
-  {% if request.user.is_staff %}
-  <br />
-<button class="btn btn-success btn-descarga-confirm btn-descarga-historico"
-        data-url="/media/{{ r.archivo }}"
-        data-nombre="{{ r.nombre }}">
-  Descargar documento histórico
-</button>
-  {% endif %}
-</div>
-
-            </div>
-          </div>
+        <div>
+          <dt class="font-semibold text-base-content">Clave</dt>
+          <dd>{{ doc.clave }}</dd>
+        </div>
+        <div>
+          <dt class="font-semibold text-base-content">Estado</dt>
+          <dd>
+            {% if doc.activo %}
+              <span class="badge badge-success badge-outline">Activo</span>
+            {% else %}
+              <span class="badge badge-error badge-outline">Inactivo</span>
+            {% endif %}
+          </dd>
+        </div>
+      </dl>
+    </article>
+    <article class="rounded-3xl border border-base-300 bg-base-100 p-6 shadow-sm space-y-4">
+      <h2 class="text-xl font-semibold text-base-content">Historial de revisiones</h2>
+      <ul class="space-y-3 text-sm text-base-content/80 max-h-80 overflow-y-auto pr-2">
+        {% if history %}
+          {% for rev in history %}
+            <li class="flex items-center justify-between rounded-xl border border-base-200 px-3 py-2">
+              <span>Rev {{ rev.revision|stringformat:"02d" }} · {{ rev.f_actualizacion|date:"d/m/Y" }}</span>
+              {% if rev.archivo %}
+                <a href="{{ rev.archivo.url }}" target="_blank" class="btn btn-ghost btn-xs">Descargar</a>
+              {% endif %}
+            </li>
           {% endfor %}
-        </div><!-- ./#accordionChanges -->
-      </div>
-    </div>
+        {% else %}
+          <li class="text-base-content/60">No hay revisiones anteriores registradas.</li>
+        {% endif %}
+      </ul>
+    </article>
   </div>
 
-  <!-- [[ SIDEBAR ]] -->
-  <div class="col-md-3" id="sidebar">
-    <div class="row">
-      <div class="col">
-        <div class="card">
-          <div class="card-header text-white bg-primary">
-            <i class="fa fa-key"></i> Código
+  {% if reportes %}
+    <article class="rounded-3xl border border-base-300 bg-base-100 p-6 shadow-sm space-y-4">
+      <h2 class="text-xl font-semibold text-base-content">Reportes asociados</h2>
+      <div class="grid gap-4 sm:grid-cols-2">
+        {% for reporte in reportes %}
+          <div class="rounded-2xl border border-base-200 p-4 text-sm text-base-content/80">
+            <p class="font-semibold text-base-content">{{ reporte.causa }}</p>
+            <p class="mt-1 text-base-content/70">{{ reporte.descripcion }}</p>
+            <p class="mt-3 text-xs text-base-content/50">Reportado el {{ reporte.created|date:"d/m/Y H:i" }}</p>
           </div>
-          <div class="card-body py-2">
-            <p class="py-2">{{ doc.clave|upper }}</p>
-          </div>
-        </div>
+        {% endfor %}
       </div>
-    </div><!-- ./row código -->
-    <div class="row">
-      <div class="col">
-        <div class="card">
-          <div class="card-header text-white bg-info">
-            <i class="fa fa-cogs"></i> Proceso
-          </div>
-          <div class="card-body">
-            <span><a href="{% url 'docs:proceso' slug=doc.proceso.slug %}">{{ doc.proceso }}</a></span>
-          </div>
-        </div>
-      </div>
-    </div><!-- ./row proceso -->
-
-    <!-- [[ Documento Obsoleto ]]-->
-    <div class="row">
-      <div class="col">
-        <div class="card">
-          <div class="card-header text-white bg-success">
-            <i class="fa fa-exclamation-triangle"></i> Documento obsoleto
-          </div>
-          <div class="card-body">
-            <a type="button" class="btn btn-success btn-lg iframe" href="{% url 'docs:panic' pk=doc.id %}">
-              Notificar documento obsoleto
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- [[ /Documento Obsoleto ]] -->
-
-    {% if doc.proceso.slug == "stn" %}
-    <div class="row">
-      <div class="col">
-        <div class="card">
-          <div class="card-header text-white bg-success">
-            <i class="fa fa-calendar"></i> Fecha de la opinión
-          </div>
-          <div class="card-body">
-            <span>{{ doc.revision_actual.f_actualizacion }}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-    {% else %}
-    <div class="row">
-      <div class="col">
-        <div class="card">
-          <div class="card-header text-white bg-warning">
-            <i class="fa fa-calendar"></i> Revisión
-          </div>
-          <div class="card-body">
-            <span>{{ doc.r_actual }}</span>
-          </div>
-        </div>
-      </div>
-    </div><!-- ./row revisión -->
-    {% endif %}
-
-    <div class="row">
-      <div class="col">
-        <div class="card">
-          <div class="card-header text-white bg-danger">
-            <i class="fa fa-cloud-download"></i> Descargar archivo
-          </div>
-          <div class="card-body">
-            <button class="btn btn-outline-danger btn-descarga-confirm"
-                    data-url="/media/{{doc.revision_actual.archivo}}"
-                    data-nombre="{{doc.revision_actual.nombre}}">
-              Descargar
-            </button>
-          </div>
-        </div>
-      </div>
-    </div><!-- ./cad descargar -->
-
-    {% if request.user.is_staff %}
-    <div class="row">
-      <div class="col">
-        <div class="card">
-          <div class="card-header text-white-50 bg-success"><i class="fa fa-certificate"></i> Agregar nueva revisión
-          </div>
-          <div class="card-body">
-            <a href="{% url 'docs:rev_add' pk=doc.id %}" id="btn-agregar" class="btn btn-success">Agregar</a>
-          </div>
-        </div>
-      </div>
-    </div>
-    {% endif %}
-
-  </div>
-</div>
+    </article>
+  {% endif %}
+</section>
 {% endblock content %}

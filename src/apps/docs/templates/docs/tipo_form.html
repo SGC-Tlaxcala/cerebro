@@ -1,0 +1,37 @@
+{% extends 'cerebro/base.html' %}
+
+{% block title %}Nuevo Tipo{% endblock %}
+
+{% block content %}
+<section class="max-w-3xl mx-auto space-y-6">
+  <header class="space-y-2">
+    <p class="text-sm uppercase tracking-wide text-base-content/60">Gestor documental</p>
+    <h1 class="text-3xl font-bold text-base-content">Registrar tipo de documento</h1>
+    <p class="text-sm text-base-content/70">Define un nuevo tipo para clasificar tus documentos.</p>
+  </header>
+
+  <div class="rounded-3xl border border-base-300 bg-base-100 p-8 shadow-sm">
+    <form method="post" class="space-y-6">
+      {% csrf_token %}
+      {% if form.errors %}
+        <div class="alert alert-error">Corrige los campos marcados.</div>
+      {% endif %}
+      <div class="form-control">
+        <label class="label"><span class="label-text font-semibold">{{ form.tipo.label }}</span></label>
+        {{ form.tipo }}
+        {% for error in form.tipo.errors %}<p class="mt-1 text-xs text-error">{{ error }}</p>{% endfor %}
+      </div>
+      <div class="form-control">
+        <label class="label"><span class="label-text font-semibold">{{ form.slug.label }}</span></label>
+        {{ form.slug }}
+        {% for error in form.slug.errors %}<p class="mt-1 text-xs text-error">{{ error }}</p>{% endfor %}
+        <p class="text-xs text-base-content/60 mt-1">Identificador corto (ej. "prc", "fmt").</p>
+      </div>
+      <div class="flex gap-3">
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <a href="{% url 'docs:add' %}" class="btn btn-ghost">Regresar</a>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock content %}

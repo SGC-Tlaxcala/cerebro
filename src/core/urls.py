@@ -21,6 +21,7 @@ urlpatterns = [
     path('profiles/', include('apps.profiles.urls')),
     path('api/v1/vozmac/', include('apps.vozmac.api.urls')),
     path('api/v1/pas/', include('apps.pas.api.urls')),
+    path('api/v1/docs/', include('apps.docs.api.urls')),
     path('api/v1/ideas/', include('apps.ideas.api.urls')),
     path('api/v1/profiles/', include('apps.profiles.api.urls')),
     path('', Index.as_view(), name='index'),
