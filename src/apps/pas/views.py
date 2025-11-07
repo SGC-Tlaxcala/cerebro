@@ -201,7 +201,7 @@ class PlanActivitiesView(DetailView):
                 }
             if estado == 'Abierta en Tiempo':
                 return {
-                    'classes': 'badge-warning badge-outline text-warning-content',
+                    'classes': 'badge-outline border border-warning text-base-content bg-transparent',
                     'text': 'Abierta',
                     'title': 'Abierta en tiempo',
                 }
