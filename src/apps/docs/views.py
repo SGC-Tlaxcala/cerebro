@@ -286,6 +286,16 @@ class DocAdd(LoginRequiredMixin, CreateView):
     form_class = DocForm
     template_name = 'docs/documento_form.html'
 
+    def get_context_data(self, **kwargs):
+        """Agrega formularios de catálogo para usarlos en modales."""
+        context = super().get_context_data(**kwargs)
+        context.setdefault('process_form', ProcesoForm())
+        context.setdefault('type_form', TipoForm())
+        context['process_add_url'] = reverse_lazy('docs:process_add')
+        context['type_add_url'] = reverse_lazy('docs:tipo_add')
+        context['return_url'] = reverse_lazy('docs:add')
+        return context
+
     def form_valid(self, form):
         """Validación del formulario."""
         document = form.save(commit=False)
@@ -471,6 +481,13 @@ class ProcessAdd(CreateView):
     template_name = 'docs/proceso_form.html'
     success_url = reverse_lazy('docs:setup')
 
+    def get_success_url(self):
+        """Permite regresar al formulario de documentos si se solicita."""
+        next_url = self.request.GET.get('next') or self.request.POST.get('next')
+        if next_url:
+            return next_url
+        return super().get_success_url()
+
 
 class TipoAdd(CreateView):
     """Formulario para agregar un nuevo tipo de documento."""
@@ -478,6 +495,13 @@ class TipoAdd(CreateView):
     form_class = TipoForm
     template_name = 'docs/tipo_form.html'
     success_url = reverse_lazy('docs:setup')
+
+    def get_success_url(self):
+        """Permite regresar al formulario de documentos si se solicita."""
+        next_url = self.request.GET.get('next') or self.request.POST.get('next')
+        if next_url:
+            return next_url
+        return super().get_success_url()
 
 
 class Buscador(HTMXDocumentListMixin, ListView):

@@ -33,7 +33,7 @@
           <div class="form-control">
             <label class="label flex items-center justify-between">
               <span class="label-text font-semibold">Proceso</span>
-              <a href="{% url 'docs:process_add' %}" class="link text-sm text-primary">Nuevo proceso</a>
+              <button type="button" class="link text-sm text-primary" data-open-modal="process-modal">Nuevo proceso</button>
             </label>
             {{ form.proceso }}
             {% for error in form.proceso.errors %}<p class="mt-1 text-xs text-error">{{ error }}</p>{% endfor %}
@@ -41,7 +41,7 @@
           <div class="form-control">
             <label class="label flex items-center justify-between">
               <span class="label-text font-semibold">Tipo</span>
-              <a href="{% url 'docs:tipo_add' %}" class="link text-sm text-primary">Nuevo tipo</a>
+              <button type="button" class="link text-sm text-primary" data-open-modal="type-modal">Nuevo tipo</button>
             </label>
             {{ form.tipo }}
             {% for error in form.tipo.errors %}<p class="mt-1 text-xs text-error">{{ error }}</p>{% endfor %}
@@ -86,4 +86,103 @@
     </form>
   </div>
 </section>
+
+<dialog id="process-modal" class="modal">
+  <div class="modal-box max-w-xl space-y-6">
+    <div class="flex items-start justify-between gap-4">
+      <div class="space-y-1">
+        <p class="text-xs uppercase tracking-wide text-base-content/60">Catálogo</p>
+        <h3 class="text-xl font-semibold text-base-content">Nuevo proceso</h3>
+        <p class="text-sm text-base-content/70">Registra un proceso para asociarlo a tus documentos.</p>
+      </div>
+      <form method="dialog">
+        <button class="btn btn-sm btn-circle btn-ghost">✕</button>
+      </form>
+    </div>
+    <form method="post" action="{{ process_add_url }}?next={{ return_url }}" class="space-y-4">
+      {% csrf_token %}
+      <div class="form-control">
+        <label class="label"><span class="label-text font-semibold">{{ process_form.proceso.label }}</span></label>
+        {{ process_form.proceso }}
+        {% for error in process_form.proceso.errors %}<p class="mt-1 text-xs text-error">{{ error }}</p>{% endfor %}
+      </div>
+      <div class="form-control">
+        <label class="label"><span class="label-text font-semibold">{{ process_form.slug.label }}</span></label>
+        {{ process_form.slug }}
+        {% for error in process_form.slug.errors %}<p class="mt-1 text-xs text-error">{{ error }}</p>{% endfor %}
+        <p class="text-xs text-base-content/60 mt-1">Identificador corto sin espacios (ej. "pln").</p>
+      </div>
+      <div class="modal-action">
+        <button type="button" class="btn btn-ghost" data-close-modal="process-modal">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Guardar proceso</button>
+      </div>
+    </form>
+  </div>
+  <form method="dialog" class="modal-backdrop">
+    <button aria-label="Cerrar">Cerrar</button>
+  </form>
+</dialog>
+
+<dialog id="type-modal" class="modal">
+  <div class="modal-box max-w-xl space-y-6">
+    <div class="flex items-start justify-between gap-4">
+      <div class="space-y-1">
+        <p class="text-xs uppercase tracking-wide text-base-content/60">Catálogo</p>
+        <h3 class="text-xl font-semibold text-base-content">Nuevo tipo</h3>
+        <p class="text-sm text-base-content/70">Define un nuevo tipo para clasificar los documentos.</p>
+      </div>
+      <form method="dialog">
+        <button class="btn btn-sm btn-circle btn-ghost">✕</button>
+      </form>
+    </div>
+    <form method="post" action="{{ type_add_url }}?next={{ return_url }}" class="space-y-4">
+      {% csrf_token %}
+      <div class="form-control">
+        <label class="label"><span class="label-text font-semibold">{{ type_form.tipo.label }}</span></label>
+        {{ type_form.tipo }}
+        {% for error in type_form.tipo.errors %}<p class="mt-1 text-xs text-error">{{ error }}</p>{% endfor %}
+      </div>
+      <div class="form-control">
+        <label class="label"><span class="label-text font-semibold">{{ type_form.slug.label }}</span></label>
+        {{ type_form.slug }}
+        {% for error in type_form.slug.errors %}<p class="mt-1 text-xs text-error">{{ error }}</p>{% endfor %}
+        <p class="text-xs text-base-content/60 mt-1">Identificador corto (ej. "prc", "fmt").</p>
+      </div>
+      <div class="modal-action">
+        <button type="button" class="btn btn-ghost" data-close-modal="type-modal">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Guardar tipo</button>
+      </div>
+    </form>
+  </div>
+  <form method="dialog" class="modal-backdrop">
+    <button aria-label="Cerrar">Cerrar</button>
+  </form>
+</dialog>
 {% endblock content %}
+
+{% block scripts %}
+  {{ block.super }}
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('[data-open-modal]').forEach(trigger => {
+        trigger.addEventListener('click', () => {
+          const modalId = trigger.getAttribute('data-open-modal');
+          const modal = document.getElementById(modalId);
+          if (modal) {
+            modal.showModal();
+          }
+        });
+      });
+
+      document.querySelectorAll('[data-close-modal]').forEach(button => {
+        button.addEventListener('click', () => {
+          const modalId = button.getAttribute('data-close-modal');
+          const modal = document.getElementById(modalId);
+          if (modal) {
+            modal.close();
+          }
+        });
+      });
+    });
+  </script>
+{% endblock scripts %}
