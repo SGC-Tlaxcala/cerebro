@@ -103,47 +103,58 @@
     </article>
   {% endif %}
 
-  <div class="grid gap-6 lg:grid-cols-2">
-    <article class="rounded-3xl border border-base-300 bg-base-100 p-6 shadow-sm space-y-4">
-      <div class="flex items-center justify-between gap-2">
-        <h2 class="text-xl font-semibold text-base-content">Última revisión</h2>
-        {% if current_revision and current_revision.archivo %}
-          <button type="button" class="btn btn-outline btn-xs" data-open-download="{{ current_revision.archivo.url }}">Descargar</button>
-        {% endif %}
-      </div>
-      {% if current_revision %}
-        <div class="rounded-2xl border border-base-200 bg-base-50 p-4 space-y-2">
-          <p class="text-sm text-base-content/70">Rev {{ current_revision.revision|stringformat:"02d" }} · {{ current_revision.f_actualizacion|date:"d/m/Y" }}</p>
-          {% if current_revision.cambios %}
-            <div class="prose prose-sm max-w-none text-base-content/80">
-              {{ current_revision.cambios|linebreaks }}
-            </div>
-          {% else %}
-            <p class="text-sm text-base-content/60">Sin descripción de cambios.</p>
-          {% endif %}
-        </div>
-      {% else %}
-        <p class="text-sm text-base-content/60">No hay revisiones registradas para este documento.</p>
-      {% endif %}
-    </article>
-    <article class="rounded-3xl border border-base-300 bg-base-100 p-6 shadow-sm space-y-4">
+  <article class="rounded-3xl border border-base-300 bg-base-100 p-6 shadow-sm space-y-4">
+    <div class="flex items-center justify-between gap-2">
       <h2 class="text-xl font-semibold text-base-content">Historial de revisiones</h2>
-      <ul class="space-y-3 text-sm text-base-content/80 max-h-80 overflow-y-auto pr-2">
+      {% if current_revision and current_revision.archivo %}
+        <button type="button" class="btn btn-outline btn-xs" data-open-download="{{ current_revision.archivo.url }}">Descargar vigente</button>
+      {% endif %}
+    </div>
+    <div class="space-y-4">
+      {% if current_revision %}
+        <div class="rounded-2xl border border-primary/30 bg-gradient-to-r from-primary/10 via-base-100 to-base-100 p-4 shadow-sm flex items-start gap-3">
+          <div class="badge badge-primary badge-outline">Actual</div>
+          <div class="flex-1 space-y-1">
+            <p class="text-sm font-semibold text-base-content">
+              Rev {{ current_revision.revision|stringformat:"02d" }} · {{ current_revision.f_actualizacion|date:"d/m/Y" }}
+            </p>
+            {% if current_revision.cambios %}
+              <p class="text-sm text-base-content/70">{{ current_revision.cambios|linebreaks }}</p>
+            {% else %}
+              <p class="text-sm text-base-content/60">Sin descripción de cambios.</p>
+            {% endif %}
+          </div>
+        </div>
+      {% endif %}
+
+      <div class="space-y-3">
         {% if history %}
           {% for rev in history %}
-            <li class="flex items-center justify-between rounded-xl border border-base-200 px-3 py-2">
-              <span>Rev {{ rev.revision|stringformat:"02d" }} · {{ rev.f_actualizacion|date:"d/m/Y" }}</span>
-              {% if rev.archivo and request.user.is_superuser %}
-                <button type="button" class="btn btn-ghost btn-xs" data-open-download="{{ rev.archivo.url }}">Descargar</button>
-              {% endif %}
-            </li>
+            <div class="flex items-start gap-3 rounded-2xl border border-base-200 bg-base-50 px-4 py-3 shadow-sm">
+              <div class="mt-1 h-3 w-3 rounded-full bg-base-300"></div>
+              <div class="flex-1">
+                <div class="flex flex-wrap items-center gap-2 text-sm">
+                  <span class="font-semibold text-base-content">Rev {{ rev.revision|stringformat:"02d" }}</span>
+                  <span class="text-base-content/60">{{ rev.f_actualizacion|date:"d/m/Y" }}</span>
+                  <span class="badge badge-ghost badge-xs">Histórica</span>
+                </div>
+                {% if rev.cambios %}
+                  <p class="text-sm text-base-content/70 mt-1">{{ rev.cambios|linebreaks }}</p>
+                {% endif %}
+                {% if rev.archivo and request.user.is_superuser %}
+                  <div class="mt-2">
+                    <button type="button" class="btn btn-ghost btn-xs" data-open-download="{{ rev.archivo.url }}">Descargar</button>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
           {% endfor %}
         {% else %}
-          <li class="text-base-content/60">No hay revisiones anteriores registradas.</li>
+          <p class="text-base-content/60">No hay revisiones anteriores registradas.</p>
         {% endif %}
-      </ul>
-    </article>
-  </div>
+      </div>
+    </div>
+  </article>
 
   {% if reportes %}
     <article class="rounded-3xl border border-base-300 bg-base-100 p-6 shadow-sm space-y-4">
