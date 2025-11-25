@@ -18,55 +18,113 @@
       </div>
       <div class="flex flex-col gap-2 text-right">
         {% if current_revision and current_revision.archivo %}
-          <a href="{{ current_revision.archivo.url }}" target="_blank" class="btn btn-primary btn-sm">
+          <button
+            type="button"
+            class="btn btn-primary btn-sm"
+            data-open-download="{{ current_revision.archivo.url }}">
             Descargar revisión {{ current_revision.revision|stringformat:"02d" }}
-          </a>
+          </button>
         {% elif doc.ruta %}
           <a href="{{ doc.ruta }}" target="_blank" class="btn btn-primary btn-sm">Abrir documento</a>
+        {% endif %}
+        {% if perms.docs.add_revision %}
+          <button type="button" class="btn btn-secondary btn-sm" data-open-modal="revision-modal">Agregar revisión</button>
         {% endif %}
         <a href="{% url 'docs:index' %}" class="btn btn-ghost btn-sm">← Regresar</a>
       </div>
     </div>
   </header>
 
-  <div class="grid gap-6 lg:grid-cols-3">
-    <article class="rounded-3xl border border-base-300 bg-base-100 p-6 shadow-sm lg:col-span-2 space-y-4">
-      <h2 class="text-xl font-semibold text-base-content">Descripción</h2>
-      {% if doc.texto_ayuda %}
-        <p class="text-base-content/80">{{ doc.texto_ayuda }}</p>
+  <article class="rounded-3xl border border-primary/30 bg-gradient-to-br from-primary/10 via-base-100 to-base-100 p-6 shadow-md space-y-4">
+    <h2 class="text-xl font-semibold text-base-content">Descripción</h2>
+    {% if doc.texto_ayuda %}
+      <p class="text-base-content/80">{{ doc.texto_ayuda }}</p>
+    {% else %}
+      <p class="text-base-content/60 text-sm">Este documento no tiene descripción registrada.</p>
+    {% endif %}
+    <dl class="grid gap-4 md:grid-cols-3 text-sm text-base-content/80">
+      <div>
+        <dt class="font-semibold text-base-content">Clave</dt>
+        <dd>{{ doc.clave }}</dd>
+      </div>
+      <div>
+        <dt class="font-semibold text-base-content">Revisión actual</dt>
+        <dd>
+          {% if current_revision %}
+            Rev {{ current_revision.revision|stringformat:"02d" }} · {{ current_revision.f_actualizacion|date:"d/m/Y" }}
+          {% else %}
+            No disponible
+          {% endif %}
+        </dd>
+      </div>
+      <div>
+        <dt class="font-semibold text-base-content">Estado</dt>
+        <dd>
+          {% if doc.activo %}
+            <span class="badge badge-success badge-outline">Activo</span>
+          {% else %}
+            <span class="badge badge-error badge-outline">Inactivo</span>
+          {% endif %}
+        </dd>
+      </div>
+    </dl>
+  </article>
+
+  {% if current_revision and current_revision.archivo %}
+    <article class="rounded-3xl border border-base-300 bg-base-100 p-4 shadow-sm">
+      <div class="flex items-center justify-between px-2 pb-4">
+        <h2 class="text-xl font-semibold text-base-content">Vista previa</h2>
+        <p class="text-sm text-base-content/60">Archivo rev {{ current_revision.revision|stringformat:"02d" }} · {{ current_file_ext|default:"" }}</p>
+      </div>
+      {% with ext=current_file_ext|lower %}
+        {% if ext == 'pdf' %}
+          <iframe src="{{ current_file_url }}" class="w-full rounded-2xl border border-base-200 bg-base-50" style="min-height: 720px;" allowfullscreen></iframe>
+        {% elif preview_image_exts and ext in preview_image_exts %}
+          <div class="flex justify-center">
+            <img src="{{ current_file_url }}" alt="Vista del documento" class="max-h-[720px] w-auto rounded-2xl border border-base-200 shadow-sm">
+          </div>
+        {% elif preview_office_exts and ext in preview_office_exts %}
+          <div class="rounded-2xl border border-base-200 bg-base-50 p-6 text-sm space-y-3">
+            <p class="text-base-content/80">La vista previa en línea no está disponible para este tipo de archivo en la intranet.</p>
+            <p class="text-base-content/70">Puedes descargarlo, pero recuerda que al hacerlo será una copia no controlada.</p>
+            <button type="button" class="btn btn-primary btn-sm" data-open-download="{{ current_revision.archivo.url }}">Descargar archivo</button>
+          </div>
+        {% else %}
+          <div class="rounded-2xl border border-base-200 bg-base-50 p-6 text-sm text-base-content/80">
+            <p>No se puede mostrar una vista previa para este tipo de archivo.</p>
+            {% if current_revision.archivo %}
+              <p class="mt-2">
+                <button type="button" class="btn btn-primary btn-sm" data-open-download="{{ current_revision.archivo.url }}">Descargar archivo</button>
+              </p>
+            {% endif %}
+          </div>
+        {% endif %}
+      {% endwith %}
+    </article>
+  {% endif %}
+
+  <div class="grid gap-6 lg:grid-cols-2">
+    <article class="rounded-3xl border border-base-300 bg-base-100 p-6 shadow-sm space-y-4">
+      <div class="flex items-center justify-between gap-2">
+        <h2 class="text-xl font-semibold text-base-content">Última revisión</h2>
+        {% if current_revision and current_revision.archivo %}
+          <button type="button" class="btn btn-outline btn-xs" data-open-download="{{ current_revision.archivo.url }}">Descargar</button>
+        {% endif %}
+      </div>
+      {% if current_revision %}
+        <div class="rounded-2xl border border-base-200 bg-base-50 p-4 space-y-2">
+          <p class="text-sm text-base-content/70">Rev {{ current_revision.revision|stringformat:"02d" }} · {{ current_revision.f_actualizacion|date:"d/m/Y" }}</p>
+          {% if current_revision.cambios %}
+            <div class="prose prose-sm max-w-none text-base-content/80">
+              {{ current_revision.cambios|linebreaks }}
+            </div>
+          {% else %}
+            <p class="text-sm text-base-content/60">Sin descripción de cambios.</p>
+          {% endif %}
+        </div>
       {% else %}
-        <p class="text-base-content/60 text-sm">Este documento no tiene descripción registrada.</p>
+        <p class="text-sm text-base-content/60">No hay revisiones registradas para este documento.</p>
       {% endif %}
-      <dl class="grid gap-4 md:grid-cols-2 text-sm text-base-content/80">
-        <div>
-          <dt class="font-semibold text-base-content">Autor</dt>
-          <dd>{{ doc.autor.get_full_name|default:doc.autor.username }}</dd>
-        </div>
-        <div>
-          <dt class="font-semibold text-base-content">Revisión actual</dt>
-          <dd>
-            {% if current_revision %}
-              Rev {{ current_revision.revision|stringformat:"02d" }} · {{ current_revision.f_actualizacion|date:"d/m/Y" }}
-            {% else %}
-              No disponible
-            {% endif %}
-          </dd>
-        </div>
-        <div>
-          <dt class="font-semibold text-base-content">Clave</dt>
-          <dd>{{ doc.clave }}</dd>
-        </div>
-        <div>
-          <dt class="font-semibold text-base-content">Estado</dt>
-          <dd>
-            {% if doc.activo %}
-              <span class="badge badge-success badge-outline">Activo</span>
-            {% else %}
-              <span class="badge badge-error badge-outline">Inactivo</span>
-            {% endif %}
-          </dd>
-        </div>
-      </dl>
     </article>
     <article class="rounded-3xl border border-base-300 bg-base-100 p-6 shadow-sm space-y-4">
       <h2 class="text-xl font-semibold text-base-content">Historial de revisiones</h2>
@@ -75,8 +133,8 @@
           {% for rev in history %}
             <li class="flex items-center justify-between rounded-xl border border-base-200 px-3 py-2">
               <span>Rev {{ rev.revision|stringformat:"02d" }} · {{ rev.f_actualizacion|date:"d/m/Y" }}</span>
-              {% if rev.archivo %}
-                <a href="{{ rev.archivo.url }}" target="_blank" class="btn btn-ghost btn-xs">Descargar</a>
+              {% if rev.archivo and request.user.is_superuser %}
+                <button type="button" class="btn btn-ghost btn-xs" data-open-download="{{ rev.archivo.url }}">Descargar</button>
               {% endif %}
             </li>
           {% endfor %}
@@ -101,5 +159,143 @@
       </div>
     </article>
   {% endif %}
+
+  {% if perms.docs.add_revision %}
+    <dialog id="revision-modal" class="modal">
+      <div class="modal-box max-w-3xl space-y-6">
+        <div class="flex items-start justify-between gap-4">
+          <div class="space-y-1">
+            <p class="text-xs uppercase tracking-wide text-base-content/60">Gestor documental</p>
+            <h3 class="text-xl font-semibold text-base-content">Nueva revisión</h3>
+            <p class="text-sm text-base-content/70">{{ doc.nombre }}</p>
+          </div>
+          <form method="dialog">
+            <button class="btn btn-sm btn-circle btn-ghost">✕</button>
+          </form>
+        </div>
+        <form id="revision-modal-form" method="post" action="{{ rev_add_url }}" enctype="multipart/form-data" class="space-y-4">
+          {% csrf_token %}
+          <div class="grid gap-4 md:grid-cols-2">
+            <div class="form-control">
+              <label class="label"><span class="label-text font-semibold">{{ revision_form.revision.label }}</span></label>
+              {{ revision_form.revision }}
+              {% for error in revision_form.revision.errors %}<p class="mt-1 text-xs text-error">{{ error }}</p>{% endfor %}
+            </div>
+            <div class="form-control">
+              <label class="label"><span class="label-text font-semibold">{{ revision_form.f_actualizacion.label }}</span></label>
+              {{ revision_form.f_actualizacion }}
+              {% for error in revision_form.f_actualizacion.errors %}<p class="mt-1 text-xs text-error">{{ error }}</p>{% endfor %}
+            </div>
+          </div>
+
+          <div class="form-control">
+            <label class="label"><span class="label-text font-semibold">{{ revision_form.archivo.label }}</span></label>
+            {{ revision_form.archivo }}
+            {% for error in revision_form.archivo.errors %}<p class="mt-1 text-xs text-error">{{ error }}</p>{% endfor %}
+          </div>
+
+          <div class="form-control">
+            <label class="label"><span class="label-text font-semibold">{{ revision_form.cambios.label }}</span></label>
+            {{ revision_form.cambios }}
+            {% for error in revision_form.cambios.errors %}<p class="mt-1 text-xs text-error">{{ error }}</p>{% endfor %}
+          </div>
+
+          <label class="label cursor-pointer gap-3 rounded-2xl border border-base-300 p-4">
+            {{ revision_form.notificacion_urgente }}
+            <span>
+              <span class="font-semibold">{{ revision_form.notificacion_urgente.label }}</span>
+              <p class="text-xs text-base-content/60">Envia una notificación urgente a los destinatarios configurados.</p>
+            </span>
+          </label>
+
+          <div class="modal-action">
+            <button type="button" class="btn btn-ghost" data-close-modal="revision-modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Guardar revisión</button>
+          </div>
+        </form>
+      </div>
+      <form method="dialog" class="modal-backdrop">
+        <button aria-label="Cerrar">Cerrar</button>
+      </form>
+    </dialog>
+  {% endif %}
+
+  <dialog id="download-modal" class="modal">
+    <div class="modal-box max-w-md space-y-4">
+      <h3 class="text-lg font-semibold text-base-content">Descargar documento</h3>
+      <p class="text-sm text-base-content/70">
+        Al descargar este archivo generas una copia no controlada. Asegúrate de consultar la versión vigente antes de usarla.
+      </p>
+      <p class="text-sm text-base-content/70">Escribe <span class="font-semibold">"Confirmar"</span> para habilitar la descarga.</p>
+      <input id="download-confirm-input" type="text" class="input input-bordered w-full" placeholder="Escribe Confirmar">
+      <div class="modal-action">
+        <button type="button" class="btn btn-ghost" data-close-modal="download-modal">Cancelar</button>
+        <button type="button" id="download-confirm-btn" class="btn btn-primary" disabled>Descargar</button>
+      </div>
+    </div>
+    <form method="dialog" class="modal-backdrop">
+      <button aria-label="Cerrar">Cerrar</button>
+    </form>
+  </dialog>
 </section>
 {% endblock content %}
+
+{% block scripts %}
+  {{ block.super }}
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('[data-open-modal]').forEach(trigger => {
+        trigger.addEventListener('click', () => {
+          const modal = document.getElementById(trigger.getAttribute('data-open-modal'));
+          modal?.showModal();
+        });
+      });
+
+      document.querySelectorAll('[data-close-modal]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const modal = document.getElementById(btn.getAttribute('data-close-modal'));
+          modal?.close();
+        });
+      });
+
+      const revisionForm = document.getElementById('revision-modal-form');
+      const urgent = document.getElementById('id_notificacion_urgente');
+      revisionForm?.addEventListener('submit', (event) => {
+        if (urgent?.checked) {
+          const confirmed = confirm('Se enviará una notificación urgente. ¿Deseas continuar?');
+          if (!confirmed) {
+            event.preventDefault();
+            urgent.checked = false;
+          }
+        }
+      });
+
+      // Descarga con confirmación
+      let pendingDownloadUrl = null;
+      const downloadModal = document.getElementById('download-modal');
+      const confirmInput = document.getElementById('download-confirm-input');
+      const confirmBtn = document.getElementById('download-confirm-btn');
+
+      document.querySelectorAll('[data-open-download]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          pendingDownloadUrl = btn.getAttribute('data-open-download');
+          if (!downloadModal) return;
+          confirmInput.value = '';
+          confirmBtn.disabled = true;
+          downloadModal.showModal();
+          confirmInput.focus();
+        });
+      });
+
+      confirmInput?.addEventListener('input', () => {
+        confirmBtn.disabled = confirmInput.value.trim().toLowerCase() !== 'confirmar';
+      });
+
+      confirmBtn?.addEventListener('click', () => {
+        if (!pendingDownloadUrl) return;
+        window.open(pendingDownloadUrl, '_blank');
+        downloadModal?.close();
+      });
+    });
+  </script>
+{% endblock scripts %}

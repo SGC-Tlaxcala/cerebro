@@ -1,60 +1,82 @@
-{% extends 'base.html' %}
-{% load crispy_forms_tags %}
-{% load static %}
+{% extends 'cerebro/base.html' %}
 
-{% block footer %}
-  <link rel="stylesheet" href="{% static 'css/datepicker.css' %}" />
-  <script src="{% static 'js/bootstrap-datepicker.js' %}"></script>
+{% block title %}Nueva revisión{% endblock %}
+
+{% block content %}
+<section class="max-w-3xl mx-auto space-y-8">
+  <header class="space-y-2">
+    <p class="text-sm uppercase tracking-wide text-base-content/60">Gestor documental</p>
+    <h1 class="text-3xl font-bold text-base-content">Nueva revisión</h1>
+    <p class="text-sm text-base-content/70">{{ doc.nombre }} · Rev {{ doc.r_actual }}</p>
+  </header>
+
+  <div class="rounded-3xl border border-base-300 bg-base-100 p-8 shadow-sm">
+    <form id="revision-form" method="post" enctype="multipart/form-data" class="space-y-6">
+      {% csrf_token %}
+
+      {% if form.errors %}
+        <div class="alert alert-error">
+          <span>Corrige los campos marcados antes de continuar.</span>
+        </div>
+      {% endif %}
+
+      <div class="grid gap-4 md:grid-cols-2">
+        <div class="form-control">
+          <label class="label"><span class="label-text font-semibold">{{ form.revision.label }}</span></label>
+          {{ form.revision }}
+          {% for error in form.revision.errors %}<p class="mt-1 text-xs text-error">{{ error }}</p>{% endfor %}
+        </div>
+        <div class="form-control">
+          <label class="label"><span class="label-text font-semibold">{{ form.f_actualizacion.label }}</span></label>
+          {{ form.f_actualizacion }}
+          {% for error in form.f_actualizacion.errors %}<p class="mt-1 text-xs text-error">{{ error }}</p>{% endfor %}
+        </div>
+      </div>
+
+      <div class="form-control">
+        <label class="label"><span class="label-text font-semibold">{{ form.archivo.label }}</span></label>
+        {{ form.archivo }}
+        {% for error in form.archivo.errors %}<p class="mt-1 text-xs text-error">{{ error }}</p>{% endfor %}
+      </div>
+
+      <div class="form-control">
+        <label class="label"><span class="label-text font-semibold">{{ form.cambios.label }}</span></label>
+        {{ form.cambios }}
+        {% for error in form.cambios.errors %}<p class="mt-1 text-xs text-error">{{ error }}</p>{% endfor %}
+      </div>
+
+      <label class="label cursor-pointer gap-3 rounded-2xl border border-base-300 p-4">
+        {{ form.notificacion_urgente }}
+        <span>
+          <span class="font-semibold">{{ form.notificacion_urgente.label }}</span>
+          <p class="text-xs text-base-content/60">Envia una notificación urgente a los destinatarios configurados.</p>
+        </span>
+      </label>
+
+      <div class="flex gap-3">
+        <button type="submit" class="btn btn-primary">Guardar revisión</button>
+        <a href="{{ doc.get_absolute_url }}" class="btn btn-ghost">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock content %}
+
+{% block scripts %}
+  {{ block.super }}
   <script>
-    $('.dateinput').datepicker({
-      format: 'dd/mm/yyyy',
-      locale: 'es'
-    });
-
-    $(document).ready(function() {
-      $('#formulario_revision').submit(function(e) {
-        var $formulario = $(this);
-        var $casillaNotificacionUrgente = $('#id_notificacion_urgente');
-
-        if ($casillaNotificacionUrgente.is(':checked')) {
-          var mensajeConfirmacion = 'Se enviará una notificación urgente. ¿Desea continuar?';
-          if (!confirm(mensajeConfirmacion)) {
-            e.preventDefault(); // Prevenir el envío del formulario si el usuario cancela
-            $casillaNotificacionUrgente.prop('checked', false); // Desmarcar la casilla
+    document.addEventListener('DOMContentLoaded', () => {
+      const form = document.getElementById('revision-form');
+      const urgent = document.getElementById('id_notificacion_urgente');
+      form?.addEventListener('submit', (event) => {
+        if (urgent?.checked) {
+          const confirmUrgent = confirm('Se enviará una notificación urgente. ¿Deseas continuar?');
+          if (!confirmUrgent) {
+            event.preventDefault();
+            urgent.checked = false;
           }
         }
       });
     });
   </script>
-{% endblock footer %}
-
-{% block content %}
-  <div class="container">
-    <div class="row">
-      {% if form.errors %}
-        {% for field in form %}
-          {% for error in field.errors %}
-            <div class="alert alert-danger">
-              <strong>{{field.name }}: </strong> {{ error|escape }}
-            </div>
-          {% endfor %}
-        {% endfor %}
-        {% for error in form.non_field_errors %}
-          <div class="alert alert-danger">
-            <strong>{{ error|escape }}</strong>
-          </div>
-        {% endfor %}
-      {% endif %}
-    </div>
-    <div class="row">
-      <div class="col">
-        <h1 class="display-3">
-          <i class="fa fa-book"></i> Actualización de revisiones</h1>
-        <h3>{{ doc }} - Revisión {{ doc.r_actual }}</h3>
-        {% include 'partials/_messages.html' %}
-        <hr>
-        {% crispy form %}
-      </div>
-    </div>
-  </div>
-{% endblock content %}
+{% endblock scripts %}

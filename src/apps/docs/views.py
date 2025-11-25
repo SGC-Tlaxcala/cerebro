@@ -19,6 +19,7 @@ from django.forms.models import BaseModelForm
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from watson import search as watson
 from django.urls import reverse_lazy
+from pathlib import Path
 from django.db.models import Q, Prefetch
 from django.views.generic import (ListView, TemplateView, DetailView, FormView)
 from django.views.generic.edit import CreateView, UpdateView
@@ -243,8 +244,22 @@ class DocDetail(DetailView):
         context['reportes'] = Reporte.objects.filter(documento=self.kwargs['pk'])
         current_revision = self.object.revision_set.order_by('-revision').first()
         context['current_revision'] = current_revision
+        if current_revision and current_revision.archivo:
+            file_url = current_revision.archivo.url
+            context['current_file_url'] = file_url
+            context['current_file_abs_url'] = self.request.build_absolute_uri(file_url)
+            context['current_file_ext'] = Path(current_revision.archivo.name).suffix.lower().lstrip('.')
+            context['preview_image_exts'] = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp']
+            context['preview_office_exts'] = ['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx']
         context['history'] = self.object.revision_set.order_by('-revision')[1:]
-        context['version'] = VersionForm
+        next_revision = 0
+        if current_revision:
+            next_revision = current_revision.revision + 1
+        context['revision_form'] = VersionForm(initial={
+            'revision': next_revision,
+            'f_actualizacion': datetime.today().date(),
+        })
+        context['rev_add_url'] = reverse_lazy('docs:rev_add', args=(self.object.id,))
         return context
 
 

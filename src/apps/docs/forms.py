@@ -155,6 +155,23 @@ class VersionForm(forms.ModelForm):
         super(VersionForm, self).__init__(*args, **kwargs)
         self.fields['f_actualizacion'].label = "Fecha de Actualización"
 
+        # Aplicar estilos tailwind/daisyui
+        for name, field in self.fields.items():
+            widget = field.widget
+            if isinstance(widget, forms.Textarea):
+                widget.attrs.setdefault('class', TEXTAREA_BASE)
+                widget.attrs.setdefault('rows', 3)
+            elif isinstance(widget, forms.FileInput):
+                widget.attrs.setdefault('class', 'file-input file-input-bordered w-full')
+            elif isinstance(widget, forms.CheckboxInput):
+                widget.attrs.setdefault('class', TOGGLE_BASE)
+            else:
+                widget.attrs.setdefault('class', INPUT_BASE)
+            widget.attrs.setdefault('placeholder', field.label)
+
+        # Facilitar fecha con input date
+        self.fields['f_actualizacion'].widget.input_type = 'date'
+
         self.helper = FormHelper()
         self.helper.form_id = 'formulario_revision'
         self.helper.layout = Layout(
