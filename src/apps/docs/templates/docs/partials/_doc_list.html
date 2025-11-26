@@ -1,69 +1,77 @@
 {% load static %}
 {% if docs %}
-  <div class="overflow-x-auto rounded-3xl border border-base-300 bg-base-100 shadow-sm">
-    <table class="table table-zebra">
-      <thead class="text-xs uppercase tracking-wide text-base-content/60">
-        <tr>
-          <th>Clave</th>
-          <th>Documento</th>
-          <th>Tipo</th>
-          <th>Proceso</th>
-          <th class="text-center">Revisión</th>
-          <th class="text-center">Actualizado</th>
-          <th class="text-center">Acciones</th>
-        </tr>
-      </thead>
-      <tbody class="text-sm">
-        {% for doc in docs %}
-          {% with current=doc.latest_revision %}
-            <tr class="align-middle">
-              <td>
-                <span class="badge badge-outline badge-primary">{{ doc.clave_display }}</span>
-              </td>
-              <td>
-                <div class="font-semibold text-base-content">{{ doc.nombre }}</div>
-                {% if doc.texto_ayuda %}
-                  <p class="text-xs text-base-content/60">{{ doc.texto_ayuda|truncatewords:16 }}</p>
-                {% endif %}
-              </td>
-              <td>{{ doc.tipo.tipo }}</td>
-              <td>{{ doc.proceso.proceso }}</td>
-              <td class="text-center">
-                {% if current %}
-                  <span class="badge badge-ghost">{{ current.revision|stringformat:"02d" }}</span>
-                {% else %}
-                  —
-                {% endif %}
-              </td>
-              <td class="text-center">
-                {% if current %}
-                  {{ current.f_actualizacion|date:"d/m/Y" }}
-                {% else %}
-                  —
-                {% endif %}
-              </td>
-              <td class="text-center">
-                <div class="flex justify-center gap-2">
-                  <a href="{% url 'docs:detalle' doc.pk %}" class="btn btn-ghost btn-xs">Ver</a>
-                  {% if current and current.archivo %}
-                    <a href="{{ current.archivo.url }}" target="_blank" class="btn btn-outline btn-xs">
-                      Descargar
-                    </a>
-                  {% elif doc.ruta %}
-                    <a href="{{ doc.ruta }}" target="_blank" class="btn btn-outline btn-xs">
-                      Abrir
-                    </a>
-                  {% endif %}
-                </div>
-              </td>
-            </tr>
-          {% endwith %}
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
+<div class="overflow-x-auto rounded-3xl border border-base-300 bg-base-100 shadow-sm">
+  <table class="table table-zebra">
+    <thead class="text-xs uppercase tracking-wide text-base-content/60">
+      <tr>
+        <th>Clave</th>
+        <th>Documento</th>
+        <th>Tipo</th>
+        <th>Proceso</th>
+        <th class="text-center">Revisión</th>
+        <th class="text-center">Actualizado</th>
+        <th class="text-center">Acciones</th>
+      </tr>
+    </thead>
+    <tbody class="text-sm">
+      {% for doc in docs %}
+      {% with current=doc.latest_revision %}
+      <tr class="align-middle">
+        <td>
+          <span class="badge badge-outline badge-primary">{{ doc.clave_display }}</span>
+        </td>
+        <td>
+          <div class="font-semibold text-base-content">{{ doc.nombre }}</div>
+          {% if doc.texto_ayuda %}
+          <p class="text-xs text-base-content/60">{{ doc.texto_ayuda|truncatewords:16 }}</p>
+          {% endif %}
+        </td>
+        <td>{{ doc.tipo.tipo }}</td>
+        <td>{{ doc.proceso.proceso }}</td>
+        <td class="text-center">
+          {% if current %}
+          <span class="badge badge-ghost">{{ current.revision|stringformat:"02d" }}</span>
+          {% else %}
+          —
+          {% endif %}
+        </td>
+        <td class="text-center">
+          {% if current %}
+          {{ current.f_actualizacion|date:"d/m/Y" }}
+          {% else %}
+          —
+          {% endif %}
+        </td>
+        <td class="text-center">
+          <div class="flex justify-center gap-2">
+            <a href="{% url 'docs:detalle' doc.pk %}" class="btn btn-primary btn-sm">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                stroke="currentColor" class="size-4">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+              </svg>
+              Ver
+            </a>
+            {% if current and current.archivo %}
+            <a href="{{ current.archivo.url }}" target="_blank" class="btn btn-ghost btn-xs">
+              Descargar
+            </a>
+            {% elif doc.ruta %}
+            <a href="{{ doc.ruta }}" target="_blank" class="btn btn-ghost btn-xs">
+              Abrir
+            </a>
+            {% endif %}
+          </div>
+        </td>
+      </tr>
+      {% endwith %}
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
 {% else %}
-  <div class="rounded-3xl border border-dashed border-base-300 bg-base-100 p-10 text-center text-base-content/70">
-    No se encontraron documentos con el criterio seleccionado.
-  </div>
+<div class="rounded-3xl border border-dashed border-base-300 bg-base-100 p-10 text-center text-base-content/70">
+  No se encontraron documentos con el criterio seleccionado.
+</div>
 {% endif %}
