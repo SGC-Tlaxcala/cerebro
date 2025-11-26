@@ -15,6 +15,7 @@ from os.path import basename
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.template.defaultfilters import slugify
+from django.urls import reverse
 
 
 User = get_user_model()
@@ -148,6 +149,17 @@ class Documento (models.Model):
     def __str__(self) -> str:
         """Formato en texto del modelo."""
         return "%s (%s-%02d)" % (self.nombre, self.tipo.slug.upper(), self.id)
+
+    @property
+    def clave_display(self):
+        return self.clave()
+
+    def get_absolute_url(self):
+        return reverse('docs:detalle', args=[self.pk])
+
+    @property
+    def latest_revision(self):
+        return self.revision_set.order_by('-revision').first()
 
     def revision_actual(self):
         """Devuelve la revisión del documento como un entero."""

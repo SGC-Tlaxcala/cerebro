@@ -1,27 +1,86 @@
-"""
-This file demonstrates writing tests using the unittest module. These will pass
-when you run "manage.py test".
-
-Replace this with more appropriate tests for your application.
-"""
-
 from django.test import TestCase
+from django.urls import reverse
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.contrib.auth import get_user_model
+from django.utils import timezone
+
+from apps.docs.models import Documento, Proceso, Tipo, Revision
 
 
-class SimpleTest(TestCase):
-    def test_basic_addition(self):
-        """
-        Tests that 1 + 1 always equals 2.
-        """
-        self.assertEqual(1 + 1, 2)
+User = get_user_model()
 
-# Write test for models in models.py
-from .models import Tipo, Proceso, Documento
 
-class TipoModelTest(TestCase):
+class DocsViewsTests(TestCase):
     def setUp(self):
-        Tipo.objects.create(tipo='Planos', slug='pln')
+        self.user = User.objects.create(username='tester')
+        self.tipo = Tipo.objects.create(tipo='Procedimiento', slug='prc')
+        self.proceso = Proceso.objects.create(proceso='Planeación', slug='pln')
+        self.doc = Documento.objects.create(
+            nombre='Guía de prueba',
+            slug='guia-prueba',
+            proceso=self.proceso,
+            tipo=self.tipo,
+            lmd=True,
+            autor=self.user,
+            texto_ayuda='Documento de ejemplo'
+        )
+        Revision.objects.create(
+            documento=self.doc,
+            revision=1,
+            f_actualizacion=timezone.now().date(),
+            archivo=SimpleUploadedFile('prueba.pdf', b'contenido de prueba'),
+            cambios='Inicial',
+            autor=self.user,
+        )
 
-    def test_tipo_model(self):
-        tipo = Tipo.objects.get(tipo='Planos')
-        self.assertEqual(tipo.slug, 'pln')
+    def test_index_renders_tailwind_template(self):
+        response = self.client.get(reverse('docs:index'))
+        self.assertContains(response, 'Gestor documental')
+        self.assertTemplateUsed(response, 'docs/index.html')
+
+    def test_ldp_returns_partial_with_htmx(self):
+        response = self.client.get(
+            reverse('docs:ldp'),
+            HTTP_HX_REQUEST='true',
+        )
+        self.assertTemplateUsed(response, 'docs/partials/_doc_list.html')
+        self.assertContains(response, self.doc.nombre)
+
+    def test_search_view_filters_results(self):
+        response = self.client.get(reverse('docs:buscador'), {'q': 'Guía'})
+        self.assertContains(response, 'Resultados de búsqueda')
+
+
+class DocsAPITests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create(username='api-user')
+        tipo = Tipo.objects.create(tipo='Formato', slug='fmt')
+        proceso = Proceso.objects.create(proceso='Operación', slug='opr')
+        doc = Documento.objects.create(
+            nombre='Formato operativo',
+            slug='formato-operativo',
+            proceso=proceso,
+            tipo=tipo,
+            autor=self.user,
+            lmd=True,
+        )
+        Revision.objects.create(
+            documento=doc,
+            revision=1,
+            f_actualizacion=timezone.now().date(),
+            archivo=SimpleUploadedFile('formato.pdf', b'pdf'),
+            cambios='Alta',
+            autor=self.user,
+        )
+
+    def test_documents_api_returns_data(self):
+        response = self.client.get('/api/v1/docs/documents/')
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(len(data) >= 1)
+        self.assertIn('nombre', data[0])
+
+    def test_documents_api_filter_by_query(self):
+        response = self.client.get('/api/v1/docs/documents/', {'q': 'operativo'})
+        self.assertEqual(response.status_code, 200)
+        self.assertGreaterEqual(len(response.json()), 1)

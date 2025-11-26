@@ -79,6 +79,10 @@ class Idea(models.Model):
         # Regresa el estado final de la idea o proyecto Resolve_last()
         return self.resolve_set.last()
 
+    @property
+    def latest_resolution(self):
+        return self.resolve_set.order_by('-created').first()
+
 
 ESPERA = 0
 NO_VIABLE = 1
@@ -99,3 +103,6 @@ class Resolve(models.Model):
 
     def __str__(self):
         return f'comment-{self.id}'
+
+    class Meta:
+        ordering = ('-created',)

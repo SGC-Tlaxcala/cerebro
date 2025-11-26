@@ -30,7 +30,7 @@ urlpatterns = [
     path('proceso/<slug:slug>', ProcesoList.as_view(), name='proceso'),
     path('buscador/', Buscador.as_view(), name='buscador'),
     path('reportes/', Reportes.as_view(), name='reportes'),
-    path('add/', login_required(DocAdd.as_view()), name='add'),
+    path('add/', DocAdd.as_view(), name='add'),
     path('setup/', login_required(SetupDoc.as_view()), name='setup'),
     path(
         'process_add/',

@@ -17,45 +17,44 @@ from .models import Documento, Proceso, Tipo, Revision, Reporte
 GUARDAR_CAMBIOS = 'Guardar cambios'
 
 
-class DocForm(forms.ModelForm):
+INPUT_BASE = 'input input-bordered w-full'
+TEXTAREA_BASE = 'textarea textarea-bordered w-full min-h-[140px]'
+SELECT_BASE = 'select select-bordered w-full'
+TOGGLE_BASE = 'toggle toggle-primary'
+
+
+class TailwindFormMixin:
+    def _apply_tailwind(self):
+        for name, field in self.fields.items():
+            widget = field.widget
+            if isinstance(widget, forms.Textarea):
+                widget.attrs.setdefault('class', TEXTAREA_BASE)
+            elif isinstance(widget, forms.Select):
+                widget.attrs.setdefault('class', SELECT_BASE)
+            elif isinstance(widget, forms.CheckboxInput):
+                widget.attrs.setdefault('class', TOGGLE_BASE)
+            else:
+                widget.attrs.setdefault('class', INPUT_BASE)
+            widget.attrs.setdefault('placeholder', field.label)
+
+
+class DocForm(TailwindFormMixin, forms.ModelForm):
     """Formulario para crear un documento nuevo."""
 
-    def __init__(self, *args, **kwargs):
-        """Inicializador del formulario de documentos."""
-        super(DocForm, self).__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.layout = Layout(
-            Div(
-                Field('nombre',  wrapper_class='col-md-8', autocomplete='off'),
-                css_class='row'
-            ),
-            Div(
-                Field('proceso', wrapper_class='col-md-3', autocomplete='off'),
-                Field('tipo', wrapper_class='col-md-3', autocomplete='off'),
-                css_class='row'
-            ),
-            Div(
-                Field('texto_ayuda', wrapper_class='col-md-8', rows='3'),
-                css_class='row'
-            ),
-            Div(
-                HTML('<hr>'),
-                FormActions(
-                    Submit('save', GUARDAR_CAMBIOS),
-                    Button('cancel', 'Cancelar')
-                ),
-                css_class='modal-footer'
-            )
-        )
-
     class Meta:
-        """Metadata de la clase DocForm."""
-
         model = Documento
-        fields = ['nombre', 'proceso', 'tipo', 'texto_ayuda']
+        fields = ['nombre', 'proceso', 'tipo', 'ruta', 'texto_ayuda', 'lmd', 'resultados']
+        widgets = {
+            'texto_ayuda': forms.Textarea(attrs={'rows': 4}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._apply_tailwind()
+        self.fields['ruta'].widget.attrs.setdefault('type', 'url')
 
 
-class ProcesoForm(forms.ModelForm):
+class ProcesoForm(TailwindFormMixin, forms.ModelForm):
     """
     Clase ProcesoForm.
 
@@ -64,25 +63,8 @@ class ProcesoForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         """Inicializador del formulario de procesos."""
-        super(ProcesoForm, self).__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.layout = Layout(
-            Div(
-                Field(
-                    'proceso',
-                    wrapper_class='col-md-12',
-                    autocomplete='off'),
-                Field('slug', wrapper_class='col-md-12', autocomplete='off'),
-                css_class='row'
-            ),
-            Div(
-                HTML('<hr>'),
-                FormActions(
-                    Submit('save', GUARDAR_CAMBIOS),
-                    Button('cancel', 'Cancelar')
-                )
-            )
-        )
+        super().__init__(*args, **kwargs)
+        self._apply_tailwind()
 
     class Meta:
         """Metadatos de la clase ProcesoForm."""
@@ -91,7 +73,7 @@ class ProcesoForm(forms.ModelForm):
         fields = ['proceso', 'slug']
 
 
-class TipoForm(forms.ModelForm):
+class TipoForm(TailwindFormMixin, forms.ModelForm):
     """
     Clase TipoForm.
 
@@ -100,22 +82,8 @@ class TipoForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         """Inicializador para la clase TipoForm."""
-        super(TipoForm, self).__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.layout = Layout(
-            Div(
-                Field('tipo', wrapper_class='col-md-12', autocomplete='off'),
-                Field('slug', wrapper_class='col-md-12', autocomplete='off'),
-                css_class='row'
-            ),
-            Div(
-                HTML('<hr>'),
-                FormActions(
-                    Submit('save', GUARDAR_CAMBIOS),
-                    Button('cancel', 'Cancelar')
-                )
-            )
-        )
+        super().__init__(*args, **kwargs)
+        self._apply_tailwind()
 
     class Meta:
         """Metadatos de la clase TipoForm."""
@@ -186,6 +154,23 @@ class VersionForm(forms.ModelForm):
         """Inicializador de la clase VersionForm."""
         super(VersionForm, self).__init__(*args, **kwargs)
         self.fields['f_actualizacion'].label = "Fecha de Actualización"
+
+        # Aplicar estilos tailwind/daisyui
+        for name, field in self.fields.items():
+            widget = field.widget
+            if isinstance(widget, forms.Textarea):
+                widget.attrs.setdefault('class', TEXTAREA_BASE)
+                widget.attrs.setdefault('rows', 3)
+            elif isinstance(widget, forms.FileInput):
+                widget.attrs.setdefault('class', 'file-input file-input-bordered w-full')
+            elif isinstance(widget, forms.CheckboxInput):
+                widget.attrs.setdefault('class', TOGGLE_BASE)
+            else:
+                widget.attrs.setdefault('class', INPUT_BASE)
+            widget.attrs.setdefault('placeholder', field.label)
+
+        # Facilitar fecha con input date
+        self.fields['f_actualizacion'].widget.input_type = 'date'
 
         self.helper = FormHelper()
         self.helper.form_id = 'formulario_revision'

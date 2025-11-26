@@ -1,0 +1,25 @@
+{% extends 'cerebro/base.html' %}
+
+{% block title %}Documentos{% endblock %}
+
+{% block content %}
+<section class="space-y-6">
+  <header class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+    <div>
+      <p class="text-sm uppercase tracking-wide text-base-content/60">Repositorio documental</p>
+      <h1 class="text-3xl font-bold text-base-content">{{ list_title|default:"Documentos" }}</h1>
+      {% if list_description %}
+        <p class="mt-1 text-sm text-base-content/70">{{ list_description }}</p>
+      {% endif %}
+    </div>
+    <div class="flex gap-3">
+      <a href="{% url 'docs:index' %}" class="btn btn-ghost btn-sm">← Regresar</a>
+      <a href="/api/v1/docs/" class="btn btn-outline btn-sm" target="_blank" rel="noopener">API</a>
+    </div>
+  </header>
+
+  <div id="docs-list">
+    {% include 'docs/partials/_doc_list.html' %}
+  </div>
+</section>
+{% endblock content %}

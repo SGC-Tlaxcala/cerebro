@@ -40,6 +40,7 @@ DJANGO_APPS = [
 THIRD_PARTY_APPS = [
     'crispy_forms',
     "crispy_bootstrap5",
+    'crispy_tailwind',
     'django_extensions',
     'watson',
     'simple_history',
@@ -48,6 +49,7 @@ THIRD_PARTY_APPS = [
     'captcha',
     'anymail',
     "compressor",
+    'rest_framework',  # added so DRF templates (browsable API) are found
 ]
 LOCAL_APPS = [
     'core',
@@ -57,6 +59,7 @@ LOCAL_APPS = [
     'apps.carto.config.CartoConfig',
     'apps.pas.config.PasConfig',
     'apps.kpi.config.KpiConfig',
+    'apps.vozmac.config.VozmacConfig',
 ]
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
@@ -153,7 +156,7 @@ MEDIA_URL = '/media/'
 FILE_UPLOAD_PERMISSIONS = 0o644
 
 CRISPY_TEMPLATE_PACK = 'bootstrap5'
-CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_ALLOWED_TEMPLATE_PACKS = ('bootstrap5', 'tailwind')
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
@@ -162,6 +165,12 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
         'rest_framework.authentication.SessionAuthentication',
+    ),
+    # Forzar solo JSON renderer para evitar la dependencia de la plantilla
+    # `rest_framework/api.html` (Browsable API). Si prefieres la browsable API,
+    # instala djangorestframework en el entorno (pip install djangorestframework)
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
     ),
 }
 

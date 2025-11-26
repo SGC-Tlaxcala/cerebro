@@ -1,0 +1,14 @@
+<form hx-post="{{ form_action }}"
+      hx-target="#pas-modal-content"
+      hx-swap="innerHTML"
+      class="space-y-6">
+  {% csrf_token %}
+  <header class="space-y-2">
+    <h3 class="text-xl font-semibold text-base-content">Eliminar actividad</h3>
+    <p class="text-sm text-base-content/70">Esta acción no se puede deshacer. ¿Seguro que deseas eliminar la actividad <strong>{{ activity.accion|striptags|truncatechars:80 }}</strong>?</p>
+  </header>
+  <div class="flex flex-wrap items-center gap-3">
+    <button type="submit" class="btn btn-error">Eliminar</button>
+    <button type="button" class="btn btn-ghost" data-close-modal="pas-modal">Cancelar</button>
+  </div>
+</form>

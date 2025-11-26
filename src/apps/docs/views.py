@@ -19,7 +19,8 @@ from django.forms.models import BaseModelForm
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from watson import search as watson
 from django.urls import reverse_lazy
-from django.db.models import Q
+from pathlib import Path
+from django.db.models import Q, Prefetch
 from django.views.generic import (ListView, TemplateView, DetailView, FormView)
 from django.views.generic.edit import CreateView, UpdateView
 from django.template.loader import render_to_string
@@ -42,6 +43,30 @@ from apps.docs.forms import (
 )
 
 
+class HTMXDocumentListMixin:
+    """Proporciona soporte para listas dinamicas usando htmx."""
+
+    partial_template = 'docs/partials/_doc_list.html'
+    list_title = ''
+    list_description = ''
+
+    def get_template_names(self):
+        if self.request.headers.get('HX-Request'):
+            return [self.partial_template]
+        return super().get_template_names()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.setdefault('list_title', self.list_title)
+        context.setdefault('list_description', self.list_description)
+        return context
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        revision_prefetch = Prefetch('revision_set', queryset=Revision.objects.order_by('-revision'))
+        return qs.select_related('tipo', 'proceso').prefetch_related(revision_prefetch)
+
+
 class Reportes(ListView):
     """
     Clase Reportes.
@@ -61,7 +86,7 @@ class Reportes(ListView):
         return self.__class__.__name__
 
 
-class IndexLMD(ListView):
+class IndexLMD(HTMXDocumentListMixin, ListView):
     """
     Índice de la Lista Maestra de Documentos.
 
@@ -71,82 +96,109 @@ class IndexLMD(ListView):
 
     model = Documento
     context_object_name = 'docs'
+    template_name = 'docs/index.html'
+    list_title = 'Lista Maestra de Documentos'
 
     def get_queryset(self):
-        """Genera la consulta de la LMD."""
-        return Documento.objects.filter(lmd=True, activo=True).order_by('id')
+        return (
+            Documento.objects.filter(lmd=True, activo=True)
+            .select_related('proceso', 'tipo')
+            .prefetch_related('revision_set')
+            .order_by('proceso', 'nombre')
+        )
 
-    def __str__(self):
-        return self.__class__.__name__
+    def get_template_names(self):
+        if self.request.headers.get('HX-Request'):
+            return [self.partial_template]
+        return [self.template_name]
+
+    def get_stats(self):
+        base_qs = Documento.objects.filter(activo=True)
+        return {
+            'total': base_qs.count(),
+            'lmd': base_qs.filter(lmd=True).count(),
+            'procesos': base_qs.values('proceso').distinct().count(),
+            'tipos': base_qs.values('tipo').distinct().count(),
+        }
 
     def get_context_data(self, **kwargs):
-        """Agrega la variable `active` al contexto de la vista."""
         context = super().get_context_data(**kwargs)
-        # Buscamos los reportes que existan en el documento actual
-        # y los agregamos al contexto
-        context['activeLMD'] = True
-        context['panicButton'] = True
+        context.update({
+            'stats': self.get_stats(),
+            'processes': Proceso.objects.order_by('proceso'),
+            'types': Tipo.objects.order_by('tipo'),
+            'activeLMD': True,
+        })
         return context
 
 
-class IndexLDP(ListView):
+class IndexLDP(HTMXDocumentListMixin, ListView):
     """Lista de documentos por proceso."""
 
     model = Documento
-    template_name = 'docs/ldp.html'
+    template_name = 'docs/list.html'
     context_object_name = 'docs'
+    list_title = 'Documentos por proceso'
+    list_description = 'Documentos agrupados por cada proceso del SGC.'
 
     def get_queryset(self):
-        """Genera la consulta de la LMD."""
-        return Documento.objects\
-            .filter(lmd=False, activo=True)\
+        return (
+            Documento.objects.filter(lmd=False, activo=True)
+            .select_related('proceso', 'tipo')
+            .prefetch_related('revision_set')
             .order_by('proceso', 'tipo')
+        )
 
     def get_context_data(self, **kwargs):
-        """Agrega la variable `active` al contexto de la vista."""
         context = super().get_context_data(**kwargs)
-        # Buscamos los reportes que existan en el documento actual
-        # y los agregamos al contexto
         context['activeLDP'] = True
-        context['panicButton'] = True
         return context
 
 
-class IndexLDT(ListView):
+class IndexLDT(HTMXDocumentListMixin, ListView):
     """Lista de documentos por tipo."""
 
     model = Documento
-    template_name = 'docs/ldt.html'
+    template_name = 'docs/list.html'
     context_object_name = 'docs'
-
-    def get_context_data(self, **kwargs):
-        """Agregamos la variable panicButton al contexto de la vista."""
-        context = super().get_context_data(**kwargs)
-        context['panicButton'] = True
-        return context
+    list_title = 'Documentos por tipo'
+    list_description = 'Filtra los documentos según su tipología.'
 
     def get_queryset(self):
-        """Genera la consulta de la LMD."""
-        return Documento.objects\
-            .filter(lmd=False, activo=True).order_by('tipo', 'proceso', 'id')
+        return (
+            Documento.objects.filter(lmd=False, activo=True)
+            .select_related('proceso', 'tipo')
+            .prefetch_related('revision_set')
+            .order_by('tipo', 'proceso', 'id')
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['activeLDT'] = True
+        return context
 
 
-class IndexLDR(ListView):
+class IndexLDR(HTMXDocumentListMixin, ListView):
     """Lista de resultados del SGC."""
 
     model = Documento
-    template_name = 'docs/ldr.html'
+    template_name = 'docs/list.html'
     context_object_name = 'docs'
-
-    def get_context_data(self, **kwargs):
-        """Agregamos la variable panicButton al contexto de la vista."""
-        context = super().get_context_data(**kwargs)
-        context['panicButton'] = True
-        return context
+    list_title = 'Documentos con resultados'
+    list_description = 'Reportes y documentos con indicadores y resultados del SGC.'
 
     def get_queryset(self):
-        """Genera la consulta de la LDR."""
-        return Documento.objects.filter(resultados=True, activo=True).order_by('proceso', 'id')
+        return (
+            Documento.objects.filter(resultados=True, activo=True)
+            .select_related('proceso', 'tipo')
+            .prefetch_related('revision_set')
+            .order_by('proceso', 'id')
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['activeLDR'] = True
+        return context
 
 
 class IndexList(ListView):
@@ -182,6 +234,7 @@ class DocDetail(DetailView):
 
     model = Documento
     context_object_name = 'doc'
+    template_name = 'docs/documento_detail.html'
 
     def get_context_data(self, **kwargs):
         """Agrega la variable `version` al contexto de la vista."""
@@ -189,8 +242,24 @@ class DocDetail(DetailView):
         # Buscamos los reportes que existan en el documento actual
         # y los agregamos al contexto
         context['reportes'] = Reporte.objects.filter(documento=self.kwargs['pk'])
-        context['panicButton'] = True
-        context.update({'version': VersionForm})
+        current_revision = self.object.revision_set.order_by('-revision').first()
+        context['current_revision'] = current_revision
+        if current_revision and current_revision.archivo:
+            file_url = current_revision.archivo.url
+            context['current_file_url'] = file_url
+            context['current_file_abs_url'] = self.request.build_absolute_uri(file_url)
+            context['current_file_ext'] = Path(current_revision.archivo.name).suffix.lower().lstrip('.')
+            context['preview_image_exts'] = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp']
+            context['preview_office_exts'] = ['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx']
+        context['history'] = self.object.revision_set.order_by('-revision')[1:]
+        next_revision = 0
+        if current_revision:
+            next_revision = current_revision.revision + 1
+        context['revision_form'] = VersionForm(initial={
+            'revision': next_revision,
+            'f_actualizacion': datetime.today().date(),
+        })
+        context['rev_add_url'] = reverse_lazy('docs:rev_add', args=(self.object.id,))
         return context
 
 
@@ -225,19 +294,33 @@ class SetupDoc(TemplateView):
         return context
 
 
-class DocAdd(CreateView):
+class DocAdd(LoginRequiredMixin, CreateView):
     """Formulario para agregar un documento."""
 
     model = Documento
     form_class = DocForm
+    template_name = 'docs/documento_form.html'
+
+    def get_context_data(self, **kwargs):
+        """Agrega formularios de catálogo para usarlos en modales."""
+        context = super().get_context_data(**kwargs)
+        context.setdefault('process_form', ProcesoForm())
+        context.setdefault('type_form', TipoForm())
+        context['process_add_url'] = reverse_lazy('docs:process_add')
+        context['type_add_url'] = reverse_lazy('docs:tipo_add')
+        context['return_url'] = reverse_lazy('docs:add')
+        return context
 
     def form_valid(self, form):
         """Validación del formulario."""
-        self.document = form.save(commit=False)
-        self.document.autor = self.request.user
-        self.document.slug = slugify(self.document.nombre)
-        self.document.save()
-        return super().form_valid(form)
+        document = form.save(commit=False)
+        document.autor = self.request.user
+        document.slug = slugify(document.nombre)
+        document.save()
+        form.save_m2m()
+        messages.success(self.request, 'El documento se registró correctamente.')
+        self.object = document
+        return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self):
         """Redirección en caso de éxito."""
@@ -413,6 +496,13 @@ class ProcessAdd(CreateView):
     template_name = 'docs/proceso_form.html'
     success_url = reverse_lazy('docs:setup')
 
+    def get_success_url(self):
+        """Permite regresar al formulario de documentos si se solicita."""
+        next_url = self.request.GET.get('next') or self.request.POST.get('next')
+        if next_url:
+            return next_url
+        return super().get_success_url()
+
 
 class TipoAdd(CreateView):
     """Formulario para agregar un nuevo tipo de documento."""
@@ -421,18 +511,47 @@ class TipoAdd(CreateView):
     template_name = 'docs/tipo_form.html'
     success_url = reverse_lazy('docs:setup')
 
+    def get_success_url(self):
+        """Permite regresar al formulario de documentos si se solicita."""
+        next_url = self.request.GET.get('next') or self.request.POST.get('next')
+        if next_url:
+            return next_url
+        return super().get_success_url()
 
-class Buscador(TemplateView):
+
+class Buscador(HTMXDocumentListMixin, ListView):
     """Vista para el buscador de documentos."""
-    template_name = 'docs/busqueda.html'
+    template_name = 'docs/list.html'
+    context_object_name = 'docs'
+    list_title = 'Resultados de búsqueda'
+    list_description = 'Documentos que coinciden con tu búsqueda.'
+
+    def get_queryset(self):
+        query = (self.request.GET.get('q') or '').strip()
+        if not query:
+            return Documento.objects.none()
+        resultados = watson.search(query)
+        ids = []
+        for resultado in resultados:
+            obj = getattr(resultado, 'object', None)
+            if isinstance(obj, Documento):
+                ids.append(obj.id)
+        if not ids:
+            ids = list(
+                Documento.objects.filter(
+                    Q(nombre__icontains=query) | Q(texto_ayuda__icontains=query)
+                ).values_list('id', flat=True)
+            )
+        return (
+            Documento.objects.filter(id__in=ids)
+            .select_related('proceso', 'tipo')
+            .prefetch_related('revision_set')
+            .order_by('proceso', 'nombre')
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        query = self.request.GET.get('q')
-        resultados = {}
-        if query:
-            resultados = watson.search(query)
-        context.update({'resultados': resultados, 'query': query})
+        context['query'] = self.request.GET.get('q', '')
         return context
 
 

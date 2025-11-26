@@ -4,6 +4,7 @@ django_environ
 # psycopg2-binary
 Unipath
 django-crispy-forms
+crispy-tailwind
 djangorestframework
 djangorestframework-simplejwt
 workdays

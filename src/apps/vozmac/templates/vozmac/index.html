@@ -1,0 +1,950 @@
+{% extends 'cerebro/base.html' %}
+{% load static %}
+
+{% block title %}Aprobación Ciudadana{% endblock %}
+
+{% block content %}
+<div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-4">
+  <h1 class="flex items-center gap-3 text-4xl font-bold">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-10 text-primary">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M6.633 10.25c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 0 1 2.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 0 0 .322-1.672V2.75a.75.75 0 0 1 .75-.75 2.25 2.25 0 0 1 2.25 2.25c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282m0 0h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 0 1-2.649 7.521c-.388.482-.987.729-1.605.729H13.48c-.483 0-.964-.078-1.423-.23l-3.114-1.04a4.501 4.501 0 0 0-1.423-.23H5.904m10.598-9.75H14.25M5.904 18.5c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 0 1-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 9.953 4.167 9.5 5 9.5h1.053c.472 0 .745.556.5.96a8.958 8.958 0 0 0-1.302 4.665c0 1.194.232 2.333.654 3.375Z" />
+    </svg>
+    Aprobación Ciudadana
+  </h1>
+  <a href="{% url 'vozmac:add' %}" class="btn btn-primary whitespace-nowrap">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
+    </svg>
+    Agregar paquete de encuestas</a>
+</div>
+
+<div id="filter" class="mb-6">
+  <div class="tabs tabs-boxed w-full justify-center" role="tablist" aria-label="Filtros de datos">
+    <button type="button" class="tab tab-lg" role="tab" aria-selected="true" data-filter="estatal" data-d="0">Estatal</button>
+    <button type="button" class="tab tab-lg" role="tab" aria-selected="false" data-filter="distrito-01" data-d="1">Distrito 01</button>
+    <button type="button" class="tab tab-lg" role="tab" aria-selected="false" data-filter="distrito-02" data-d="2">Distrito 02</button>
+    <button type="button" class="tab tab-lg" role="tab" aria-selected="false" data-filter="distrito-03" data-d="3">Distrito 03</button>
+  </div>
+  <div id="mac-filter-wrapper" class="mt-3 hidden">
+    <div id="mac-filter-tabs" class="tabs tabs-sm tabs-boxed w-full justify-center" role="tablist" aria-label="Filtro por MAC"></div>
+    <div id="mac-filter-empty" class="text-center text-xs text-gray-500 mt-2" style="display:none">Sin MACs disponibles.</div>
+  </div>
+  <div class="mt-4 flex justify-center">
+    <a id="download-btn" href="/api/v1/vozmac/export" class="btn btn-sm btn-outline gap-2" download>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v12m0 0 4-4m-4 4-4-4"/>
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 15v3a3 3 0 0 0 3 3h6a3 3 0 0 0 3-3v-3"/>
+      </svg>
+      Descargar CSV
+    </a>
+  </div>
+</div>
+
+<div id="general" class="grid grid-cols-1 md:grid-cols-12 gap-6 mt-6">
+  <div class="md:col-span-5">
+    <div id="objetivo-calidad" class="card bg-base-100 shadow h-full">
+      <div class="card-body flex flex-col items-center">
+        <h2 class="card-title self-start">Objetivo de Calidad</h2>
+        <div id="objetivo-gauge" class="w-full" style="min-height:280px; min-width:300px"></div>
+        <div class="mt-6 w-full text-left space-y-2">
+          <p class="text-base font-semibold text-gray-700 leading-relaxed">
+            Cumplir en un 95% la satisfacción ciudadana sobre el servicio de los Módulos de Atención Ciudadana.
+          </p>
+          <p id="objetivo-resumen" class="text-base font-semibold text-gray-700 leading-relaxed"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="md:col-span-7">
+    <div class="card bg-base-100 shadow h-full" id="seguimiento">
+      <div class="card-body">
+        <h2 class="card-title">Seguimiento mensual</h2>
+        <div id="seguimiento-loading" class="flex justify-center items-center py-6" style="display:none">
+          <svg class="animate-spin h-8 w-8 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+          </svg>
+        </div>
+        <div id="seguimiento-chart" style="min-height:280px"></div>
+        <div id="seguimiento-empty" class="text-center text-sm text-gray-500 mt-4" style="display:none">Sin datos para el año anterior.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6 mt-6">
+  <div class="md:col-span-7">
+    <div class="card bg-base-100 shadow h-full" id="satisfaccion">
+      <div class="card-body">
+        <h2 class="card-title">Satisfacción Ciudadana</h2>
+        <div id="satisfaccion-loading" class="flex justify-center items-center py-6" style="display:none">
+          <svg class="animate-spin h-8 w-8 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+          </svg>
+        </div>
+
+        <div id="satisfaccion-chart" class="w-full" style="min-height:360px"></div>
+        <div id="satisfaccion-legend" class="mt-4 text-sm grid grid-cols-1 gap-2"></div>
+        <div id="satisfaccion-empty" class="text-center text-sm text-gray-500 mt-4" style="display:none">Sin datos</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="md:col-span-5">
+    <div id="motivo-visita" class="card bg-base-100 shadow h-full">
+      <div class="card-body">
+        <h2 class="card-title">Motivo de Visita</h2>
+
+        <!-- Spinner (oculto por defecto) -->
+        <div id="motivo-loading" class="flex justify-center items-center py-6" style="display:none">
+          <svg class="animate-spin h-8 w-8 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+          </svg>
+        </div>
+
+        <!-- Contenedor del chart y mensaje "Sin datos" -->
+        <div id="motivo-chart" class="w-full" style="min-height:260px"></div>
+        <div id="motivo-legend" class="mt-4 text-sm"></div>
+        <div id="motivo-empty" class="text-center text-sm text-gray-500 mt-4" style="display:none">Sin datos</div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+{% endblock content %}
+
+{% block scripts %}
+    <script>
+    // Motivo de visita: carga mediante fetch + ApexCharts
+    (function () {
+
+      // Mapeo visual con iconos (Heroicons-like inline SVGs)
+      const MOTIVO_LABELS = {
+        // Heroicons - document-text (outline)
+        '1': { text: 'Trámite', svg: '<svg xmlns="http://www.w3.org/2000/svg" class="inline-block h-5 w-5 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h10M7 16h10"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"/></svg>' },
+        // Recoger credencial - icono proporcionado (convertido a atributos HTML)
+        '2': { text: 'Recoger credencial', svg: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 inline-block h-5 w-5 mr-1">  <path stroke-linecap="round" stroke-linejoin="round" d="M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Zm6-10.125a1.875 1.875 0 1 1-3.75 0 1.875 1.875 0 0 1 3.75 0Zm1.294 6.336a6.721 6.721 0 0 1-3.17.789 6.721 6.721 0 0 1-3.168-.789 3.376 3.376 0 0 1 6.338 0Z" /> </svg>' }
+      };
+
+      function showSpinner() {
+        const s = document.getElementById('motivo-loading'); if (s) s.style.display = 'flex';
+      }
+      function hideSpinner() {
+        const s = document.getElementById('motivo-loading'); if (s) s.style.display = 'none';
+      }
+      function showEmpty() { const e = document.getElementById('motivo-empty'); if (e) e.style.display = 'block'; }
+      function hideEmpty() { const e = document.getElementById('motivo-empty'); if (e) e.style.display = 'none'; }
+
+      function resolveThemeColor(cssVar, fallback) {
+        try {
+          const root = document.documentElement;
+          if (!root) return fallback;
+          const style = getComputedStyle(root);
+          const baseVar = cssVar.startsWith('--') ? cssVar : `--${cssVar}`;
+          const fallbackVar = baseVar.replace(/^--/, '--fallback-');
+          const candidates = [baseVar, fallbackVar];
+          for (const name of candidates) {
+            const raw = style.getPropertyValue(name);
+            const normalized = normalizeCssColor(raw);
+            if (normalized) return normalized;
+          }
+        } catch (err) {
+          console.warn('resolveThemeColor error', err);
+        }
+        return fallback;
+      }
+
+      function normalizeCssColor(raw) {
+        if (!raw) return null;
+        const trimmed = raw.trim();
+        if (!trimmed || trimmed.toLowerCase() === 'initial') return null;
+        if (trimmed.startsWith('var(')) return null;
+        if (/^#|^rgb|^hsl|^oklch|^color/i.test(trimmed)) {
+          if (trimmed.startsWith('oklch')) {
+            return parseOklchToHex(trimmed);
+          }
+          return trimmed;
+        }
+        const parts = trimmed.split(/\s+/);
+        if (parts.length >= 3) {
+          if (parts.some(function (segment) { return segment.includes('%') || segment.includes('deg'); })) {
+            return `hsl(${parts.slice(0, 3).join(' ')})`;
+          }
+          const l = parseFloat(parts[0]);
+          const c = parseFloat(parts[1]);
+          const h = parseFloat(parts[2]);
+          return oklchToHexSafe(l, c, h);
+        }
+        return null;
+      }
+
+      function parseOklchToHex(value) {
+        const match = value.match(/oklch\(\s*([0-9.]+)\s+([0-9.]+)\s+([0-9.]+)/i);
+        if (!match) return null;
+        const l = parseFloat(match[1]);
+        const c = parseFloat(match[2]);
+        const h = parseFloat(match[3]);
+        return oklchToHexSafe(l, c, h);
+      }
+
+      function oklchToHexSafe(l, c, h) {
+        if (!isFinite(l) || !isFinite(c) || !isFinite(h)) return null;
+        return oklchToHex(l, c, h);
+      }
+
+      function oklchToHex(l, c, hDeg) {
+        const hRad = (hDeg * Math.PI) / 180;
+        const a = c * Math.cos(hRad);
+        const b = c * Math.sin(hRad);
+
+        let l1 = l + 0.3963377774 * a + 0.2158037573 * b;
+        let m1 = l - 0.1055613458 * a - 0.0638541728 * b;
+        let s1 = l - 0.0894841775 * a - 1.2914855480 * b;
+
+        l1 = Math.pow(l1, 3);
+        m1 = Math.pow(m1, 3);
+        s1 = Math.pow(s1, 3);
+
+        let r = +4.0767416621 * l1 - 3.3077115913 * m1 + 0.2309699292 * s1;
+        let g = -1.2684380046 * l1 + 2.6097574011 * m1 - 0.3413193965 * s1;
+        let b2 = -0.0041960863 * l1 - 0.7034186147 * m1 + 1.7076147010 * s1;
+
+        const toSrgb = function (x) {
+          const clamped = Math.min(Math.max(x, 0), 1);
+          return clamped <= 0.0031308 ? clamped * 12.92 : 1.055 * Math.pow(clamped, 1 / 2.4) - 0.055;
+        };
+
+        r = toSrgb(r);
+        g = toSrgb(g);
+        b2 = toSrgb(b2);
+
+        const toHex = function (x) {
+          return Math.round(Math.min(Math.max(x, 0), 1) * 255).toString(16).padStart(2, '0');
+        };
+
+        return `#${toHex(r)}${toHex(g)}${toHex(b2)}`;
+      }
+
+      function getMotivoColor(key) {
+        if (key === '1') return '#d4098d'; // Rosa del logotipo boleta
+        if (key === '2') return resolveThemeColor('--p', '#661ae6'); // Primario del tema (morado)
+        return resolveThemeColor('--s', '#a6adbb'); // Secundario como respaldo
+      }
+
+      function safeUpdateChart(labels, series, colors) {
+        if (window.motivoChart) {
+          try {
+            window.motivoChart.updateOptions({ labels: labels, colors: colors });
+            window.motivoChart.updateSeries(series);
+            return;
+          } catch (err) {
+            try { window.motivoChart.destroy(); } catch (e) {}
+            window.motivoChart = null;
+          }
+        }
+        const el = document.getElementById('motivo-chart');
+        if (!el) return;
+        const options = {
+          chart: { type: 'pie', height: 320 },
+          labels: labels,
+          series: series,
+          colors: colors,
+          legend: { position: 'bottom' },
+          responsive: [{ breakpoint: 640, options: { chart: { height: 260 } } }]
+        };
+        window.motivoChart = new ApexCharts(el, options);
+        window.motivoChart.render();
+      }
+
+      function buildMotivoChart(data) {
+        hideSpinner();
+        if (!Array.isArray(data) || data.length === 0) {
+          // no hay datos
+          if (window.motivoChart) { try { window.motivoChart.destroy(); } catch (e) {} window.motivoChart = null; }
+          hideSpinner(); showEmpty();
+          return;
+        }
+        hideEmpty();
+        const series = data.map(function(i) { return Number(i.total); });
+        // Renderizar leyenda con iconos y totales
+        try {
+          const legendEl = document.getElementById('motivo-legend');
+          if (legendEl) {
+            legendEl.innerHTML = data.map(function(i){
+              const key = String(i.p0_tipo_visita);
+              const meta = MOTIVO_LABELS[key];
+              const svg = meta ? meta.svg : '';
+              const text = meta ? meta.text : ('Tipo ' + key);
+              const count = Number(i.total) || 0;
+              return `<div class="flex items-center gap-2"><span>${svg}</span><span>${text} <span class="text-gray-500">(${count})</span></span></div>`;
+            }).join('');
+          }
+        } catch(e) { /* ignore legend rendering errors */ }
+        // ApexCharts usa etiquetas en texto plano; la leyenda con iconos se maneja abajo.
+        const plainLabels = data.map(function(i){
+          const key = String(i.p0_tipo_visita);
+          const meta = MOTIVO_LABELS[key];
+          return meta ? meta.text : ('Tipo ' + key);
+        });
+        const colors = data.map(function(i){ return getMotivoColor(String(i.p0_tipo_visita)); });
+        safeUpdateChart(plainLabels, series, colors);
+      }
+
+      const FILTER_STATE = { d: '0', mac: null };
+
+      function normalizeMacValue(value) {
+        if (value === null || value === undefined) return null;
+        const trimmed = String(value).trim();
+        return trimmed ? trimmed : null;
+      }
+
+      function buildQueryFromFilters(filters) {
+        const params = new URLSearchParams();
+        if (filters.mac) {
+          params.set('mac', filters.mac);
+        } else if (filters.d && filters.d !== '0') {
+          params.set('d', filters.d);
+        }
+        const query = params.toString();
+        return query ? `?${query}` : '';
+      }
+
+      function setActiveTab(dValue) {
+        const tabs = document.querySelectorAll('#filter [data-d]');
+        tabs.forEach(function (t) {
+          if (t.getAttribute('data-d') === String(dValue)) {
+            t.classList.add('tab-active');
+            t.setAttribute('aria-selected', 'true');
+          } else {
+            t.classList.remove('tab-active');
+            t.setAttribute('aria-selected', 'false');
+          }
+        });
+      }
+
+      function setActiveMac(macValue) {
+        const macTabs = document.querySelectorAll('#mac-filter-tabs [data-mac]');
+        macTabs.forEach(function (tab) {
+          const current = normalizeMacValue(tab.getAttribute('data-mac'));
+          const isActive = macValue ? current === macValue : current === null;
+          if (isActive) {
+            tab.classList.add('tab-active');
+            tab.setAttribute('aria-selected', 'true');
+          } else {
+            tab.classList.remove('tab-active');
+            tab.setAttribute('aria-selected', 'false');
+          }
+        });
+      }
+
+      function updateDownloadLink() {
+        const btn = document.getElementById('download-btn');
+        if (!btn) return;
+        let url = '/api/v1/vozmac/export';
+        const params = new URLSearchParams();
+        if (FILTER_STATE.mac) {
+          params.set('mac', FILTER_STATE.mac);
+        } else if (FILTER_STATE.d && FILTER_STATE.d !== '0') {
+          params.set('d', FILTER_STATE.d);
+        }
+        const query = params.toString();
+        btn.href = query ? `${url}?${query}` : url;
+      }
+
+      function syncUrl(push) {
+        const url = new URL(window.location.href);
+        if (FILTER_STATE.d && FILTER_STATE.d !== '0') {
+          url.searchParams.set('d', FILTER_STATE.d);
+        } else {
+          url.searchParams.delete('d');
+        }
+        if (FILTER_STATE.mac) {
+          url.searchParams.set('mac', FILTER_STATE.mac);
+        } else {
+          url.searchParams.delete('mac');
+        }
+        updateDownloadLink();
+        if (push) {
+          window.history.pushState({}, '', url.toString());
+        } else {
+          window.history.replaceState({}, '', url.toString());
+        }
+      }
+
+      async function loadMotivoForFilters(filters) {
+        let apiUrl = '/api/v1/vozmac/motivo';
+        const query = buildQueryFromFilters(filters);
+        if (query) apiUrl += query;
+        showSpinner();
+        hideEmpty();
+        try {
+          const response = await fetch(apiUrl, { headers: { 'Accept': 'application/json' } });
+          if (!response.ok) {
+            throw new Error(`Motivo request failed (${response.status})`);
+          }
+          const data = await response.json();
+          buildMotivoChart(data);
+        } catch (error) {
+          hideSpinner();
+          showEmpty();
+          console.error('fetch motivo error', error);
+        }
+      }
+
+      function loadAllData() {
+        const filters = { d: FILTER_STATE.d, mac: FILTER_STATE.mac };
+        loadMotivoForFilters(filters);
+        if (typeof window.loadSatisfaccionForFilters === 'function') {
+          window.loadSatisfaccionForFilters(filters);
+        }
+        if (typeof window.loadSeguimientoForFilters === 'function') {
+          window.loadSeguimientoForFilters(filters);
+        }
+      }
+
+      function loadMacOptions(dValue, options) {
+        const opts = Object.assign({ preserveSelection: false, syncOnSelectionChange: true }, options || {});
+        const wrapper = document.getElementById('mac-filter-wrapper');
+        const tabs = document.getElementById('mac-filter-tabs');
+        const empty = document.getElementById('mac-filter-empty');
+        if (!wrapper || !tabs || !empty) {
+          return Promise.resolve([]);
+        }
+        if (!dValue || dValue === '0') {
+          wrapper.classList.add('hidden');
+          tabs.innerHTML = '';
+          empty.style.display = 'none';
+          if (!opts.preserveSelection && FILTER_STATE.mac) {
+            FILTER_STATE.mac = null;
+            if (opts.syncOnSelectionChange) {
+              syncUrl(false);
+            }
+          }
+          setActiveMac(null);
+          return Promise.resolve([]);
+        }
+        wrapper.classList.remove('hidden');
+        empty.textContent = 'Cargando MACs...';
+        empty.style.display = 'block';
+        tabs.innerHTML = '';
+        const endpoint = '/api/v1/vozmac/macs?d=' + encodeURIComponent(dValue);
+        return fetch(endpoint)
+          .then(function (response) {
+            if (!response.ok) {
+              throw new Error('Network response was not ok ' + response.statusText);
+            }
+            return response.json();
+          })
+          .then(function (data) {
+            let macs = Array.isArray(data) ? data.map(normalizeMacValue).filter(Boolean) : [];
+            macs = Array.from(new Set(macs));
+            if (!macs.length) {
+              empty.textContent = 'Sin MACs disponibles.';
+              tabs.innerHTML = '';
+            } else {
+              empty.style.display = 'none';
+              const buttons = ['<button type="button" class="tab tab-sm" role="tab" data-mac=\"\">Todos los MAC</button>']
+                .concat(macs.map(function (mac) {
+                  const label = String(mac);
+                  return `<button type=\"button\" class=\"tab tab-sm\" role=\"tab\" data-mac=\"${label}\">${label}</button>`;
+                }));
+              tabs.innerHTML = buttons.join('');
+            }
+            let selectionChanged = false;
+            if (!opts.preserveSelection || (FILTER_STATE.mac && !macs.includes(FILTER_STATE.mac))) {
+              if (FILTER_STATE.mac) selectionChanged = true;
+              FILTER_STATE.mac = null;
+            }
+            setActiveMac(FILTER_STATE.mac);
+            if (selectionChanged && opts.syncOnSelectionChange) {
+              syncUrl(false);
+            }
+            return macs;
+          })
+          .catch(function (error) {
+            console.error('Error fetching macs:', error);
+            empty.textContent = 'No se pudieron cargar los MAC.';
+            empty.style.display = 'block';
+            tabs.innerHTML = '';
+            let selectionChanged = false;
+            if (FILTER_STATE.mac) {
+              FILTER_STATE.mac = null;
+              selectionChanged = true;
+            }
+            setActiveMac(null);
+            if (selectionChanged && opts.syncOnSelectionChange) {
+              syncUrl(false);
+            }
+            return [];
+          });
+      }
+
+      function parseStateFromUrl(search) {
+        const params = new URLSearchParams(search);
+        const dParam = params.get('d');
+        const macParam = params.get('mac');
+        FILTER_STATE.d = (dParam && dParam !== '0') ? dParam : '0';
+        FILTER_STATE.mac = normalizeMacValue(macParam);
+        updateDownloadLink();
+      }
+
+      function handleDistrictChange(newD) {
+        const normalized = (newD && newD !== '0') ? String(newD) : '0';
+        if (FILTER_STATE.d === normalized) {
+          return;
+        }
+        FILTER_STATE.d = normalized;
+        FILTER_STATE.mac = null;
+        syncUrl(true);
+        setActiveTab(FILTER_STATE.d);
+        loadAllData();
+        loadMacOptions(FILTER_STATE.d, { preserveSelection: false, syncOnSelectionChange: true });
+      }
+
+      function handleMacChange(newMac) {
+        if (FILTER_STATE.d === '0') return;
+        const normalized = normalizeMacValue(newMac);
+        if (FILTER_STATE.mac === normalized) {
+          return;
+        }
+        FILTER_STATE.mac = normalized;
+        syncUrl(true);
+        setActiveMac(FILTER_STATE.mac);
+        loadAllData();
+      }
+
+      document.addEventListener('DOMContentLoaded', function () {
+        parseStateFromUrl(window.location.search);
+        setActiveTab(FILTER_STATE.d);
+
+        const filterContainer = document.getElementById('filter');
+        if (filterContainer) {
+          filterContainer.addEventListener('click', function (e) {
+            const macBtn = e.target.closest('[data-mac]');
+            if (macBtn) {
+              e.preventDefault();
+              handleMacChange(macBtn.getAttribute('data-mac'));
+              return;
+            }
+            const districtBtn = e.target.closest('[data-d]');
+            if (!districtBtn) return;
+            e.preventDefault();
+            const newD = districtBtn.getAttribute('data-d') || '0';
+            handleDistrictChange(newD);
+          });
+        }
+
+        loadMacOptions(FILTER_STATE.d, { preserveSelection: true, syncOnSelectionChange: true })
+          .then(function () {
+            setActiveMac(FILTER_STATE.mac);
+            loadAllData();
+          });
+      });
+
+      window.addEventListener('popstate', function () {
+        parseStateFromUrl(window.location.search);
+        setActiveTab(FILTER_STATE.d);
+        loadMacOptions(FILTER_STATE.d, { preserveSelection: true, syncOnSelectionChange: true })
+          .then(function () {
+            setActiveMac(FILTER_STATE.mac);
+            loadAllData();
+          });
+      });
+
+      // -------------------- Satisfaccion chart --------------------
+      function showSatisSpinner(){ const s = document.getElementById('satisfaccion-loading'); if (s) s.style.display='flex'; }
+      function hideSatisSpinner(){ const s = document.getElementById('satisfaccion-loading'); if (s) s.style.display='none'; }
+      function showSatisEmpty(){ const e = document.getElementById('satisfaccion-empty'); if (e) e.style.display='block'; }
+      function hideSatisEmpty(){ const e = document.getElementById('satisfaccion-empty'); if (e) e.style.display='none'; }
+
+      // Diverging horizontal stacked bar: negative (1-2) -> left (negative values), neutral (3) -> small center/right, positive (4-5) -> right
+      function safeUpdateSatisChart(categories, series){
+        if (window.satisChart){
+          try{ window.satisChart.updateOptions({ xaxis:{ categories }}); window.satisChart.updateSeries(series); return; } catch(e){ try{ window.satisChart.destroy(); }catch(_){} window.satisChart=null; }
+        }
+        const el = document.getElementById('satisfaccion-chart'); if(!el) return;
+        const options = {
+          chart: { type: 'bar', stacked: true, stackType: 'normal', height: 340 },
+          plotOptions: { bar: { horizontal: true, barHeight: '40%' } },
+          dataLabels: { enabled: false },
+          stroke: { width: 1, colors: ['#fff'] },
+          xaxis: { labels: { formatter: v => Math.abs(v) + '%' } },
+          tooltip: { y: { formatter: v => Math.abs(v) + '%' } },
+          legend: { position: 'bottom' },
+          colors: ['#ef4444','#f59e0b','#10b981'] // negativo, neutral, positivo
+        };
+        window.satisChart = new ApexCharts(el, Object.assign(options, { series }));
+        window.satisChart.render();
+      }
+
+      function buildSatisfaccionChart(resp){
+        hideSatisSpinner();
+        if (typeof window.updateObjetivoCalidadResumen === 'function') {
+          const firstDate = resp && resp.first_response_date ? resp.first_response_date : null;
+          const lastDate = resp && resp.last_response_date ? resp.last_response_date : null;
+          const total = resp && typeof resp.total_responses === 'number' ? resp.total_responses : 0;
+          window.updateObjetivoCalidadResumen(firstDate, lastDate, total);
+        }
+        if (!resp || !resp.by_question) { showSatisEmpty(); if (typeof window.updateObjetivoCalidadGauge === 'function') { window.updateObjetivoCalidadGauge(0); } return; }
+        const questions = ['p1_claridad_info','p2_amabilidad','p3_instalaciones','p4_tiempo_espera'];
+        const categories = questions.map(function(q){
+          const meta = resp.by_question[q];
+          return meta && meta.label ? meta.label : q;
+        });
+
+        // For diverging: negative = 1+2 (as negative values), neutral = 3, positive = 4-5
+        const negSeries = { name: 'Negativo (1-2)', data: [] };
+        const neuSeries = { name: 'Neutral (3)', data: [] };
+        const posSeries = { name: 'Positivo (4-5)', data: [] };
+        const legendRows = [];
+        const favorableValues = [];
+
+        questions.forEach(function(q){
+          const meta = resp.by_question[q] || {};
+          const dist = meta.distribution || {};
+          const total = (meta.total && meta.total > 0) ? meta.total : 0;
+          const c1 = Number(dist['1']||0);
+          const c2 = Number(dist['2']||0);
+          const c3 = Number(dist['3']||0);
+          const c4 = Number(dist['4']||0);
+          const c5 = Number(dist['5']||0);
+          let negPct = 0, neuPct = 0, posPct = 0;
+          if (total) {
+            negPct = Math.round(((c1 + c2) / total) * 10000) / 100; // two decimals
+            neuPct = Math.round((c3 / total) * 10000) / 100;
+            posPct = Math.round(((c4 + c5) / total) * 10000) / 100;
+          }
+          // negative values for left side
+          negSeries.data.push(-negPct);
+          neuSeries.data.push(neuPct);
+          posSeries.data.push(posPct);
+
+          let favorablePct = meta && meta.favorable_pct != null ? Number(meta.favorable_pct) : posPct;
+          if (!isFinite(favorablePct)) favorablePct = 0;
+          legendRows.push({
+            label: meta.label || q,
+            favorable: favorablePct
+          });
+          if (total || meta.favorable_pct != null) {
+            favorableValues.push(favorablePct);
+          }
+        });
+
+        // render legend with favorable pct
+        try{
+          const legendEl = document.getElementById('satisfaccion-legend');
+          if (legendEl){
+            legendEl.innerHTML = legendRows.map(function(row){
+              return `<div class="flex items-center justify-between"><div>${row.label}</div><div class="font-semibold">${row.favorable}% favorables</div></div>`;
+            }).join('');
+          }
+        }catch(e){}
+
+        hideSatisEmpty();
+        safeUpdateSatisChart(categories, [negSeries, neuSeries, posSeries]);
+        if (typeof window.updateObjetivoCalidadGauge === 'function') {
+          if (favorableValues.length) {
+            const gaugeAverage = favorableValues.reduce(function(acc, val){ return acc + val; }, 0) / favorableValues.length;
+            window.updateObjetivoCalidadGauge(gaugeAverage);
+          } else {
+            window.updateObjetivoCalidadGauge(0);
+          }
+        }
+
+      }
+
+      window.loadSatisfaccionForFilters = async function(filters){
+        let apiUrl = '/api/v1/vozmac/satisfaccion';
+        const params = new URLSearchParams();
+        if (filters && filters.mac) {
+          params.set('mac', filters.mac);
+        } else if (filters && filters.d && filters.d !== '0') {
+          params.set('d', filters.d);
+        }
+        const query = params.toString();
+        if (query) apiUrl += '?' + query;
+        showSatisSpinner();
+        hideSatisEmpty();
+        try {
+          const response = await fetch(apiUrl, { headers: { 'Accept': 'application/json' } });
+          if (!response.ok) {
+            throw new Error(`Satisfacción request failed (${response.status})`);
+          }
+          const data = await response.json();
+          buildSatisfaccionChart(data);
+        } catch (err) {
+          hideSatisSpinner();
+          showSatisEmpty();
+          console.error('fetch satisfaccion error', err);
+        }
+      };
+
+    })();
+
+    // -------------------- Objetivo de Calidad Gauge --------------------
+    (function(){
+      const GAUGE_ELEMENT_ID = 'objetivo-gauge';
+      const SUMMARY_ELEMENT_ID = 'objetivo-resumen';
+      const COLOR_GREEN = '#16a34a';
+      const COLOR_ORANGE = '#fb923c';
+      const COLOR_RED = '#ef4444';
+      let gaugeChart = null;
+
+      function getGaugeColor(value) {
+        if (value >= 95) return COLOR_GREEN;
+        if (value >= 75) return COLOR_ORANGE;
+        return COLOR_RED;
+      }
+
+      function createGauge() {
+        if (typeof ApexCharts === 'undefined') {
+          console.warn('ApexCharts no está disponible; gauge de Objetivo de Calidad no se renderizará.');
+          return null;
+        }
+        const el = document.getElementById(GAUGE_ELEMENT_ID);
+        if (!el) return null;
+
+        const options = {
+          chart: {
+            type: 'radialBar',
+            height: 280,
+            sparkline: { enabled: true }
+          },
+          series: [0],
+          colors: [getGaugeColor(0)],
+          plotOptions: {
+            radialBar: {
+              startAngle: -120,
+              endAngle: 120,
+              hollow: {
+                size: '62%',
+                background: 'transparent'
+              },
+              track: {
+                background: '#e5e7eb',
+                strokeWidth: '100%'
+              },
+              dataLabels: {
+                name: {
+                  show: true,
+                  color: '#6b7280',
+                  fontSize: '14px',
+                  offsetY: 60,
+                  formatter: function () { return 'Promedio favorable'; }
+                },
+                value: {
+                  show: true,
+                  fontSize: '34px',
+                  fontWeight: 700,
+                  offsetY: -10,
+                  formatter: function (val) {
+                    const num = Number(val);
+                    return isFinite(num) ? num.toFixed(1) + '%' : '--';
+                  }
+                }
+              }
+            }
+          },
+          stroke: { lineCap: 'round' },
+          fill: { type: 'solid' }
+        };
+
+        const chart = new ApexCharts(el, options);
+        chart.render();
+        return chart;
+      }
+
+      function ensureGauge() {
+        if (gaugeChart) return gaugeChart;
+        gaugeChart = createGauge();
+        return gaugeChart;
+      }
+
+      function formatDateLabel(isoString) {
+        if (!isoString) return '--';
+        const date = new Date(isoString);
+        if (Number.isNaN(date.getTime())) return '--';
+        return date.toLocaleDateString('es-MX', {
+          day: '2-digit',
+          month: 'long',
+          year: 'numeric'
+        });
+      }
+
+      function formatCount(value) {
+        try {
+          return new Intl.NumberFormat('es-MX').format(value || 0);
+        } catch (e) {
+          return String(value || 0);
+        }
+      }
+
+      window.updateObjetivoCalidadGauge = function(value) {
+        const chart = ensureGauge();
+        if (!chart) return;
+        const numeric = Number(value);
+        const safeValue = isFinite(numeric) ? Math.max(0, Math.min(100, numeric)) : 0;
+        const rounded = Number(safeValue.toFixed(2));
+        chart.updateOptions({ colors: [getGaugeColor(rounded)] }, false, false);
+        chart.updateSeries([rounded]);
+      };
+
+      window.updateObjetivoCalidadResumen = function(firstDate, lastDate, total) {
+        const el = document.getElementById(SUMMARY_ELEMENT_ID);
+        if (!el) return;
+        const startLabel = formatDateLabel(firstDate);
+        const endLabel = formatDateLabel(lastDate);
+        const totalLabel = formatCount(total);
+        el.textContent = `Desde ${startLabel} hasta ${endLabel} se han capturado ${totalLabel} encuestas.`;
+      };
+
+      ensureGauge();
+    })();
+
+    // -------------------- Seguimiento Chart --------------------
+    (function(){
+      function showSeguimientoSpinner(){ const s = document.getElementById('seguimiento-loading'); if (s) s.style.display='flex'; }
+      function hideSeguimientoSpinner(){ const s = document.getElementById('seguimiento-loading'); if (s) s.style.display='none'; }
+      function showSeguimientoEmpty(){ const e = document.getElementById('seguimiento-empty'); if (e) e.style.display='block'; }
+      function hideSeguimientoEmpty(){ const e = document.getElementById('seguimiento-empty'); if (e) e.style.display='none'; }
+
+      function prepareSeguimientoConfig(chartData){
+        const labels = Array.isArray(chartData.labels) ? chartData.labels : [];
+        const datasets = Array.isArray(chartData.datasets) ? chartData.datasets : [];
+
+        const series = datasets.map(d => ({
+          name: d.label,
+          data: (d.data || []).map(v => (typeof v === 'number' ? v : parseFloat(v))).map(val => (isNaN(val) ? 0 : val))
+        }));
+
+        const colors = datasets.map(d => d.borderColor || '#8884d8');
+        const allValues = [];
+        series.forEach(ds => {
+          ds.data.forEach(val => { if (typeof val === 'number' && val > 0) allValues.push(val); });
+        });
+
+        let yMin = 1;
+        let yMax = 5;
+        let tickAmount = 4;
+        if (allValues.length) {
+          const minVal = Math.min(...allValues);
+          const maxVal = Math.max(...allValues);
+          const range = maxVal - minVal;
+          const padding = Math.max(0.05, range * 0.15);
+          const rawMin = minVal - padding;
+          const rawMax = maxVal + padding;
+          yMin = Math.max(1, Math.floor(rawMin * 100) / 100);
+          yMax = Math.min(5, Math.ceil(rawMax * 100) / 100);
+          if (yMax - yMin < 0.2) {
+            yMin = Math.max(1, yMin - 0.1);
+            yMax = Math.min(5, yMax + 0.1);
+          }
+          const desiredTicks = Math.ceil((yMax - yMin) / 0.1);
+          tickAmount = Math.min(10, Math.max(3, desiredTicks));
+        }
+
+        const options = {
+          chart: {
+            height: 420,
+            type: 'line',
+            zoom: { enabled: false },
+            toolbar: { show: true, tools: { download: true, selection: false, zoom: false, zoomin: false, zoomout: false, pan: false, reset: false } }
+          },
+          colors: colors,
+          dataLabels: { enabled: false },
+          stroke: { curve: 'smooth', width: 3 },
+          title: {
+            text: chartData.year ? `Promedio Mensual (${chartData.year})` : 'Promedio Mensual',
+            align: 'left'
+          },
+          grid: {
+            borderColor: '#e7e7e7',
+            row: { colors: ['#f3f3f3', 'transparent'], opacity: 0.5 },
+          },
+          xaxis: {
+            categories: labels,
+          },
+          yaxis: {
+            title: { text: 'Calificación Promedio' },
+            min: Number(yMin.toFixed(2)),
+            max: Number(yMax.toFixed(2)),
+            tickAmount,
+            decimalsInFloat: 2
+          },
+          legend: {
+            position: 'bottom',
+            horizontalAlign: 'center',
+            floating: false,
+            offsetY: 10
+          },
+          tooltip: {
+            y: { formatter: function(val){ return typeof val === 'number' ? val.toFixed(2) : val; } }
+          }
+        };
+
+        return { series, options };
+      }
+
+      function safeUpdateSeguimientoChart(chartData) {
+        const config = prepareSeguimientoConfig(chartData);
+        if (window.seguimientoChart) {
+          try {
+            window.seguimientoChart.updateOptions(config.options);
+            window.seguimientoChart.updateSeries(config.series);
+            return;
+          } catch (err) {
+            try { window.seguimientoChart.destroy(); } catch (e) {}
+            window.seguimientoChart = null;
+          }
+        }
+        const el = document.getElementById('seguimiento-chart');
+        if (!el) return;
+
+        window.seguimientoChart = new ApexCharts(el, Object.assign({}, config.options, { series: config.series }));
+        window.seguimientoChart.render();
+      }
+
+      function buildSeguimientoChart(data) {
+        hideSeguimientoSpinner();
+        if (!data || !data.datasets || data.datasets.every(d => d.data.every(val => val === 0))) {
+          if (window.seguimientoChart) { try { window.seguimientoChart.destroy(); } catch (e) {} window.seguimientoChart = null; }
+          showSeguimientoEmpty();
+          return;
+        }
+        hideSeguimientoEmpty();
+        safeUpdateSeguimientoChart(data);
+      }
+
+      window.loadSeguimientoForFilters = function(filters) {
+        let apiUrl = '/api/v1/vozmac/seguimiento';
+        const params = new URLSearchParams();
+        if (filters && filters.mac) {
+          params.set('mac', filters.mac);
+        } else if (filters && filters.d && filters.d !== '0') {
+          params.set('d', filters.d);
+        }
+        const query = params.toString();
+        if (query) apiUrl += '?' + query;
+        showSeguimientoSpinner();
+        hideSeguimientoEmpty();
+
+        fetch(apiUrl)
+          .then(response => {
+            if (!response.ok) throw new Error('Network response was not ok ' + response.statusText);
+            return response.json();
+          })
+          .then(buildSeguimientoChart)
+          .catch(error => {
+            hideSeguimientoSpinner();
+            showSeguimientoEmpty();
+              console.error('Error fetching seguimiento data:', error);
+          });
+      };
+    })();
+    </script>
+{% endblock scripts %}

@@ -1,0 +1,69 @@
+{% load static %}
+{% if docs %}
+  <div class="overflow-x-auto rounded-3xl border border-base-300 bg-base-100 shadow-sm">
+    <table class="table table-zebra">
+      <thead class="text-xs uppercase tracking-wide text-base-content/60">
+        <tr>
+          <th>Clave</th>
+          <th>Documento</th>
+          <th>Tipo</th>
+          <th>Proceso</th>
+          <th class="text-center">Revisión</th>
+          <th class="text-center">Actualizado</th>
+          <th class="text-center">Acciones</th>
+        </tr>
+      </thead>
+      <tbody class="text-sm">
+        {% for doc in docs %}
+          {% with current=doc.latest_revision %}
+            <tr class="align-middle">
+              <td>
+                <span class="badge badge-outline badge-primary">{{ doc.clave_display }}</span>
+              </td>
+              <td>
+                <div class="font-semibold text-base-content">{{ doc.nombre }}</div>
+                {% if doc.texto_ayuda %}
+                  <p class="text-xs text-base-content/60">{{ doc.texto_ayuda|truncatewords:16 }}</p>
+                {% endif %}
+              </td>
+              <td>{{ doc.tipo.tipo }}</td>
+              <td>{{ doc.proceso.proceso }}</td>
+              <td class="text-center">
+                {% if current %}
+                  <span class="badge badge-ghost">{{ current.revision|stringformat:"02d" }}</span>
+                {% else %}
+                  —
+                {% endif %}
+              </td>
+              <td class="text-center">
+                {% if current %}
+                  {{ current.f_actualizacion|date:"d/m/Y" }}
+                {% else %}
+                  —
+                {% endif %}
+              </td>
+              <td class="text-center">
+                <div class="flex justify-center gap-2">
+                  <a href="{% url 'docs:detalle' doc.pk %}" class="btn btn-ghost btn-xs">Ver</a>
+                  {% if current and current.archivo %}
+                    <a href="{{ current.archivo.url }}" target="_blank" class="btn btn-outline btn-xs">
+                      Descargar
+                    </a>
+                  {% elif doc.ruta %}
+                    <a href="{{ doc.ruta }}" target="_blank" class="btn btn-outline btn-xs">
+                      Abrir
+                    </a>
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+          {% endwith %}
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% else %}
+  <div class="rounded-3xl border border-dashed border-base-300 bg-base-100 p-10 text-center text-base-content/70">
+    No se encontraron documentos con el criterio seleccionado.
+  </div>
+{% endif %}

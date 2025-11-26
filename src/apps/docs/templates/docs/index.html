@@ -1,377 +1,128 @@
-{# docs/index.html #}
-{% extends "base.html" %}
+{% extends 'cerebro/base.html' %}
 
-{% block header %}
-  <link rel="stylesheet" href="//cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
-{% endblock header%}
-
-{% block footer %}
-<script type="text/javascript">
-
-$(function () {
-   var activeTab = $('[href=' + location.hash + ']');
-   activeTab && activeTab.tab('show');
-})
-
-function bootstrap_tab_bookmark (selector) { if (selector == undefined) {
-    selector = ""; }
- 
-    /* Automagically jump on good tab based on anchor */
-    $(document).ready(function() {
-        url = document.location.href.split('#');
-        if(url[1] != undefined) {
-            $(selector + '[href=#'+url[1]+']').tab('show');
-        }
-    });
- 
-    var update_location = function (event) {
-        document.location.hash = this.getAttribute("href");
-    }
- 
-    /* Update hash based on tab */
-    $(selector + "[data-toggle=pill]").click(update_location);
-    $(selector + "[data-toggle=tab]").click(update_location);
-}
-</script>
-{% endblock footer %}
-
-{% block contextual %}
-  <a class="btn btn-large btn-danger" type="button" href="{% url "docs.views.agregar_documento" %}">
-    Agregar un Documento <strong>Nuevo</strong></a>   
-{% endblock %}
+{% block title %}Documentos SGC{% endblock %}
 
 {% block content %}
+<section class="space-y-10">
+  <header class="rounded-3xl border border-base-300 bg-base-100 p-8 shadow-lg">
+    <div class="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+      <div class="flex items-start gap-4">
+        <div class="grid h-16 w-16 place-items-center rounded-2xl bg-primary/10 text-primary">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-10">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 0 1-2-2V5.75A2.75 2.75 0 0 1 7.75 3h6.086c.464 0 .91.184 1.238.512l3.914 3.914c.328.328.512.774.512 1.238V19a2 2 0 0 1-2 2Z" />
+          </svg>
+        </div>
+        <div>
+          <p class="text-sm uppercase tracking-wide text-base-content/60">Sistema de Gestión de la Calidad</p>
+          <h1 class="text-3xl font-bold text-base-content">Gestor documental</h1>
+          <p class="mt-1 max-w-2xl text-sm text-base-content/70">
+            Consulta la Lista Maestra de Documentos, resultados del SGC y registros clasificados por proceso o tipo. Usa los filtros para localizar cualquier archivo.
+          </p>
+        </div>
+      </div>
+      <div class="flex flex-col items-end gap-3">
+        <a href="{% url 'docs:add' %}" class="btn btn-primary btn-sm">Agregar documento</a>
+        <p class="text-sm text-base-content/60">Última actualización · {% now "d/m/Y H:i" %}</p>
+      </div>
+    </div>
+  </header>
 
-<div class="col-md-12">
-  <ul class="nav nav-tabs">
-    <li class="active"><a href="#procedimientos" data-toggle="tab">Procedimientos</a></li>
-    <li><a href="#formatos" data-toggle="tab">Formatos</a></li>
-    <li><a href="#instrucciones" data-toggle="tab">Instrucciones de Trabajo</a></li>
-    <li><a href="#externos" data-toggle="tab">Documentos Externos</a></li>
-    <li><a href="#registros" data-toggle="tab">Registros</a></li>
-    <li><a href="#stn" data-toggle="tab">Opiniones Técnicas</a></li>
-    <li><a href="#coc" data-toggle="tab">Oficios COC</a></li>
-  </ul>
-</div>
+  <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+    <article class="rounded-2xl border border-base-300 bg-base-100 p-5 shadow-sm">
+      <p class="text-sm text-base-content/60">Documentos activos</p>
+      <p class="mt-2 text-3xl font-semibold text-base-content">{{ stats.total }}</p>
+    </article>
+    <article class="rounded-2xl border border-base-300 bg-base-100 p-5 shadow-sm">
+      <p class="text-sm text-base-content/60">Lista Maestra</p>
+      <p class="mt-2 text-3xl font-semibold text-base-content">{{ stats.lmd }}</p>
+    </article>
+    <article class="rounded-2xl border border-base-300 bg-base-100 p-5 shadow-sm">
+      <p class="text-sm text-base-content/60">Procesos</p>
+      <p class="mt-2 text-3xl font-semibold text-base-content">{{ stats.procesos }}</p>
+    </article>
+    <article class="rounded-2xl border border-base-300 bg-base-100 p-5 shadow-sm">
+      <p class="text-sm text-base-content/60">Tipos</p>
+      <p class="mt-2 text-3xl font-semibold text-base-content">{{ stats.tipos }}</p>
+    </article>
+  </div>
 
-<div class="col-md-12">
-<div class="tab-content">
-  <div class="tab-pane fade in active" id="procedimientos">
-    <h3>Procedimientos y Documentación del SGC</h3>
-    <div class="table-responsive">
-      <table class="table table-striped table-bordered table-condensed table-hover">
-        <thead>
-          <tr>
-            <th>Documento</th>
-            <th>Código</th>
-            <th>Revisión</th>
-            <th>Aprobación</th>
-            <th>Activo</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for doc in los_docs %}
-          {% ifchanged doc.proceso %}
-          <tr>
-            <td colspan="5" style="text-align: center;"><strong>{{doc.proceso}}</strong></td>
-          </tr>
-          {% endifchanged %}
-          <tr>
-            <td>
-              {{ doc.nombre }}
-              {% if request.user.is_superuser and not doc.activo %}
-                  <a title="Revisar documento OBSOLETO" class="pull-right" href="/docs/{{ doc.id }}/detalles"><i class="icon-eye"></i></a>
-              {% endif %}
-            </td>
-            <td{% if doc.obsoleto or not doc.r_actual %} class="disabled"{% endif %}>
-              {% if doc.r_actual and doc.activo %}
-                <a href="/docs/{{ doc.id }}/detalles">{{ doc.clave|upper }}</a>
-              {% else %}
-                {{ doc.clave|upper }}
-              {% endif %}
-            </td>
-            {% if doc.r_actual %}
-              <td style="text-align: center;">{{ doc.r_actual }}</td>
-              <td>{{ doc.revision_actual.f_actualizacion|date:"M d, Y" }}</td>
-              <td style="text-align: center;">{% if doc.activo %}<i class="icon-checkmark"></i>{% else %}<i class="icon-cancel-3"></i>{% endif %}</td>
-            {% else %}
-              <td colspan="3">
-                <a href="{% url "docs.views.agregar_control" doc=doc.id %}">
-                <i class="icon-plus-2"></i> Agregar una nueva revisión
-              </td>
-            {% endif %}
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div><!-- ./table-responsive -->
+  <div class="space-y-4 rounded-3xl border border-base-300 bg-base-100 p-6 shadow-sm">
+    <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+      <div class="tabs tabs-boxed" role="tablist" aria-label="Filtros de documento">
+        <button type="button"
+                class="tab tab-sm tab-active"
+                data-tab="lmd"
+                hx-get="{% url 'docs:index' %}"
+                hx-target="#docs-list"
+                hx-swap="innerHTML"
+                hx-indicator="#docs-loading">
+          LMD
+        </button>
+        <button type="button"
+                class="tab tab-sm"
+                data-tab="ldp"
+                hx-get="{% url 'docs:ldp' %}"
+                hx-target="#docs-list"
+                hx-swap="innerHTML"
+                hx-indicator="#docs-loading">
+          Por proceso
+        </button>
+        <button type="button"
+                class="tab tab-sm"
+                data-tab="ldt"
+                hx-get="{% url 'docs:ldt' %}"
+                hx-target="#docs-list"
+                hx-swap="innerHTML"
+                hx-indicator="#docs-loading">
+          Por tipo
+        </button>
+        <button type="button"
+                class="tab tab-sm"
+                data-tab="ldr"
+                hx-get="{% url 'docs:ldr' %}"
+                hx-target="#docs-list"
+                hx-swap="innerHTML"
+                hx-indicator="#docs-loading">
+          Resultados
+        </button>
+      </div>
+      <label class="input input-bordered flex items-center gap-2 max-w-md">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 opacity-70" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 1 1 0 11 5.5 5.5 0 0 1 0-11Zm-7 5.5a7 7 0 1 1 12.452 4.391l3.328 3.329a.75.75 0 1 1-1.06 1.06l-3.329-3.328A7 7 0 0 1 2 9Z" clip-rule="evenodd" />
+        </svg>
+        <input type="search"
+               name="q"
+               placeholder="Buscar documento..."
+               hx-get="{% url 'docs:buscador' %}"
+               hx-trigger="keyup changed delay:400ms"
+               hx-target="#docs-list"
+               hx-swap="innerHTML"
+               hx-indicator="#docs-loading"
+               class="grow"
+               autocomplete="off" />
+      </label>
+    </div>
+    <div id="docs-loading" class="hidden text-sm text-base-content/70">
+      <span class="loading loading-spinner loading-sm mr-2"></span> Actualizando listado...
+    </div>
   </div>
-  <div class="tab-pane fade" id="formatos">
-    <h3>Formatos</h3>
-    <div class="table-responsive">
-      <table class="table table-striped table-bordered table-condensed table-hover">
-        <thead>
-          <tr>
-            <th>Documento</th>
-            <th>Código</th>
-            <th>Revisión</th>
-            <th>Aprobación</th>
-            <th>Activo</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for doc in los_fmts %}
-          {% ifchanged doc.proceso %}
-          <tr>
-            <td colspan="5" style="text-align: center;"><strong>{{doc.proceso}}</strong></td>
-          </tr>
-          {% endifchanged %}
-          <tr>
-            <td>
-              {{ doc.nombre }}               
-              {% if request.user.is_superuser and not doc.activo %}
-                  <a title="Revisar documento OBSOLETO" class="pull-right" href="/docs/{{ doc.id }}/detalles"><i class="icon-eye"></i></a>
-              {% endif %}
-            </td>
-            <td{% if doc.obsoleto or not doc.r_actual %} class="disabled"{% endif %}>
-              {% if doc.r_actual and doc.activo %}
-                <a href="/docs/{{ doc.id }}/detalles">{{ doc.clave|upper }}</a>
-              {% else %}
-                {{ doc.clave|upper }}
-              {% endif %}
-            </td>
-            {% if doc.r_actual %}
-              <td style="text-align: center;">{{ doc.r_actual }}</td>
-              <td>{{ doc.revision_actual.f_actualizacion|date:"M d, Y" }}</td>
-              <td style="text-align: center;">{% if doc.activo %}<i class="icon-checkmark"></i>{% else %}<i class="icon-cancel-3"></i>{% endif %}</td>
-            {% else %}
-              <td colspan="3">
-                <a href="{% url "docs.views.agregar_control" doc=doc.id %}">
-                <i class="icon-plus-2"></i> Agregar una nueva revisión
-              </td>
-            {% endif %}
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div><!-- ./table responsive -->
-  </div><!-- ./#formatos -->
-  <div class="tab-pane fade" id="instrucciones">
-    <h3>Instrucciones de Trabajo</h3>
-    <table class="table table-striped table-bordered table-condensed table-hover">
-      <thead>
-        <tr>
-          <th>Documento</th>
-          <th>Código</th>
-          <th>Revisión</th>
-          <th>Aprobación</th>
-          <th>Activo</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for doc in las_ints %}
-        {% ifchanged doc.proceso %}
-        <tr>
-          <td colspan="5" style="text-align: center;"><strong>{{doc.proceso}}</strong></td>
-        </tr>
-        {% endifchanged %}
-        <tr>
-          <td>
-            {{ doc.nombre }}
-            {% if request.user.is_superuser and not doc.activo %}
-                <a title="Revisar documento OBSOLETO" class="pull-right" href="/docs/{{ doc.id }}/detalles"><i class="icon-eye"></i></a>
-            {% endif %}
-          </td>
-          <td{% if doc.obsoleto or not doc.r_actual %} class="disabled"{% endif %}>
-            {% if doc.r_actual and doc.activo %}
-              <a href="/docs/{{ doc.id }}/detalles">{{ doc.clave|upper }}</a>
-            {% else %}
-              {{ doc.clave|upper }}
-            {% endif %}
-          </td>
-          {% if doc.r_actual %}
-            <td style="text-align: center;">{{ doc.r_actual }}</td>
-            <td>{{ doc.revision_actual.f_actualizacion|date:"M d, Y" }}</td>
-            <td style="text-align: center;">{% if doc.activo %}<i class="icon-checkmark"></i>{% else %}<i class="icon-cancel-3"></i>{% endif %}</td>
-          {% else %}
-            <td colspan="3">
-              <a href="{% url "docs.views.agregar_control" doc=doc.id %}">
-              <i class="icon-plus-2"></i> Agregar una nueva revisión
-            </td>
-          {% endif %}
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+
+  <div id="docs-list">
+    {% include 'docs/partials/_doc_list.html' %}
   </div>
-  <div class="tab-pane fade" id="externos">
-    <h3>Documentos Externos</h3>
-    <table class="table table-striped table-bordered table-condensed table-hover">
-      <thead>
-        <tr>
-          <th>Documento</th>
-          <th>Código</th>
-          <th>Revisión</th>
-          <th>Aprobación</th>
-          <th>Activo</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for doc in los_exts %}
-        {% ifchanged doc.proceso %}
-        <tr>
-          <td colspan="5" style="text-align: center;"><strong>{{doc.proceso}}</strong></td>
-        </tr>
-        {% endifchanged %}
-        <tr>
-          <td>{{ doc.nombre }}</td>
-          <td{% if doc.obsoleto or not doc.r_actual %} class="disabled"{% endif %}>
-            {% if doc.r_actual %}
-              <a href="/docs/{{ doc.id }}/detalles">{{ doc.clave|upper }}</a>
-            {% else %}
-              {{ doc.clave|upper }}
-            {% endif %}
-          </td>
-          {% if doc.r_actual %}
-            <td style="text-align: center;">{{ doc.r_actual }}</td>
-            <td>{{ doc.revision_actual.f_actualizacion|date:"M d, Y" }}</td>
-            <td style="text-align: center;">{% if doc.activo %}<i class="icon-checkmark"></i>{% else %}<i class="icon-cancel-3"></i>{% endif %}</td>
-          {% else %}
-            <td colspan="3">
-              <a href="{% url "docs.views.agregar_control" doc=doc.id %}">
-              <i class="icon-plus-2"></i> Agregar una nueva revisión
-            </td>
-          {% endif %}
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>    
-  </div>
-  <div class="tab-pane fade" id="registros">
-    <h3>Registros</h3>
-    <table class="table table-striped table-bordered table-condensed table-hover">
-      <thead>
-        <tr>
-          <th>Documento</th>
-          <th>Código</th>
-          <th>Revisión</th>
-          <th>Aprobación</th>
-          <th>Activo</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for doc in los_regs %}
-        {% ifchanged doc.proceso %}
-        <tr>
-          <td colspan="5" style="text-align: center;"><strong>{{doc.proceso}}</strong></td>
-        </tr>
-        {% endifchanged %}
-        <tr>
-          <td>{{ doc.nombre }}</td>
-          <td{% if doc.obsoleto or not doc.r_actual %} class="disabled"{% endif %}>
-            {% if doc.r_actual %}
-              <a href="/docs/{{ doc.id }}/detalles">{{ doc.clave|upper }}</a>
-            {% else %}
-              {{ doc.clave|upper }}
-            {% endif %}
-          </td>
-          {% if doc.r_actual %}
-            <td style="text-align: center;">{{ doc.r_actual }}</td>
-            <td>{{ doc.revision_actual.f_actualizacion|date:"M d, Y" }}</td>
-            <td style="text-align: center;">{% if doc.activo %}<i class="icon-checkmark"></i>{% else %}<i class="icon-cancel-3"></i>{% endif %}</td>
-          {% else %}
-            <td colspan="3">
-              <a href="{% url "docs.views.agregar_control" doc=doc.id %}">
-              <i class="icon-plus-2"></i> Agregar una nueva revisión
-            </td>
-          {% endif %}
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>    
-  </div>
-  <div class="tab-pane fade" id="stn">
-    <h3>Opiniones Técnicas</h3>
-    <table class="table table-striped table-bordered table-condensed table-hover">
-      <thead>
-        <tr>
-          <th>Documento</th>
-          <th>Código</th>
-          <th>Emisión</th>
-          <th>Activo</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for doc in las_stn %}
-        {% ifchanged doc.proceso %}
-        <tr>
-          <td colspan="5" style="text-align: center;"><strong>{{doc.proceso}}</strong></td>
-        </tr>
-        {% endifchanged %}
-        <tr>
-          <td>{{ doc.nombre }}</td>
-          <td{% if doc.obsoleto or not doc.r_actual %} class="disabled"{% endif %}>
-            {% if doc.r_actual %}
-              <a href="/docs/{{ doc.id }}/detalles">{{ doc.clave|upper }}</a>
-            {% else %}
-              {{ doc.clave|upper }}
-            {% endif %}
-          </td>
-          {% if doc.r_actual %}
-            <td>{{ doc.revision_actual.f_actualizacion|date:"M d, Y" }}</td>
-            <td style="text-align: center;">{% if doc.activo %}<i class="icon-checkmark"></i>{% else %}<i class="icon-cancel-3"></i>{% endif %}</td>
-          {% else %}
-            <td colspan="3">
-              <a href="{% url "docs.views.agregar_control" doc=doc.id %}">
-              <i class="icon-plus-2"></i> Agregar una nueva revisión
-            </td>
-          {% endif %}
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>    
-  </div>
-  <div class="tab-pane fade" id="coc">
-    <h3>Oficios COC</h3>
-    <table class="table table-striped table-bordered table-condensed table-hover">
-      <thead>
-        <tr>
-          <th>Documento</th>
-          <th>Código</th>
-          <th>Emisión</th>
-          <th>Activo</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for doc in los_coc %}
-        {% ifchanged doc.proceso %}
-        <tr>
-          <td colspan="5" style="text-align: center;"><strong>{{doc.proceso}}</strong></td>
-        </tr>
-        {% endifchanged %}
-        <tr>
-          <td>{{ doc.nombre }}</td>
-          <td{% if doc.obsoleto or not doc.r_actual %} class="disabled"{% endif %}>
-            {% if doc.r_actual %}
-              <a href="/docs/{{ doc.id }}/detalles">{{ doc.clave|upper }}</a>
-            {% else %}
-              {{ doc.clave|upper }}
-            {% endif %}
-          </td>
-          {% if doc.r_actual %}
-            <td>{{ doc.revision_actual.f_actualizacion|date:"M d, Y" }}</td>
-            <td style="text-align: center;">{% if doc.activo %}<i class="icon-checkmark"></i>{% else %}<i class="icon-cancel-3"></i>{% endif %}</td>
-          {% else %}
-            <td colspan="3">
-              <a href="{% url "docs.views.agregar_control" doc=doc.id %}">
-              <i class="icon-plus-2"></i> Agregar una nueva revisión
-            </td>
-          {% endif %}
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>    
-  </div>
-</div>
-</div>
+</section>
+
 {% endblock content %}
+
+{% block scripts %}
+<script>
+  (function(){
+    const tabs = document.querySelectorAll('[data-tab]');
+    document.addEventListener('click', function(evt){
+      const tab = evt.target.closest('[data-tab]');
+      if (!tab) return;
+      tabs.forEach(btn => btn.classList.toggle('tab-active', btn === tab));
+    });
+  })();
+</script>
+{% endblock scripts %}

@@ -10,6 +10,15 @@ from tinymce.models import HTMLField
 User = get_user_model()
 
 
+def user_display_name(user):
+    if not user:
+        return ''
+    full_name = (user.get_full_name() or '').strip()
+    if full_name:
+        return full_name
+    return user.email or user.username
+
+
 class TrackingFields(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
@@ -141,7 +150,14 @@ class Plan(TrackingFields):
 class Accion(TrackingFields):
     plan = models.ForeignKey(Plan, on_delete=models.CASCADE)
     accion = HTMLField()
-    responsable = models.CharField(blank=True, null=True, max_length=255, help_text='Iniciales del Responsable')
+    responsable = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        related_name='acciones_responsables',
+        blank=True,
+        null=True,
+        help_text='Persona responsable de la actividad',
+    )
     recursos = models.CharField(blank=True, null=True, max_length=255, help_text='Recursos necesarios para realizar la actividad')
     evidencia = models.CharField(max_length=255, blank=True, null=True, help_text='Evidencia documental esperada')
     fecha_inicio = models.DateField(blank=True, null=True)
@@ -151,20 +167,30 @@ class Accion(TrackingFields):
         verbose_name = _(u'Actividad')
         verbose_name_plural = _('Actividades')
 
+    def _latest_seguimiento(self):
+        return self.seguimiento_set.order_by('-fecha', '-created').first()
+
     @property
     def estado(self):
-        return self.seguimiento_set.latest().estado
+        latest = self._latest_seguimiento()
+        return latest.estado if latest else None
+
+    @property
+    def responsable_display(self):
+        return user_display_name(self.responsable)
 
     @property
     def get_estado(self):
         """Regresa el estado de una acción correctiva, de acuerdo al último seguimiento capturado."""
-        if self.seguimiento_set.count() == 0:
-            if self.fecha_fin >= datetime.date.today():
-                return 'Abierta en Tiempo'
-            else:
-                return 'Abierta Fuera de Tiempo'
-        else:
-            return self.seguimiento_set.latest().get_estado_display()
+        latest = self._latest_seguimiento()
+        if latest and latest.estado == CERRADA:
+            return 'Cerrada'
+
+        fecha_limite = self.fecha_fin
+        hoy = datetime.date.today()
+        if fecha_limite and fecha_limite < hoy:
+            return 'Abierta Fuera de Tiempo'
+        return 'Abierta en Tiempo'
 
     def __str__(self):
         return f'{self.id} - {self.plan}: {self.get_estado}'
@@ -176,7 +202,14 @@ class Seguimiento(TrackingFields, models.Model):
     fecha = models.DateField(help_text="Fecha de la actualización")
     evidencia = models.FileField(upload_to='pas', blank=True, null=True)
     estado = models.IntegerField(choices=A_ESTADO)
-    responsable = models.CharField(max_length=5, help_text='Iniciales del Responsable', blank=True, null=True)
+    responsable = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        related_name='seguimientos_responsables',
+        help_text='Persona responsable de la actualización',
+        blank=True,
+        null=True,
+    )
 
     class Meta:
         verbose_name = _(u'Seguimiento de Acciones')
@@ -186,3 +219,7 @@ class Seguimiento(TrackingFields, models.Model):
 
     def __str__(self):
         return f'{self.accion} - {self.fecha}: {self.get_estado_display()}'
+
+    @property
+    def responsable_display(self):
+        return user_display_name(self.responsable)

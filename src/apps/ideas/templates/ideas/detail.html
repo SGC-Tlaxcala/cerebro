@@ -1,83 +1,106 @@
-{% extends 'base.html' %}
+{% extends 'cerebro/base.html' %}
 
-{% block head_title %}Detalle de Ideas{% endblock %}
+{% block title %}Detalle de Idea{% endblock %}
 
 {% block content %}
-  <div class="row">
-      <div class="col">
-        <div class="jumbotron">
-          <h1 class="display-4"><span class="fa fa-lightbulb-o"></span> {{ idea.title }}</h1>
-           <p class="lead">
-                <a href="{% url 'ideas:index' %}" class="btn btn-primary">Regresar</a>
-           </p>
+<section class="space-y-10">
+  <header class="rounded-3xl border border-base-300 bg-base-100 p-8 shadow-lg">
+    <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+      <div class="space-y-3">
+        <p class="text-sm text-base-content/60">Caja de ideas · {{ idea.get_type_display }}</p>
+        <h1 class="text-3xl font-bold text-base-content flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-8 text-warning">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m5.303.947-1.591 1.591m4.238 4.212H17.7M4.5 10.5H2.25m3.447-4.303 1.591 1.591M8.25 18h7.5m-6 3h4.5M9 10.5a3 3 0 1 1 6 0c0 1.34-.44 2.304-.99 3-.527.667-.842 1.498-.968 2.356-.035.237-.166.444-.363.57a.75.75 0 0 1-.798 0 1.01 1.01 0 0 1-.363-.57c-.126-.858-.441-1.689-.968-2.356-.55-.696-.99-1.66-.99-3Z" />
+          </svg>
+          {{ idea.title }}
+        </h1>
+        <p class="text-sm text-base-content/70">Propuesta enviada por {{ idea.name }} · {{ idea.site }}</p>
+        <div class="flex flex-wrap gap-2 text-sm">
+          <span class="badge badge-outline">{{ idea.get_scope_display }}</span>
+          <span class="badge badge-outline badge-primary">Registro {{ idea.created|date:"d/m/Y" }}</span>
         </div>
       </div>
+      {% with resolution=resolution %}
+        <div class="space-y-3 text-right">
+          {% if resolution %}
+            {% if resolution.viable == 2 %}
+              <span class="badge badge-success badge-lg">Viable</span>
+            {% elif resolution.viable == 1 %}
+              <span class="badge badge-error badge-lg">No viable</span>
+            {% else %}
+              <span class="badge badge-warning badge-lg text-warning-content">En análisis</span>
+            {% endif %}
+            <p class="text-xs text-base-content/60">Actualizado el {{ resolution.created|date:"d/m/Y" }}</p>
+          {% else %}
+            <span class="badge badge-neutral badge-lg">En revisión</span>
+          {% endif %}
+          <a href="{% url 'ideas:index' %}" class="btn btn-ghost btn-sm">← Regresar</a>
+        </div>
+      {% endwith %}
+    </div>
+  </header>
+
+  <div class="grid gap-6 lg:grid-cols-3">
+    <article class="rounded-3xl border border-base-300 bg-base-100 p-6 shadow-sm lg:col-span-2 space-y-4">
+      <h2 class="text-xl font-semibold text-base-content">Descripción</h2>
+      <div class="prose prose-sm max-w-none text-base-content/80">{{ idea.desc|safe }}</div>
+    </article>
+    <article class="rounded-3xl border border-base-300 bg-base-100 p-6 shadow-sm space-y-4">
+      <h2 class="text-xl font-semibold text-base-content">Contacto</h2>
+      <dl class="space-y-2 text-sm text-base-content/80">
+        <div>
+          <dt class="font-semibold text-base-content">Nombre</dt>
+          <dd>{{ idea.name }}</dd>
+        </div>
+        <div>
+          <dt class="font-semibold text-base-content">Correo</dt>
+          <dd>{{ idea.contact }}</dd>
+        </div>
+        <div>
+          <dt class="font-semibold text-base-content">Sitio</dt>
+          <dd>{{ idea.site }}</dd>
+        </div>
+      </dl>
+    </article>
   </div>
 
-  <div class="row">
-    <div class="col">
-        <table class="table table-striped table-hover">
-          <tbody>
-            <tr>
-               <th scope="row" class="text-right w-25">Propone</th>
-               <td class="w-75">{{ idea.name }}</td>
-            </tr>
-            <tr>
-               <th scope="row" class="text-right w-25">Sitio</th>
-               <td class="w-75">{{ idea.site }}</td>
-            </tr>
-            <tr>
-               <th scope="row" class="text-right w-25">Tipo</th>
-               <td class="w-75">{{ idea.get_type_display }}</td>
-            </tr>
-            <tr>
-               <th scope="row" class="text-right w-25">Alcance</th>
-               <td class="w-75">{{ idea.get_scope_display }}</td>
-            </tr>
-            <tr>
-                <th scope="row" class="text-right w-25">Descripción</th>
-                <td class="w-75">{{ idea.desc | safe }}</td>
-            </tr>
-            <tr>
-                <th scope="row" class="text-right w-25">Resultados (en el caso de Proyectos)</th>
-                <td class="w-75">{{ idea.results | safe }}</td>
-            </tr>
-            <tr>
-                <th scope="row" class="text-right w-25">Formatos</th>
-                <td class="w-75"><a href="/media/{{ idea.docs }}">{{ idea.docs }}</a></td>
-            </tr>
-            <tr>
-                <th scope="row" class="text-right w-25">Evidencias</th>
-                <td class="w-75"><a href="/media/{{ idea.evidence }}">{{ idea.evidence }}</a></td>
-            </tr>
-          </tbody>
-        </table>
-    </div>
+  <div class="grid gap-6 lg:grid-cols-3">
+    <article class="rounded-3xl border border-base-300 bg-base-100 p-6 shadow-sm space-y-4">
+      <h2 class="text-xl font-semibold text-base-content">Resultados esperados / obtenidos</h2>
+      <div class="prose prose-sm max-w-none text-base-content/80">
+        {{ idea.results|default:'Sin resultados registrados'|safe }}
+      </div>
+    </article>
+    <article class="rounded-3xl border border-base-300 bg-base-100 p-6 shadow-sm space-y-4 lg:col-span-2">
+      <h2 class="text-xl font-semibold text-base-content">Archivos adjuntos</h2>
+      <ul class="space-y-2 text-sm text-base-content/80">
+        <li class="flex items-center justify-between rounded-xl border border-base-300 px-4 py-3">
+          <span>Formatos del proyecto</span>
+          {% if idea.docs %}
+            <a href="{{ idea.docs.url }}" target="_blank" class="btn btn-sm btn-outline">Descargar</a>
+          {% else %}
+            <span class="text-base-content/50">No disponible</span>
+          {% endif %}
+        </li>
+        <li class="flex items-center justify-between rounded-xl border border-base-300 px-4 py-3">
+          <span>Evidencias</span>
+          {% if idea.evidence %}
+            <a href="{{ idea.evidence.url }}" target="_blank" class="btn btn-sm btn-outline">Descargar</a>
+          {% else %}
+            <span class="text-base-content/50">No disponible</span>
+          {% endif %}
+        </li>
+      </ul>
+    </article>
   </div>
 
-  {% if idea.resolve_set.last %}
-    <div class="row">
-    <h3>Resultado de la evaluación</h3>
-    </div>
-  <div class="row">
-    <div class="col">
-        <table class="table table-striped table-hover">
-          <tbody>
-            <tr>
-               <th scope="row" class="text-right w-25">Resolución</th>
-               <td class="w-75">{% if idea.resolve_set.last.viable == 2 %}<strong>Viable</strong>{% elif idea.resolve_set.last.viable == 1 %}No viable{% else %}En análisis{% endif %}</td>
-            </tr>
-            <tr>
-               <th scope="row" class="text-right w-25">Fecha de resolución</th>
-               <td class="w-75">{{ idea.resolve_set.last.created }}</td>
-            </tr>
-            <tr>
-               <th scope="row" class="text-right w-25">Resolución</th>
-               <td class="w-75">{{ idea.resolve_set.last.resolve | safe }}</td>
-            </tr>
-          </tbody>
-        </table>
-    </div>
-  </div>
+  {% if resolution %}
+    <article class="rounded-3xl border border-base-300 bg-base-100 p-6 shadow-sm space-y-3">
+      <h2 class="text-xl font-semibold text-base-content">Resolución</h2>
+      <div class="prose prose-sm max-w-none text-base-content/80">
+        {{ resolution.resolve|safe }}
+      </div>
+    </article>
   {% endif %}
+</section>
 {% endblock content %}

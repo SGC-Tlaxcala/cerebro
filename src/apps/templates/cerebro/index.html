@@ -1,0 +1,872 @@
+{% extends 'cerebro/base.html' %}
+{% load static %}
+
+{% block title %}Cuadro de Mando Integral{% endblock title %}
+
+{% block content %}
+<section class="mx-auto flex max-w-3xl flex-col items-center gap-6 text-center">
+  <div class="w-full">
+    <form class="card bg-base-100 shadow-md" method="get" action="{% url 'docs:buscador' %}">
+      <div class="card-body">
+        <h2 class="card-title justify-center text-2xl font-semibold">Busca un documento</h2>
+        <p class="text-sm text-base-content/70">Escribe el nombre o palabra clave del documento que necesitas.</p>
+        <div class="flex flex-col gap-3 sm:flex-row">
+          <label for="search-docs" class="sr-only">Nombre del documento</label>
+          <input
+            id="search-docs"
+            type="search"
+            name="q"
+            placeholder="Escribe el documento a buscar"
+            class="input input-bordered w-full"
+            aria-label="Nombre del documento"
+          />
+          <button type="submit" class="btn btn-primary gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="size-5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+            </svg>
+            Buscar
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</section>
+
+<section class="mx-auto mt-12 w-full max-w-5xl">
+  <div class="card bg-base-100 shadow-xl border border-base-200">
+    <div class="card-body gap-6 md:flex md:items-start">
+      <div class="mx-auto flex shrink-0 items-center justify-center">
+        <img src="{% static 'img/logo.svg' %}" alt="INE logo" class="h-20 w-auto object-contain" />
+      </div>
+      <div class="flex-1 space-y-4 text-left">
+        <div class="flex flex-col gap-2 md:flex-row md:items-baseline md:justify-between">
+          <h2 class="text-3xl font-bold leading-tight">Política de la Calidad</h2>
+          <span class="badge badge-outline">Revisión: 00 · 2021</span>
+        </div>
+        <p class="text-base leading-relaxed text-base-content/80">
+          En el Instituto Nacional Electoral (INE), estamos comprometidos en proporcionar a la ciudadanía un servicio eficiente y de calidad en el trámite de expedición de su credencial para votar, desde la entrevista hasta la entrega de la credencial para votar, para contribuir al derecho a la identidad ciudadana. Lo hacemos con base en el marco normativo, reglamentario y en un entorno de mejora continua con apego a los requisitos de la norma ISO 9001:2015.
+        </p>
+        <div class="divider my-6"></div>
+        <div class="grid gap-4 text-sm md:grid-cols-2">
+          <div class="rounded-lg border border-base-200 bg-base-100/50 p-4">
+            <h3 class="text-sm font-semibold uppercase tracking-wide text-primary">Nuestro compromiso</h3>
+            <p class="mt-2 text-base leading-relaxed text-base-content/80">
+              Garantizar procesos oportunos y confiables que acompañen a las personas en cada etapa de su trámite, asegurando la integridad y confidencialidad de su información.
+            </p>
+          </div>
+          <div class="rounded-lg border border-base-200 bg-base-100/50 p-4">
+            <h3 class="text-sm font-semibold uppercase tracking-wide text-primary">Enfoque de mejora continua</h3>
+            <p class="mt-2 text-base leading-relaxed text-base-content/80">
+              Evaluamos de forma permanente nuestros resultados y prácticas para alinear nuestros servicios a las necesidades ciudadanas y los estándares internacionales de calidad.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="mx-auto mt-12 w-full max-w-4xl">
+  <div class="card border border-primary/30 bg-primary/5 shadow-md">
+    <div class="card-body">
+      <h2 class="card-title text-3xl font-bold text-primary">Alcance del Sistema</h2>
+      <p class="mt-4 text-lg leading-relaxed text-base-content">
+        Dar un Servicio de Atención a la Ciudadanía durante el trámite de expedición de su credencial para votar, dese la primera entrevista hasta la entrega de la credencial en los MAC en la entidad.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="mx-auto mt-12 w-full max-w-6xl space-y-8">
+  <div class="flex flex-col items-center gap-3 text-center">
+    <h2 class="text-3xl font-bold">Objetivos de la calidad</h2>
+  </div>
+
+  <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-3" id="obj1">
+    <article class="card bg-base-100 shadow-lg border border-base-200">
+      <div class="card-body space-y-4">
+        <div class="flex items-center gap-3">
+          <span class="badge badge-primary badge-outline text-sm">01</span>
+          <h3 class="text-lg font-semibold">Actualizar el Padrón Electoral</h3>
+        </div>
+        <p class="text-base leading-relaxed text-base-content/80">
+          1. Actualizar el Padrón Electoral en la entidad mediante la captación de solicitudes de credencial requeridas por la ciudadanía en los Módulos de Atención Ciudadana en al menos el 90% del rango mínimo establecido en el pronóstico.
+        </p>
+        <button type="button" class="btn btn-outline btn-primary" data-modal="kpi1-modal" data-chart="kpi1">
+          {{ cap }}
+        </button>
+      </div>
+    </article>
+
+    <article class="card bg-base-100 shadow-lg border border-base-200">
+      <div class="card-body space-y-4">
+        <div class="flex items-center gap-3">
+          <span class="badge badge-primary badge-outline text-sm">02</span>
+          <h3 class="text-lg font-semibold">Implementación del modelo MAC</h3>
+        </div>
+        <p class="text-base leading-relaxed text-base-content/80">
+          2. Incrementar en un 30% la implementación del modelo institucional de Módulos de Atención Ciudadana fijos de la entidad, con base en el Reporte porcentaje de avance en la implementación del modelo institucional vigente.
+        </p>
+        <button type="button" class="btn btn-outline btn-primary" data-modal="kpi2-modal" data-chart="kpi2">
+          MAC con imagen institucional
+        </button>
+      </div>
+    </article>
+
+    <article class="card bg-base-100 shadow-lg border border-base-200">
+      <div class="card-body space-y-4">
+        <div class="flex items-center gap-3">
+          <span class="badge badge-primary badge-outline text-sm">03</span>
+          <h3 class="text-lg font-semibold">Mantenimiento del 100% de los MAC</h3>
+        </div>
+        <p class="text-base leading-relaxed text-base-content/80">
+          3. Lograr el mantenimiento del 100% de los Módulos de Atención Ciudadana con modelo institucional, con base en el Reporte del porcentaje de avance en la implementación del modelo institucional vigente, en los conceptos de pintura en muros, aire acondicionado, marquesina, entre otros.
+        </p>
+      </div>
+    </article>
+
+    <article class="card bg-base-100 shadow-lg border border-base-200">
+      <div class="card-body space-y-4">
+        <div class="flex items-center gap-3">
+          <span class="badge badge-primary badge-outline text-sm">04</span>
+          <h3 class="text-lg font-semibold">Servicio a domicilio</h3>
+        </div>
+        <p class="text-base leading-relaxed text-base-content/80">
+          4. Mantener el servicio a domicilio, acorde con lo que establece el artículo 141 de la Ley General de Instituciones y Procedimientos Electorales.
+        </p>
+        <button type="button" class="btn btn-outline btn-primary" data-modal="kpi4-modal">
+          Solicitudes art. 141
+        </button>
+      </div>
+    </article>
+
+    <article class="card bg-base-100 shadow-lg border border-base-200 md:col-span-2 xl:col-span-1" id="obj2">
+      <div class="card-body space-y-4">
+        <div class="flex items-center gap-3">
+          <span class="badge badge-primary badge-outline text-sm">05</span>
+          <h3 class="text-lg font-semibold">Satisfacción ciudadana</h3>
+        </div>
+        <p class="text-base leading-relaxed text-base-content/80">
+          5. Cumplir en un 95% la satisfacción ciudadana sobre el servicio de los Módulos de Atención Ciudadana.
+        </p>
+        <button type="button" class="btn btn-outline btn-primary" data-modal="kpi5-modal" data-chart="kpi5">
+          Aprobación Ciudadana
+        </button>
+      </div>
+    </article>
+  </div>
+</section>
+
+<dialog id="kpi1-modal" class="modal">
+  <div id="obj2" class="modal-box w-11/12 max-w-5xl space-y-6">
+    <div class="flex items-start justify-between gap-4">
+      <div>
+        <h3 class="text-2xl font-semibold text-base-content">{{ cap }}</h3>
+        <p class="text-sm text-base-content/70">Seguimiento mensual de trámites</p>
+      </div>
+      <button type="button" class="btn btn-sm btn-circle btn-ghost" aria-label="Cerrar" data-close-modal="kpi1-modal">✕</button>
+    </div>
+    <div class="rounded-2xl border border-base-200 bg-base-100 p-6 space-y-6">
+      <div
+        id="chartKPI1"
+        class="w-full"
+        style="min-height:360px;"
+        data-forecast="{{ cap.forecast|default:0 }}"
+        data-goal="{{ cap.goal|default:0 }}"
+      ></div>
+      <div id="kpi1-details" class="grid grid-cols-1 gap-3 text-sm text-base-content md:grid-cols-3">
+        <div class="rounded-xl border border-base-200 bg-base-100/80 p-4 shadow-sm">
+          <p class="text-xs font-semibold uppercase tracking-wide text-base-content/70">Trámites acumulados</p>
+          <p class="mt-2 text-2xl font-bold text-base-content" id="kpi1-total">0</p>
+        </div>
+        <div class="rounded-xl border border-base-200 bg-base-100/80 p-4 shadow-sm">
+          <p class="text-xs font-semibold uppercase tracking-wide text-base-content/70">Pronóstico anual</p>
+          <p class="mt-2 text-2xl font-bold text-base-content" id="kpi1-forecast">{{ cap.forecast|default:0 }}</p>
+        </div>
+        <div class="rounded-xl border border-base-200 bg-base-100/80 p-4 shadow-sm">
+          <p class="text-xs font-semibold uppercase tracking-wide text-base-content/70">Meta de cumplimiento</p>
+          <p class="mt-2 text-2xl font-bold text-base-content" id="kpi1-goal">{{ cap.goal|default:0 }}%</p>
+        </div>
+      </div>
+      <p id="kpi1-summary" class="text-xs text-base-content/60"></p>
+    </div>
+  </div>
+  <form method="dialog" class="modal-backdrop">
+    <button aria-label="Cerrar" class="hidden">cerrar</button>
+  </form>
+</dialog>
+
+<dialog id="kpi2-modal" class="modal">
+  <div id="obj3" class="modal-box w-11/12 max-w-3xl space-y-6">
+    <div class="flex items-start justify-between gap-4">
+      <div>
+        <h3 class="text-2xl font-semibold text-base-content">{{ imagen.title }}</h3>
+        <p class="text-sm text-base-content/70">Monitoreo de módulos con imagen institucional</p>
+      </div>
+      <button type="button" class="btn btn-sm btn-circle btn-ghost" aria-label="Cerrar" data-close-modal="kpi2-modal">✕</button>
+    </div>
+    <div class="rounded-2xl border border-base-200 bg-base-100 p-6 space-y-6">
+      <div
+        id="chartKPI2"
+        class="w-full"
+        style="min-height:320px;"
+        data-current="{{ imagen.mac_imagen|default:0 }}"
+        data-total="{{ imagen.mac_totales|default:0 }}"
+      ></div>
+      <div id="kpi2-details" class="grid grid-cols-1 gap-3 text-sm text-base-content md:grid-cols-2">
+        <div class="rounded-xl border border-base-200 bg-base-100/80 p-4 shadow-sm">
+          <p class="text-xs font-semibold uppercase tracking-wide text-base-content/70">MAC con imagen</p>
+          <p class="mt-2 text-2xl font-bold text-base-content" id="kpi2-current">{{ imagen.mac_imagen|default:0 }}</p>
+        </div>
+        <div class="rounded-xl border border-base-200 bg-base-100/80 p-4 shadow-sm">
+          <p class="text-xs font-semibold uppercase tracking-wide text-base-content/70">Total de MAC</p>
+          <p class="mt-2 text-2xl font-bold text-base-content" id="kpi2-total">{{ imagen.mac_totales|default:0 }}</p>
+        </div>
+      </div>
+      <p id="kpi2-summary" class="text-xs text-base-content/60"></p>
+    </div>
+  </div>
+  <form method="dialog" class="modal-backdrop">
+    <button aria-label="Cerrar" class="hidden">cerrar</button>
+  </form>
+</dialog>
+
+<dialog id="kpi4-modal" class="modal">
+  <div id="obj4" class="modal-box w-11/12 max-w-4xl space-y-4">
+    <div class="flex items-start justify-between gap-4">
+      <div>
+        <h3 class="text-2xl font-semibold text-base-content">Trámites art. 141</h3>
+        <p class="text-sm text-base-content/70">Detalle mensual de solicitudes recibidas y atendidas</p>
+      </div>
+      <button type="button" class="btn btn-sm btn-circle btn-ghost" aria-label="Cerrar" data-close-modal="kpi4-modal">✕</button>
+    </div>
+    <div class="overflow-x-auto rounded-2xl border border-base-200 bg-base-100">
+      <table class="table table-sm table-zebra">
+        <thead class="bg-base-200/70">
+          <tr class="text-xs font-semibold uppercase tracking-wide text-base-content/70">
+            <th scope="col" class="bg-base-200/70 text-left">Solicitudes</th>
+            <th scope="col">Ene</th>
+            <th scope="col">Feb</th>
+            <th scope="col">Mar</th>
+            <th scope="col">Abr</th>
+            <th scope="col">May</th>
+            <th scope="col">Jun</th>
+            <th scope="col">Jul</th>
+            <th scope="col">Ago</th>
+          </tr>
+        </thead>
+        <tbody class="text-sm text-base-content">
+          <tr class="hover:bg-base-200/40 transition-colors">
+            <th scope="row" class="font-semibold text-left">Recibidas</th>
+            <td class="text-right">4</td>
+            <td class="text-right">19</td>
+            <td class="text-right">0</td>
+            <td class="text-right">0</td>
+            <td class="text-right">0</td>
+            <td class="text-right">0</td>
+            <td class="text-right">0</td>
+            <td class="text-right">0</td>
+          </tr>
+          <tr class="hover:bg-base-200/40 transition-colors">
+            <th scope="row" class="font-semibold text-left">Atendidas</th>
+            <td class="text-right">4</td>
+            <td class="text-right">19</td>
+            <td class="text-right">0</td>
+            <td class="text-right">0</td>
+            <td class="text-right">0</td>
+            <td class="text-right">0</td>
+            <td class="text-right">0</td>
+            <td class="text-right">0</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <form method="dialog" class="modal-backdrop">
+    <button aria-label="Cerrar" class="hidden">cerrar</button>
+  </form>
+</dialog>
+
+<dialog id="kpi5-modal" class="modal">
+  <div id="obj5" class="modal-box w-11/12 max-w-3xl space-y-6">
+    <div class="flex items-start justify-between gap-4">
+      <div>
+        <h3 class="text-2xl font-semibold text-base-content">Satisfacción Ciudadana</h3>
+        <p class="text-sm text-base-content/70">Indicador de percepción ciudadana en los MAC</p>
+      </div>
+      <button type="button" class="btn btn-sm btn-circle btn-ghost" aria-label="Cerrar" data-close-modal="kpi5-modal">✕</button>
+    </div>
+    <div class="rounded-2xl border border-base-200 bg-base-100 p-4 space-y-4">
+      <div id="kpi5-loading" class="flex justify-center items-center py-6" style="display:none">
+        <svg class="animate-spin h-8 w-8 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+        </svg>
+      </div>
+      <div id="kpi5-empty" class="text-center text-sm text-gray-500" style="display:none">
+        Sin datos de satisfacción disponibles.
+      </div>
+      <div id="chartKPI5" class="w-full" style="min-height:320px;"></div>
+      <div id="kpi5-legend" class="space-y-2 text-sm text-base-content/80"></div>
+      <p id="kpi5-summary" class="text-xs text-base-content/60"></p>
+    </div>
+  </div>
+  <form method="dialog" class="modal-backdrop">
+    <button aria-label="Cerrar" class="hidden">cerrar</button>
+  </form>
+</dialog>
+{% endblock content %}
+
+{% block scripts %}
+  <script>
+    window.kpiCharts = window.kpiCharts || {};
+
+    window.kpiCharts.kpi1 = function drawKPI1() {
+      const container = document.getElementById('chartKPI1');
+      if (!container) return;
+
+      const formatNumber = (value) => {
+        try {
+          return new Intl.NumberFormat('es-MX').format(value || 0);
+        } catch (err) {
+          return String(value || 0);
+        }
+      };
+
+      const calcularMinimoEstetico = (valorMin) => {
+        if (!Number.isFinite(valorMin)) return 0;
+        const unidades = valorMin % 10;
+        if (unidades >= 5) {
+          return valorMin - unidades;
+        }
+        return valorMin - unidades - 5;
+      };
+
+      const meses = [
+        {% for t in cap.tramitemensual_set.all|dictsort:"month" %}
+          '{{ t.month|stringformat:"02d" }}'{% if not forloop.last %}, {% endif %}
+        {% endfor %}
+      ];
+      const tramites = [
+        {% for t in cap.tramitemensual_set.all|dictsort:"month" %}
+          {{ t.tramites|default:0 }}{% if not forloop.last %}, {% endif %}
+        {% endfor %}
+      ];
+      const forecastValue = Number(container.dataset.forecast || {{ cap.forecast|default:0 }}) || 0;
+      const goalValue = Number(container.dataset.goal || {{ cap.goal|default:0 }}) || 0;
+
+      const monthLabel = (m) => {
+        const labels = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+        const index = parseInt(m, 10) - 1;
+        return labels[index] || '';
+      };
+
+      const tramitesData = tramites.map((value) => Number(value) || 0);
+      const categorias = meses.map(monthLabel);
+
+      let acumuladoTemp = 0;
+      const porcentajeAcum = tramitesData.map((value) => {
+        acumuladoTemp += value;
+        if (forecastValue > 0) {
+          return Number(((acumuladoTemp / forecastValue) * 100).toFixed(2));
+        }
+        return 0;
+      });
+
+      const minPct = porcentajeAcum.length ? Math.min(...porcentajeAcum, goalValue) : goalValue;
+      const maxPct = porcentajeAcum.length ? Math.max(...porcentajeAcum, goalValue) : goalValue;
+      const rawMinY2 = porcentajeAcum.length ? calcularMinimoEstetico(minPct) : 0;
+      const minY2 = Math.max(0, rawMinY2);
+      const maxValueForAxis = Math.max(maxPct, goalValue);
+      const maxY2 = Math.max(100, Math.ceil((maxValueForAxis || 0) / 5) * 5 || 100);
+      const goalSeriesData = categorias.map(() => goalValue);
+
+      if (window.kpi1Chart) {
+        try { window.kpi1Chart.destroy(); } catch (err) { /* noop */ }
+        window.kpi1Chart = null;
+      }
+
+      const options = {
+        chart: {
+          height: 420,
+          type: 'line',
+          animations: { easing: 'easeinout', speed: 400 }
+        },
+        series: [
+          { name: 'Trámites mensuales', type: 'column', data: tramitesData, yAxisIndex: 0 },
+          { name: '% Acumulado', type: 'line', data: porcentajeAcum, yAxisIndex: 1 },
+          { name: goalValue ? `Meta ${goalValue}%` : 'Meta', type: 'line', data: goalSeriesData, yAxisIndex: 1 }
+        ],
+        stroke: { width: [0, 3, 2], curve: 'smooth' },
+        plotOptions: { bar: { columnWidth: '45%', borderRadius: 6 } },
+        dataLabels: { enabled: false },
+        colors: ['#4f46e5', '#d946ef', '#0ea5e9'],
+        xaxis: { categories: categorias },
+        yaxis: [
+          {
+            title: { text: 'Número de trámites' },
+            min: 0,
+            labels: { formatter: (value) => formatNumber(value) }
+          },
+          {
+            opposite: true,
+            title: { text: '% Acumulado' },
+            min: minY2,
+            max: maxY2,
+            labels: { formatter: (value) => `${Number(value).toFixed(0)}%` }
+          }
+        ],
+        legend: {
+          position: 'top',
+          horizontalAlign: 'center',
+          markers: { radius: 6 }
+        },
+        tooltip: {
+          shared: true,
+          y: {
+            formatter: (value, { seriesIndex }) => {
+              if (seriesIndex === 0) {
+                return `${formatNumber(value)} trámites`;
+              }
+              return `${Number(value).toFixed(2)}%`;
+            }
+          }
+        }
+      };
+
+      window.kpi1Chart = new ApexCharts(container, options);
+      window.kpi1Chart.render();
+
+      const totalTramites = tramitesData.reduce((acc, value) => acc + value, 0);
+      const totalEl = document.getElementById('kpi1-total');
+      if (totalEl) totalEl.textContent = formatNumber(totalTramites);
+
+      const forecastEl = document.getElementById('kpi1-forecast');
+      if (forecastEl) forecastEl.textContent = formatNumber(forecastValue);
+
+      const goalEl = document.getElementById('kpi1-goal');
+      if (goalEl) {
+        const goalLabel = Number.isFinite(goalValue) ? (goalValue % 1 === 0 ? goalValue.toFixed(0) : goalValue.toFixed(1)) : '0';
+        goalEl.textContent = `${goalLabel}%`;
+      }
+
+      const lastPercent = porcentajeAcum.length ? porcentajeAcum[porcentajeAcum.length - 1] : 0;
+      const summaryEl = document.getElementById('kpi1-summary');
+      if (summaryEl) {
+        const percentLabel = Number.isFinite(lastPercent) ? lastPercent.toFixed(1) : '0.0';
+        summaryEl.textContent = `Acumulado: ${formatNumber(totalTramites)} trámites (${percentLabel}% del pronóstico anual).`;
+      }
+    };
+    window.kpiCharts.kpi1.requiresGoogleCharts = false;
+
+    (function () {
+      const CHART_ID = 'chartKPI2';
+      const SUMMARY_ID = 'kpi2-summary';
+      const CURRENT_ID = 'kpi2-current';
+      const TOTAL_ID = 'kpi2-total';
+      const COLOR_GREEN = '#16a34a';
+      const COLOR_ORANGE = '#fb923c';
+      const COLOR_RED = '#ef4444';
+      let chartInstance = null;
+
+      function getEl(id) {
+        return document.getElementById(id);
+      }
+
+      function formatNumber(value) {
+        try {
+          return new Intl.NumberFormat('es-MX').format(value || 0);
+        } catch (err) {
+          return String(value || 0);
+        }
+      }
+
+      function getGaugeColor(percent) {
+        if (percent >= 95) return COLOR_GREEN;
+        if (percent >= 75) return COLOR_ORANGE;
+        return COLOR_RED;
+      }
+
+      function ensureChart() {
+        if (typeof ApexCharts === 'undefined') {
+          console.warn('ApexCharts no está disponible; no se puede renderizar KPI2.');
+          return null;
+        }
+        if (chartInstance) return chartInstance;
+        const el = getEl(CHART_ID);
+        if (!el) return null;
+
+        const options = {
+          chart: {
+            type: 'radialBar',
+            height: 320,
+            sparkline: { enabled: true }
+          },
+          series: [0],
+          colors: [getGaugeColor(0)],
+          plotOptions: {
+            radialBar: {
+              startAngle: -120,
+              endAngle: 120,
+              hollow: {
+                size: '60%',
+                background: 'transparent'
+              },
+              track: {
+                background: '#e5e7eb',
+                strokeWidth: '100%'
+              },
+              dataLabels: {
+                name: {
+                  show: true,
+                  color: '#6b7280',
+                  fontSize: '14px',
+                  offsetY: 60,
+                  formatter: function () { return 'Avance con imagen'; }
+                },
+                value: {
+                  show: true,
+                  fontSize: '34px',
+                  fontWeight: 700,
+                  offsetY: -10,
+                  formatter: function (val) {
+                    const num = Number(val);
+                    return Number.isFinite(num) ? num.toFixed(1) + '%' : '--';
+                  }
+                }
+              }
+            }
+          },
+          stroke: { lineCap: 'round' },
+          fill: { type: 'solid' }
+        };
+
+        chartInstance = new ApexCharts(el, options);
+        chartInstance.render();
+        return chartInstance;
+      }
+
+      function updateGauge(percent) {
+        const chart = ensureChart();
+        if (!chart) return;
+        const safe = Number.isFinite(percent) ? Math.max(0, Math.min(100, percent)) : 0;
+        const rounded = Number(safe.toFixed(2));
+        chart.updateOptions({ colors: [getGaugeColor(rounded)] }, false, false);
+        chart.updateSeries([rounded]);
+      }
+
+      function updateSummary(current, total, percent) {
+        const summaryEl = getEl(SUMMARY_ID);
+        if (!summaryEl) return;
+        const totalLabel = formatNumber(total);
+        const currentLabel = formatNumber(current);
+        const percentLabel = Number.isFinite(percent) ? percent.toFixed(1) : '0.0';
+        summaryEl.textContent = `Se han certificado ${currentLabel} de ${totalLabel} módulos (${percentLabel}% con imagen).`;
+      }
+
+      window.kpiCharts.kpi2 = function drawKPI2() {
+        const container = getEl(CHART_ID);
+        if (!container) return;
+
+        const current = Number(container.dataset.current || 0);
+        const total = Number(container.dataset.total || 0);
+        const percent = total > 0 ? (current / total) * 100 : 0;
+
+        const currentEl = getEl(CURRENT_ID);
+        if (currentEl) currentEl.textContent = formatNumber(current);
+        const totalEl = getEl(TOTAL_ID);
+        if (totalEl) totalEl.textContent = formatNumber(total);
+
+        updateGauge(percent);
+        updateSummary(current, total, percent);
+      };
+      window.kpiCharts.kpi2.requiresGoogleCharts = false;
+    })();
+
+    (function () {
+      const ENDPOINT = '/api/v1/vozmac/satisfaccion';
+      const CHART_ID = 'chartKPI5';
+      const LOADING_ID = 'kpi5-loading';
+      const EMPTY_ID = 'kpi5-empty';
+      const DETAILS_ID = 'kpi5-legend';
+      const SUMMARY_ID = 'kpi5-summary';
+      const QUESTIONS = [
+        { field: 'p1_claridad_info', label: 'Claridad de la información' },
+        { field: 'p2_amabilidad', label: 'Amabilidad' },
+        { field: 'p3_instalaciones', label: 'Instalaciones' },
+        { field: 'p4_tiempo_espera', label: 'Tiempo de espera' },
+      ];
+      const COLOR_GREEN = '#16a34a';
+      const COLOR_ORANGE = '#fb923c';
+      const COLOR_RED = '#ef4444';
+      let gaugeChart = null;
+
+      function getEl(id) {
+        return document.getElementById(id);
+      }
+
+      function showSpinner() {
+        const el = getEl(LOADING_ID);
+        if (el) el.style.display = 'flex';
+      }
+
+      function hideSpinner() {
+        const el = getEl(LOADING_ID);
+        if (el) el.style.display = 'none';
+      }
+
+      function showEmpty() {
+        const el = getEl(EMPTY_ID);
+        if (el) el.style.display = 'block';
+      }
+
+      function hideEmpty() {
+        const el = getEl(EMPTY_ID);
+        if (el) el.style.display = 'none';
+      }
+
+      function formatDateLabel(isoString) {
+        if (!isoString) return '--';
+        const date = new Date(isoString);
+        if (Number.isNaN(date.getTime())) return '--';
+        return date.toLocaleDateString('es-MX', {
+          day: '2-digit',
+          month: 'long',
+          year: 'numeric'
+        });
+      }
+
+      function formatNumber(value) {
+        try {
+          return new Intl.NumberFormat('es-MX').format(value || 0);
+        } catch (err) {
+          return String(value || 0);
+        }
+      }
+
+      function getGaugeColor(value) {
+        if (value >= 95) return COLOR_GREEN;
+        if (value >= 75) return COLOR_ORANGE;
+        return COLOR_RED;
+      }
+
+      function ensureGauge() {
+        if (typeof ApexCharts === 'undefined') {
+          console.warn('ApexCharts no está disponible; no se puede renderizar KPI5.');
+          return null;
+        }
+        if (gaugeChart) return gaugeChart;
+        const el = getEl(CHART_ID);
+        if (!el) return null;
+
+        const options = {
+          chart: {
+            type: 'radialBar',
+            height: 320,
+            sparkline: { enabled: true }
+          },
+          series: [0],
+          colors: [getGaugeColor(0)],
+          plotOptions: {
+            radialBar: {
+              startAngle: -120,
+              endAngle: 120,
+              hollow: {
+                size: '62%',
+                background: 'transparent'
+              },
+              track: {
+                background: '#e5e7eb',
+                strokeWidth: '100%'
+              },
+              dataLabels: {
+                name: {
+                  show: true,
+                  color: '#6b7280',
+                  fontSize: '14px',
+                  offsetY: 60,
+                  formatter: function () { return 'Promedio favorable'; }
+                },
+                value: {
+                  show: true,
+                  fontSize: '34px',
+                  fontWeight: 700,
+                  offsetY: -10,
+                  formatter: function (val) {
+                    const num = Number(val);
+                    return Number.isFinite(num) ? num.toFixed(1) + '%' : '--';
+                  }
+                }
+              }
+            }
+          },
+          stroke: { lineCap: 'round' },
+          fill: { type: 'solid' }
+        };
+
+        gaugeChart = new ApexCharts(el, options);
+        gaugeChart.render();
+        return gaugeChart;
+      }
+
+      function updateGauge(value) {
+        const chart = ensureGauge();
+        if (!chart) return;
+        const numeric = Number(value);
+        const safeValue = Number.isFinite(numeric) ? Math.max(0, Math.min(100, numeric)) : 0;
+        const rounded = Number(safeValue.toFixed(2));
+        chart.updateOptions({ colors: [getGaugeColor(rounded)] }, false, false);
+        chart.updateSeries([rounded]);
+      }
+
+      function renderDetails(rows) {
+        const el = getEl(DETAILS_ID);
+        if (!el) return;
+        if (!rows || !rows.length) {
+          el.innerHTML = '';
+          return;
+        }
+        el.innerHTML = rows.map(function (row) {
+          const favorable = Number.isFinite(row.favorablePct) ? row.favorablePct.toFixed(1) : '0.0';
+          const average = Number.isFinite(row.average) ? row.average.toFixed(2) : '0.00';
+          return `<div class="flex items-center justify-between gap-4"><div>${row.label}</div><div class="text-right"><span class="font-semibold">${favorable}%</span><span class="text-xs text-base-content/60 ml-2">Prom. ${average}</span></div></div>`;
+        }).join('');
+      }
+
+      function updateSummary(resp, avgFavorable) {
+        const el = getEl(SUMMARY_ID);
+        if (!el) return;
+        if (!resp) {
+          el.textContent = 'Sin información disponible.';
+          return;
+        }
+        const startLabel = formatDateLabel(resp.first_response_date);
+        const endLabel = formatDateLabel(resp.last_response_date);
+        const total = formatNumber(resp.total_responses || 0);
+        const favorableLabel = Number.isFinite(avgFavorable) ? avgFavorable.toFixed(1) : '0.0';
+        el.textContent = `Periodo: ${startLabel} – ${endLabel} · ${total} encuestas · ${favorableLabel}% favorable promedio`;
+      }
+
+      function resetView() {
+        updateGauge(0);
+        renderDetails([]);
+        updateSummary(null);
+      }
+
+      function processResponse(resp) {
+        hideSpinner();
+        if (!resp || !resp.by_question) {
+          resetView();
+          showEmpty();
+          return;
+        }
+
+        const rows = [];
+        const favorableValues = [];
+
+        QUESTIONS.forEach(function (item) {
+          const meta = resp.by_question[item.field] || {};
+          const label = meta.label || item.label || item.field;
+          const average = Number(meta.average);
+          const favorable = Number(meta.favorable_pct);
+
+          if (Number.isFinite(favorable)) {
+            favorableValues.push(favorable);
+          }
+
+          rows.push({
+            label: label,
+            average: Number.isFinite(average) ? average : 0,
+            favorablePct: Number.isFinite(favorable) ? favorable : 0
+          });
+        });
+
+        const avgFavorable = favorableValues.length
+          ? favorableValues.reduce(function (acc, val) { return acc + val; }, 0) / favorableValues.length
+          : 0;
+
+        hideEmpty();
+        updateGauge(avgFavorable);
+        renderDetails(rows);
+        updateSummary(resp, avgFavorable);
+      }
+
+      function fetchData() {
+        showSpinner();
+        hideEmpty();
+        const detailsEl = getEl(DETAILS_ID);
+        if (detailsEl) detailsEl.innerHTML = '';
+        const summaryEl = getEl(SUMMARY_ID);
+        if (summaryEl) summaryEl.textContent = '';
+        updateGauge(0);
+
+        fetch(ENDPOINT, { headers: { 'Accept': 'application/json' } })
+          .then(function (resp) {
+            if (!resp.ok) {
+              throw new Error('Error al obtener datos de satisfacción (' + resp.status + ')');
+            }
+            return resp.json();
+          })
+          .then(processResponse)
+          .catch(function (err) {
+            console.error('No se pudo cargar la información de satisfacción para KPI5', err);
+            hideSpinner();
+            resetView();
+            showEmpty();
+          });
+      }
+
+      window.kpiCharts.kpi5 = function drawKPI5() {
+        if (!getEl(CHART_ID)) return;
+        fetchData();
+      };
+      window.kpiCharts.kpi5.requiresGoogleCharts = false;
+    })();
+
+    function openModal(modalId, chartKey) {
+      const dialog = document.getElementById(modalId);
+      if (!dialog) return;
+
+      if (chartKey && window.kpiCharts && typeof window.kpiCharts[chartKey] === 'function') {
+        const drawFn = window.kpiCharts[chartKey];
+        const needsGoogle = drawFn.requiresGoogleCharts !== false;
+        const hasGoogleViz = typeof google !== 'undefined'
+          && google.visualization
+          && typeof google.visualization.arrayToDataTable === 'function';
+        if (!needsGoogle) {
+          drawFn();
+        } else if (hasGoogleViz) {
+          drawFn();
+        } else if (typeof google !== 'undefined'
+          && google.charts
+          && typeof google.charts.setOnLoadCallback === 'function') {
+          google.charts.setOnLoadCallback(drawFn);
+        } else {
+          drawFn();
+        }
+      }
+
+      dialog.showModal();
+    }
+
+    function closeModal(modalId) {
+      const dialog = document.getElementById(modalId);
+      if (dialog && dialog.open) {
+        dialog.close();
+      }
+    }
+
+    window.openModal = openModal;
+    window.closeModal = closeModal;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('[data-modal]').forEach((btn) => {
+        btn.addEventListener('click', () => openModal(btn.dataset.modal, btn.dataset.chart));
+      });
+
+      document.querySelectorAll('[data-close-modal]').forEach((btn) => {
+        btn.addEventListener('click', () => closeModal(btn.dataset.closeModal));
+      });
+    });
+  </script>
+{% endblock scripts %}
