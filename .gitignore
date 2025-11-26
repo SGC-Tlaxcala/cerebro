@@ -4,6 +4,7 @@
 .idea/
 media/
 .vscode/
+!.vscode/launch.json
 fixtures/
 *.ipynb
 src/apps/assets/
