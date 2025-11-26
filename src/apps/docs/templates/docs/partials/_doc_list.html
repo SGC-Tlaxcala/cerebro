@@ -54,9 +54,9 @@
               Ver
             </a>
             {% if current and current.archivo %}
-            <a href="{{ current.archivo.url }}" target="_blank" class="btn btn-ghost btn-xs">
+            <button type="button" class="btn btn-ghost btn-xs" data-open-download="{{ current.archivo.url }}">
               Descargar
-            </a>
+            </button>
             {% elif doc.ruta %}
             <a href="{{ doc.ruta }}" target="_blank" class="btn btn-ghost btn-xs">
               Abrir
@@ -70,6 +70,60 @@
     </tbody>
   </table>
 </div>
+
+<dialog id="download-modal-list" class="modal">
+  <div class="modal-box max-w-md space-y-4">
+    <h3 class="text-lg font-semibold text-base-content">Descargar documento</h3>
+    <p class="text-sm text-base-content/70">
+      Al descargar este archivo generas una copia no controlada. Asegúrate de consultar la versión vigente antes de
+      usarla.
+    </p>
+    <p class="text-sm text-base-content/70">Escribe <span class="font-semibold">"Confirmar"</span> para habilitar la
+      descarga.</p>
+    <input id="download-confirm-input-list" type="text" class="input input-bordered w-full"
+      placeholder="Escribe Confirmar">
+    <div class="modal-action">
+      <button type="button" class="btn btn-ghost"
+        onclick="document.getElementById('download-modal-list').close()">Cancelar</button>
+      <button type="button" id="download-confirm-btn-list" class="btn btn-primary" disabled>Descargar</button>
+    </div>
+  </div>
+  <form method="dialog" class="modal-backdrop">
+    <button>Cerrar</button>
+  </form>
+</dialog>
+
+<script>
+  (function () {
+    const modal = document.getElementById('download-modal-list');
+    const confirmInput = document.getElementById('download-confirm-input-list');
+    const confirmBtn = document.getElementById('download-confirm-btn-list');
+    let pendingUrl = null;
+
+    const buttons = document.querySelectorAll('#docs-list [data-open-download]');
+    buttons.forEach(btn => {
+      btn.addEventListener('click', function (e) {
+        e.preventDefault();
+        pendingUrl = this.getAttribute('data-open-download');
+        confirmInput.value = '';
+        confirmBtn.disabled = true;
+        modal.showModal();
+        setTimeout(() => confirmInput.focus(), 100);
+      });
+    });
+
+    confirmInput.addEventListener('input', function () {
+      confirmBtn.disabled = this.value.trim().toLowerCase() !== 'confirmar';
+    });
+
+    confirmBtn.addEventListener('click', function () {
+      if (pendingUrl) {
+        window.open(pendingUrl, '_blank');
+        modal.close();
+      }
+    });
+  })();
+</script>
 {% else %}
 <div class="rounded-3xl border border-dashed border-base-300 bg-base-100 p-10 text-center text-base-content/70">
   No se encontraron documentos con el criterio seleccionado.
