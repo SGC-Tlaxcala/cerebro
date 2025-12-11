@@ -5,6 +5,7 @@
 media/
 .vscode/
 !.vscode/launch.json
+!.vscode/settings.json
 fixtures/
 *.ipynb
 src/apps/assets/

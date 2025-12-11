@@ -24,48 +24,53 @@ from .models import Plan, Accion, Seguimiento, CERRADA
 
 def hx_trigger_header(*events):
     if not events:
-        return ''
-    payload = {event: '' for event in events}
+        return ""
+    payload = {event: "" for event in events}
     return json.dumps(payload)
 
 
-@method_decorator(login_required, name='dispatch')
 class PASIndex(ListView):
     model = Plan
-    template_name = 'pas/index.html'
+    template_name = "pas/index.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        plan_list = Plan.objects.all().order_by('-fecha_llenado')
-        latest_estado = Seguimiento.objects.filter(
-            accion=OuterRef('pk')
-        ).order_by('-fecha').values('estado')[:1]
+        plan_list = Plan.objects.all().order_by("-fecha_llenado")
+        latest_estado = (
+            Seguimiento.objects.filter(accion=OuterRef("pk"))
+            .order_by("-fecha")
+            .values("estado")[:1]
+        )
 
         def state_priority(estado):
-            if estado == 'Abierta Fuera de Tiempo':
+            if estado == "Abierta Fuera de Tiempo":
                 return 0
-            if estado == 'Cerrada':
+            if estado == "Cerrada":
                 return 3
-            if estado == 'Abierta en Tiempo':
+            if estado == "Abierta en Tiempo":
                 return 2
             return 1
 
         action_items = []
-        action_qs = Accion.objects.select_related('plan', 'responsable').annotate(
-            latest_estado=Subquery(latest_estado)
-        ).prefetch_related('seguimiento_set')
+        action_qs = (
+            Accion.objects.select_related("plan", "responsable")
+            .annotate(latest_estado=Subquery(latest_estado))
+            .prefetch_related("seguimiento_set")
+        )
 
         for action in action_qs:
             estado = action.get_estado
-            if estado == 'Cerrada':
+            if estado == "Cerrada":
                 continue
             priority = state_priority(estado)
-            action_items.append((
-                priority,
-                action.fecha_fin or date.max,
-                action.pk,
-                action,
-            ))
+            action_items.append(
+                (
+                    priority,
+                    action.fecha_fin or date.max,
+                    action.pk,
+                    action,
+                )
+            )
 
         action_items.sort(key=lambda item: (item[0], item[1], item[2]))
         action_list = [item[3] for item in action_items]
@@ -75,160 +80,165 @@ class PASIndex(ListView):
             abiertas_en_tiempo = 0
             abiertas_fuera_de_tiempo = 0
 
-            for accion in plan.accion_set.select_related('responsable'):
+            for accion in plan.accion_set.select_related("responsable"):
                 estado = accion.get_estado
-                if estado == 'Cerrada':
+                if estado == "Cerrada":
                     cerradas += 1
-                elif estado == 'Abierta en Tiempo':
+                elif estado == "Abierta en Tiempo":
                     abiertas_en_tiempo += 1
-                elif estado == 'Abierta Fuera de Tiempo':
+                elif estado == "Abierta Fuera de Tiempo":
                     abiertas_fuera_de_tiempo += 1
 
             plan.cerradas = cerradas
             plan.abiertas_en_tiempo = abiertas_en_tiempo
             plan.abiertas_fuera_de_tiempo = abiertas_fuera_de_tiempo
-            plan.total_actividades = cerradas + abiertas_en_tiempo + abiertas_fuera_de_tiempo
+            plan.total_actividades = (
+                cerradas + abiertas_en_tiempo + abiertas_fuera_de_tiempo
+            )
 
-        context['plan_list'] = plan_list
-        context['action_list'] = action_list
+        context["plan_list"] = plan_list
+        context["action_list"] = action_list
         return context
 
 
-@method_decorator(login_required, name='dispatch')
+@method_decorator(login_required, name="dispatch")
 class PASAdd(CreateView):
     model = Plan
     form_class = PlanForm
-    template_name = 'pas/add.html'
+    template_name = "pas/add.html"
 
     def dispatch(self, request, *args, **kwargs):
-        if request.headers.get('HX-Request') and request.GET.get('close'):
-            return HttpResponse('')
+        if request.headers.get("HX-Request") and request.GET.get("close"):
+            return HttpResponse("")
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context.update({
-            'form_action': reverse('pas:add'),
-            'hx_target': '#pas-form-container',
-            'hx_swap': 'innerHTML',
-            'form_in_modal': False,
-        })
+        context.update(
+            {
+                "form_action": reverse("pas:add"),
+                "hx_target": "#pas-form-container",
+                "hx_swap": "innerHTML",
+                "form_in_modal": False,
+            }
+        )
         return context
 
     def get_template_names(self):
-        if self.request.headers.get('HX-Request'):
-            return ['pas/partials/_plan_form.html']
+        if self.request.headers.get("HX-Request"):
+            return ["pas/partials/_plan_form.html"]
         return super().get_template_names()
 
     def get_success_url(self):
-        return reverse('pas:detalle', args=[self.object.pk])
+        return reverse("pas:detalle", args=[self.object.pk])
 
     def form_valid(self, form):
         form.instance.user = self.request.user
         response = super().form_valid(form)
-        if self.request.headers.get('HX-Request'):
+        if self.request.headers.get("HX-Request"):
             redirect_url = str(self.get_success_url())
-            return HttpResponse('', status=204, headers={'HX-Redirect': redirect_url})
+            return HttpResponse("", status=204, headers={"HX-Redirect": redirect_url})
         return response
 
     def form_invalid(self, form):
-        if self.request.headers.get('HX-Request'):
+        if self.request.headers.get("HX-Request"):
             return self.render_to_response(self.get_context_data(form=form), status=422)
         return super().form_invalid(form)
 
 
-@method_decorator(login_required, name='dispatch')
 class PASDetail(DetailView):
     model = Plan
-    template_name = 'pas/plan_detail.html'
+    template_name = "pas/plan_detail.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['plan'] = self.object
+        context["plan"] = self.object
         return context
 
 
-@method_decorator(login_required, name='dispatch')
 class PlanSummaryView(DetailView):
     model = Plan
-    template_name = 'pas/partials/_plan_summary.html'
+    template_name = "pas/partials/_plan_summary.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         plan = self.object
         activities = list(plan.accion_set.all())
         total = len(activities)
-        closed = sum(1 for activity in activities if activity.get_estado == 'Cerrada')
+        closed = sum(1 for activity in activities if activity.get_estado == "Cerrada")
         progress = round((closed / total) * 100) if total else 0
-        context.update({
-            'plan': plan,
-            'total_activities': total,
-            'closed_activities': closed,
-            'open_activities': total - closed,
-            'progress': progress,
-            'all_closed': total > 0 and closed == total,
-        })
+        context.update(
+            {
+                "plan": plan,
+                "total_activities": total,
+                "closed_activities": closed,
+                "open_activities": total - closed,
+                "progress": progress,
+                "all_closed": total > 0 and closed == total,
+            }
+        )
         return context
 
 
-@method_decorator(login_required, name='dispatch')
 class PlanActivitiesView(DetailView):
     model = Plan
-    template_name = 'pas/partials/_activities_list.html'
+    template_name = "pas/partials/_activities_list.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         plan = self.object
         followups_prefetch = Prefetch(
-            'seguimiento_set',
-            queryset=Seguimiento.objects.select_related('responsable').order_by('-fecha', '-created'),
+            "seguimiento_set",
+            queryset=Seguimiento.objects.select_related("responsable").order_by(
+                "-fecha", "-created"
+            ),
         )
 
         def state_priority(estado):
-            if estado == 'Abierta Fuera de Tiempo':
+            if estado == "Abierta Fuera de Tiempo":
                 return 0
-            if estado == 'Cerrada':
+            if estado == "Cerrada":
                 return 3
-            if estado == 'Abierta en Tiempo':
+            if estado == "Abierta en Tiempo":
                 return 2
             return 1
 
         def build_estado_badge(estado, closed_in_time):
-            if estado == 'Abierta Fuera de Tiempo':
+            if estado == "Abierta Fuera de Tiempo":
                 return {
-                    'classes': 'badge-error text-error-content',
-                    'text': 'Abierta',
-                    'title': 'Abierta fuera de tiempo',
+                    "classes": "badge-error text-error-content",
+                    "text": "Abierta",
+                    "title": "Abierta fuera de tiempo",
                 }
-            if estado == 'Abierta en Tiempo':
+            if estado == "Abierta en Tiempo":
                 return {
-                    'classes': 'badge-outline border border-warning text-base-content bg-transparent',
-                    'text': 'Abierta',
-                    'title': 'Abierta en tiempo',
+                    "classes": "badge-outline border border-warning text-base-content bg-transparent",
+                    "text": "Abierta",
+                    "title": "Abierta en tiempo",
                 }
-            if estado == 'Cerrada':
+            if estado == "Cerrada":
                 if closed_in_time is False:
                     return {
-                        'classes': 'badge-success badge-outline text-success',
-                        'text': 'Cerrada',
-                        'title': 'Cerrada fuera de tiempo',
+                        "classes": "badge-success badge-outline text-success",
+                        "text": "Cerrada",
+                        "title": "Cerrada fuera de tiempo",
                     }
                 return {
-                    'classes': 'badge-success text-success-content',
-                    'text': 'Cerrada',
-                    'title': 'Cerrada en tiempo',
+                    "classes": "badge-success text-success-content",
+                    "text": "Cerrada",
+                    "title": "Cerrada en tiempo",
                 }
             return {
-                'classes': 'badge-neutral badge-outline',
-                'text': estado or 'Sin estado',
-                'title': estado or 'Sin estado',
+                "classes": "badge-neutral badge-outline",
+                "text": estado or "Sin estado",
+                "title": estado or "Sin estado",
             }
 
         activities = []
         for activity in (
-            plan.accion_set.select_related('responsable')
+            plan.accion_set.select_related("responsable")
             .prefetch_related(followups_prefetch)
-            .order_by('fecha_fin', 'id')
+            .order_by("fecha_fin", "id")
         ):
             estado = activity.get_estado
             followups = list(activity.seguimiento_set.all())
@@ -239,155 +249,182 @@ class PlanActivitiesView(DetailView):
                     closed_in_time = closure_followup.fecha <= activity.fecha_fin
                 else:
                     closed_in_time = True
-            activities.append({
-                'activity': activity,
-                'estado': estado,
-                'estado_priority': state_priority(estado),
-                'followup_count': len(followups),
-                'latest_followup': followups[0] if followups else None,
-                'closed_in_time': closed_in_time,
-                'badge': build_estado_badge(estado, closed_in_time),
-            })
-        activities.sort(key=lambda item: (item['estado_priority'], item['activity'].fecha_fin or date.max, item['activity'].pk))
+            activities.append(
+                {
+                    "activity": activity,
+                    "estado": estado,
+                    "estado_priority": state_priority(estado),
+                    "followup_count": len(followups),
+                    "latest_followup": followups[0] if followups else None,
+                    "closed_in_time": closed_in_time,
+                    "badge": build_estado_badge(estado, closed_in_time),
+                }
+            )
+        activities.sort(
+            key=lambda item: (
+                item["estado_priority"],
+                item["activity"].fecha_fin or date.max,
+                item["activity"].pk,
+            )
+        )
         can_modify = not (plan.eliminacion or plan.recurrencia)
-        context.update({'plan': plan, 'activities': activities, 'can_modify': can_modify})
+        context.update(
+            {"plan": plan, "activities": activities, "can_modify": can_modify}
+        )
         return context
 
 
 class PlanFormMixin:
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context.update({
-            'form_action': self.request.path,
-            'hx_target': '#pas-modal-content',
-            'hx_swap': 'innerHTML',
-            'form_in_modal': True,
-            'modal_id': 'pas-modal',
-        })
+        context.update(
+            {
+                "form_action": self.request.path,
+                "hx_target": "#pas-modal-content",
+                "hx_swap": "innerHTML",
+                "form_in_modal": True,
+                "modal_id": "pas-modal",
+            }
+        )
         return context
 
     def form_invalid(self, form):
-        if self.request.headers.get('HX-Request'):
+        if self.request.headers.get("HX-Request"):
             return self.render_to_response(self.get_context_data(form=form), status=422)
         return super().form_invalid(form)
 
 
-@method_decorator(login_required, name='dispatch')
+@method_decorator(login_required, name="dispatch")
 class PlanUpdateView(PlanFormMixin, UpdateView):
     model = Plan
     form_class = PlanForm
-    template_name = 'pas/partials/_plan_form.html'
+    template_name = "pas/partials/_plan_form.html"
 
     def get_success_url(self):
-        return reverse('pas:detalle', args=[self.object.pk])
+        return reverse("pas:detalle", args=[self.object.pk])
 
     def form_valid(self, form):
         response = super().form_valid(form)
-        if self.request.headers.get('HX-Request'):
-            header = hx_trigger_header('pas:refresh-summary', 'pas:close-modal')
-            return HttpResponse('', status=204, headers={'HX-Trigger': header})
+        if self.request.headers.get("HX-Request"):
+            header = hx_trigger_header("pas:refresh-summary", "pas:close-modal")
+            return HttpResponse("", status=204, headers={"HX-Trigger": header})
         return response
 
 
-@method_decorator(login_required, name='dispatch')
+@method_decorator(login_required, name="dispatch")
 class PlanClosureView(FormView):
     form_class = PlanClosureForm
-    template_name = 'pas/partials/_plan_closure_form.html'
+    template_name = "pas/partials/_plan_closure_form.html"
 
     def dispatch(self, request, *args, **kwargs):
-        self.plan = get_object_or_404(Plan, pk=kwargs['pk'])
+        self.plan = get_object_or_404(Plan, pk=kwargs["pk"])
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context.update({
-            'plan': self.plan,
-            'form_action': self.request.path,
-            'modal_id': 'pas-modal',
-        })
+        context.update(
+            {
+                "plan": self.plan,
+                "form_action": self.request.path,
+                "modal_id": "pas-modal",
+            }
+        )
         return context
 
     def get_initial(self):
         initial = super().get_initial()
         if self.plan.eliminacion:
-            initial['resultado'] = 'close'
-            initial['comentarios'] = self.plan.txt_eliminacion
+            initial["resultado"] = "close"
+            initial["comentarios"] = self.plan.txt_eliminacion
         elif self.plan.recurrencia:
-            initial['resultado'] = 'recurrence'
-            initial['comentarios'] = self.plan.txt_recurrencia
+            initial["resultado"] = "recurrence"
+            initial["comentarios"] = self.plan.txt_recurrencia
         return initial
 
     def form_invalid(self, form):
-        if self.request.headers.get('HX-Request'):
+        if self.request.headers.get("HX-Request"):
             return self.render_to_response(self.get_context_data(form=form), status=422)
         return super().form_invalid(form)
 
     def form_valid(self, form):
-        if any(activity.get_estado != 'Cerrada' for activity in self.plan.accion_set.all()):
-            form.add_error(None, 'Aún existen actividades abiertas.')
+        if any(
+            activity.get_estado != "Cerrada" for activity in self.plan.accion_set.all()
+        ):
+            form.add_error(None, "Aún existen actividades abiertas.")
             return self.form_invalid(form)
 
-        resultado = form.cleaned_data['resultado']
-        comentarios = form.cleaned_data.get('comentarios')
+        resultado = form.cleaned_data["resultado"]
+        comentarios = form.cleaned_data.get("comentarios")
 
-        if resultado == 'close':
+        if resultado == "close":
             self.plan.eliminacion = True
             self.plan.txt_eliminacion = comentarios
             self.plan.recurrencia = False
-            self.plan.txt_recurrencia = ''
+            self.plan.txt_recurrencia = ""
         else:
             self.plan.recurrencia = True
             self.plan.txt_recurrencia = comentarios
             self.plan.eliminacion = False
-            self.plan.txt_eliminacion = ''
+            self.plan.txt_eliminacion = ""
 
-        self.plan.save(update_fields=['eliminacion', 'txt_eliminacion', 'recurrencia', 'txt_recurrencia'])
+        self.plan.save(
+            update_fields=[
+                "eliminacion",
+                "txt_eliminacion",
+                "recurrencia",
+                "txt_recurrencia",
+            ]
+        )
 
-        if self.request.headers.get('HX-Request'):
-            header = hx_trigger_header('pas:refresh-summary', 'pas:close-modal')
-            return HttpResponse('', status=204, headers={'HX-Trigger': header})
+        if self.request.headers.get("HX-Request"):
+            header = hx_trigger_header("pas:refresh-summary", "pas:close-modal")
+            return HttpResponse("", status=204, headers={"HX-Trigger": header})
 
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse('pas:detalle', args=[self.plan.pk])
+        return reverse("pas:detalle", args=[self.plan.pk])
 
 
 class ActivityBaseView:
     form_class = AccionForm
-    template_name = 'pas/partials/_activity_form.html'
+    template_name = "pas/partials/_activity_form.html"
 
     def get_success_url(self):
-        return reverse('pas:detalle', args=[self.plan.pk])
+        return reverse("pas:detalle", args=[self.plan.pk])
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context.update({
-            'plan': self.plan,
-            'form_action': self.request.path,
-            'modal_id': 'pas-modal',
-        })
+        context.update(
+            {
+                "plan": self.plan,
+                "form_action": self.request.path,
+                "modal_id": "pas-modal",
+            }
+        )
         return context
 
     def form_invalid(self, form):
-        if self.request.headers.get('HX-Request'):
+        if self.request.headers.get("HX-Request"):
             return self.render_to_response(self.get_context_data(form=form), status=422)
         return super().form_invalid(form)
 
     def form_valid(self, form):
         response = super().form_valid(form)
-        if self.request.headers.get('HX-Request'):
-            header = hx_trigger_header('pas:refresh-activities', 'pas:refresh-summary', 'pas:close-modal')
-            return HttpResponse('', status=204, headers={'HX-Trigger': header})
+        if self.request.headers.get("HX-Request"):
+            header = hx_trigger_header(
+                "pas:refresh-activities", "pas:refresh-summary", "pas:close-modal"
+            )
+            return HttpResponse("", status=204, headers={"HX-Trigger": header})
         return response
 
 
-@method_decorator(login_required, name='dispatch')
+@method_decorator(login_required, name="dispatch")
 class ActivityCreateView(ActivityBaseView, CreateView):
     model = Accion
 
     def dispatch(self, request, *args, **kwargs):
-        self.plan = get_object_or_404(Plan, pk=kwargs['pk'])
+        self.plan = get_object_or_404(Plan, pk=kwargs["pk"])
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
@@ -396,7 +433,7 @@ class ActivityCreateView(ActivityBaseView, CreateView):
         return super().form_valid(form)
 
 
-@method_decorator(login_required, name='dispatch')
+@method_decorator(login_required, name="dispatch")
 class ActivityUpdateView(ActivityBaseView, UpdateView):
     model = Accion
 
@@ -409,57 +446,67 @@ class ActivityUpdateView(ActivityBaseView, UpdateView):
         return obj
 
 
-@method_decorator(login_required, name='dispatch')
+@method_decorator(login_required, name="dispatch")
 class ActivityDeleteView(DeleteView):
     model = Accion
-    template_name = 'pas/partials/_confirm_delete.html'
+    template_name = "pas/partials/_confirm_delete.html"
 
     def get_success_url(self):
-        return reverse('pas:detalle', args=[self.object.plan.pk])
+        return reverse("pas:detalle", args=[self.object.plan.pk])
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context.update({'activity': self.object, 'form_action': self.request.path, 'modal_id': 'pas-modal'})
+        context.update(
+            {
+                "activity": self.object,
+                "form_action": self.request.path,
+                "modal_id": "pas-modal",
+            }
+        )
         return context
 
     def delete(self, request, *args, **kwargs):
         self.object = self.get_object()
-        plan_pk = self.object.plan.pk
+
         response = super().delete(request, *args, **kwargs)
-        if request.headers.get('HX-Request'):
-            header = hx_trigger_header('pas:refresh-activities', 'pas:refresh-summary', 'pas:close-modal')
-            return HttpResponse('', status=204, headers={'HX-Trigger': header})
+        if request.headers.get("HX-Request"):
+            header = hx_trigger_header(
+                "pas:refresh-activities", "pas:refresh-summary", "pas:close-modal"
+            )
+            return HttpResponse("", status=204, headers={"HX-Trigger": header})
         return response
 
 
 class FollowUpBaseView(CreateView):
     model = Seguimiento
     form_class = SeguimientoForm
-    template_name = 'pas/partials/_followup_form.html'
+    template_name = "pas/partials/_followup_form.html"
 
     def dispatch(self, request, *args, **kwargs):
-        self.activity = get_object_or_404(Accion, pk=kwargs['pk'])
+        self.activity = get_object_or_404(Accion, pk=kwargs["pk"])
         return super().dispatch(request, *args, **kwargs)
 
     def get_success_url(self):
-        return reverse('pas:detalle', args=[self.activity.plan.pk])
+        return reverse("pas:detalle", args=[self.activity.plan.pk])
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context.update({
-            'form_action': self.request.path,
-            'activity': self.activity,
-            'modal_id': 'pas-modal',
-        })
+        context.update(
+            {
+                "form_action": self.request.path,
+                "activity": self.activity,
+                "modal_id": "pas-modal",
+            }
+        )
         return context
 
     def get_initial(self):
         initial = super().get_initial()
-        initial.setdefault('fecha', timezone.now().date())
+        initial.setdefault("fecha", timezone.now().date())
         return initial
 
     def form_invalid(self, form):
-        if self.request.headers.get('HX-Request'):
+        if self.request.headers.get("HX-Request"):
             return self.render_to_response(self.get_context_data(form=form), status=422)
         return super().form_invalid(form)
 
@@ -467,27 +514,32 @@ class FollowUpBaseView(CreateView):
         form.instance.accion = self.activity
         form.instance.user = self.request.user
         response = super().form_valid(form)
-        if self.request.headers.get('HX-Request'):
-            header = hx_trigger_header('pas:refresh-activities', 'pas:refresh-summary', 'pas:close-modal')
-            return HttpResponse('', status=204, headers={'HX-Trigger': header})
+        if self.request.headers.get("HX-Request"):
+            header = hx_trigger_header(
+                "pas:refresh-activities", "pas:refresh-summary", "pas:close-modal"
+            )
+            return HttpResponse("", status=204, headers={"HX-Trigger": header})
         return response
 
 
-@method_decorator(login_required, name='dispatch')
+@method_decorator(login_required, name="dispatch")
 class FollowUpCreateView(FollowUpBaseView):
     pass
 
 
-@method_decorator(login_required, name='dispatch')
 class FollowUpListView(DetailView):
     model = Accion
-    template_name = 'pas/partials/_followup_list.html'
+    template_name = "pas/partials/_followup_list.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        followups = self.object.seguimiento_set.select_related('responsable').order_by('-fecha', '-created')
-        context.update({
-            'activity': self.object,
-            'followups': followups,
-        })
+        followups = self.object.seguimiento_set.select_related("responsable").order_by(
+            "-fecha", "-created"
+        )
+        context.update(
+            {
+                "activity": self.object,
+                "followups": followups,
+            }
+        )
         return context
