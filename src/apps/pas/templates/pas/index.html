@@ -16,7 +16,8 @@
         <div>
           <h1 class="text-3xl font-bold text-base-content">Control de Planes de Acción</h1>
           <p class="mt-1 max-w-2xl text-sm text-base-content/70">
-            Seguimiento centralizado de actividades y planes que impulsa la mejora continua y el cumplimiento de los compromisos establecidos por la organización.
+            Seguimiento centralizado de actividades y planes que impulsa la mejora continua y el cumplimiento de los
+            compromisos establecidos por la organización.
           </p>
         </div>
       </div>
@@ -26,10 +27,11 @@
           {% now "d/m/Y H:i" as current_timestamp %}
           <span class="text-sm text-base-content/60">Última actualización · {{ current_timestamp }}</span>
         </div>
-        <a href="{% url 'pas:add' %}"
-           class="btn btn-primary btn-sm w-full">
+        {% if user.is_authenticated %}
+        <a href="{% url 'pas:add' %}" class="btn btn-primary btn-sm w-full">
           Agregar plan de acción
         </a>
+        {% endif %}
       </div>
     </div>
   </header>
@@ -61,7 +63,8 @@
         </div>
         <div>
           <h2 class="text-2xl font-semibold">Lista de Actividades</h2>
-          <p class="text-sm text-base-content/70">Monitorea el avance puntual de cada actividad comprometida en los planes.</p>
+          <p class="text-sm text-base-content/70">Monitorea el avance puntual de cada actividad comprometida en los
+            planes.</p>
         </div>
       </div>
       <span class="badge badge-lg badge-primary badge-outline">{{ action_list|length }} actividades</span>
@@ -82,44 +85,41 @@
           </thead>
           <tbody class="text-sm">
             {% for action in action_list %}
-              <tr class="align-top">
-                <td class="text-center">
-                  <a class="link link-primary font-medium" href="{% url 'pas:detalle' action.plan.id %}">{{ action.plan.folio }}</a>
-                </td>
-                <td class="space-y-2">
-                  <div class="prose prose-sm max-w-none text-base-content/80">{{ action.accion|safe }}</div>
-                  {% if action.evidencia %}
-                    <p class="text-xs text-base-content/60"><span class="font-semibold text-base-content/80">Evidencia solicitada:</span> {{ action.evidencia }}</p>
-                  {% endif %}
-                </td>
-                <td class="text-center text-base-content/80">{{ action.fecha_fin|date:"d/m/Y" }}</td>
-                <td class="text-center text-base-content/80">{{ action.responsable_display|default:'—' }}</td>
-                <td class="text-center text-base-content/80">
-                  <button type="button"
-                          class="btn btn-ghost btn-xs gap-2"
-                          hx-get="{% url 'pas:followup-list' action.pk %}"
-                          hx-target="#pas-modal-content"
-                          hx-swap="innerHTML">
-                    Seguimientos
-                    <span class="badge badge-outline badge-sm">{{ action.seguimiento_set.count }}</span>
-                  </button>
-                </td>
-                <td class="text-center">
-                  {% if action.get_estado == 'Cerrada' %}
-                    <span class="badge badge-success badge-outline">Cerrada</span>
-                  {% elif action.get_estado == 'Abierta en Tiempo' %}
-                    <span class="badge badge-warning badge-outline text-warning-content">En tiempo</span>
-                  {% elif action.get_estado == 'Abierta Fuera de Tiempo' %}
-                    <span class="badge badge-error badge-outline">Fuera de tiempo</span>
-                  {% else %}
-                    <span class="badge badge-neutral badge-outline">Sin estado</span>
-                  {% endif %}
-                </td>
-              </tr>
+            <tr class="align-top">
+              <td class="text-center">
+                <a class="link link-primary font-medium" href="{% url 'pas:detalle' action.plan.id %}">{{ action.plan.folio }}</a>
+              </td>
+              <td class="space-y-2">
+                <div class="prose prose-sm max-w-none text-base-content/80">{{ action.accion|safe }}</div>
+                {% if action.evidencia %}
+                <p class="text-xs text-base-content/60"><span class="font-semibold text-base-content/80">Evidencia
+                    solicitada:</span> {{ action.evidencia }}</p>
+                {% endif %}
+              </td>
+              <td class="text-center text-base-content/80">{{ action.fecha_fin|date:"d/m/Y" }}</td>
+              <td class="text-center text-base-content/80">{{ action.responsable_display|default:'—' }}</td>
+              <td class="text-center text-base-content/80">
+                <button type="button" class="btn btn-ghost btn-xs gap-2" hx-get="{% url 'pas:followup-list' action.pk %}" hx-target="#pas-modal-content" hx-swap="innerHTML">
+                  Seguimientos
+                  <span class="badge badge-outline badge-sm">{{ action.seguimiento_set.count }}</span>
+                </button>
+              </td>
+              <td class="text-center">
+                {% if action.get_estado == 'Cerrada' %}
+                <span class="badge badge-success badge-outline">Cerrada</span>
+                {% elif action.get_estado == 'Abierta en Tiempo' %}
+                <span class="badge badge-warning badge-outline text-warning-content">En tiempo</span>
+                {% elif action.get_estado == 'Abierta Fuera de Tiempo' %}
+                <span class="badge badge-error badge-outline">Fuera de tiempo</span>
+                {% else %}
+                <span class="badge badge-neutral badge-outline">Sin estado</span>
+                {% endif %}
+              </td>
+            </tr>
             {% empty %}
-              <tr>
-                <td colspan="7" class="py-10 text-center text-base-content/60">No hay actividades registradas.</td>
-              </tr>
+            <tr>
+              <td colspan="7" class="py-10 text-center text-base-content/60">No hay actividades registradas.</td>
+            </tr>
             {% endfor %}
           </tbody>
         </table>
@@ -157,57 +157,56 @@
           </thead>
           <tbody class="text-sm">
             {% for plan in plan_list %}
-              <tr class="align-top">
-                <td class="text-center">
-                  <a class="link link-secondary font-medium" href="{% url 'pas:detalle' plan.id %}">{{ plan.folio }}</a>
-                </td>
-                <td class="text-center text-base-content/80">
-                  <span class="badge badge-outline badge-info badge-lg min-h-[3.5rem] items-center px-4 py-2 text-sm">{{ plan.get_documento_display }}</span>
-                </td>
-                <td class="space-y-3">
-                  <div class="flex items-center gap-2 text-base-content">
-                    <a class="link link-hover flex items-center gap-2 text-base-content hover:text-primary transition-colors"
-                       href="{% url 'pas:detalle' plan.id %}">
-                      <span class="font-semibold text-base-content">{{ plan.nombre }}</span>
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
-                      </svg>
-                    </a>
-                  </div>
-                  <div class="prose prose-sm max-w-none text-base-content/70">
-                    {% if plan.documento == 1 %}
-                      {{ plan.desc_cnc|truncatewords_html:30|safe }}
-                    {% else %}
-                      {{ plan.desc_pcm|truncatewords_html:30|safe }}
-                    {% endif %}
-                  </div>
-                </td>
-                <td class="text-center text-base-content/80">
-                  <div class="flex flex-wrap items-center justify-center gap-2">
-                    <span class="badge badge-success badge-sm gap-1" title="Actividades cerradas">
-                      <span class="font-semibold">{{ plan.cerradas|default_if_none:0 }}</span>
-                      <span>Cerradas</span>
-                    </span>
-                    <span class="badge badge-warning badge-sm text-warning-content gap-1" title="Actividades en tiempo">
-                      <span class="font-semibold">{{ plan.abiertas_en_tiempo|default_if_none:0 }}</span>
-                      <span>En tiempo</span>
-                    </span>
-                    <span class="badge badge-error badge-sm gap-1" title="Actividades fuera de tiempo">
-                      <span class="font-semibold">{{ plan.abiertas_fuera_de_tiempo|default_if_none:0 }}</span>
-                      <span>Fuera de tiempo</span>
-                    </span>
-                    <span class="badge badge-outline badge-primary badge-sm gap-1" title="Total de actividades">
-                      <span class="font-semibold">{{ plan.accion_set.count }}</span>
-                      <span>Total</span>
-                    </span>
-                  </div>
-                </td>
-                <td class="text-center text-base-content/80">{{ plan.fecha_llenado|date:"d/m/Y" }}</td>
-              </tr>
+            <tr class="align-top">
+              <td class="text-center">
+                <a class="link link-secondary font-medium" href="{% url 'pas:detalle' plan.id %}">{{ plan.folio }}</a>
+              </td>
+              <td class="text-center text-base-content/80">
+                <span class="badge badge-outline badge-info badge-lg min-h-[3.5rem] items-center px-4 py-2 text-sm">{{ plan.siglas }}</span>
+              </td>
+              <td class="space-y-3">
+                <div class="flex items-center gap-2 text-base-content">
+                  <a class="link link-hover flex items-center gap-2 text-base-content hover:text-primary transition-colors" href="{% url 'pas:detalle' plan.id %}">
+                    <span class="font-semibold text-base-content">{{ plan.nombre }}</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                    </svg>
+                  </a>
+                </div>
+                <div class="prose prose-sm max-w-none text-base-content/70">
+                  {% if plan.documento == 1 %}
+                  {{ plan.desc_cnc|truncatewords_html:30|safe }}
+                  {% else %}
+                  {{ plan.desc_pcm|truncatewords_html:30|safe }}
+                  {% endif %}
+                </div>
+              </td>
+              <td class="text-center text-base-content/80">
+                <div class="flex flex-wrap items-center justify-center gap-2">
+                  <span class="badge badge-success badge-sm gap-1" title="Actividades cerradas">
+                    <span class="font-semibold">{{ plan.cerradas|default_if_none:0 }}</span>
+                    <span>Cerradas</span>
+                  </span>
+                  <span class="badge badge-warning badge-sm text-warning-content gap-1" title="Actividades en tiempo">
+                    <span class="font-semibold">{{ plan.abiertas_en_tiempo|default_if_none:0 }}</span>
+                    <span>En tiempo</span>
+                  </span>
+                  <span class="badge badge-error badge-sm gap-1" title="Actividades fuera de tiempo">
+                    <span class="font-semibold">{{ plan.abiertas_fuera_de_tiempo|default_if_none:0 }}</span>
+                    <span>Fuera de tiempo</span>
+                  </span>
+                  <span class="badge badge-outline badge-primary badge-sm gap-1" title="Total de actividades">
+                    <span class="font-semibold">{{ plan.accion_set.count }}</span>
+                    <span>Total</span>
+                  </span>
+                </div>
+              </td>
+              <td class="text-center text-base-content/80">{{ plan.fecha_llenado|date:"d/m/Y" }}</td>
+            </tr>
             {% empty %}
-              <tr>
-                <td colspan="6" class="py-10 text-center text-base-content/60">No hay planes registrados.</td>
-              </tr>
+            <tr>
+              <td colspan="6" class="py-10 text-center text-base-content/60">No hay planes registrados.</td>
+            </tr>
             {% endfor %}
           </tbody>
         </table>
