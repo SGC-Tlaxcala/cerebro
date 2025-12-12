@@ -1,4 +1,4 @@
-# Cerebro
+# C7erebro
 .env
 .env.json
 .idea/
@@ -14,6 +14,7 @@ venv/
 cerebro.db
 competencia/
 .vs/
+src/staticfiles/
 *#*#
 
 # Byte-compiled / optimized / DLL files
