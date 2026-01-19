@@ -13,6 +13,7 @@ from apps.profiles.models import Profile
 logger = logging.getLogger(__name__)
 logging.getLogger("urllib3").setLevel(logging.WARNING)
 
+
 class Command(BaseCommand):
     help = 'Envía notificaciones programadas para revisiones de documentos no urgentes.'
 
@@ -42,7 +43,7 @@ class Command(BaseCommand):
         mensaje_html = render_to_string('docs/notificacion_periodica.html', context)
 
         api_key = os.getenv('EMAIL_API_KEY')
-        from_email = 'Cerebro <cerebro@sgctlaxcala.com.mx>'
+        from_email = 'Cerebro <cerebro@cmi.lat>'
 
         if not api_key:
             logger.critical(f"[{ahora.strftime('%Y-%m-%d %H:%M')}] No se encontró la variable de entorno EMAIL_API_KEY. No se pueden enviar notificaciones.")
@@ -58,13 +59,22 @@ class Command(BaseCommand):
 
             try:
                 response = requests.post(
-                    "https://api.mailgun.net/v3/sgctlaxcala.com.mx/messages",
+                    "https://api.mailgun.net/v3/cmi.lat/messages",
                     auth=("api", api_key),
                     data={
                         "from": from_email,
                         "to": to_email,
                         "subject": asunto,
-                        "html": mensaje_html
+                        "html": mensaje_html,
+
+                        "text": (
+                            "Se han actualizado documentos en el sistema CMI.\n\n"
+                            "Puede revisar los cambios ingresando al sistema.\n\n"
+                            "Saludos,\n"
+                            "Equipo CMI"
+                        ),
+                        "h:Reply-To": "cerebro@cmi.lat",
+                        "h:List-ID": "Notificaciones CMI <notificaciones.cmi.lat>"
                     }
                 )
                 response.raise_for_status()

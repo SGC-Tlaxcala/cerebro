@@ -347,7 +347,7 @@ def envio_de_correo(request, destinatarios, asunto, documento, revision, autor):
     """
     Envía notificaciones por correo electrónico a una lista de destinatarios.
     """
-    from_email = "Cerebro <cerebro@sgctlaxcala.com.mx>"
+    from_email = "Cerebro <cerebro@cmi.lat>"
     for destinatario_profile in destinatarios:
         nombre_usuario = destinatario_profile.user.get_full_name()
         if not nombre_usuario:
@@ -388,7 +388,7 @@ def send_message(request, destinatarios, asunto, documento, revision, autor):
     logger = logging.getLogger(__name__)
     logging.getLogger("urllib3").setLevel(logging.WARNING)
     api_key = os.getenv("EMAIL_API_KEY")
-    from_email = "Cerebro <cerebro@sgctlaxcala.com.mx>"
+    from_email = "Cerebro <cerebro@cmi.lat>"
 
     if not api_key:
         logger.critical("No se encontró la variable de entorno EMAIL_API_KEY.")
@@ -418,7 +418,7 @@ def send_message(request, destinatarios, asunto, documento, revision, autor):
 
         try:
             response = requests.post(
-                "https://api.mailgun.net/v3/sgctlaxcala.com.mx/messages",
+                "https://api.mailgun.net/v3/cmi.lat/messages",
                 auth=("api", api_key),
                 data={
                     "from": from_email,
