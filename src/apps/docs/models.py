@@ -16,6 +16,7 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from django.template.defaultfilters import slugify
 from django.urls import reverse
+from django.utils import timezone
 import hashlib
 
 
@@ -247,6 +248,9 @@ class Revision (models.Model):
         blank=True,
         editable=False,
         help_text="Checksum SHA-256 del archivo asociado a la revisión")
+    checksum_calculado_en = models.DateTimeField(null=True, blank=True, editable=False)
+    checksum_verificado_en = models.DateTimeField(null=True, blank=True, editable=False)
+    checksum_algoritmo = models.CharField(max_length=20, default="sha256", editable=False)
 
     # Trazabilidad
     autor = models.ForeignKey(
@@ -281,26 +285,28 @@ class Revision (models.Model):
         from django.urls import reverse
         return reverse('docs:detalle', args=[self.documento.id])
 
-    def save(self, *args, **kwargs):
-        # Flag to check if this is the initial save
-        is_new_instance = self.pk is None
+    def calcular_checksum(self):
+        """
+        Calculate the SHA-256 checksum of the associated file.
+        """
+        if not self.archivo:
+            raise FileNotFoundError("No file associated with this revision.")
 
-        # Call the parent save method first to ensure the file is saved to MEDIA_ROOT
+        sha256 = hashlib.sha256()
+        with open(self.archivo.path, 'rb') as f:
+            for chunk in iter(lambda: f.read(8192), b""):
+                sha256.update(chunk)
+        return sha256.hexdigest()
+
+    def save(self, *args, **kwargs):
+        # Call the parent save method first to ensure the file is saved
         super().save(*args, **kwargs)
 
-        # Calculate checksum only if the file exists and the checksum is empty
-        if self.archivo and (is_new_instance or not self.checksum):
-            checksum = hashlib.sha256()
-            file_path = self.archivo.path
-
-            # Read the file in binary mode and calculate the checksum
-            with open(file_path, 'rb') as f:
-                for chunk in iter(lambda: f.read(8192), b""):
-                    checksum.update(chunk)
-
-            # Update the checksum field
-            self.checksum = checksum.hexdigest()
-            self.save(update_fields=["checksum"])
+        # Calculate checksum if not already set
+        if self.archivo and not self.checksum:
+            self.checksum = self.calcular_checksum()
+            self.checksum_calculado_en = timezone.now()
+            self.save(update_fields=["checksum", "checksum_calculado_en"])
 
 
 class Reporte(models.Model):
