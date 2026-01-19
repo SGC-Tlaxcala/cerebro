@@ -16,6 +16,7 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from django.template.defaultfilters import slugify
 from django.urls import reverse
+import hashlib
 
 
 User = get_user_model()
@@ -240,6 +241,13 @@ class Revision (models.Model):
     # Identificación de cambios
     cambios = models.TextField()
 
+    # Verificación y validación
+    checksum = models.CharField(
+        max_length=64,
+        blank=True,
+        editable=False,
+        help_text="Checksum SHA-256 del archivo asociado a la revisión")
+
     # Trazabilidad
     autor = models.ForeignKey(
         User,
@@ -272,6 +280,27 @@ class Revision (models.Model):
     def get_absolute_url(self):
         from django.urls import reverse
         return reverse('docs:detalle', args=[self.documento.id])
+
+    def save(self, *args, **kwargs):
+        # Flag to check if this is the initial save
+        is_new_instance = self.pk is None
+
+        # Call the parent save method first to ensure the file is saved to MEDIA_ROOT
+        super().save(*args, **kwargs)
+
+        # Calculate checksum only if the file exists and the checksum is empty
+        if self.archivo and (is_new_instance or not self.checksum):
+            checksum = hashlib.sha256()
+            file_path = self.archivo.path
+
+            # Read the file in binary mode and calculate the checksum
+            with open(file_path, 'rb') as f:
+                for chunk in iter(lambda: f.read(8192), b""):
+                    checksum.update(chunk)
+
+            # Update the checksum field
+            self.checksum = checksum.hexdigest()
+            self.save(update_fields=["checksum"])
 
 
 class Reporte(models.Model):

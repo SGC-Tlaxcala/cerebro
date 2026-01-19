@@ -30,6 +30,7 @@ class RevisionInline (admin.TabularInline):
     model = Revision
     extra = 1
     fields = ('revision', 'f_actualizacion', 'archivo', 'cambios', 'notificacion_urgente')
+    readonly_fields = ('checksum',)
     formfield_overrides = {
         models.TextField: {'widget': forms.Textarea(attrs={'rows': 4, 'cols': 50})},
     }
@@ -48,9 +49,16 @@ class DocumentoAdmin(admin.ModelAdmin):
 
     def save_formset(self, request, form, formset, change):
         instances = formset.save(commit=False)
+
+        # Guardar / actualizar
         for instance in instances:
             instance.autor = request.user
             instance.save()
+
+        # Eliminar objetos marcados para borrar
+        for obj in formset.deleted_objects:
+            obj.delete()
+
         formset.save_m2m()
 
 
