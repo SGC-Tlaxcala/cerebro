@@ -50,8 +50,11 @@ class Command(BaseCommand):
                 checksum_actual = rev.calcular_checksum()
 
                 if not rev.checksum:
-                    rev.calcular_y_guardar_checksum()
-                    calculadas += 1
+                    try:
+                        rev.calcular_y_guardar_checksum()
+                        calculadas += 1
+                    except FileNotFoundError:
+                        faltantes += 1
                 elif rev.checksum == checksum_actual:
                     rev.checksum_verificado_en = timezone.now()
                     rev.save(update_fields=["checksum_verificado_en"])

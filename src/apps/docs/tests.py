@@ -34,6 +34,8 @@ class DocsViewsTests(TestCase):
             archivo=SimpleUploadedFile("prueba.pdf", b"contenido de prueba"),
             cambios="Inicial",
             autor=self.user,
+            checksum="d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2",
+            checksum_calculado_en=timezone.now(),
         )
         # Crear un documento adicional con lmd=False para la prueba
         self.doc_ldp = Documento.objects.create(
@@ -194,6 +196,14 @@ class RevisionChecksumTests(TestCase):
     def test_verify_checksum_command(self):
         # Simulate the verify_checksums management command
         from apps.docs.management.commands.verify_checksums import Command
+        from django.core.files.base import ContentFile
+
+        # Inicializar datos con un checksum válido
+        # Asegurar que el archivo existe y el checksum coincide
+        self.revision.archivo.save("dummy_file.txt", ContentFile(b"dummy content"))
+        self.revision.checksum = self.revision.calcular_checksum()
+        self.revision.checksum_verificado_en = None
+        self.revision.save()
 
         command = Command()
         command.handle()

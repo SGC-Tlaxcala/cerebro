@@ -17,7 +17,6 @@ from django.contrib.auth import get_user_model
 from django.template.defaultfilters import slugify
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.timezone import now
 import hashlib
 
 
@@ -316,8 +315,11 @@ class Revision (models.Model):
     def save(self, *args, **kwargs):
         """
         Guardar la instancia del modelo Revision.
+        - Calcula y guarda el checksum si es necesario antes de guardar.
         - Llama al método `super().save()` para guardar la instancia.
         """
+        if self.archivo and not self.checksum:
+            self.calcular_y_guardar_checksum()
         super().save(*args, **kwargs)
 
 
