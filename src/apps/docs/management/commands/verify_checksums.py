@@ -1,6 +1,5 @@
 import os
 import time
-import hashlib
 import pytz
 import logging
 
@@ -14,12 +13,17 @@ logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
-    help = "Verifica la integridad de los archivos asociados a revisiones mediante checksum SHA-256."
+    help = "Verifica y calcula checksums para las revisiones."
 
     def handle(self, *args, **options):
         tz = pytz.timezone("America/Mexico_City")
         ahora = timezone.now().astimezone(tz)
         inicio = time.monotonic()
+
+        ok = 0
+        calculadas = 0
+        faltantes = 0
+        inconsistentes = 0
 
         revisiones = Revision.objects.exclude(archivo__isnull=True).exclude(archivo="")
 
@@ -29,54 +33,33 @@ class Command(BaseCommand):
             ))
             return
 
-        ok = 0
-        calculadas = 0
-        faltantes = 0
-        inconsistentes = 0
-
         self.stdout.write(f"[{ahora:%Y-%m-%d %H:%M}] Verificando {revisiones.count()} revisiones...")
 
         for rev in revisiones:
+            if not rev.archivo:
+                faltantes += 1
+                continue
+
             try:
                 file_path = os.path.join(settings.MEDIA_ROOT, rev.archivo.name)
 
                 if not os.path.exists(file_path):
                     faltantes += 1
-                    self.stdout.write(self.style.ERROR(
-                        f"MISSING_FILE  | Revision id={rev.id} | {rev.archivo.name}"
-                    ))
                     continue
 
-                # Caso: no hay checksum -> calcular usando save()
+                checksum_actual = rev.calcular_checksum()
+
                 if not rev.checksum:
-                    rev.save()
+                    rev.calcular_y_guardar_checksum()
                     calculadas += 1
-                    self.stdout.write(self.style.SUCCESS(
-                        f"CHECKSUM_CALCULATED | Revision id={rev.id}"
-                    ))
-                    continue
-
-                # Verificación normal
-                sha256 = hashlib.sha256()
-                with open(file_path, "rb") as f:
-                    for chunk in iter(lambda: f.read(8192), b""):
-                        sha256.update(chunk)
-
-                checksum_actual = sha256.hexdigest()
-
-                if checksum_actual == rev.checksum:
+                elif rev.checksum == checksum_actual:
+                    rev.checksum_verificado_en = timezone.now()
+                    rev.save(update_fields=["checksum_verificado_en"])
                     ok += 1
                 else:
                     inconsistentes += 1
-                    self.stdout.write(self.style.ERROR(
-                        f"MISMATCH | Revision id={rev.id} | esperado={rev.checksum} | actual={checksum_actual}"
-                    ))
-
             except Exception as e:
                 logger.exception(f"Error verificando revisión {rev.id}")
-                self.stdout.write(self.style.ERROR(
-                    f"ERROR | Revision id={rev.id} | {e}"
-                ))
 
         fin = time.monotonic()
         duracion = fin - inicio

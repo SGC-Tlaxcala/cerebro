@@ -17,6 +17,7 @@ from django.contrib.auth import get_user_model
 from django.template.defaultfilters import slugify
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.timezone import now
 import hashlib
 
 
@@ -298,15 +299,26 @@ class Revision (models.Model):
                 sha256.update(chunk)
         return sha256.hexdigest()
 
-    def save(self, *args, **kwargs):
-        # Call the parent save method first to ensure the file is saved
-        super().save(*args, **kwargs)
-
-        # Calculate checksum if not already set
+    def calcular_y_guardar_checksum(self):
+        """
+        Calcula y guarda el checksum si es necesario.
+        - Calcula el checksum solo si el archivo existe y el campo `checksum` está vacío.
+        - Actualiza los campos `checksum` y `checksum_calculado_en`.
+        """
         if self.archivo and not self.checksum:
-            self.checksum = self.calcular_checksum()
-            self.checksum_calculado_en = timezone.now()
-            self.save(update_fields=["checksum", "checksum_calculado_en"])
+            try:
+                self.checksum = self.calcular_checksum()
+                self.checksum_calculado_en = timezone.now()
+                self.save(update_fields=["checksum", "checksum_calculado_en"])
+            except FileNotFoundError:
+                pass  # Log or handle the error if necessary
+
+    def save(self, *args, **kwargs):
+        """
+        Guardar la instancia del modelo Revision.
+        - Llama al método `super().save()` para guardar la instancia.
+        """
+        super().save(*args, **kwargs)
 
 
 class Reporte(models.Model):

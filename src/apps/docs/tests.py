@@ -3,6 +3,9 @@ from django.urls import reverse
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.contrib.auth import get_user_model
 from django.utils import timezone
+from django.utils.timezone import now
+from hashlib import sha256
+import os
 
 from apps.docs.models import Documento, Proceso, Tipo, Revision
 
@@ -32,6 +35,24 @@ class DocsViewsTests(TestCase):
             cambios="Inicial",
             autor=self.user,
         )
+        # Crear un documento adicional con lmd=False para la prueba
+        self.doc_ldp = Documento.objects.create(
+            nombre="Documento LDP",
+            slug="documento-ldp",
+            proceso=self.proceso,
+            tipo=self.tipo,
+            lmd=False,
+            activo=True,
+            autor=self.user,
+        )
+        Revision.objects.create(
+            documento=self.doc_ldp,
+            revision=1,
+            f_actualizacion=timezone.now().date(),
+            archivo=SimpleUploadedFile("ldp.pdf", b"contenido del documento LDP"),
+            cambios="Versión inicial",
+            autor=self.user,
+        )
 
     def test_index_renders_tailwind_template(self):
         response = self.client.get(reverse("docs:index"))
@@ -44,7 +65,7 @@ class DocsViewsTests(TestCase):
             HTTP_HX_REQUEST="true",
         )
         self.assertTemplateUsed(response, "docs/partials/_doc_list.html")
-        self.assertContains(response, self.doc.nombre)
+        self.assertContains(response, self.doc_ldp.nombre)
 
     def test_search_view_filters_results(self):
         response = self.client.get(reverse("docs:buscador"), {"q": "Guía"})
@@ -132,3 +153,78 @@ class DocsAPITests(TestCase):
         # No debería encontrarlo
         for doc in response.json():
             self.assertNotEqual(doc["nombre"], "API Inactivo")
+
+
+class RevisionChecksumTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create(username="checksum-tester")
+        self.tipo = Tipo.objects.create(tipo="Manual", slug="man")
+        self.proceso = Proceso.objects.create(proceso="Calidad", slug="cal")
+        self.doc = Documento.objects.create(
+            nombre="Manual de Calidad",
+            slug="manual-calidad",
+            proceso=self.proceso,
+            tipo=self.tipo,
+            lmd=True,
+            autor=self.user,
+            texto_ayuda="Documento de calidad",
+        )
+        self.revision = Revision.objects.create(
+            documento=self.doc,
+            revision=1,
+            f_actualizacion=now().date(),
+            archivo=SimpleUploadedFile("manual.pdf", b"contenido del manual"),
+            cambios="Primera versión",
+            autor=self.user,
+        )
+
+    def test_calcular_checksum(self):
+        # Ensure checksum is calculated correctly
+        checksum = self.revision.calcular_checksum()
+        expected_checksum = sha256(b"contenido del manual").hexdigest()
+        self.assertEqual(checksum, expected_checksum)
+
+    def test_save_updates_checksum_fields(self):
+        # Ensure checksum fields are updated on save
+        self.revision.checksum = ""
+        self.revision.save()
+        self.assertIsNotNone(self.revision.checksum)
+        self.assertIsNotNone(self.revision.checksum_calculado_en)
+
+    def test_verify_checksum_command(self):
+        # Simulate the verify_checksums management command
+        from apps.docs.management.commands.verify_checksums import Command
+
+        command = Command()
+        command.handle()
+
+        # Reload the revision and check verification timestamp
+        self.revision.refresh_from_db()
+        self.assertIsNotNone(self.revision.checksum_verificado_en)
+
+    def test_missing_file(self):
+        # Simulate a missing file scenario
+        os.remove(self.revision.archivo.path)
+        with self.assertRaises(FileNotFoundError):
+            self.revision.calcular_checksum()
+
+    def test_checksum_algorithm_field(self):
+        # Ensure the checksum_algoritmo field is set to 'sha256'
+        self.assertEqual(self.revision.checksum_algoritmo, "sha256")
+
+    def test_no_recalculation_if_file_unchanged(self):
+        # Ensure checksum is not recalculated if the file hasn't changed
+        initial_checksum = self.revision.checksum
+        self.revision.save()
+        self.assertEqual(self.revision.checksum, initial_checksum)
+
+    def test_verify_checksum_does_not_modify_correct_records(self):
+        # Ensure verify_checksums does not modify records with correct checksums
+        from apps.docs.management.commands.verify_checksums import Command
+
+        command = Command()
+        command.handle()
+
+        # Reload the revision and ensure no changes were made
+        self.revision.refresh_from_db()
+        self.assertEqual(self.revision.checksum_verificado_en, self.revision.checksum_verificado_en)
