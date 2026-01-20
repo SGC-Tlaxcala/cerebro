@@ -1,0 +1,52 @@
+{% load static %}
+
+<div id="carousel-wrapper" class="relative hidden">
+    <button onclick="dismissCarousel()" class="btn btn-circle btn-sm absolute top-4 right-4 z-50 bg-black/20 border-none text-white">✕</button>
+
+    <div id="main-carousel" class="carousel w-full">
+        <div id="slide1" class="carousel-item relative w-full">
+            <a href="{% url 'pmml:register' %}" class="w-full">
+                <img src="{% static 'img/hero-pmml-final.png' %}" class="w-full" alt="Suscripción SGC" />
+            </a>
+            <div class="absolute left-5 right-5 top-1/2 flex -translate-y-1/2 transform justify-between">
+                <a href="#slide2" class="btn btn-circle btn-ghost text-gray-400">❮</a>
+                <a href="#slide2" class="btn btn-circle btn-ghost text-gray-400">❯</a>
+            </div>
+        </div>
+
+        <div id="slide2" class="carousel-item relative w-full">
+            <a href="{% url 'docs:index' %}" class="w-full">
+                <img src="{% static 'img/hero-cmi-final.png' %}" class="w-full" alt="CMI Móvil" />
+            </a>
+            <div class="absolute left-5 right-5 top-1/2 flex -translate-y-1/2 transform justify-between">
+                <a href="#slide1" class="btn btn-circle btn-ghost text-gray-400">❮</a>
+                <a href="#slide1" class="btn btn-circle btn-ghost text-gray-400">❯</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function dismissCarousel() {
+        document.getElementById('carousel-wrapper').classList.add('hidden');
+        sessionStorage.setItem('carousel_dismissed', 'true');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const wrapper = document.getElementById('carousel-wrapper');
+        const carousel = document.getElementById('main-carousel');
+
+        if (!sessionStorage.getItem('carousel_dismissed')) {
+            wrapper.classList.remove('hidden');
+        }
+
+        let currentSlide = 1;
+        setInterval(() => {
+            currentSlide = (currentSlide === 1) ? 2 : 1;
+            const target = document.getElementById(`slide${currentSlide}`);
+            if (target && !wrapper.classList.contains('hidden')) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+            }
+        }, 5000);
+    });
+</script>

@@ -23,41 +23,7 @@
 <body class="min-h-screen">
   {% include 'cerebro/partials/_navbar.html' %}
 
-  <div id="global-carousel" class="relative carousel w-full max-h-[555px] overflow-hidden mb-8 shadow-xl hidden">
-    <!-- Slide 1: Suscripción PMML -->
-    <div id="slide1" class="carousel-item relative w-full">
-      <img src="{% static 'img/hero-notificaciones-valentine.png' %}" class="w-full object-cover" alt="Suscripción a Notificaciones SGC" />
-      <a href="{% url 'pmml:register' %}" class="absolute inset-0 z-10"></a>
-      <button onclick="dismissCarousel()" class="btn btn-circle btn-sm btn-ghost absolute top-4 right-4 z-20 bg-base-100/50 hover:bg-base-100 text-base-content">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
-    </div>
-
-    <!-- Slide 2: Placeholder Vigencia -->
-    <div id="slide2" class="carousel-item relative w-full bg-base-200">
-      <div class="flex flex-col items-center justify-center w-full h-full p-10 text-center">
-        <h2 class="text-4xl font-bold text-primary mb-4">CMI Móvil - La Fuente Única de Verdad</h2>
-        <p class="text-xl">Recuerde verificar la vigencia de sus documentos. El sello de 15 días es su garantía.</p>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const carousel = document.getElementById('global-carousel');
-      if (!sessionStorage.getItem('carousel_dismissed')) {
-        carousel.classList.remove('hidden');
-      }
-    });
-
-    function dismissCarousel() {
-      const carousel = document.getElementById('global-carousel');
-      carousel.classList.add('hidden');
-      sessionStorage.setItem('carousel_dismissed', 'true');
-    }
-  </script>
+  {% include 'cerebro/partials/_carrousel.html' %}
 
   <main class="container mx-auto max-w-screen-xl px-4 py-8">
     {% block content %}{% endblock content %}
