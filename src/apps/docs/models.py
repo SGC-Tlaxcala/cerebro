@@ -16,6 +16,8 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from django.template.defaultfilters import slugify
 from django.urls import reverse
+from django.utils import timezone
+import hashlib
 
 
 User = get_user_model()
@@ -240,6 +242,16 @@ class Revision (models.Model):
     # Identificación de cambios
     cambios = models.TextField()
 
+    # Verificación y validación
+    checksum = models.CharField(
+        max_length=64,
+        blank=True,
+        editable=False,
+        help_text="Checksum SHA-256 del archivo asociado a la revisión")
+    checksum_calculado_en = models.DateTimeField(null=True, blank=True, editable=False)
+    checksum_verificado_en = models.DateTimeField(null=True, blank=True, editable=False)
+    checksum_algoritmo = models.CharField(max_length=20, default="sha256", editable=False)
+
     # Trazabilidad
     autor = models.ForeignKey(
         User,
@@ -272,6 +284,43 @@ class Revision (models.Model):
     def get_absolute_url(self):
         from django.urls import reverse
         return reverse('docs:detalle', args=[self.documento.id])
+
+    def calcular_checksum(self):
+        """
+        Calculate the SHA-256 checksum of the associated file.
+        """
+        if not self.archivo:
+            raise FileNotFoundError("No file associated with this revision.")
+
+        sha256 = hashlib.sha256()
+        with open(self.archivo.path, 'rb') as f:
+            for chunk in iter(lambda: f.read(8192), b""):
+                sha256.update(chunk)
+        return sha256.hexdigest()
+
+    def calcular_y_guardar_checksum(self):
+        """
+        Calcula y guarda el checksum si es necesario.
+        - Calcula el checksum solo si el archivo existe y el campo `checksum` está vacío.
+        - Actualiza los campos `checksum` y `checksum_calculado_en`.
+        """
+        if self.archivo and not self.checksum:
+            try:
+                self.checksum = self.calcular_checksum()
+                self.checksum_calculado_en = timezone.now()
+                self.save(update_fields=["checksum", "checksum_calculado_en"])
+            except FileNotFoundError:
+                pass  # Log or handle the error if necessary
+
+    def save(self, *args, **kwargs):
+        """
+        Guardar la instancia del modelo Revision.
+        - Calcula y guarda el checksum si es necesario antes de guardar.
+        - Llama al método `super().save()` para guardar la instancia.
+        """
+        if self.archivo and not self.checksum:
+            self.calcular_y_guardar_checksum()
+        super().save(*args, **kwargs)
 
 
 class Reporte(models.Model):
