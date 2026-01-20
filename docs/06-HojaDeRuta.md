@@ -2,7 +2,7 @@
 
 Este documento rastrea el progreso de las tareas de refactorización y desarrollo.
 
-0. Trabajando en la tarea: 5 :: 2025-12-11
+0. Trabajando en la tarea: 6 :: 2026-01-20
 
 - [x] 1. Asegurar que solo se listen documentos activos en la app `docs`.
     - [x] 1.1 Modificar `Buscador` en `views.py` para filtrar `activo=True`.
@@ -20,4 +20,6 @@ Este documento rastrea el progreso de las tareas de refactorización y desarroll
 - [ ] 5. Mejorar visualización de estado 'Fuera de tiempo' en PAS.
     - [x] 5.1 Reemplazar texto por icono de alerta rojo en index.
     - [x] 5.2 Reemplazar texto 'Cerrada' por icono check-badge azul filled.
+- [ ] 6. Implementar App PMML (Poor-Man-Mailing-List).
+
 
