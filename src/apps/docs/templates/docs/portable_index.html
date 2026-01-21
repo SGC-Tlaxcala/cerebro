@@ -1,0 +1,507 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Validador de Integridad SGC</title>
+    <!-- Carga del Manifiesto -->
+    <script src="manifest.js"></script>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --success-color: #16a34a;
+            --warning-color: #ca8a04;
+            --error-color: #dc2626;
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-main: #1f2937;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 2rem;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .section-card {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-size: 1rem;
+        }
+
+        .btn-primary:hover {
+            background-color: #1d4ed8;
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .d-none {
+            display: none;
+        }
+
+        /* Alertas */
+        .alert {
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .alert-error {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        .alert-warning {
+            background-color: #fef9c3;
+            color: #854d0e;
+            border: 1px solid #fde047;
+        }
+
+        .alert-success {
+            background-color: #dcfce7;
+            color: #15803d;
+            border: 1px solid #bbf7d0;
+        }
+
+        /* Tabla */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th,
+        td {
+            padding: 0.75rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: #f9fafb;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        tr.clickable {
+            cursor: pointer;
+            transition: background-color 0.1s;
+        }
+
+        tr.clickable:hover {
+            background-color: #f3f4f6;
+        }
+
+        /* Modal / Overlay */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        /* Process Modal Styles */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(4px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .modal-card {
+            background: var(--card-bg);
+            padding: 2.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .modal-img {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 1.5rem;
+            object-fit: contain;
+        }
+
+        .modal-text {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-main);
+            margin: 0;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Bloqueo por Expiración -->
+        <div id="expirationBlock" class="hidden">
+            <div class="alert alert-error">
+                <h1>Versión Obsoleta</h1>
+                <p>Esta copia del CMI Portátil ha expirado (Vigencia: 15 días).</p>
+                <p>Por favor, solicite una nueva versión actualizada.</p>
+            </div>
+        </div>
+
+        <!-- Alerta de Integridad Comprometida (Index) -->
+        <div id="integrityAlert" class="hidden">
+            <div class="alert alert-error">
+                <h1>⚠️ HERRAMIENTA ALTERADA</h1>
+                <p>Integridad comprometida: El código de este visor no coincide con el manifiesto oficial.</p>
+            </div>
+        </div>
+
+        <div id="mainApp">
+            <header>
+                <h1>Validador de Integridad SGC</h1>
+                <p id="versionInfo" class="text-secondary"></p>
+            </header>
+
+            <!-- Sección de Montaje -->
+            <div class="section-card" id="mountSection">
+                <h2>1. Sincronización</h2>
+                <p>Haga clic en el botón y seleccione la carpeta que contiene el CMI Portátil (incluyendo este archivo).</p>
+                <button class="btn-primary" id="btnSync" onclick="document.getElementById('dirInput').click()">
+                    Sincronizar Directorio SGC
+                </button>
+                <input type="file" id="dirInput" webkitdirectory directory multiple class="d-none">
+            </div>
+
+            <!-- Listado de Archivos -->
+            <div class="section-card hidden" id="listSection">
+                <h2>2. Documentos Disponibles</h2>
+                <div class="alert alert-warning hidden" id="fileErrorAlert"></div>
+                <div id="statusAlert" class="hidden"></div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Documento</th>
+                            <th>Ruta</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody id="fileListBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Process Modal -->
+    <div id="processModal" class="modal-backdrop hidden">
+        <div class="modal-card">
+            <img id="processImg" class="modal-img" src="" alt="Procesando...">
+            <p id="processText" class="modal-text"></p>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successAlert" class="overlay hidden">
+        <div class="section-card" style="margin: 0; text-align: center; max-width: 400px;">
+            <h2 style="color: var(--success-color);">✅ Validación Exitosa</h2>
+            <p>Archivo válido y vigente.</p>
+            <button class="btn-primary" onclick="document.getElementById('successAlert').classList.add('hidden')">Aceptar</button>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="overlay hidden">
+        <div class="spinner"></div>
+    </div>
+
+    <script>
+        // --- Constantes y Configuración ---
+        const BUILD_DATE_STR = "{{ build_date|date:'c' }}";
+        const BUILD_DATE = new Date(BUILD_DATE_STR);
+        const EXPIRATION_DATE_STR = "{{ expiration_date|date:'c' }}";
+        const EXPIRATION_DATE = new Date(EXPIRATION_DATE_STR);
+
+        let fileMap = new Map(); // Mapa de rutas normalizadas -> File Object
+
+        // --- Ciclo de Vida: Inicio ---
+        (function init() {
+            // 1. Verificar Expiración
+            const now = new Date();
+            const timeLeft = EXPIRATION_DATE - now;
+            const daysLeft = Math.ceil(timeLeft / (1000 * 60 * 60 * 24));
+
+            document.getElementById('versionInfo').textContent = `Generado: ${BUILD_DATE.toLocaleDateString()} | Vence: ${EXPIRATION_DATE.toLocaleDateString()} (${Math.max(0, daysLeft)} días)`;
+
+            if (now > EXPIRATION_DATE) {
+                document.getElementById('expirationBlock').classList.remove('hidden');
+                document.getElementById('mainApp').classList.add('hidden');
+                document.getElementById('btnSync').disabled = true; // Deshabilitar explícitamente
+            }
+        })();
+
+        async function showStep(gifName, text) {
+            const modal = document.getElementById('processModal');
+            const img = document.getElementById('processImg');
+            const txt = document.getElementById('processText');
+
+            modal.classList.remove('hidden');
+            img.src = 'assets/' + gifName;
+            txt.textContent = text;
+
+            await new Promise(resolve => setTimeout(resolve, 1500));
+        }
+
+        // --- Manejador de Archivos (Directory Picker via Input) ---
+        document.getElementById('dirInput').addEventListener('change', async (event) => {
+            // showLoading(true); // Reemplazado por secuencia de pasos
+            const files = event.target.files;
+
+            if (!files || files.length === 0) {
+                return;
+            }
+
+            fileMap.clear();
+            let indexFile = null;
+
+            // 1. Mapeo y Normalización
+            // Estrategia: Detectar la carpeta raíz.
+            // Si el usuario selecciona "CMI_Folder", los archivos vendrán como "CMI_Folder/docs/...", "CMI_Folder/index.html"
+            // Queremos mapear "docs/..." -> File
+
+            for (let file of files) {
+                const parts = file.webkitRelativePath.split('/');
+                // parts[0] es la carpeta raíz contenedora.
+                // parts.slice(1) es la ruta relativa interna.
+
+                if (parts.length > 1) {
+                    const relativeKey = parts.slice(1).join('/');
+                    fileMap.set(relativeKey, file);
+
+                    if (relativeKey === 'index.html') {
+                        indexFile = file;
+                    }
+                }
+            }
+
+            // 2. Auto-Verificación del Index (Si se encontró)
+            if (indexFile && typeof SGC_MANIFEST !== 'undefined' && SGC_MANIFEST['index.html']) {
+                try {
+                    // Paso 1
+                    await showStep('scanning.gif', 'Verificando vigencia...');
+
+                    // Paso 2
+                    await showStep('fingerprint.gif', 'Verificando huella digital...');
+                    const buffer = await indexFile.arrayBuffer();
+                    const hash = await cryptoHashArrayBuffer(buffer);
+
+                    if (hash === SGC_MANIFEST['index.html'].hash) {
+                        // Paso 3
+                        await showStep('ok.gif', 'Herramienta válida');
+                        document.getElementById('processModal').classList.add('hidden');
+                        console.log("Index integrity verified.");
+                        document.getElementById('successAlert').classList.remove('hidden');
+                    } else {
+                        document.getElementById('processModal').classList.add('hidden');
+                        document.getElementById('integrityAlert').classList.remove('hidden');
+                        document.getElementById('mountSection').classList.add('hidden');
+                        console.error(`Hash mismatch! Expected ${SGC_MANIFEST['index.html'].hash}, got ${hash}`);
+                        return;
+                    }
+                } catch (e) {
+                    console.error("Error leyendo index.html:", e);
+                    document.getElementById('processModal').classList.add('hidden');
+                }
+            } else {
+                console.warn("index.html no encontrado en la selección para autoverificación.");
+            }
+
+            // 3. Renderizar Lista
+            renderFileList();
+
+            // 4. Update UI
+            document.getElementById('mountSection').classList.add('hidden');
+            document.getElementById('listSection').classList.remove('hidden');
+        });
+
+        function renderFileList() {
+            const tbody = document.getElementById('fileListBody');
+            tbody.innerHTML = '';
+
+            if (typeof SGC_MANIFEST === 'undefined') return;
+
+            Object.keys(SGC_MANIFEST).forEach(path => {
+                // Ignorar index.html y manifest.js
+                if (path === 'index.html' || path === 'manifest.js') return;
+
+                const tr = document.createElement('tr');
+                tr.classList.add('clickable');
+
+                // Verificar si tenemos el archivo
+                const hasFile = fileMap.has(path);
+                const statusText = hasFile ? "Sincronizado" : "No encontrado";
+                const statusClass = hasFile ? "text-secondary" : "text-danger"; // text-danger definimos inline o class
+
+                tr.innerHTML = `
+                    <td>${path.split('/').pop()}</td>
+                    <td>${path}</td>
+                    <td><span id="status-${btoa(path)}" class="${statusClass}">${statusText}</span></td>
+                `;
+
+                // Solo agregar listener si tenemos el archivo
+                if (hasFile) {
+                    tr.addEventListener('click', () => verifyAndOpen(path));
+                }
+
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function verifyAndOpen(relativePath) {
+            // showLoading(true); // Reemplazado por secuencia
+            const alertBox = document.getElementById('fileErrorAlert');
+            alertBox.classList.add('hidden');
+
+            try {
+                // 1. Obtener file del mapa
+                const file = fileMap.get(relativePath);
+                if (!file) throw new Error("Archivo no disponible en memoria. Intente resincronizar.");
+
+                // Paso 1
+                await showStep('scanning.gif', 'Verificando vigencia...');
+
+                // Paso 2
+                await showStep('fingerprint.gif', 'Verificando huella digital...');
+                // 2. Calcular Hash
+                const arrayBuffer = await file.arrayBuffer();
+                const hash = await cryptoHashArrayBuffer(arrayBuffer);
+
+                // 3. Verificar
+                const expectedHash = SGC_MANIFEST[relativePath].hash;
+
+                if (hash === expectedHash) {
+                    // Paso 3
+                    await showStep('ok.gif', 'Documento válido');
+                    document.getElementById('processModal').classList.add('hidden');
+                    // Integridad OK
+                    updateStatus(relativePath, 'Válido', 'green');
+
+                    // Abrir
+                    const url = URL.createObjectURL(file);
+                    window.open(url, '_blank');
+
+                    // Limpieza (opcional, revoke después de un tiempo)
+                    setTimeout(() => URL.revokeObjectURL(url), 60000);
+                } else {
+                    document.getElementById('processModal').classList.add('hidden');
+                    // Integridad Fallida
+                    updateStatus(relativePath, 'CORRUPTO', 'red');
+                    throw new Error("INTEGRIDAD COMPROMETIDA: El archivo ha sido alterado.");
+                }
+
+            } catch (err) {
+                document.getElementById('processModal').classList.add('hidden');
+                console.error(err);
+                alertBox.textContent = err.message || "Error desconocido al abrir el archivo.";
+                alertBox.classList.remove('hidden');
+            }
+        }
+
+        // --- Helpers ---
+        function updateStatus(path, text, color) {
+            const el = document.getElementById(`status-${btoa(path)}`);
+            if (el) {
+                el.textContent = text;
+                el.style.color = color;
+                el.style.fontWeight = 'bold';
+            }
+        }
+
+        async function cryptoHashArrayBuffer(buffer) {
+            const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        async function cryptoHash(text) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(text);
+            return await cryptoHashArrayBuffer(data);
+        }
+    </script>
+</body>
+
+</html>
