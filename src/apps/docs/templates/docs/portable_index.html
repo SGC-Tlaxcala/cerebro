@@ -271,6 +271,7 @@
         <div class="modal-card">
             <img id="processImg" class="modal-img" src="" alt="Procesando...">
             <p id="processText" class="modal-text"></p>
+            <button id="modalCloseBtn" class="btn-primary mt-4 hidden" onclick="document.getElementById('processModal').classList.add('hidden')">Cerrar</button>
         </div>
     </div>
 
@@ -317,10 +318,16 @@
             const modal = document.getElementById('processModal');
             const img = document.getElementById('processImg');
             const txt = document.getElementById('processText');
+            const btn = document.getElementById('modalCloseBtn');
 
             modal.classList.remove('hidden');
+            btn.classList.add('hidden'); // Asegurar botón oculto durante pasos
+
+            img.style.display = 'block'; // Asegurar visible
             img.src = 'assets/' + gifName;
+
             txt.textContent = text;
+            txt.style.color = 'var(--text-main)'; // Restaurar color por defecto
 
             await new Promise(resolve => setTimeout(resolve, 1000));
         }
@@ -413,7 +420,7 @@
                 // Verificar si tenemos el archivo
                 const hasFile = fileMap.has(path);
                 const statusText = hasFile ? "Sincronizado" : "No encontrado";
-                const statusClass = hasFile ? "text-secondary" : "text-danger"; // text-danger definimos inline o class
+                const statusClass = hasFile ? "text-secondary" : "text-danger";
 
                 tr.innerHTML = `
                     <td>${path.split('/').pop()}</td>
@@ -423,60 +430,80 @@
 
                 // Solo agregar listener si tenemos el archivo
                 if (hasFile) {
-                    tr.addEventListener('click', () => verifyAndOpen(path));
+                    const file = fileMap.get(path);
+                    const expectedHash = SGC_MANIFEST[path].hash;
+                    tr.addEventListener('click', () => runValidationSequence(file, expectedHash, path));
                 }
 
                 tbody.appendChild(tr);
             });
         }
 
-        async function verifyAndOpen(relativePath) {
-            // showLoading(true); // Reemplazado por secuencia
+        async function runValidationSequence(file, expectedHash, relativePath) {
             const alertBox = document.getElementById('fileErrorAlert');
             alertBox.classList.add('hidden');
 
+            // Reset modal state
+            document.getElementById('processImg').src = '';
+            document.getElementById('processText').textContent = '';
+
             try {
-                // 1. Obtener file del mapa
-                const file = fileMap.get(relativePath);
-                if (!file) throw new Error("Archivo no disponible en memoria. Intente resincronizar.");
-
-                // Paso 1
-                await showStep('scanning.gif', 'Verificando vigencia...');
-
-                // Paso 2
-                await showStep('fingerprint.gif', 'Verificando huella digital...');
-                // 2. Calcular Hash
-                const arrayBuffer = await file.arrayBuffer();
-                const hash = await cryptoHashArrayBuffer(arrayBuffer);
-
-                // 3. Verificar
-                const expectedHash = SGC_MANIFEST[relativePath].hash;
-
-                if (hash === expectedHash) {
-                    // Paso 3
-                    await showStep('ok.gif', 'Documento válido');
-                    document.getElementById('processModal').classList.add('hidden');
-                    // Integridad OK
-                    updateStatus(relativePath, 'Válido', 'green');
-
-                    // Abrir
-                    const url = URL.createObjectURL(file);
-                    window.open(url, '_blank');
-
-                    // Limpieza (opcional, revoke después de un tiempo)
-                    setTimeout(() => URL.revokeObjectURL(url), 60000);
-                } else {
-                    document.getElementById('processModal').classList.add('hidden');
-                    // Integridad Fallida
-                    updateStatus(relativePath, 'CORRUPTO', 'red');
-                    throw new Error("INTEGRIDAD COMPROMETIDA: El archivo ha sido alterado.");
+                // --- Paso 1: Vigencia ---
+                await showStep('scanning.gif', 'Verificando vigencia del archivo...');
+                const now = new Date();
+                if (now > EXPIRATION_DATE) {
+                    throw new Error("CERTIFICADO EXPIRADO: La vigencia de 15 días ha concluido.");
                 }
 
-            } catch (err) {
+                // --- Paso 2: Huella Digital ---
+                await showStep('fingerprint.gif', 'Verificando huella digital...');
+
+                let arrayBuffer = await file.arrayBuffer();
+                const hash = await cryptoHashArrayBuffer(arrayBuffer);
+
+                // Liberar memoria (Best effort en JS)
+                arrayBuffer = null;
+
+                if (hash !== expectedHash) {
+                    throw new Error("MODIFICACIÓN DETECTADA: La huella digital no coincide.");
+                }
+
+                // --- Paso 3: Resultado Exitoso ---
+                await showStep('ok.gif', 'Archivo válido');
+
+                // Cerrar modal y actualizar estado
                 document.getElementById('processModal').classList.add('hidden');
+                updateStatus(relativePath, 'Válido', 'green');
+
+                // Abrir archivo
+                const url = URL.createObjectURL(file);
+                window.open(url, '_blank');
+
+                // Limpieza de ObjectURL
+                setTimeout(() => URL.revokeObjectURL(url), 60000);
+
+            } catch (err) {
+                // Manejo de Errores: Mantener modal o mostrar alerta
                 console.error(err);
-                alertBox.textContent = err.message || "Error desconocido al abrir el archivo.";
-                alertBox.classList.remove('hidden');
+
+                // Si estamos en el modal, cambiar a estado de error visualmente podría ser mejor, 
+                // pero bajo estricta instrucción "modal debe permanecer abierto mostrando el error":
+                const img = document.getElementById('processImg');
+                img.src = ''; // O un icono de error si tuviéramos
+                img.style.display = 'none'; // ocultar gif si falla
+
+                const txt = document.getElementById('processText');
+                txt.textContent = err.message;
+                txt.style.color = 'var(--error-color)';
+
+                // No cerramos el modal automáticmante en error para que el usuario lo lea.
+                // Opcional: permitir cerrar al hacer click fuera? Por ahora bloqueante como solicitado.
+                // "bloqueando el botón de apertura" -> ya no se ejecuta window.open
+
+                // Mostrar botón de cierre para que el usuario pueda salir del estado de error
+                document.getElementById('modalCloseBtn').classList.remove('hidden');
+
+                updateStatus(relativePath, 'ERROR', 'red');
             }
         }
 
