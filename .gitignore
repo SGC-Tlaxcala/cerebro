@@ -16,6 +16,7 @@ cerebro.db
 competencia/
 .vs/
 *#*#
+manifest.js
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
