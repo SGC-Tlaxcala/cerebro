@@ -1,8 +1,11 @@
-# Hoja de Ruta - Refactorización y Mejoras
+- [x] 8. Crear pruebas unitarias para `build_cmi_portatil.py`.
+    - [x] 8.1 Verificar ejecución exitosa y generación de directorio.
+    - [x] 8.2 Verificar contenido del manifiesto y archivos copiados.
+
+- [x] 9. Agregar tiempo de ejecución a la salida de `build_cmi_portatil.py`.
+
 
 Este documento rastrea el progreso de las tareas de refactorización y desarrollo.
-
-0. Trabajando en la tarea: 6 :: 2026-01-20
 
 - [x] 1. Asegurar que solo se listen documentos activos en la app `docs`.
     - [x] 1.1 Modificar `Buscador` en `views.py` para filtrar `activo=True`.
@@ -20,6 +23,8 @@ Este documento rastrea el progreso de las tareas de refactorización y desarroll
 - [ ] 5. Mejorar visualización de estado 'Fuera de tiempo' en PAS.
     - [x] 5.1 Reemplazar texto por icono de alerta rojo en index.
     - [x] 5.2 Reemplazar texto 'Cerrada' por icono check-badge azul filled.
-- [ ] 6. Implementar App PMML (Poor-Man-Mailing-List).
 
+- [x] 6. Refactorizar generate_manifest.py como management command.
+    - [x] 6.1 Transformar script en BaseCommand.
+    - [x] 6.2 Generar pruebas unitarias para el comando.
 
