@@ -54,6 +54,14 @@
     - [x] 17.2 Tema 'valentine' y nuevas columnas en tabla.
     - [x] 17.3 Iconografía SVG embebida para estados.
 
+0. Trabajando en la tarea: 18 :: 2026-01-22T12:00:00
+
+- [ ] 18. Mejoras de Navegación y Estética (Task 5).
+    - [ ] 18.1 Copiar `logo.svg` a `assets/`.
+    - [ ] 18.2 UI: Header con logo, título "CMI Móvil", Filtros y Búsqueda.
+    - [ ] 18.3 JS: Lógica de filtrado y actualización de iconos.
+
+
 
 
 

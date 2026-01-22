@@ -42,13 +42,20 @@ class Command(BaseCommand):
         source_css_dir = os.path.join(static_docs_dir, "css")
         source_js_dir = os.path.join(static_docs_dir, "js")
 
-        # Copiar GIFs
-        for gif in ["scanning.gif", "fingerprint.gif", "ok.gif"]:
-            src_gif = os.path.join(source_img_dir, gif)
-            if os.path.exists(src_gif):
-                shutil.copy2(src_gif, os.path.join(assets_dir, gif))
+        # Copiar GIFs y Logo
+
+        assets_to_copy = ["scanning.gif", "fingerprint.gif", "ok.gif", "logo.svg"]
+
+        for asset in assets_to_copy:
+            # Intentar primero en docs/static/img
+            src_asset = os.path.join(source_img_dir, asset)
+
+            if os.path.exists(src_asset):
+                shutil.copy2(src_asset, os.path.join(assets_dir, asset))
             else:
-                self.stdout.write(self.style.WARNING(f"Asset no encontrado: {src_gif}"))
+                self.stdout.write(
+                    self.style.WARNING(f"Asset no encontrado: {src_asset}")
+                )
 
         # Copiar Librerías (DaisyUI, Tailwind)
         assets_map = {
@@ -64,7 +71,12 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.WARNING(f"Lib no encontrada: {src_path}"))
 
         # 2. Recolección de Documentos
-        active_docs = Documento.objects.filter(activo=True)
+        # 2. Recolección de Documentos
+        active_docs = (
+            Documento.objects.filter(activo=True)
+            .select_related("proceso", "tipo")
+            .prefetch_related("revision_set")
+        )
         manifest = {}
         errors = 0
 
@@ -105,7 +117,7 @@ class Command(BaseCommand):
                 "hash": file_hash,
                 "size": rev.archivo.size,
                 "nombre": doc.nombre,
-                "proceso": doc.proceso.proceso,
+                "proceso": doc.proceso.proceso if doc.proceso else "General",
                 "tipo": doc.tipo.tipo,
             }
 
@@ -155,6 +167,10 @@ class Command(BaseCommand):
                     file_path = os.path.join(root, file)
                     arcname = os.path.relpath(file_path, cmi_build_dir)
                     zipf.write(file_path, arcname)
+
+        # 6.5 Copia estática (Requisito 6)
+        static_zip_path = os.path.join(dest_dir, "cmi-portatil.zip")
+        shutil.copy2(zip_path, static_zip_path)
 
         # 7. Rotación (Mantener 4 más recientes)
         # Buscar zips en dest_dir

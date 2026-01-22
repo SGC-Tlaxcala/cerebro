@@ -45,7 +45,10 @@
             currentSlide = (currentSlide === 1) ? 2 : 1;
             const target = document.getElementById(`slide${currentSlide}`);
             if (target && !wrapper.classList.contains('hidden')) {
-                target.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+                carousel.scrollTo({
+                    left: target.offsetLeft,
+                    behavior: 'smooth'
+                });
             }
         }, 5000);
     });

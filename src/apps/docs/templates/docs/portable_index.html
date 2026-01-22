@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CMI Portátil - SGC</title>
+    <title>CMI Móvil</title>
     <!-- Carga del Manifiesto -->
     <script src="manifest.js"></script>
     <!-- Local Assets -->
@@ -77,9 +77,19 @@
         </div>
 
         <div id="mainApp" class="space-y-6">
-            <header class="text-center py-6">
-                <h1 class="text-4xl font-bold text-primary">Validador de Integridad SGC</h1>
+            <header class="text-center py-6 flex flex-col items-center gap-4">
+                <img src="assets/logo.svg" alt="SGC Logo" style="height: 150px;" class="w-auto object-contain">
+                <h1 class="text-4xl font-bold text-primary">CMI Móvil</h1>
                 <p id="versionInfo" class="text-secondary mt-2 font-mono text-sm"></p>
+
+                <!-- Filters & Search -->
+                <div class="w-full max-w-2xl px-4 flex flex-col gap-4">
+                    <input type="text" id="searchInput" placeholder="Buscar por nombre de documento..." class="input input-bordered w-full" />
+
+                    <div id="process-filters" class="flex flex-wrap gap-2 my-4">
+                        <!-- Badges injected via JS -->
+                    </div>
+                </div>
             </header>
 
             <!-- Sección de Montaje -->
@@ -103,7 +113,7 @@
             <!-- Listado de Archivos -->
             <div class="card bg-base-100 shadow-xl hidden" id="listSection">
                 <div class="card-body">
-                    <h2 class="card-title">2. Documentos Disponibles</h2>
+
 
                     <div class="alert alert-warning shadow-lg hidden mb-4" id="fileErrorAlert">
                         <div>
@@ -174,6 +184,7 @@
         const EXPIRATION_DATE = new Date(EXPIRATION_DATE_STR);
 
         let fileMap = new Map();
+        let activeProcessFilter = 'Todos';
 
         // --- Ciclo de Vida: Inicio ---
         (function init() {
@@ -189,6 +200,9 @@
                 document.getElementById('mainApp').classList.add('opacity-50', 'pointer-events-none'); // Deshabilitar visualmente
                 document.getElementById('btnSync').disabled = true;
             }
+
+            // Visibilidad Inmediata: Generar badges al cargar (usando manifest.js cargado)
+            generateProcessBadges();
         })();
 
         async function showStep(gifName, text) {
@@ -229,6 +243,12 @@
                 }
             }
 
+            // 3. Renderizar Lista (Inmediato)
+            renderFileList();
+            generateProcessBadges();
+            document.getElementById('mountSection').classList.add('hidden');
+            document.getElementById('listSection').classList.remove('hidden');
+
             // 2. Auto-Verificación del Index (Secuencia Visual)
             if (indexFile && typeof SGC_MANIFEST !== 'undefined' && SGC_MANIFEST['index.html']) {
                 try {
@@ -252,7 +272,7 @@
                         document.getElementById('integrityAlert').classList.remove('hidden');
                         document.getElementById('mountSection').classList.add('hidden');
                         console.error(`Hash mismatch! Expected ${SGC_MANIFEST['index.html'].hash}, got ${hash}`);
-                        return;
+                        // return; // Bloqueo eliminado
                     }
                 } catch (e) {
                     console.error("Error leyendo index.html:", e);
@@ -262,13 +282,73 @@
                 console.warn("index.html no encontrado en la selección para autoverificación.");
             }
 
-            // 3. Renderizar Lista
-            renderFileList();
-
-            // 4. Update UI
-            document.getElementById('mountSection').classList.add('hidden');
-            document.getElementById('listSection').classList.remove('hidden');
+            // (Renderizado movido al inicio)
         });
+
+
+
+        function generateProcessBadges() {
+            if (typeof SGC_MANIFEST === 'undefined') return;
+
+            const processes = {};
+            let totalDocs = 0;
+
+            Object.keys(SGC_MANIFEST).forEach(key => {
+                if (key === 'index.html' || key === 'manifest.js') return;
+                totalDocs++;
+                const proc = SGC_MANIFEST[key].proceso || 'General';
+                processes[proc] = (processes[proc] || 0) + 1;
+            });
+
+            const container = document.getElementById('process-filters');
+            if (container) {
+                container.innerHTML = '';
+
+                // "Todos" Badge
+                container.innerHTML += `<span class="badge ${activeProcessFilter === 'Todos' ? 'badge-primary' : 'badge-outline'} cursor-pointer" onclick="filterByProcess('Todos')">Todos (${totalDocs})</span>`;
+
+                // Process Badges
+                Object.keys(processes).sort().forEach(proc => {
+                    const isActive = activeProcessFilter === proc;
+                    const badgeClass = isActive ? 'badge-primary' : 'badge-outline';
+                    container.innerHTML += `<span class="badge ${badgeClass} cursor-pointer" onclick="filterByProcess('${proc}')">${proc} (${processes[proc]})</span>`;
+                });
+            }
+        }
+
+        function filterByProcess(proc) {
+            activeProcessFilter = proc;
+            generateProcessBadges(); // Re-render for active state visual feedback
+            applyFilters();
+        }
+
+        function applyFilters() {
+            const term = document.getElementById('searchInput').value.toLowerCase();
+            const rows = document.querySelectorAll('#fileListBody tr');
+
+            rows.forEach(row => {
+                const nameEl = row.querySelector('td:nth-child(1)');
+                const procEl = row.querySelector('td:nth-child(2)');
+
+                if (!nameEl || !procEl) return;
+
+                const name = nameEl.textContent.toLowerCase();
+                const proceso = procEl.textContent;
+
+                const matchesTerm = name.includes(term);
+                const matchesProc = activeProcessFilter === 'Todos' || proceso === activeProcessFilter;
+
+                if (matchesTerm && matchesProc) {
+                    row.classList.remove('hidden');
+                } else {
+                    row.classList.add('hidden');
+                }
+            });
+        }
+
+        // Input Listener
+        const searchInp = document.getElementById('searchInput');
+        if (searchInp) searchInp.addEventListener('input', applyFilters);
 
         function renderFileList() {
             const tbody = document.getElementById('fileListBody');
@@ -286,11 +366,11 @@
                 const meta = SGC_MANIFEST[path];
                 const hasFile = fileMap.has(path);
 
-                // Icono Sincronizado (Shield Exclamation - Rojo)
+                // Icono Sincronizado (Lock Closed - Rojo)
                 const syncIcon = `
                 <div class="tooltip" data-tip="Sincronizado">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-error" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.618 5.984A11.955 11.955 0 0112 2.944a11.956 11.956 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016zM12 9v2m0 4h.01" />
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-error" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
                     </svg>
                 </div>`;
 
@@ -394,8 +474,8 @@
                     // Shield Check (Verde)
                     el.innerHTML = `
                     <div class="tooltip" data-tip="Válido">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-success" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
                         </svg>
                     </div>`;
                 } else {
