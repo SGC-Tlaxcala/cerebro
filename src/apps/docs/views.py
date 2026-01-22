@@ -715,3 +715,9 @@ def reportes_context(request):
         return {"panic_reports": reportes}
     else:
         return {}
+
+
+class CMIMovilView(TemplateView):
+    """Vista de ayuda para el CMI Móvil."""
+
+    template_name = "docs/CMIMovil_help.html"
