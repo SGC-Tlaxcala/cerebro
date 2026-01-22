@@ -1,6 +1,6 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="es" data-theme="fantasy">
+<html lang="es" data-theme="valentine">
 
 <head>
     <meta charset="UTF-8">
@@ -118,8 +118,9 @@
                         <table class="table table-zebra w-full">
                             <thead>
                                 <tr>
-                                    <th>Documento</th>
-                                    <th>Ruta</th>
+                                    <th>Nombre</th>
+                                    <th>Proceso</th>
+                                    <th>Tipo</th>
                                     <th>Estado</th>
                                 </tr>
                             </thead>
@@ -280,24 +281,44 @@
                 if (path === 'index.html' || path === 'manifest.js') return;
 
                 const tr = document.createElement('tr');
-                tr.classList.add('hover', 'cursor-pointer'); // DaisyUI hover y cursor
+                tr.classList.add('hover', 'cursor-pointer');
 
-                // Verificar si tenemos el archivo
+                const meta = SGC_MANIFEST[path];
                 const hasFile = fileMap.has(path);
-                const statusHtml = hasFile
-                    ? `<div class="badge badge-success gap-2">Sincronizado</div>`
-                    : `<div class="badge badge-error gap-2">No encontrado</div>`;
+
+                // Icono Sincronizado (Shield Exclamation - Rojo)
+                const syncIcon = `
+                <div class="tooltip" data-tip="Sincronizado">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-error" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.618 5.984A11.955 11.955 0 0112 2.944a11.956 11.956 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016zM12 9v2m0 4h.01" />
+                    </svg>
+                </div>`;
+
+                // Icono No Encontrado (Gris)
+                const missingIcon = `
+                <div class="tooltip" data-tip="No encontrado">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-base-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>`;
+
+                const statusHtml = hasFile ? syncIcon : missingIcon;
+
+                // Render con nuevos campos: Nombre, Proceso, Tipo
+                const nombre = meta.nombre || path.split('/').pop();
+                const proceso = meta.proceso || '-';
+                const tipo = meta.tipo || 'DOC';
 
                 tr.innerHTML = `
-                    <td><div class="font-bold">${path.split('/').pop()}</div></td>
-                    <td class="text-xs opacity-70">${path}</td>
+                    <td><div class="font-bold text-sm text-left">${nombre}</div></td>
+                    <td class="text-xs text-left">${proceso}</td>
+                    <td><div class="badge badge-outline text-xs">${tipo}</div></td>
                     <td><span id="status-${btoa(path)}">${statusHtml}</span></td>
                 `;
 
-                // Solo agregar listener si tenemos el archivo
                 if (hasFile) {
                     const file = fileMap.get(path);
-                    const expectedHash = SGC_MANIFEST[path].hash;
+                    const expectedHash = meta.hash;
                     tr.addEventListener('click', () => runValidationSequence(file, expectedHash, path));
                 }
 
@@ -370,9 +391,21 @@
             const el = document.getElementById(`status-${btoa(path)}`);
             if (el) {
                 if (isValid) {
-                    el.innerHTML = `<div class="badge badge-success gap-2">Válido</div>`;
+                    // Shield Check (Verde)
+                    el.innerHTML = `
+                    <div class="tooltip" data-tip="Válido">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                        </svg>
+                    </div>`;
                 } else {
-                    el.innerHTML = `<div class="badge badge-error gap-2">Corrupto</div>`;
+                    // Shield Exclamation (Rojo)
+                    el.innerHTML = `
+                    <div class="tooltip" data-tip="Corrupto">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-error" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                    </div>`;
                 }
             }
         }

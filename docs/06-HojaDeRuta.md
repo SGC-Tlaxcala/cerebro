@@ -47,6 +47,14 @@
     - [x] 16.1 Copiar DaisyUI y Tailwind a `assets/`.
     - [x] 16.2 Refactorizar `portable_index.html` con clases DaisyUI/Tailwind.
 
+0. Trabajando en la tarea: 17 :: 2026-01-22T11:40:00
+
+- [x] 17. Mejoras de UI y Densidad de Información (Task 4).
+    - [x] 17.1 Actualizar `build_cmi_portatil` con metadatos extendidos.
+    - [x] 17.2 Tema 'valentine' y nuevas columnas en tabla.
+    - [x] 17.3 Iconografía SVG embebida para estados.
+
+
 
 
 

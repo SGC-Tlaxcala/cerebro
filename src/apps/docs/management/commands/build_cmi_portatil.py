@@ -101,7 +101,13 @@ class Command(BaseCommand):
                 file_hash = sha256.hexdigest()
 
             # 2.3 Agregar al manifiesto
-            manifest[rel_path] = {"hash": file_hash, "size": rev.archivo.size}
+            manifest[rel_path] = {
+                "hash": file_hash,
+                "size": rev.archivo.size,
+                "nombre": doc.nombre,
+                "proceso": doc.proceso.proceso,
+                "tipo": doc.tipo.tipo,
+            }
 
             # Validación opcional contra DB (si existiera campo hash confiable)
             if rev.checksum and file_hash != rev.checksum:
