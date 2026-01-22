@@ -41,6 +41,13 @@
     - [x] 15.1 Copiar GIFs a carpeta assets/ en `build_cmi_portatil`.
     - [x] 15.2 Implementar modal de pasos (Scanning -> Fingerprint -> OK) en `portable_index`.
 
+0. Trabajando en la tarea: 16 :: 2026-01-21T15:55:00
+
+- [x] 16. Diseño Visual Definitivo (Task 3).
+    - [x] 16.1 Copiar DaisyUI y Tailwind a `assets/`.
+    - [x] 16.2 Refactorizar `portable_index.html` con clases DaisyUI/Tailwind.
+
+
 
 
 

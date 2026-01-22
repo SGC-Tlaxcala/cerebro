@@ -1,202 +1,27 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="fantasy">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Validador de Integridad SGC</title>
+    <title>CMI Portátil - SGC</title>
     <!-- Carga del Manifiesto -->
     <script src="manifest.js"></script>
+    <!-- Local Assets -->
+    <script src="assets/tailwind.min.js"></script>
+    <link href="assets/daisyui.min.css" rel="stylesheet" type="text/css" />
+
     <style>
-        :root {
-            --primary-color: #2563eb;
-            --success-color: #16a34a;
-            --warning-color: #ca8a04;
-            --error-color: #dc2626;
-            --bg-color: #f3f4f6;
-            --card-bg: #ffffff;
-            --text-main: #1f2937;
-            --text-secondary: #6b7280;
-            --border-color: #e5e7eb;
-        }
-
-        body {
-            font-family: 'Segoe UI', system-ui, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            margin: 0;
-            padding: 2rem;
-            line-height: 1.5;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        header {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        h1 {
-            color: var(--primary-color);
-            margin-bottom: 0.5rem;
-        }
-
-        .section-card {
-            background: var(--card-bg);
-            padding: 2rem;
-            border-radius: 0.75rem;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            margin-bottom: 2rem;
-        }
-
-        .btn-primary {
-            background-color: var(--primary-color);
-            color: white;
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 0.5rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            font-size: 1rem;
-        }
-
-        .btn-primary:hover {
-            background-color: #1d4ed8;
-        }
-
-        .btn-primary:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        .d-none {
-            display: none;
-        }
-
-        /* Alertas */
-        .alert {
-            padding: 1rem;
-            border-radius: 0.5rem;
-            margin-bottom: 1rem;
-            font-weight: 600;
-            text-align: center;
-        }
-
-        .alert-error {
-            background-color: #fee2e2;
-            color: #991b1b;
-            border: 1px solid #fecaca;
-        }
-
-        .alert-warning {
-            background-color: #fef9c3;
-            color: #854d0e;
-            border: 1px solid #fde047;
-        }
-
-        .alert-success {
-            background-color: #dcfce7;
-            color: #15803d;
-            border: 1px solid #bbf7d0;
-        }
-
-        /* Tabla */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-        }
-
-        th,
-        td {
-            padding: 0.75rem 1.5rem;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        th {
-            background-color: #f9fafb;
-            font-weight: 600;
-            color: var(--text-secondary);
-        }
-
-        tr.clickable {
-            cursor: pointer;
-            transition: background-color 0.1s;
-        }
-
-        tr.clickable:hover {
-            background-color: #f3f4f6;
-        }
-
-        /* Modal / Overlay */
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-        }
-
+        /* Custom Overrides only if needed */
         .spinner {
             border: 4px solid #f3f3f3;
-            border-top: 4px solid var(--primary-color);
+            border-top: 4px solid var(--p);
+            /* Primary color from daisyui */
             border-radius: 50%;
             width: 40px;
             height: 40px;
             animation: spin 1s linear infinite;
-        }
-
-        /* Process Modal Styles */
-        .modal-backdrop {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.75);
-            backdrop-filter: blur(4px);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-        }
-
-        .modal-card {
-            background: var(--card-bg);
-            padding: 2.5rem;
-            border-radius: 1rem;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            text-align: center;
-            max-width: 400px;
-            width: 90%;
-        }
-
-        .modal-img {
-            width: 100px;
-            height: 100px;
-            margin-bottom: 1.5rem;
-            object-fit: contain;
-        }
-
-        .modal-text {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--text-main);
-            margin: 0;
         }
 
         @keyframes spin {
@@ -208,85 +33,136 @@
                 transform: rotate(360deg);
             }
         }
+
+        .clickable {
+            cursor: pointer;
+        }
+
+        .clickable:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
     </style>
 </head>
 
-<body>
-    <div class="container">
+<body class="min-h-screen bg-base-200">
+    <div class="container mx-auto p-4">
         <!-- Bloqueo por Expiración -->
         <div id="expirationBlock" class="hidden">
-            <div class="alert alert-error">
-                <h1>Versión Obsoleta</h1>
-                <p>Esta copia del CMI Portátil ha expirado (Vigencia: 15 días).</p>
-                <p>Por favor, solicite una nueva versión actualizada.</p>
+            <div class="alert alert-error shadow-lg">
+                <div>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <div>
+                        <h3 class="font-bold">Versión Obsoleta</h3>
+                        <div class="text-xs">Esta copia del CMI Portátil ha expirado (Vigencia: 15 días). Solicite una nueva versión.</div>
+                    </div>
+                </div>
             </div>
         </div>
 
         <!-- Alerta de Integridad Comprometida (Index) -->
-        <div id="integrityAlert" class="hidden">
-            <div class="alert alert-error">
-                <h1>⚠️ HERRAMIENTA ALTERADA</h1>
-                <p>Integridad comprometida: El código de este visor no coincide con el manifiesto oficial.</p>
+        <div id="integrityAlert" class="hidden mb-4">
+            <div class="alert alert-error shadow-lg">
+                <div>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <div>
+                        <h3 class="font-bold">⚠️ HERRAMIENTA ALTERADA</h3>
+                        <div class="text-xs">Integridad comprometida: El código de este visor no coincide con el manifiesto oficial.</div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div id="mainApp">
-            <header>
-                <h1>Validador de Integridad SGC</h1>
-                <p id="versionInfo" class="text-secondary"></p>
+        <div id="mainApp" class="space-y-6">
+            <header class="text-center py-6">
+                <h1 class="text-4xl font-bold text-primary">Validador de Integridad SGC</h1>
+                <p id="versionInfo" class="text-secondary mt-2 font-mono text-sm"></p>
             </header>
 
             <!-- Sección de Montaje -->
-            <div class="section-card" id="mountSection">
-                <h2>1. Sincronización</h2>
-                <p>Haga clic en el botón y seleccione la carpeta que contiene el CMI Portátil (incluyendo este archivo).</p>
-                <button class="btn-primary" id="btnSync" onclick="document.getElementById('dirInput').click()">
-                    Sincronizar Directorio SGC
-                </button>
-                <input type="file" id="dirInput" webkitdirectory directory multiple class="d-none">
+            <div class="card bg-base-100 shadow-xl" id="mountSection">
+                <div class="card-body text-center items-center">
+                    <h2 class="card-title">1. Sincronización</h2>
+                    <p>Haga clic en el botón y seleccione la carpeta que contiene el CMI Portátil.</p>
+                    <div class="card-actions justify-center mt-4">
+                        <button class="btn btn-primary btn-wide" id="btnSync" onclick="document.getElementById('dirInput').click()">
+                            Sincronizar Directorio SGC
+                        </button>
+                    </div>
+                    <input type="file" id="dirInput" webkitdirectory directory multiple class="hidden">
+                    <div id="step1-spinner" class="hidden mt-4">
+                        <span class="loading loading-spinner loading-lg text-primary"></span>
+                        <p class="text-xs mt-2">Analizando archivos...</p>
+                    </div>
+                </div>
             </div>
 
             <!-- Listado de Archivos -->
-            <div class="section-card hidden" id="listSection">
-                <h2>2. Documentos Disponibles</h2>
-                <div class="alert alert-warning hidden" id="fileErrorAlert"></div>
-                <div id="statusAlert" class="hidden"></div>
+            <div class="card bg-base-100 shadow-xl hidden" id="listSection">
+                <div class="card-body">
+                    <h2 class="card-title">2. Documentos Disponibles</h2>
 
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Documento</th>
-                            <th>Ruta</th>
-                            <th>Estado</th>
-                        </tr>
-                    </thead>
-                    <tbody id="fileListBody"></tbody>
-                </table>
+                    <div class="alert alert-warning shadow-lg hidden mb-4" id="fileErrorAlert">
+                        <div>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                            <span id="fileErrorText"></span>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="table table-zebra w-full">
+                            <thead>
+                                <tr>
+                                    <th>Documento</th>
+                                    <th>Ruta</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody id="fileListBody"></tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Process Modal -->
-    <div id="processModal" class="modal-backdrop hidden">
-        <div class="modal-card">
-            <img id="processImg" class="modal-img" src="" alt="Procesando...">
-            <p id="processText" class="modal-text"></p>
-            <button id="modalCloseBtn" class="btn-primary mt-4 hidden" onclick="document.getElementById('processModal').classList.add('hidden')">Cerrar</button>
+    <!-- Process Modal (DaisyUI) -->
+    <input type="checkbox" id="process_modal_toggle" class="modal-toggle" />
+    <div class="modal" id="processModal" role="dialog">
+        <div class="modal-box text-center">
+            <h3 class="font-bold text-lg mb-4">Validando Integridad</h3>
+            <div class="flex justify-center mb-4">
+                <img id="processImg" class="w-24 h-24 object-contain" src="" alt="Procesando...">
+            </div>
+            <p id="processText" class="py-4 text-xl font-semibold"></p>
+            <div class="modal-action justify-center hidden" id="modalCloseAction">
+                <button class="btn btn-sm" onclick="closeProcessModal()">Cerrar</button>
+            </div>
         </div>
     </div>
+    <!-- Script para compatibilidad de cierre manual -->
+    <script>
+        function openProcessModal() { document.getElementById('process_modal_toggle').checked = true; }
+        function closeProcessModal() { document.getElementById('process_modal_toggle').checked = false; }
+    </script>
 
-    <!-- Success Modal -->
-    <div id="successAlert" class="overlay hidden">
-        <div class="section-card" style="margin: 0; text-align: center; max-width: 400px;">
-            <h2 style="color: var(--success-color);">✅ Validación Exitosa</h2>
-            <p>Archivo válido y vigente.</p>
-            <button class="btn-primary" onclick="document.getElementById('successAlert').classList.add('hidden')">Aceptar</button>
+    <!-- Success Modal (DaisyUI Alert inside Modal or just Alert) -->
+    <!-- Reutilizamos el modal de proceso para éxito o añadimos uno nuevo si se prefiere. 
+         Por simplicidad, mantendré el Success Modal aparte como DaisyUI Modal. -->
+    <input type="checkbox" id="success_modal_toggle" class="modal-toggle" />
+    <div class="modal">
+        <div class="modal-box text-center">
+            <h3 class="text-success text-2xl font-bold">✅ Validación Exitosa</h3>
+            <p class="py-4">Archivo válido y vigente.</p>
+            <div class="modal-action justify-center">
+                <label for="success_modal_toggle" class="btn btn-primary">Aceptar</label>
+            </div>
         </div>
-    </div>
-
-    <!-- Loading Overlay -->
-    <div id="loadingOverlay" class="overlay hidden">
-        <div class="spinner"></div>
     </div>
 
     <script>
@@ -296,11 +172,11 @@
         const EXPIRATION_DATE_STR = "{{ expiration_date|date:'c' }}";
         const EXPIRATION_DATE = new Date(EXPIRATION_DATE_STR);
 
-        let fileMap = new Map(); // Mapa de rutas normalizadas -> File Object
+        let fileMap = new Map();
 
         // --- Ciclo de Vida: Inicio ---
         (function init() {
-            // 1. Verificar Expiración
+            // Verificar Expiración
             const now = new Date();
             const timeLeft = EXPIRATION_DATE - now;
             const daysLeft = Math.ceil(timeLeft / (1000 * 60 * 60 * 24));
@@ -309,51 +185,39 @@
 
             if (now > EXPIRATION_DATE) {
                 document.getElementById('expirationBlock').classList.remove('hidden');
-                document.getElementById('mainApp').classList.add('hidden');
-                document.getElementById('btnSync').disabled = true; // Deshabilitar explícitamente
+                document.getElementById('mainApp').classList.add('opacity-50', 'pointer-events-none'); // Deshabilitar visualmente
+                document.getElementById('btnSync').disabled = true;
             }
         })();
 
         async function showStep(gifName, text) {
-            const modal = document.getElementById('processModal');
             const img = document.getElementById('processImg');
             const txt = document.getElementById('processText');
-            const btn = document.getElementById('modalCloseBtn');
+            const action = document.getElementById('modalCloseAction');
 
-            modal.classList.remove('hidden');
-            btn.classList.add('hidden'); // Asegurar botón oculto durante pasos
+            // Asegurar que el modal esté abierto
+            openProcessModal();
+            action.classList.add('hidden'); // Ocultar cerrar
 
-            img.style.display = 'block'; // Asegurar visible
+            img.style.display = 'block';
             img.src = 'assets/' + gifName;
 
             txt.textContent = text;
-            txt.style.color = 'var(--text-main)'; // Restaurar color por defecto
+            txt.className = "py-4 text-xl font-semibold"; // Reset class
 
             await new Promise(resolve => setTimeout(resolve, 1000));
         }
 
         // --- Manejador de Archivos (Directory Picker via Input) ---
         document.getElementById('dirInput').addEventListener('change', async (event) => {
-            // showLoading(true); // Reemplazado por secuencia de pasos
             const files = event.target.files;
-
-            if (!files || files.length === 0) {
-                return;
-            }
+            if (!files || files.length === 0) return;
 
             fileMap.clear();
             let indexFile = null;
 
-            // 1. Mapeo y Normalización
-            // Estrategia: Detectar la carpeta raíz.
-            // Si el usuario selecciona "CMI_Folder", los archivos vendrán como "CMI_Folder/docs/...", "CMI_Folder/index.html"
-            // Queremos mapear "docs/..." -> File
-
             for (let file of files) {
                 const parts = file.webkitRelativePath.split('/');
-                // parts[0] es la carpeta raíz contenedora.
-                // parts.slice(1) es la ruta relativa interna.
-
                 if (parts.length > 1) {
                     const relativeKey = parts.slice(1).join('/');
                     fileMap.set(relativeKey, file);
@@ -364,7 +228,7 @@
                 }
             }
 
-            // 2. Auto-Verificación del Index (Si se encontró)
+            // 2. Auto-Verificación del Index (Secuencia Visual)
             if (indexFile && typeof SGC_MANIFEST !== 'undefined' && SGC_MANIFEST['index.html']) {
                 try {
                     // Paso 1
@@ -378,11 +242,12 @@
                     if (hash === SGC_MANIFEST['index.html'].hash) {
                         // Paso 3
                         await showStep('ok.gif', 'Herramienta válida');
-                        document.getElementById('processModal').classList.add('hidden');
+                        closeProcessModal();
+
                         console.log("Index integrity verified.");
-                        document.getElementById('successAlert').classList.remove('hidden');
+                        document.getElementById('success_modal_toggle').checked = true;
                     } else {
-                        document.getElementById('processModal').classList.add('hidden');
+                        closeProcessModal();
                         document.getElementById('integrityAlert').classList.remove('hidden');
                         document.getElementById('mountSection').classList.add('hidden');
                         console.error(`Hash mismatch! Expected ${SGC_MANIFEST['index.html'].hash}, got ${hash}`);
@@ -390,7 +255,7 @@
                     }
                 } catch (e) {
                     console.error("Error leyendo index.html:", e);
-                    document.getElementById('processModal').classList.add('hidden');
+                    closeProcessModal();
                 }
             } else {
                 console.warn("index.html no encontrado en la selección para autoverificación.");
@@ -415,17 +280,18 @@
                 if (path === 'index.html' || path === 'manifest.js') return;
 
                 const tr = document.createElement('tr');
-                tr.classList.add('clickable');
+                tr.classList.add('hover', 'cursor-pointer'); // DaisyUI hover y cursor
 
                 // Verificar si tenemos el archivo
                 const hasFile = fileMap.has(path);
-                const statusText = hasFile ? "Sincronizado" : "No encontrado";
-                const statusClass = hasFile ? "text-secondary" : "text-danger";
+                const statusHtml = hasFile
+                    ? `<div class="badge badge-success gap-2">Sincronizado</div>`
+                    : `<div class="badge badge-error gap-2">No encontrado</div>`;
 
                 tr.innerHTML = `
-                    <td>${path.split('/').pop()}</td>
-                    <td>${path}</td>
-                    <td><span id="status-${btoa(path)}" class="${statusClass}">${statusText}</span></td>
+                    <td><div class="font-bold">${path.split('/').pop()}</div></td>
+                    <td class="text-xs opacity-70">${path}</td>
+                    <td><span id="status-${btoa(path)}">${statusHtml}</span></td>
                 `;
 
                 // Solo agregar listener si tenemos el archivo
@@ -442,10 +308,6 @@
         async function runValidationSequence(file, expectedHash, relativePath) {
             const alertBox = document.getElementById('fileErrorAlert');
             alertBox.classList.add('hidden');
-
-            // Reset modal state
-            document.getElementById('processImg').src = '';
-            document.getElementById('processText').textContent = '';
 
             try {
                 // --- Paso 1: Vigencia ---
@@ -472,8 +334,8 @@
                 await showStep('ok.gif', 'Archivo válido');
 
                 // Cerrar modal y actualizar estado
-                document.getElementById('processModal').classList.add('hidden');
-                updateStatus(relativePath, 'Válido', 'green');
+                closeProcessModal();
+                updateStatus(relativePath, true); // true = valid
 
                 // Abrir archivo
                 const url = URL.createObjectURL(file);
@@ -483,37 +345,35 @@
                 setTimeout(() => URL.revokeObjectURL(url), 60000);
 
             } catch (err) {
-                // Manejo de Errores: Mantener modal o mostrar alerta
                 console.error(err);
-
-                // Si estamos en el modal, cambiar a estado de error visualmente podría ser mejor, 
-                // pero bajo estricta instrucción "modal debe permanecer abierto mostrando el error":
-                const img = document.getElementById('processImg');
-                img.src = ''; // O un icono de error si tuviéramos
-                img.style.display = 'none'; // ocultar gif si falla
 
                 const txt = document.getElementById('processText');
                 txt.textContent = err.message;
-                txt.style.color = 'var(--error-color)';
+                txt.className = "py-4 text-xl font-semibold text-error"; // Error color
 
-                // No cerramos el modal automáticmante en error para que el usuario lo lea.
-                // Opcional: permitir cerrar al hacer click fuera? Por ahora bloqueante como solicitado.
-                // "bloqueando el botón de apertura" -> ya no se ejecuta window.open
+                const img = document.getElementById('processImg');
+                img.style.display = 'none';
 
                 // Mostrar botón de cierre para que el usuario pueda salir del estado de error
-                document.getElementById('modalCloseBtn').classList.remove('hidden');
+                document.getElementById('modalCloseAction').classList.remove('hidden');
 
-                updateStatus(relativePath, 'ERROR', 'red');
+                updateStatus(relativePath, false); // false = invalid
+
+                // Mostrar error en lista también (opcional)
+                document.getElementById('fileErrorText').textContent = err.message;
+                document.getElementById('fileErrorAlert').classList.remove('hidden');
             }
         }
 
         // --- Helpers ---
-        function updateStatus(path, text, color) {
+        function updateStatus(path, isValid) {
             const el = document.getElementById(`status-${btoa(path)}`);
             if (el) {
-                el.textContent = text;
-                el.style.color = color;
-                el.style.fontWeight = 'bold';
+                if (isValid) {
+                    el.innerHTML = `<div class="badge badge-success gap-2">Válido</div>`;
+                } else {
+                    el.innerHTML = `<div class="badge badge-error gap-2">Corrupto</div>`;
+                }
             }
         }
 

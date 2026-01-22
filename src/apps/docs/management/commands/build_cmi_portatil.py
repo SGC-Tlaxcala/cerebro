@@ -35,17 +35,33 @@ class Command(BaseCommand):
         os.makedirs(docs_dir)
         os.makedirs(assets_dir)
 
-        # 1.1 Copiar Assets (GIFs)
+        # 1.1 Copiar Assets (GIFs y Librerías Static)
         # Asumiendo estructura src/apps/docs/static/docs/images/
-        # APPS_DIR es src/apps. src/apps/docs/static/docs/images
-        source_img_dir = settings.APPS_DIR.child("docs", "static", "docs", "images")
+        static_docs_dir = settings.APPS_DIR.child("docs", "static", "docs")
+        source_img_dir = os.path.join(static_docs_dir, "images")
+        source_css_dir = os.path.join(static_docs_dir, "css")
+        source_js_dir = os.path.join(static_docs_dir, "js")
 
+        # Copiar GIFs
         for gif in ["scanning.gif", "fingerprint.gif", "ok.gif"]:
-            src_gif = source_img_dir.child(gif)
+            src_gif = os.path.join(source_img_dir, gif)
             if os.path.exists(src_gif):
                 shutil.copy2(src_gif, os.path.join(assets_dir, gif))
             else:
                 self.stdout.write(self.style.WARNING(f"Asset no encontrado: {src_gif}"))
+
+        # Copiar Librerías (DaisyUI, Tailwind)
+        assets_map = {
+            "daisyui.min.css": source_css_dir,
+            "tailwind.min.js": source_js_dir,
+        }
+
+        for filename, source_dir in assets_map.items():
+            src_path = os.path.join(source_dir, filename)
+            if os.path.exists(src_path):
+                shutil.copy2(src_path, os.path.join(assets_dir, filename))
+            else:
+                self.stdout.write(self.style.WARNING(f"Lib no encontrada: {src_path}"))
 
         # 2. Recolección de Documentos
         active_docs = Documento.objects.filter(activo=True)
