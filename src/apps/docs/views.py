@@ -29,7 +29,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.mail import send_mail
 from django.contrib import messages
 import os
-import requests
 import logging
 from apps.docs.models import Documento, Proceso, Tipo, Revision, Reporte, Notificacion
 from apps.profiles.models import Profile
@@ -345,9 +344,9 @@ class DocAdd(LoginRequiredMixin, CreateView):
 
 def envio_de_correo(request, destinatarios, asunto, documento, revision, autor):
     """
-    Envía notificaciones por correo electrónico a una lista de destinatarios.
+    Envía notificaciones por correo electrónico a una lista de destinatarios utilizando SMTP.
     """
-    from_email = "Cerebro <cerebro@cmi.lat>"
+    from_email = os.getenv("SMTP_USER", "cerebro@cmi.lat")
     for destinatario_profile in destinatarios:
         nombre_usuario = destinatario_profile.user.get_full_name()
         if not nombre_usuario:
@@ -369,7 +368,7 @@ def envio_de_correo(request, destinatarios, asunto, documento, revision, autor):
             send_mail(
                 asunto,
                 "",  # Mensaje de texto plano vacío
-                from_email,
+                f"SGC Tlaxcala <{from_email}>",
                 [destinatario_profile.user.email],
                 html_message=mensaje_html,
                 fail_silently=False,
@@ -383,20 +382,10 @@ def envio_de_correo(request, destinatarios, asunto, documento, revision, autor):
 
 def send_message(request, destinatarios, asunto, documento, revision, autor):
     """
-    Envía notificaciones por correo electrónico a una lista de destinatarios utilizando la API de Mailgun.
+    Envía notificaciones por correo electrónico a una lista de destinatarios utilizando SMTP.
     """
     logger = logging.getLogger(__name__)
-    logging.getLogger("urllib3").setLevel(logging.WARNING)
-    api_key = os.getenv("EMAIL_API_KEY")
-    from_email = "Cerebro <cerebro@cmi.lat>"
-
-    if not api_key:
-        logger.critical("No se encontró la variable de entorno EMAIL_API_KEY.")
-        messages.error(
-            request,
-            "Error de configuración del servidor: no se pudo enviar la notificación.",
-        )
-        return
+    from_email = os.getenv("SMTP_USER", "cerebro@cmi.lat")
 
     for destinatario_profile in destinatarios:
         nombre_usuario = destinatario_profile.user.get_full_name()
@@ -417,18 +406,15 @@ def send_message(request, destinatarios, asunto, documento, revision, autor):
         )
 
         try:
-            response = requests.post(
-                "https://api.mailgun.net/v3/cmi.lat/messages",
-                auth=("api", api_key),
-                data={
-                    "from": from_email,
-                    "to": f"{nombre_usuario} <{destinatario_profile.user.email}>",
-                    "subject": asunto,
-                    "html": mensaje_html,
-                },
+            send_mail(
+                asunto,
+                "",
+                f"SGC Tlaxcala <{from_email}>",
+                [destinatario_profile.user.email],
+                html_message=mensaje_html,
+                fail_silently=False,
             )
-            response.raise_for_status()
-        except requests.exceptions.RequestException as e:
+        except Exception as e:
             logger.error(
                 f"Error al enviar notificación a {destinatario_profile.user.email}: {e}"
             )

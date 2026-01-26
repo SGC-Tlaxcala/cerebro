@@ -1,9 +1,9 @@
 import os
-import requests
 import logging
 import pytz
 
 from django.core.management.base import BaseCommand
+from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.utils import timezone
 
@@ -11,7 +11,6 @@ from apps.files.models import Revision, Notificacion
 from apps.pmml.models import Subscriber
 
 logger = logging.getLogger(__name__)
-logging.getLogger("urllib3").setLevel(logging.WARNING)
 
 
 class Command(BaseCommand):
@@ -49,40 +48,36 @@ class Command(BaseCommand):
         asunto = f"Documentos actualizados a la fecha {context['fecha_notificacion']}"
         mensaje_html = render_to_string("docs/notificacion_periodica.html", context)
 
-        api_key = os.getenv("EMAIL_API_KEY")
-        from_email = "Cerebro <cerebro@cmi.lat>"
+        smtp_user = os.getenv("SMTP_USER")
+        from_email = f"SGC Tlaxcala <{smtp_user}>"
 
-        if not api_key:
+        if not smtp_user:
             logger.critical(
-                f"[{ahora.strftime('%Y-%m-%d %H:%M')}] No se encontró la variable de entorno EMAIL_API_KEY. No se pueden enviar notificaciones."
+                f"[{ahora.strftime('%Y-%m-%d %H:%M')}] No se encontró la variable de entorno SMTP_USER. No se pueden enviar notificaciones."
             )
-            self.stdout.write(self.style.ERROR("Error: EMAIL_API_KEY no configurada."))
+            self.stdout.write(self.style.ERROR("Error: SMTP_USER no configurada."))
             return
+        
+        texto_plano = (
+            "Se han actualizado documentos en el sistema CMI.\n\n"
+            "Puede revisar los cambios ingresando al sistema.\n\n"
+            "Saludos,\n"
+            "Equipo CMI"
+        )
 
         for subscriber in destinatarios:
-            to_email = f"{subscriber.nombre_completo} <{subscriber.email_full}>"
+            to_email = subscriber.email_full
 
             try:
-                response = requests.post(
-                    "https://api.mailgun.net/v3/cmi.lat/messages",
-                    auth=("api", api_key),
-                    data={
-                        "from": from_email,
-                        "to": to_email,
-                        "subject": asunto,
-                        "html": mensaje_html,
-                        "text": (
-                            "Se han actualizado documentos en el sistema CMI.\n\n"
-                            "Puede revisar los cambios ingresando al sistema.\n\n"
-                            "Saludos,\n"
-                            "Equipo CMI"
-                        ),
-                        "h:Reply-To": "cerebro@cmi.lat",
-                        "h:List-ID": "Notificaciones CMI <notificaciones.cmi.lat>",
-                    },
+                send_mail(
+                    asunto,
+                    texto_plano,
+                    from_email,
+                    [to_email],
+                    html_message=mensaje_html,
+                    fail_silently=False,
                 )
-                response.raise_for_status()
-            except requests.exceptions.RequestException as e:
+            except Exception as e:
                 logger.error(
                     f"[{ahora.strftime('%Y-%m-%d %H:%M')}] Error al enviar notificación a {subscriber.email_full}: {e}"
                 )

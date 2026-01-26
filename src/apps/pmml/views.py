@@ -1,5 +1,4 @@
 import os
-import requests
 import uuid
 import logging
 from django.shortcuts import render, redirect, get_object_or_404
@@ -48,10 +47,16 @@ def verify(request, token):
 
 
 def send_activation_email(subscriber, request):
-    api_key = os.getenv("EMAIL_API_KEY")
-    if not api_key:
+    """
+    Envía correo de activación usando SMTP.
+    """
+    from django.core.mail import send_mail
+    from django.conf import settings
+    
+    smtp_user = os.getenv("SMTP_USER")
+    if not smtp_user:
         logger.error(
-            "EMAIL_API_KEY no configurada. No se pudo enviar el correo de activación."
+            "SMTP_USER no configurada. No se pudo enviar el correo de activación."
         )
         return
 
@@ -61,8 +66,8 @@ def send_activation_email(subscriber, request):
     relative_path = reverse("pmml:verify", args=[subscriber.token])
     activation_link = f"http://10.29.0.35{relative_path}"
 
-    from_email = "Cerebro <cerebro@cmi.lat>"
-    to_email = f"{subscriber.nombre_completo} <{subscriber.email_full}>"
+    from_email = f"SGC Tlaxcala <{smtp_user}>"
+    to_email = subscriber.email_full
     subject = "Confirma tu suscripción a Notificaciones CMI"
 
     html_content = f"""
@@ -72,19 +77,17 @@ def send_activation_email(subscriber, request):
     <p>Si no solicitaste esto, puedes ignorar este correo.</p>
     <p>Saludos,<br>Equipo CMI</p>
     """
+    
+    text_content = f"Hola {subscriber.nombre_completo}, confirma tu suscripción en: {activation_link}"
 
     try:
-        response = requests.post(
-            "https://api.mailgun.net/v3/cmi.lat/messages",
-            auth=("api", api_key),
-            data={
-                "from": from_email,
-                "to": to_email,
-                "subject": subject,
-                "html": html_content,
-                "text": f"Hola {subscriber.nombre_completo}, confirma tu suscripción en: {activation_link}",
-            },
+        send_mail(
+            subject,
+            text_content,
+            from_email,
+            [to_email],
+            html_message=html_content,
+            fail_silently=False,
         )
-        response.raise_for_status()
-    except requests.exceptions.RequestException as e:
+    except Exception as e:
         logger.error(f"Error al enviar correo a {to_email}: {e}")

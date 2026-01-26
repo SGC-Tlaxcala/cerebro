@@ -43,7 +43,6 @@ THIRD_PARTY_APPS = [
     "guardian",
     "tinymce",
     "captcha",
-    "anymail",
     "compressor",
     "rest_framework",  # added so DRF templates (browsable API) are found
 ]
@@ -221,19 +220,17 @@ AUTHENTICATION_BACKENDS = (
     "guardian.backends.ObjectPermissionBackend",
 )
 
-# Caso no. 35, Backend para correo
-EMAIL_HOST = env("EMAIL_HOST")
+# Caso no. 35, Backend para correo (SMTP)
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = env("EMAIL_HOST", default="smtp.mailgun.org")
 EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=False)
-EMAIL_USE_SSL = env.bool("EMAIL_USE_SSL", default=False)
-EMAIL_PORT = env("EMAIL_PORT")
-EMAIL_HOST_USER = env("EMAIL_HOST_USER")
-EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
-DEFAULT_FROM_EMAIL = "Cerebro <cerebro@sgctlaxcala.com.mx>"
-
-ANYMAIL = {
-    "MAILGUN_API_KEY": env("EMAIL_HOST_USER"),
-    "MAILGUN_SENDER_DOMAIN": env("EMAIL_HOST_PASSWORD"),
-}
+EMAIL_USE_SSL = env.bool("EMAIL_USE_SSL", default=True)
+EMAIL_PORT = env.int("EMAIL_PORT", default=465)
+EMAIL_HOST_USER = env("SMTP_USER")
+EMAIL_HOST_PASSWORD = env("SMTP_PASS")
+DEFAULT_FROM_EMAIL = f"SGC Tlaxcala <{env('SMTP_USER')}>"
+SERVER_EMAIL = env("SMTP_USER")
+EMAIL_TIMEOUT = 15
 
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
